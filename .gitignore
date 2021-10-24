@@ -1,0 +1,5 @@
+*~
+
+# python stuff
+__pycache__/*
+*.pyc
