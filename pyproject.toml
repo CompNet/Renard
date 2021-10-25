@@ -6,7 +6,7 @@ authors = ["Aethor <oow.autre@gmail.com>"]
 license = "GPL"
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "^3.8"
 torch = "^1.10.0"
 transformers = "^4.11.3"
 nltk = "^3.6.5"
