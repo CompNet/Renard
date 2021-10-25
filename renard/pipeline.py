@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Tuple, Set, Optional
+from typing import Any, Dict, Tuple, Set, Optional
 from tqdm import tqdm
 
 
@@ -16,7 +16,7 @@ class PipelineStep:
 class Pipeline:
     """A flexible NLP pipeline"""
 
-    def __init__(self, steps: Tuple[PipelineStep]) -> None:
+    def __init__(self, steps: Tuple[PipelineStep, ...]) -> None:
         self.steps = steps
 
     def check_valid(self) -> Tuple[bool, Optional[str]]:

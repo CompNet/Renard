@@ -1,5 +1,5 @@
 from typing import Callable, Dict, Any, List, Set
-from pipeline import PipelineStep
+from renard.pipeline import PipelineStep
 
 
 class NLTKWordTokenizer(PipelineStep):
