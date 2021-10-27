@@ -1,6 +1,6 @@
 from typing import Dict, Any, List, Set, Optional
-from renard.ner import bio_entities
-from renard.pipeline import PipelineStep
+from renard.pipeline.ner import bio_entities
+from renard.pipeline.core import PipelineStep
 
 
 class CoOccurencesGraphExtractor(PipelineStep):

@@ -1,7 +1,7 @@
 from typing import List, Dict, Any, Set, Tuple, Optional
 from transformers.tokenization_utils_base import BatchEncoding
 from tqdm import tqdm
-from renard.pipeline import PipelineStep
+from renard.pipeline.core import PipelineStep
 
 
 def bio_entities(tokens: List[str], bio_tags: List[str]) -> List[Tuple[str, str, int]]:

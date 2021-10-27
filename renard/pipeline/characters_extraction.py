@@ -1,6 +1,6 @@
 from collections import defaultdict
 from typing import Any, Dict, List, Set
-from renard.pipeline import PipelineStep
+from renard.pipeline.core import PipelineStep
 
 
 class NaiveCharactersExtractor(PipelineStep):
