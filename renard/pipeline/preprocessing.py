@@ -1,6 +1,6 @@
 from typing import List, Tuple, Set, Dict, Any
 import re
-from renard.pipeline import PipelineStep
+from renard.pipeline.core import PipelineStep
 
 
 class CustomSubstitutionPreprocessor(PipelineStep):

@@ -2,8 +2,9 @@
 name = "renard"
 version = "0.0.1"
 description = "Relationships Extraction from NARrative Documents"
-authors = ["Aethor <oow.autre@gmail.com>"]
-license = "GPL"
+authors = ["Arthur Amalvy <arthur.amalvy@univ-avignon.fr>"]
+license = "GPL-3.0-only"
+readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.8"
@@ -12,6 +13,7 @@ transformers = "^4.11.3"
 nltk = "^3.6.5"
 tqdm = "^4.62.3"
 networkx = "^2.6.3"
+stanza = "^1.3.0"
 
 [tool.poetry.dev-dependencies]
 
