@@ -2,7 +2,7 @@ from typing import List, Tuple
 import unittest, random
 from hypothesis import given
 from hypothesis.control import assume
-from hypothesis.strategies import lists, tuples, sampled_from, integers
+from hypothesis.strategies import lists, tuples, sampled_from, integers, just
 from renard.pipeline.ner import score_ner
 
 
@@ -15,7 +15,7 @@ class TestScoreNer(unittest.TestCase):
     @given(
         integers(min_value=1, max_value=100).flatmap(
             lambda n: tuples(
-                lists(sampled_from(("O")), min_size=n, max_size=n),
+                lists(just("O"), min_size=n, max_size=n),
                 lists(sampled_from(("B-PER", "I-PER", "O")), min_size=n, max_size=n),
             )
         )
@@ -31,7 +31,7 @@ class TestScoreNer(unittest.TestCase):
         integers(min_value=1, max_value=100).flatmap(
             lambda n: tuples(
                 lists(sampled_from(("B-PER", "I-PER", "O")), min_size=n, max_size=n),
-                lists(sampled_from(("O")), min_size=n, max_size=n),
+                lists(just("O"), min_size=n, max_size=n),
             )
         )
     )
