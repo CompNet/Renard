@@ -47,3 +47,7 @@ class TestPipelineValidity(unittest.TestCase):
         pipeline = Pipeline((TestPipelineStep1(), TestPipelineStep2()))
 
         self.assertFalse(pipeline.check_valid()[0])
+
+
+if __name__ == "__main__":
+    unittest.main()

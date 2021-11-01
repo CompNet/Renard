@@ -1,4 +1,5 @@
-from typing import List, Dict, Any, Set, Tuple, Optional
+from typing import List, Dict, Any, Set, Tuple, Optional, Union
+from nltk.metrics.scores import precision
 from transformers.tokenization_utils_base import BatchEncoding
 from tqdm import tqdm
 from renard.pipeline.core import PipelineStep
@@ -23,7 +24,7 @@ def bio_entities(tokens: List[str], bio_tags: List[str]) -> List[Tuple[str, str,
 
         elif tag.startswith("I-"):
             if current_entity is None:
-                print(f"[warning] inconsistant bio tags. Will try to procede")
+                print(f"[warning] inconsistant bio tags. Will try to procede.")
                 current_entity = token
                 current_tag = tag[2:]
                 continue
@@ -35,6 +36,78 @@ def bio_entities(tokens: List[str], bio_tags: List[str]) -> List[Tuple[str, str,
             current_tag = None
 
     return bio_entities
+
+
+def score_ner(
+    pred_bio_tags: List[str], ref_bio_tags: List[str]
+) -> Tuple[Optional[float], Optional[float], Optional[float]]:
+    """Score NER as in CoNLL-2003 shared task
+
+    Precision is the percentage of named entities in ``ref_bio_tags``
+    that are correct. Recall is the percentage of named entities in
+    pred_bio_tags that are in ref_bio_tags. F1 is the harmonic mean of
+    both.
+
+    :param pred_bio_tags:
+    :param ref_bio_tags:
+    :return: ``(precision, recall, F1 score)``
+
+    """
+    assert len(pred_bio_tags) == len(ref_bio_tags)
+
+    if len(pred_bio_tags) == 0:
+        return (None, None, None)
+
+    pred_entities = []
+    ref_entities = []
+
+    for (entity_list, tags) in zip(
+        [pred_entities, ref_entities], [pred_bio_tags, ref_bio_tags]
+    ):
+
+        current_entity: Optional[Dict[str, Union[int, str]]] = None
+
+        for i, tag in enumerate(tags):
+
+            if tag.startswith("B-"):
+                if not current_entity is None:
+                    current_entity["end_idx"] = i
+                    entity_list.append(current_entity)
+                current_entity = {"start_idx": i, "type": tag[2:]}
+
+            elif tag.startswith("O"):
+                if not current_entity is None:
+                    current_entity["end_idx"] = i
+                    entity_list.append(current_entity)
+                current_entity = None
+
+        if not current_entity is None:
+            current_entity["end_idx"] = len(tags)
+            entity_list.append(current_entity)
+
+    # TODO: optim
+    correct_predictions = 0
+    for pred_entity in pred_entities:
+        if pred_entity in ref_entities:
+            correct_predictions += 1
+    precision = None
+    if len(pred_entities) > 0:
+        precision = correct_predictions / len(pred_entities)
+
+    # TODO: optim
+    recalled_entities = 0
+    for ref_entity in ref_entities:
+        if ref_entity in pred_entities:
+            recalled_entities += 1
+    recall = None
+    if len(ref_entities) > 0:
+        recall = recalled_entities / len(ref_entities)
+
+    if precision is None or recall is None or precision + recall == 0:
+        return (precision, recall, None)
+    f1 = 2 * precision * recall / (precision + recall)
+
+    return (precision, recall, f1)
 
 
 class NLTKNamedEntityRecognizer(PipelineStep):
