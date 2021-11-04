@@ -90,16 +90,22 @@ class StanfordCoreNLPPipeline(PipelineStep):
 
         only supports english for now
 
+    .. warning::
+
+        coreference resolution support is experimental only. Use at
+        your own risk.
+
     * TODO description when coref is implemented
     :ivar annotate_corefs: ``True`` if coreferences must be annotated,
         ``False`` otherwise. This parameter is not yet implemented
+
     """
 
     def __init__(self, annotate_corefs: bool = False) -> None:
         self.annotate_corefs = annotate_corefs
-        # TODO remove message when coref is implemented
+        # TODO remove message when coref is fully implemented
         if annotate_corefs:
-            print("[warning] : coreference annotation is not yet supported")
+            print("[warning] : coreferences annotation is experimental")
 
     def __call__(self, text: str, **kwargs) -> Dict[str, Any]:
         if not corenlp_is_installed():
@@ -110,7 +116,7 @@ class StanfordCoreNLPPipeline(PipelineStep):
         with CoreNLPClient(
             annotators=corenlp_annotators,
             max_char_length=len(text),
-            timeout=9999999,
+            timeout=9999999,  # TODO
             be_quiet=True,
             properties={"ner.applyFineGrained": False},
         ) as client:
@@ -123,26 +129,52 @@ class StanfordCoreNLPPipeline(PipelineStep):
             bio_tags = corenlp_annotations_bio_tags(annotations)
 
             # 2. corefs with sliding window on sentence
+            #    (corefs needs too much memory if run on while book)
             #
             # * TODO batch requests
             #   from the stanza doc : documents can be concatenated together
             #   by separating them with two line breaks
+            #
+            # * TODO correctly join / unifiy co-references chains
+            coref_chains = []
             if self.annotate_corefs:
                 sentences = corenlp_annotations_sentences(annotations)
                 # * TODO n as parameter
+                cur_token_idx = 0
                 for context_sentences in tqdm(
                     sliding_window(sentences, n=3), total=len(sentences) / 3
                 ):
                     # * TODO not only dcoref
                     #   to change the coref algorithm when using "coref" annotator :
                     #   set "coref.algorithm='neural'"
-                    client.annotate(
+                    coref_annotations = client.annotate(
                         " ".join(context_sentences),
                         annotators=corenlp_annotators + ["parse", "dcoref"],
                     )
+                    for chain in coref_annotations.corefChain:  # type: ignore
+                        coref_chains.append([])
+                        for mention in chain.mention:
+                            sent_start_idx = len(
+                                coref_annotations.sentence[mention.sentenceIndex].token
+                            )
+                            coref_chains[-1].append(
+                                {
+                                    "start_idx": cur_token_idx
+                                    + sent_start_idx
+                                    + mention.beginIndex,
+                                    "end_idx": cur_token_idx
+                                    + sent_start_idx
+                                    + mention.endIndex,
+                                }
+                            )
+                    cur_token_idx += sum(
+                        [len(sent.token) for sent in coref_annotations.sentence]
+                    )
 
-        # * TODO coref annotations parsing
-        return {"tokens": tokens, "bio_tags": bio_tags}
+        out_dict = {"tokens": tokens, "bio_tags": bio_tags}
+        if self.annotate_corefs:
+            out_dict["coref_chains"] = coref_chains
+        return out_dict
 
     def needs(self) -> Set[str]:
         return set()
@@ -150,5 +182,5 @@ class StanfordCoreNLPPipeline(PipelineStep):
     def produces(self) -> Set[str]:
         production = {"tokens", "bio_tags"}
         if self.annotate_corefs:
-            production.add("corefs")
+            production.add("coref_chains")
         return production
