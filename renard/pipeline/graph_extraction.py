@@ -22,11 +22,33 @@ class CoOccurencesGraphExtractor(PipelineStep):
         characters: Set[str],
         **kwargs
     ) -> Dict[str, Any]:
+        """Extract a characters graph
+
+        :param tokens:
+        :param bio_tags:
+        :param characters:
+
+        :return: a ``networkx.Graph``.
+
+        .. note::
+
+            Although ``networkx.Graph`` doesnt really support dynamic
+            graphs, when ``self.extract_dynamic_graph`` is set to
+            ``True``, the returned graph has the nice property that
+            exporting it to `gexf` format using ``G.write_gexf()``
+            will produce a correct dynamic graph that can be read by
+            Gephi. Because of a limitation in networkx, the dynamic
+            weight attribute is stored as ``'dweight'`` instead of
+            ``'weight'``.
+        """
         assert len(tokens) == len(bio_tags)
 
         import networkx as nx
 
         G = nx.Graph()
+
+        # if self.extract_dynamic_graph:
+        #     G.graph["mode"] = "dynamic"
 
         character_to_last_appearance: Dict[str, Optional[int]] = {
             character: None for character in characters
@@ -39,10 +61,7 @@ class CoOccurencesGraphExtractor(PipelineStep):
             if e[1].startswith("PER")
         ]
 
-        if self.extract_dynamic_graph:
-            dynamic_characters_graph = []
-
-        for person, tokenidx in person_tokenidx:
+        for i, (person, tokenidx) in enumerate(person_tokenidx):
             if person in characters:
                 character_to_last_appearance[person] = tokenidx
                 close_characters = [
@@ -53,27 +72,35 @@ class CoOccurencesGraphExtractor(PipelineStep):
                     and not c == person
                 ]
                 for close_character in close_characters:
-                    if G.has_edge(person, close_character):
-                        G.edges[person, close_character]["weight"] += 1
+                    if not G.has_edge(person, close_character):
+                        if self.extract_dynamic_graph:
+                            G.add_edge(person, close_character)
+                            # dynamic graphs : the edge exists starting timestep i
+                            G.edges[person, close_character]["start"] = i
+                            # dynamic graphs : the weight attribute is an empty series
+                            G.edges[person, close_character]["dweight"] = []
+                        else:
+                            G.add_edge(person, close_character, weight=0)
+                    if self.extract_dynamic_graph:
+                        # dynamic graphs : add a new entry to the weight series
+                        # according to networkx source code, each entry must be
+                        # of the form [value, start, end]
+                        weights = G.edges[person, close_character]["dweight"]
+                        if len(weights) != 0:
+                            # end of last weight attribute
+                            weights[-1][-1] = i
+                        # value, start and end of current weight attribute
+                        last_weight_value = weights[-1][0] if len(weights) > 0 else 0
+                        G.edges[person, close_character]["dweight"].append(
+                            [float(last_weight_value) + 1, i, len(person_tokenidx)]
+                        )
                     else:
-                        G.add_edge(person, close_character, weight=1)
-                if self.extract_dynamic_graph:
-                    dynamic_characters_graph.append(copy.deepcopy(G))  # type: ignore
+                        G.edges[person, close_character]["weight"] += 1
 
-        if self.extract_dynamic_graph:
-            return {
-                "dynamic_characters_graph": dynamic_characters_graph,  # type: ignore
-                "characters_graph": dynamic_characters_graph[-1]  # type: ignore
-                if len(dynamic_characters_graph) > 0  # type: ignore
-                else None,
-            }
         return {"characters_graph": G}
 
     def needs(self) -> Set[str]:
         return {"tokens", "bio_tags", "characters"}
 
     def produces(self) -> Set[str]:
-        production = {"characters_graph"}
-        if self.extract_dynamic_graph:
-            production.add("dynamic_characters_graph")
-        return production
+        return {"characters_graph"}
