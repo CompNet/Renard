@@ -95,9 +95,9 @@ class StanfordCoreNLPPipeline(PipelineStep):
         coreference resolution support is experimental only. Use at
         your own risk.
 
-    * TODO description when coref is implemented
-    :ivar annotate_corefs: ``True`` if coreferences must be annotated,
-        ``False`` otherwise. This parameter is not yet implemented
+    TODO description when coref is implemented
+
+    :ivar annotate_corefs: ``True`` if coreferences must be annotated, ``False`` otherwise. This parameter is not yet implemented
 
     """
 

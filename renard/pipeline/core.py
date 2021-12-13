@@ -3,6 +3,15 @@ from tqdm import tqdm
 
 
 class PipelineStep:
+    """An abstract pipeline step, executed sequentially
+
+    .. note::
+
+        The ``__call__``, ``needs`` and ``produces`` methods _must_ be
+        overriden by derived classes.
+
+    """
+
     def __call__(self, text: str, **kwargs) -> Dict[str, Any]:
         raise NotImplementedError()
 
@@ -23,9 +32,7 @@ class Pipeline:
         """Check that the current pipeline can be run, which is
         possible if all steps needs are satisfied
 
-        :return: a tuple :
-            - ``(True, None)`` if the pipeline is valid
-            - ``(False, "an error message")`` otherwise
+        :return: a tuple : ``(True, None)`` if the pipeline is valid, ``(False, 'an error message')`` otherwise
         """
         pipeline_state = {"text"}
         for i, step in enumerate(self.steps):

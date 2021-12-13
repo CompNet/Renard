@@ -6,3 +6,6 @@ __pycache__/*
 
 # hypothesis
 .hypothesis/*
+
+# sphinx
+./docs/_build/*
