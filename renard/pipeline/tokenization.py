@@ -3,15 +3,16 @@ from renard.pipeline.core import PipelineStep
 
 
 class NLTKWordTokenizer(PipelineStep):
-    """Construct a nltk word tokenizer
-
-    :ivar language: language, passed to :func:`nltk.word_tokenize`
-    """
+    """Construct a nltk word tokenizer"""
 
     def __init__(self, language="eng"):
+        """:param language: language, passed to :func:`nltk.word_tokenize`"""
         self.language = language
 
     def __call__(self, text: str, **kwargs) -> Dict[str, Any]:
+        """
+        :param text:
+        """
         import nltk
 
         nltk.download("punkt", quiet=True)
@@ -29,11 +30,17 @@ class BertTokenizer(PipelineStep):
     """Tokenizer for bert based models"""
 
     def __init__(self, huggingface_model_id: str = "bert-base-cased") -> None:
+        """
+        :param huggingface_model_id:
+        """
         from transformers import AutoTokenizer
 
         self.tokenizer = AutoTokenizer.from_pretrained(huggingface_model_id)
 
     def __call__(self, text: str, **kwargs) -> Dict[str, Any]:
+        """
+        :param text:
+        """
         import nltk
 
         nltk.download("punkt", quiet=True)

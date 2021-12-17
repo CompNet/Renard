@@ -111,19 +111,19 @@ def score_ner(
 
 
 class NLTKNamedEntityRecognizer(PipelineStep):
-    """An entity recognizer based on NLTK
-
-    requires the following pre-computed pipeline attributes :
-
-    - ``tokens: List[str]``
-
-    :ivar language: iso 639-2 3-letter language code
-    """
+    """An entity recognizer based on NLTK"""
 
     def __init__(self, language: str = "eng") -> None:
+        """
+        :param language: iso 639-2 3-letter language code
+        """
         self.language = language
 
     def __call__(self, text: str, tokens: List[str], **kwargs) -> Dict[str, Any]:
+        """
+        :param text:
+        :param tokens:
+        """
 
         import nltk
         from nltk.chunk import tree2conlltags
@@ -150,6 +150,10 @@ class BertNamedEntityRecognizer(PipelineStep):
     def __init__(
         self, huggingface_model_id: str = "dslim/bert-base-NER", batch_size: int = 4
     ):
+        """
+        :param huggingface_model_id:
+        :param batch_size:
+        """
         from transformers import AutoModelForTokenClassification
 
         self.model = AutoModelForTokenClassification.from_pretrained(
@@ -164,6 +168,11 @@ class BertNamedEntityRecognizer(PipelineStep):
         wp_tokens: List[str],
         **kwargs,
     ) -> Dict[str, Any]:
+        """
+        :param text:
+        :param bert_batch_encoding:
+        :param wp_tokens:
+        """
         import torch
 
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")

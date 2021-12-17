@@ -39,6 +39,15 @@ templates_path = ["_templates"]
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
 
+# -- Autodoc -------------------------------------------------
+
+autodoc_default_options = {
+    "members": True,
+    "special-members": True,
+    "private-members": True,
+}
+
+
 # -- Options for HTML output -------------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for

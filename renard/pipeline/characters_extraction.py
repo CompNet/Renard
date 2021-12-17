@@ -4,22 +4,22 @@ from renard.pipeline.core import PipelineStep
 
 
 class NaiveCharactersExtractor(PipelineStep):
-    """A basic character extractor using NER
-
-    needs the following pipeline attributes :
-
-    - ``tokens``
-    - ``bio_tags``
-
-    :ivar min_appearance:
-    """
+    """A basic character extractor using NER"""
 
     def __init__(self, min_appearance: int) -> None:
+        """
+        :param min_appearance:
+        """
         self.min_appearance = min_appearance
 
     def __call__(
         self, text: str, tokens: List[str], bio_tags: List[str], **kwargs
     ) -> Dict[str, Any]:
+        """
+        :param text:
+        :param tokens:
+        :param bio_tags:
+        """
 
         entities = defaultdict(int)
         current_entity: List[str] = []

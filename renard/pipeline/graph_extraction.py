@@ -28,7 +28,8 @@ class CoOccurencesGraphExtractor(PipelineStep):
         :param bio_tags:
         :param characters:
 
-        :return: a ``networkx.Graph``.
+        :return: a ``dict`` with key ``'characters_graph'`` and a
+            ``networkx.Graph`` as value.
 
         .. note::
 
@@ -40,15 +41,13 @@ class CoOccurencesGraphExtractor(PipelineStep):
             Gephi. Because of a limitation in networkx, the dynamic
             weight attribute is stored as ``'dweight'`` instead of
             ``'weight'``.
+
         """
         assert len(tokens) == len(bio_tags)
 
         import networkx as nx
 
         G = nx.Graph()
-
-        # if self.extract_dynamic_graph:
-        #     G.graph["mode"] = "dynamic"
 
         character_to_last_appearance: Dict[str, Optional[int]] = {
             character: None for character in characters
