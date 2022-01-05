@@ -1,5 +1,4 @@
 from typing import List, Dict, Any, Set, Tuple, Optional, Union
-from nltk.metrics.scores import precision
 from transformers.tokenization_utils_base import BatchEncoding
 from tqdm import tqdm
 from renard.pipeline.core import PipelineStep
@@ -15,13 +14,22 @@ def bio_entities(tokens: List[str], bio_tags: List[str]) -> List[Tuple[str, str,
 
     current_entity: Optional[str] = None
     current_tag: Optional[str] = None
+    current_i: Optional[int] = None
+
+    def maybe_push_current_entity(current_entity, current_tag, current_i):
+        if current_entity is None:
+            return
+        bio_entities.append((current_entity, current_tag, current_i))
+        current_entity = None
+        current_tag = None
+        current_i = None
 
     for i, (token, tag) in enumerate(zip(tokens, bio_tags)):
-
         if tag.startswith("B-"):
+            maybe_push_current_entity(current_entity, current_tag, current_i)
             current_entity = token
             current_tag = tag[2:]
-
+            current_i = i
         elif tag.startswith("I-"):
             if current_entity is None:
                 print(f"[warning] inconsistant bio tags. Will try to procede.")
@@ -29,11 +37,9 @@ def bio_entities(tokens: List[str], bio_tags: List[str]) -> List[Tuple[str, str,
                 current_tag = tag[2:]
                 continue
             current_entity += f" {token}"
-
-        elif not current_entity is None:
-            bio_entities.append((current_entity, current_tag, i))
-            current_entity = None
-            current_tag = None
+        else:
+            maybe_push_current_entity(current_entity, current_tag, i)
+    maybe_push_current_entity(current_entity, current_tag, current_i)
 
     return bio_entities
 
