@@ -6,9 +6,9 @@ import stanza
 from stanza.protobuf import CoreNLP_pb2
 from stanza.server import CoreNLPClient
 from stanza.resources.installation import DEFAULT_CORENLP_DIR
+from more_itertools import windowed
 
 from renard.pipeline.core import PipelineStep
-from renard.utils import sliding_window
 
 
 def corenlp_is_installed() -> bool:
@@ -96,12 +96,14 @@ class StanfordCoreNLPPipeline(PipelineStep):
         your own risk.
 
     TODO description when coref is implemented
-
-    :ivar annotate_corefs: ``True`` if coreferences must be annotated, ``False`` otherwise. This parameter is not yet implemented
-
     """
 
     def __init__(self, annotate_corefs: bool = False) -> None:
+        """
+        :param annotate_corefs: ``True`` if coreferences must be
+            annotated, ``False`` otherwise. This parameter is not
+            yet implemented.
+        """
         self.annotate_corefs = annotate_corefs
         # TODO remove message when coref is fully implemented
         if annotate_corefs:
@@ -142,7 +144,7 @@ class StanfordCoreNLPPipeline(PipelineStep):
                 # * TODO n as parameter
                 cur_token_idx = 0
                 for context_sentences in tqdm(
-                    sliding_window(sentences, n=3), total=len(sentences) / 3
+                    windowed(sentences, 3), total=len(sentences) / 3
                 ):
                     # * TODO not only dcoref
                     #   to change the coref algorithm when using "coref" annotator :
