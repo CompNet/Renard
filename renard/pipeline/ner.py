@@ -16,7 +16,8 @@ def bio_entities(tokens: List[str], bio_tags: List[str]) -> List[Tuple[str, str,
     current_tag: Optional[str] = None
     current_i: Optional[int] = None
 
-    def maybe_push_current_entity(current_entity, current_tag, current_i):
+    def maybe_push_current_entity():
+        nonlocal current_entity, current_tag, current_i
         if current_entity is None:
             return
         bio_entities.append((current_entity, current_tag, current_i))
@@ -26,7 +27,7 @@ def bio_entities(tokens: List[str], bio_tags: List[str]) -> List[Tuple[str, str,
 
     for i, (token, tag) in enumerate(zip(tokens, bio_tags)):
         if tag.startswith("B-"):
-            maybe_push_current_entity(current_entity, current_tag, current_i)
+            maybe_push_current_entity()
             current_entity = token
             current_tag = tag[2:]
             current_i = i
@@ -38,8 +39,8 @@ def bio_entities(tokens: List[str], bio_tags: List[str]) -> List[Tuple[str, str,
                 continue
             current_entity += f" {token}"
         else:
-            maybe_push_current_entity(current_entity, current_tag, i)
-    maybe_push_current_entity(current_entity, current_tag, current_i)
+            maybe_push_current_entity()
+    maybe_push_current_entity()
 
     return bio_entities
 
