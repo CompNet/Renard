@@ -21,15 +21,18 @@ class CoOccurencesGraphExtractor(PipelineStep):
     ) -> None:
         """
         :param co_occurences_dist:
+
         :param dynamic: either ``None``, or one of ``{'nx', 'gephi'}``
+
             - if ``None`` (the defaul), a ``nx.graph`` is extracted
-            - if ``'nx'``, several ``nx.graph`` are extracted. In that case,
-                ``dynamic_window`` *must* be specified.
-            - if ``'gephi'``, a single ``nx.graph`` is extracted. This graph has the
-                nice property that exporting it to `gexf` format using
-                ``G.write_gexf()`` will produce a correct dynamic graph that can be
-                read by Gephi. Because of a limitation in networkx, the dynamic weight
-                attribute is stored as ``dweight`` instead of ``weight``.
+            - if ``'nx'``, several ``nx.graph`` are extracted. In that
+                case, ``dynamic_window`` *must* be specified.
+            - if ``'gephi'``, a single ``nx.graph`` is extracted. This
+                graph has the nice property that exporting it to `gexf`
+                format using ``G.write_gexf()`` will produce a correct
+                dynamic graph that can be read by Gephi. Because of a
+                limitation in networkx, the dynamic weight attribute is
+                stored as ``dweight`` instead of ``weight``.
         """
 
         self.co_occurences_dist = co_occurences_dist
