@@ -67,13 +67,22 @@ class GraphRulesCharactersExtractor(PipelineStep):
     merging this graph nodes.
 
     This algorithm is inspired from Vala et al., 2015
+
+    .. warning::
+
+        This is a work in progress.
+
     """
 
     def __init__(self) -> None:
         self.hypocorism_gazetteer = HypocorismGazetteer()
 
     def __call__(
-        self, tokens: List[str], bio_tags: List[str], **kwargs: Any
+        self,
+        tokens: List[str],
+        bio_tags: List[str],
+        corefs: List[List[dict]],
+        **kwargs: Any
     ) -> Dict[str, Any]:
         assert len(tokens) == len(bio_tags)
 
@@ -85,20 +94,44 @@ class GraphRulesCharactersExtractor(PipelineStep):
             if tag.startswith("PER"):
                 G.add_node(mention)
 
-        # links using nickname gazetteer
+        # rules-based links
         for name1 in G:
             for name2 in G:
                 if name1 == name2:
                     continue
-                if self.hypocorism_gazetteer.are_related(name1, name2):
+                if (
+                    self.hypocorism_gazetteer.are_related(name1, name2)
+                    or self.names_are_related_after_title_removal(name1, name2)
+                    or self.names_are_in_coref(name1, name2, corefs)
+                ):
                     G.add_edge(name1, name2)
 
         return {
             "characters": [Character(names) for names in nx.connected_components(G)]
         }
 
+    def names_are_related_after_title_removal(self, name1: str, name2: str) -> bool:
+        from nameparser import HumanName
+        from nameparser.config import CONSTANTS
+
+        CONSTANTS.string_format = "{first} {middle} {last}"
+        raw_name1 = HumanName(name1).full_name
+        raw_name2 = HumanName(name2).full_name
+
+        return raw_name1 == raw_name2 or self.hypocorism_gazetteer.are_related(
+            raw_name1, raw_name2
+        )
+
+    def names_are_in_coref(self, name1: str, name2: str, corefs: List[List[dict]]):
+        for coref_chain in corefs:
+            if any([name1 == m["mention"] for m in coref_chain]) and any(
+                [name2 == m["mention"] for m in coref_chain]
+            ):
+                return True
+        return False
+
     def needs(self) -> Set[str]:
-        return {"tokens", "bio_tags"}
+        return {"tokens", "bio_tags", "corefs"}
 
     def produces(self) -> Set[str]:
         return {"characters"}

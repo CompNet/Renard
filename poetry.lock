@@ -207,6 +207,14 @@ optional = false
 python-versions = ">=3.5"
 
 [[package]]
+name = "nameparser"
+version = "1.1.0"
+description = "A simple Python module for parsing human names into their individual components."
+category = "main"
+optional = false
+python-versions = "*"
+
+[[package]]
 name = "networkx"
 version = "2.6.3"
 description = "Python package for creating and manipulating graphs and networks"
@@ -639,7 +647,7 @@ socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "92e731e731e26e28c2017cc1e347271026d5d09c628f3dfc8afa1ae959970afb"
+content-hash = "518efce4554508e27c561ba250b3cda0e63d498c16d1691de5cdbcd5b5df8edc"
 
 [metadata.files]
 alabaster = [
@@ -779,6 +787,10 @@ markupsafe = [
 more-itertools = [
     {file = "more-itertools-8.12.0.tar.gz", hash = "sha256:7dc6ad46f05f545f900dd59e8dfb4e84a4827b97b3cfecb175ea0c7d247f6064"},
     {file = "more_itertools-8.12.0-py3-none-any.whl", hash = "sha256:43e6dd9942dffd72661a2c4ef383ad7da1e6a3e968a927ad7a6083ab410a688b"},
+]
+nameparser = [
+    {file = "nameparser-1.1.0-py2.py3-none-any.whl", hash = "sha256:4efc7b6d3e77bb399936610f0d67fe64b14a4b7877b8a01ddf34273edd724a1a"},
+    {file = "nameparser-1.1.0.tar.gz", hash = "sha256:bbd4831c72426757ec59674a1aad29c40bf411358a6d6e1cdd68002cbcb90d08"},
 ]
 networkx = [
     {file = "networkx-2.6.3-py3-none-any.whl", hash = "sha256:80b6b89c77d1dfb64a4c7854981b60aeea6360ac02c6d4e4913319e0a313abef"},
