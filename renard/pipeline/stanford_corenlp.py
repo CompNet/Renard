@@ -1,5 +1,5 @@
 import os
-from typing import List, Set, Dict, Any
+from typing import List, Optional, Set, Dict, Any
 
 from tqdm import tqdm
 import stanza
@@ -13,22 +13,6 @@ from renard.pipeline.core import PipelineStep
 
 def corenlp_is_installed() -> bool:
     return os.path.exists(DEFAULT_CORENLP_DIR)
-
-
-def corenlp_annotations_sentences(annotations: CoreNLP_pb2.Document) -> List[str]:
-    """Extract an array of sentences from stanford corenlp annotations
-
-    :param annotations: stanford CoreNLP text annotations
-    :return: an array of sentences
-    """
-    sentences = []
-    for sentence in annotations.sentence:  # type: ignore
-        current_sentence = []
-        for token in sentence.token:
-            current_sentence.append(token.word)
-            current_sentence.append(token.after)
-        sentences.append("".join(current_sentence))
-    return sentences
 
 
 def corenlp_annotations_bio_tags(annotations: CoreNLP_pb2.Document) -> List[str]:
@@ -86,96 +70,143 @@ def corenlp_annotations_bio_tags(annotations: CoreNLP_pb2.Document) -> List[str]
 class StanfordCoreNLPPipeline(PipelineStep):
     """a full NLP pipeline using stanford CoreNLP
 
-    .. note::
-
-        only supports english for now
-
     .. warning::
 
-        coreference resolution support is experimental only. Use at
-        your own risk.
-
-    TODO description when coref is implemented
+        RAM usage might be high for coreference resolutions as it uses
+        the entire novel ! If CoreNLP terminates with an out of memory
+        error, you can try allocating more memory for the server by
+        using ``server_kwargs`` (example : ``{"memory": "8G"}``).
     """
 
-    def __init__(self, annotate_corefs: bool = False) -> None:
+    def __init__(
+        self,
+        annotate_corefs: bool = False,
+        corefs_algorithm: str = "statistical",
+        corenlp_custom_properties: Optional[Dict[str, Any]] = None,
+        server_timeout: int = 9999999,
+        **server_kwargs,
+    ) -> None:
         """
         :param annotate_corefs: ``True`` if coreferences must be
             annotated, ``False`` otherwise. This parameter is not
             yet implemented.
+
+        :param corefs_algorithm: one of ``{"deterministic", "statistical", "neural"}``
+
+        :param corenlp_custom_properties: custom properties dictionary to pass to the
+            CoreNLP server. Note that some properties are already set when calling the
+            server, so not all properties are supported : it is intended as a last
+            resort escape hatch. In particular, do not set ``'ner.applyFineGrained'``.
+            If you need to set the coreference algorithm used, see ``corefs_algorithm``.
+
+        :param server_timeout: CoreNLP server timeout in ms
+
+        :param server_kwargs: extra args for stanford CoreNLP server. `be_quiet`
+            and `max_char_length` are *not* supported.
+            See here for a list of possible args :
+            https://stanfordnlp.github.io/stanza/client_properties.html#corenlp-server-start-options-server
         """
+        assert corefs_algorithm in {"deterministic", "statistical", "neural"}
         self.annotate_corefs = annotate_corefs
-        # TODO remove message when coref is fully implemented
-        if annotate_corefs:
-            print("[warning] : coreferences annotation is experimental")
+        self.corefs_algorithm = corefs_algorithm
+
+        self.server_timeout = server_timeout
+        self.server_kwargs = server_kwargs
+        self.corenlp_custom_properties = (
+            corenlp_custom_properties if not corenlp_custom_properties is None else {}
+        )
 
     def __call__(self, text: str, **kwargs) -> Dict[str, Any]:
         if not corenlp_is_installed():
             stanza.install_corenlp()
 
-        # 1. tokenization + ner
+        # define corenlp annotators and properties
         corenlp_annotators = ["tokenize", "ssplit", "pos", "lemma", "ner"]
+        corenlp_properties = {
+            **self.corenlp_custom_properties,
+            **{"ner.applyFineGrained": False},
+        }
+
+        ## coreference annotation settings
+        if self.annotate_corefs:
+            if self.corefs_algorithm == "deterministic":
+                corenlp_annotators += ["parse", "dcoref"]
+            elif self.corefs_algorithm == "statistical":
+                corenlp_annotators += ["depparse", "coref"]
+                corenlp_properties = {
+                    **corenlp_properties,
+                    **{"coref.algorithm": "statistical"},
+                }
+            elif self.corefs_algorithm == "neural":
+                corenlp_annotators += ["depparse", "coref"]
+                corenlp_properties = {
+                    **corenlp_properties,
+                    **{"coref.algorithm": "neural"},
+                }
+            else:
+                raise RuntimeError(
+                    f"unknown coref algorithm : {self.corefs_algorithm}."
+                )
+
         with CoreNLPClient(
             annotators=corenlp_annotators,
             max_char_length=len(text),
-            timeout=9999999,  # TODO
+            timeout=self.server_timeout,
             be_quiet=True,
-            properties={"ner.applyFineGrained": False},
+            properties=corenlp_properties,
+            **self.server_kwargs,
         ) as client:
+
+            # compute annotation
             annotations: CoreNLP_pb2.Document = client.annotate(text)  # type: ignore
+
+            # parse tokens
             tokens = [
                 token.word
                 for sentence in annotations.sentence  # type: ignore
                 for token in sentence.token
             ]
+
+            # parse NER bio tags
             bio_tags = corenlp_annotations_bio_tags(annotations)
 
-            # 2. corefs with sliding window on sentence
-            #    (corefs needs too much memory if run on while book)
-            #
-            # * TODO batch requests
-            #   from the stanza doc : documents can be concatenated together
-            #   by separating them with two line breaks
-            #
-            # * TODO correctly join / unifiy co-references chains
-            coref_chains = []
+            # parse corefs if enabled
             if self.annotate_corefs:
-                sentences = corenlp_annotations_sentences(annotations)
-                # * TODO n as parameter
-                cur_token_idx = 0
-                for context_sentences in tqdm(
-                    windowed(sentences, 3), total=len(sentences) / 3
-                ):
-                    # * TODO not only dcoref
-                    #   to change the coref algorithm when using "coref" annotator :
-                    #   set "coref.algorithm='neural'"
-                    coref_annotations = client.annotate(
-                        " ".join(context_sentences),
-                        annotators=corenlp_annotators + ["parse", "dcoref"],
-                    )
-                    for chain in coref_annotations.corefChain:  # type: ignore
-                        coref_chains.append([])
-                        for mention in chain.mention:
-                            sent_start_idx = len(
-                                coref_annotations.sentence[mention.sentenceIndex].token
-                            )
-                            coref_chains[-1].append(
-                                {
-                                    "start_idx": cur_token_idx
-                                    + sent_start_idx
-                                    + mention.beginIndex,
-                                    "end_idx": cur_token_idx
-                                    + sent_start_idx
-                                    + mention.endIndex,
-                                }
-                            )
-                    cur_token_idx += sum(
-                        [len(sent.token) for sent in coref_annotations.sentence]
-                    )
+
+                coref_chains = []
+
+                for coref_chain in annotations.corefChain:  # type: ignore
+
+                    chain = []
+
+                    for mention in coref_chain.mention:  # type: ignore
+
+                        mention_sent = annotations.sentence[mention.sentenceIndex]  # type: ignore
+                        sent_start_idx = mention_sent.token[0].tokenBeginIndex
+
+                        mention_words = []
+                        for token in mention_sent.token[
+                            mention.beginIndex : mention.endIndex - 1
+                        ]:
+                            mention_words.append(token.word)
+                            mention_words.append(token.after)
+                        mention_words.append(
+                            mention_sent.token[mention.endIndex - 1].word
+                        )
+
+                        chain.append(
+                            {
+                                "start_idx": sent_start_idx + mention.beginIndex,
+                                "end_idx": sent_start_idx + mention.endIndex,
+                                "mention": "".join(mention_words),
+                            }
+                        )
+
+                    coref_chains.append(chain)
 
         out_dict = {"tokens": tokens, "bio_tags": bio_tags}
         if self.annotate_corefs:
-            out_dict["coref_chains"] = coref_chains
+            out_dict["corefs"] = coref_chains
         return out_dict
 
     def needs(self) -> Set[str]:
@@ -184,5 +215,5 @@ class StanfordCoreNLPPipeline(PipelineStep):
     def produces(self) -> Set[str]:
         production = {"tokens", "bio_tags"}
         if self.annotate_corefs:
-            production.add("coref_chains")
+            production.add("corefs")
         return production
