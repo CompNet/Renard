@@ -1,3 +1,5 @@
+from os import name
+from renard.pipeline.characters_extraction import Character
 from typing import Dict, Any, List, Set, Optional, Tuple, cast
 
 import networkx as nx
@@ -44,7 +46,7 @@ class CoOccurencesGraphExtractor(PipelineStep):
         text: str,
         tokens: List[str],
         bio_tags: List[str],
-        characters: Set[str],
+        characters: Set[Character],
         **kwargs
     ) -> Dict[str, Any]:
         """Extract a characters graph
@@ -59,13 +61,15 @@ class CoOccurencesGraphExtractor(PipelineStep):
         """
         assert len(tokens) == len(bio_tags)
 
-        # (person, token index)
-        character_tokenidx = [
-            (e[0], e[2])
-            for e in bio_entities(tokens, bio_tags)
-            if e[1].startswith("PER")
-            if e[0] in characters
-        ]
+        # greedily assign mentions
+        character_tokenidx = []
+        for mention, tag, token_idx in bio_entities(tokens, bio_tags):
+            if not tag.startswith("PER"):
+                continue
+            for character in characters:
+                if mention in character.names:
+                    character_tokenidx.append((character, token_idx))
+                    break
 
         if self.dynamic == "gephi":
             return {
@@ -83,7 +87,7 @@ class CoOccurencesGraphExtractor(PipelineStep):
             }
         return {"characters_graph": self._extract_graph(character_tokenidx)}
 
-    def _extract_graph(self, character_tokenidx: List[Tuple[str, int]]):
+    def _extract_graph(self, character_tokenidx: List[Tuple[Character, int]]):
 
         # co-occurence matrix, where C[i][j] is 1 when appearance
         # i co-occur with j if i < j, or 0 when it doesn't
@@ -117,7 +121,7 @@ class CoOccurencesGraphExtractor(PipelineStep):
         return G
 
     def _extract_dynamic_graph2(
-        self, character_tokenidx: List[Tuple[str, int]], window: int
+        self, character_tokenidx: List[Tuple[Character, int]], window: int
     ) -> List[nx.Graph]:
         return [
             self._extract_graph([elt for elt in ct if not elt is None])
@@ -125,16 +129,23 @@ class CoOccurencesGraphExtractor(PipelineStep):
         ]
 
     def _extract_gephi_dynamic_graph(
-        self, character_tokenidx: List[Tuple[str, int]]
+        self, character_tokenidx: List[Tuple[Character, int]]
     ) -> nx.Graph:
+        # keep only longest name in graph node : possible only if it is unique
+        # TODO: might want to try and get shorter names if longest names aren't
+        #       unique
+        characters = set([e[0] for e in character_tokenidx])
+        character_names = set([e[0].longest_name() for e in character_tokenidx])
+        assert len(character_names) == len(characters)
+
         G = nx.Graph()
 
-        characters = set([e[0] for e in character_tokenidx])
+        name_tokenidx = [(e[0].longest_name(), e[1]) for e in character_tokenidx]
         character_to_last_appearance: Dict[str, Optional[int]] = {
-            character: None for character in characters
+            name: None for name in character_names
         }
 
-        for i, (character, tokenidx) in enumerate(character_tokenidx):
+        for i, (character, tokenidx) in enumerate(name_tokenidx):
             if not character in characters:
                 continue
             character_to_last_appearance[character] = tokenidx
@@ -160,7 +171,7 @@ class CoOccurencesGraphExtractor(PipelineStep):
                 # value, start and end of current weight attribute
                 last_weight_value = weights[-1][0] if len(weights) > 0 else 0
                 G.edges[character, close_character]["dweight"].append(
-                    [float(last_weight_value) + 1, i, len(person_tokenidx)]
+                    [float(last_weight_value) + 1, i, len(name_tokenidx)]
                 )
 
         return G
