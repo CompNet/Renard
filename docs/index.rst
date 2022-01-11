@@ -6,6 +6,7 @@ Welcome to Renard's documentation!
    :caption: Contents:
 
    pipeline
+   resources
 
 
 Indices and tables

@@ -37,18 +37,23 @@ class HypocorismGazetteer:
                     self.nickname_to_names[nickname].add(name)
 
     def get_nicknames(self, name: str) -> Set[str]:
+        """Return all possible nickname for the given name"""
         try:
             return self.name_to_nicknames[name.lower()]
         except KeyError:
             return set()
 
     def get_possible_names(self, nickname: str) -> Set[str]:
+        """Return all names that can correspond to the given nickname"""
         try:
             return self.nickname_to_names[nickname.lower()]
         except KeyError:
             return set()
 
     def are_related(self, name1: str, name2: str) -> bool:
+        """Check if one name is an hypocorism of the other
+        (or if both names are equals)
+        """
         return (
             name1.lower() == name2.lower()
             or name2.lower() in self.get_nicknames(name1)
