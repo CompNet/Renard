@@ -36,6 +36,7 @@ def bio_entities(tokens: List[str], bio_tags: List[str]) -> List[Tuple[str, str,
                 print(f"[warning] inconsistant bio tags. Will try to procede.")
                 current_entity = token
                 current_tag = tag[2:]
+                current_i = i
                 continue
             current_entity += f" {token}"
         else:
