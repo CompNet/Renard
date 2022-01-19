@@ -24,5 +24,5 @@ class CustomSubstitutionPreprocessor(PipelineStep):
     def needs(self) -> Set[str]:
         return set()
 
-    def produces(self) -> Set[str]:
+    def production(self) -> Set[str]:
         return set()

@@ -1,9 +1,12 @@
-from renard.pipeline.ner import bio_entities
-from typing import Any, Dict, List, FrozenSet, Set
+from typing import Any, Dict, List, FrozenSet, Set, Optional
+from itertools import combinations
 from collections import defaultdict
 from dataclasses import dataclass
+from renard.gender import Gender
+from renard.pipeline.ner import bio_entities
 from renard.pipeline.core import PipelineStep
 from renard.resources.hypocorisms import HypocorismGazetteer
+from renard.resources.pronouns.pronouns import is_a_female_pronoun, is_a_male_pronoun
 
 
 @dataclass(eq=True, frozen=True)
@@ -57,7 +60,7 @@ class NaiveCharactersExtractor(PipelineStep):
     def needs(self) -> Set[str]:
         return {"tokens", "bio_tags"}
 
-    def produces(self) -> Set[str]:
+    def production(self) -> Set[str]:
         return {"characters"}
 
 
@@ -78,13 +81,13 @@ class GraphRulesCharactersExtractor(PipelineStep):
         self.hypocorism_gazetteer = HypocorismGazetteer()
 
     def __call__(
-        self,
-        tokens: List[str],
-        bio_tags: List[str],
-        corefs: List[List[dict]],
-        **kwargs: Any
+        self, tokens: List[str], bio_tags: List[str], **kwargs: Any
     ) -> Dict[str, Any]:
         assert len(tokens) == len(bio_tags)
+
+        corefs: Optional[List[List[dict]]] = None
+        if "corefs" in kwargs:
+            corefs = kwargs["corefs"]
 
         import networkx as nx
 
@@ -95,19 +98,32 @@ class GraphRulesCharactersExtractor(PipelineStep):
                 G.add_node(mention)
 
         # rules-based links
-        for name1 in G:
-            for name2 in G:
-                if name1 == name2:
-                    continue
-                if (
-                    self.hypocorism_gazetteer.are_related(name1, name2)
-                    or self.names_are_related_after_title_removal(name1, name2)
-                    or self.names_are_in_coref(name1, name2, corefs)
-                ):
-                    G.add_edge(name1, name2)
+        for (name1, name2) in combinations(G.nodes(), 2):
+            if (
+                self.hypocorism_gazetteer.are_related(name1, name2)
+                or self.names_are_related_after_title_removal(name1, name2)
+                or (
+                    not corefs is None and self.names_are_in_coref(name1, name2, corefs)
+                )
+            ):
+                G.add_edge(name1, name2)
+
+        # unlink rules
+        for (name1, name2) in combinations(G.nodes(), 2):
+            if corefs is None:
+                break
+            # if characters dont have the same infered gender,
+            # unlink the shortes path between them
+            gender1 = self.infer_name_gender(name1, corefs)
+            gender2 = self.infer_name_gender(name2, corefs)
+            if gender1 != gender2:
+                for path in nx.all_shortest_paths(G, source=name1, target=name2):
+                    G.remove_edges_from(path)
 
         return {
-            "characters": [Character(names) for names in nx.connected_components(G)]
+            "characters": [
+                Character(frozenset(names)) for names in nx.connected_components(G)
+            ]
         }
 
     def names_are_related_after_title_removal(self, name1: str, name2: str) -> bool:
@@ -130,8 +146,31 @@ class GraphRulesCharactersExtractor(PipelineStep):
                 return True
         return False
 
-    def needs(self) -> Set[str]:
-        return {"tokens", "bio_tags", "corefs"}
+    def infer_name_gender(self, name: str, corefs: List[List[dict]]) -> Gender:
+        """Try to infer a character's gender from coreferences chains"""
 
-    def produces(self) -> Set[str]:
+        female_count = 0
+        male_count = 0
+
+        for coref_chain in corefs:
+            mentions = {m["mention"] for m in coref_chain}
+            if not name in mentions:
+                continue
+            for mention in mentions:
+                if is_a_male_pronoun(mention):
+                    male_count += 1
+                elif is_a_female_pronoun(mention):
+                    female_count += 1
+
+        if male_count == female_count:
+            return Gender.UNKNOWN
+        return Gender.MALE if male_count > female_count else Gender.FEMALE
+
+    def needs(self) -> Set[str]:
+        return {"tokens", "bio_tags"}
+
+    def optional_needs(self) -> Set[str]:
+        return {"corefs"}
+
+    def production(self) -> Set[str]:
         return {"characters"}

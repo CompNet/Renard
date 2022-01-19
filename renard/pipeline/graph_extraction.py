@@ -182,5 +182,5 @@ class CoOccurencesGraphExtractor(PipelineStep):
     def needs(self) -> Set[str]:
         return {"tokens", "bio_tags", "characters"}
 
-    def produces(self) -> Set[str]:
+    def production(self) -> Set[str]:
         return {"characters_graph"}

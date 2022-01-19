@@ -22,7 +22,7 @@ class NLTKWordTokenizer(PipelineStep):
     def needs(self) -> Set[str]:
         return {"text"}
 
-    def produces(self) -> Set[str]:
+    def production(self) -> Set[str]:
         return {"tokens"}
 
 
@@ -62,7 +62,7 @@ class BertTokenizer(PipelineStep):
     def needs(self) -> Set[str]:
         return {"text"}
 
-    def produces(self) -> Set[str]:
+    def production(self) -> Set[str]:
         return {"tokens", "bert_batch_encoding", "wp_tokens"}
 
     @staticmethod
