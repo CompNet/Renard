@@ -1,5 +1,7 @@
-from typing import Any, Dict, Tuple, Set, List
+from dataclasses import dataclass
+from typing import Any, Dict, Tuple, Set, List, Optional, Union
 from tqdm import tqdm
+from transformers.tokenization_utils_base import BatchEncoding
 
 
 class PipelineStep:
@@ -27,6 +29,33 @@ class PipelineStep:
 
     def production(self) -> Set[str]:
         raise NotImplementedError()
+
+
+@dataclass
+class PipelineState:
+    """The state of a pipeline, annotated in a Pipeline lifetime"""
+
+    text: str
+
+    # tokenization
+    tokens: Optional[List[str]] = None
+    ## BERT tokenization
+    wp_tokens: Optional[List[str]] = None
+
+    # NER
+    bio_tags: Optional[List[str]] = None
+    ## BERT NER
+    wp_bio_tags: Optional[List[str]] = None
+    bert_batch_encoding: Optional[BatchEncoding] = None
+
+    # coreference resolution
+    corefs: Optional[List[List[dict]]] = None
+
+    # character detection
+    characters: Optional[Set["Character"]] = None
+
+    # graph extraction
+    characters_graph: Optional[Union[List["nx.Graph"], "nx.Graph"]] = None
 
 
 class Pipeline:
@@ -65,7 +94,7 @@ class Pipeline:
 
         return (True, warnings)
 
-    def __call__(self, text: str) -> Dict[str, Any]:
+    def __call__(self, text: str) -> PipelineState:
         """Run the pipeline sequentially
 
         :return: the output of the last step of the pipeline
@@ -76,10 +105,12 @@ class Pipeline:
         for warning in warnings_or_errors:
             print(f"[warning] : {warning}")
 
-        kwargs = {"text": text}
+        state = PipelineState(text)
         tqdm_steps = tqdm(self.steps, total=len(self.steps))
         for step in tqdm_steps:
             tqdm_steps.set_description_str(f"{step.__class__.__name__}")
-            kwargs = {**kwargs, **step(**kwargs)}
+            out = step(**state.__dict__)
+            for key, value in out.items():
+                setattr(state, key, value)
 
-        return kwargs
+        return state

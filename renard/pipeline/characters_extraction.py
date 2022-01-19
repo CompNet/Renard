@@ -81,13 +81,13 @@ class GraphRulesCharactersExtractor(PipelineStep):
         self.hypocorism_gazetteer = HypocorismGazetteer()
 
     def __call__(
-        self, tokens: List[str], bio_tags: List[str], **kwargs: Any
+        self,
+        tokens: List[str],
+        bio_tags: List[str],
+        corefs: List[List[dict]] = None,
+        **kwargs: dict
     ) -> Dict[str, Any]:
         assert len(tokens) == len(bio_tags)
-
-        corefs: Optional[List[List[dict]]] = None
-        if "corefs" in kwargs:
-            corefs = kwargs["corefs"]
 
         import networkx as nx
 
