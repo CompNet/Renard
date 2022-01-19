@@ -1,7 +1,9 @@
 from dataclasses import dataclass
 from typing import Any, Dict, Tuple, Set, List, Optional, Union
+
 from tqdm import tqdm
 from transformers.tokenization_utils_base import BatchEncoding
+import networkx as nx
 
 
 class PipelineStep:
@@ -55,7 +57,25 @@ class PipelineState:
     characters: Optional[Set["Character"]] = None
 
     # graph extraction
-    characters_graph: Optional[Union[List["nx.Graph"], "nx.Graph"]] = None
+    characters_graph: Optional[Union[List[nx.Graph], nx.Graph]] = None
+
+    def export_graph_to_gexf(self, path: str):
+        """Export characters graph to Gephi's gexf format
+
+        :param path: export file path
+        """
+        if not isinstance(self.characters_graph, nx.Graph):
+            raise RuntimeError(
+                f"characters graph cant be exported : {self.characters_graph}"
+            )
+        G = nx.relabel_nodes(
+            self.characters_graph,
+            {
+                character: character.longest_name()  # type: ignore
+                for character in self.characters_graph.nodes()
+            },
+        )
+        nx.write_gexf(G, path)
 
 
 class Pipeline:

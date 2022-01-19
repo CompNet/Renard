@@ -33,7 +33,7 @@ simple example :
    )
 
    out = pipeline(text)
-   nx.write_gexf(out.characters_graph, "./network.gexf")
+   out.export_graph_to_gexf("./network.gexf")
 
 
 Each step of a pipeline may require informations from previous steps
