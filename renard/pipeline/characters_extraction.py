@@ -49,7 +49,7 @@ class NaiveCharactersExtractor(PipelineStep):
         characters = [
             Character(frozenset((entity,)))
             for entity, count in entities.items()
-            if count > self.min_appearance
+            if count >= self.min_appearance
         ]
 
         return {"characters": characters}
