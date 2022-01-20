@@ -17,6 +17,8 @@ def bio_entities(tokens: List[str], bio_tags: List[str]) -> List[Tuple[str, str,
     current_tag: Optional[str] = None
     current_i: Optional[int] = None
 
+    inconsistent_tags_count = 0
+
     def maybe_push_current_entity():
         nonlocal current_entity, current_tag, current_i
         if current_entity is None:
@@ -34,7 +36,7 @@ def bio_entities(tokens: List[str], bio_tags: List[str]) -> List[Tuple[str, str,
             current_i = i
         elif tag.startswith("I-"):
             if current_entity is None:
-                print(f"[warning] inconsistant bio tags. Will try to procede.")
+                inconsistent_tags_count += 1
                 current_entity = token
                 current_tag = tag[2:]
                 current_i = i
@@ -43,6 +45,9 @@ def bio_entities(tokens: List[str], bio_tags: List[str]) -> List[Tuple[str, str,
         else:
             maybe_push_current_entity()
     maybe_push_current_entity()
+
+    if inconsistent_tags_count > 0:
+        print(f"[warning] inconsistent bio tags (x{inconsistent_tags_count})")
 
     return bio_entities
 
