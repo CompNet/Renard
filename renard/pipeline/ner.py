@@ -1,4 +1,5 @@
 from typing import List, Dict, Any, Set, Tuple, Optional, Union
+import torch
 from transformers.tokenization_utils_base import BatchEncoding
 from tqdm import tqdm
 from renard.pipeline.core import PipelineStep
@@ -156,17 +157,18 @@ class BertNamedEntityRecognizer(PipelineStep):
     """An entity recognizer based on BERT"""
 
     def __init__(
-        self, huggingface_model_id: str = "dslim/bert-base-NER", batch_size: int = 4
+        self,
+        model: str = "dslim/bert-base-NER",
+        batch_size: int = 4,
     ):
         """
-        :param huggingface_model_id:
+        :param model: huggingface model id or path to a custom model.
+            Is passed to the huggingface ``from_pretrained`` method.
         :param batch_size:
         """
         from transformers import AutoModelForTokenClassification
 
-        self.model = AutoModelForTokenClassification.from_pretrained(
-            huggingface_model_id
-        )
+        self.model = AutoModelForTokenClassification.from_pretrained(model)
         self.batch_size = batch_size
 
     def __call__(
