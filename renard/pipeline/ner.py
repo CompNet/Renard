@@ -149,7 +149,7 @@ class NLTKNamedEntityRecognizer(PipelineStep):
     def needs(self) -> Set[str]:
         return {"tokens"}
 
-    def produces(self) -> Set[str]:
+    def production(self) -> Set[str]:
         return {"bio_tags"}
 
 
@@ -240,5 +240,5 @@ class BertNamedEntityRecognizer(PipelineStep):
     def needs(self) -> Set[str]:
         return {"bert_batch_encoding", "wp_tokens"}
 
-    def produces(self) -> Set[str]:
+    def production(self) -> Set[str]:
         return {"wp_bio_tags", "bio_tags"}

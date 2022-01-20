@@ -212,7 +212,7 @@ class StanfordCoreNLPPipeline(PipelineStep):
     def needs(self) -> Set[str]:
         return set()
 
-    def produces(self) -> Set[str]:
+    def production(self) -> Set[str]:
         production = {"tokens", "bio_tags"}
         if self.annotate_corefs:
             production.add("corefs")
