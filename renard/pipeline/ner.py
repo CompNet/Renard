@@ -132,6 +132,7 @@ class NLTKNamedEntityRecognizer(PipelineStep):
         :param language: iso 639-2 3-letter language code
         """
         self.language = language
+        super().__init__()
 
     def __call__(self, text: str, tokens: List[str], **kwargs) -> Dict[str, Any]:
         """
@@ -175,6 +176,7 @@ class BertNamedEntityRecognizer(PipelineStep):
 
         self.model = AutoModelForTokenClassification.from_pretrained(model)
         self.batch_size = batch_size
+        super().__init__()
 
     def __call__(
         self,
@@ -198,7 +200,12 @@ class BertNamedEntityRecognizer(PipelineStep):
         with torch.no_grad():
             wp_labels = []
 
-            for batch_i in tqdm(range(batches_nb)):
+            batch_i_s = (
+                tqdm(range(batches_nb))
+                if self.progress_report == "tqdm"
+                else range(batches_nb)
+            )
+            for batch_i in batch_i_s:
                 batch_start = batch_i * self.batch_size
                 batch_end = batch_start + self.batch_size
                 out = self.model(

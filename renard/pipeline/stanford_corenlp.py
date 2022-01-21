@@ -1,12 +1,10 @@
 import os
 from typing import List, Optional, Set, Dict, Any
 
-from tqdm import tqdm
 import stanza
 from stanza.protobuf import CoreNLP_pb2
 from stanza.server import CoreNLPClient
 from stanza.resources.installation import DEFAULT_CORENLP_DIR
-from more_itertools import windowed
 
 from renard.pipeline.core import PipelineStep
 
@@ -115,6 +113,7 @@ class StanfordCoreNLPPipeline(PipelineStep):
         self.corenlp_custom_properties = (
             corenlp_custom_properties if not corenlp_custom_properties is None else {}
         )
+        super().__init__()
 
     def __call__(self, text: str, **kwargs) -> Dict[str, Any]:
         if not corenlp_is_installed():

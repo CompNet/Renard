@@ -43,6 +43,7 @@ class CoOccurencesGraphExtractor(PipelineStep):
                 assert not dynamic_window is None and dynamic_window > 0
         self.dynamic = dynamic
         self.dynamic_window = dynamic_window
+        super().__init__()
 
     def __call__(
         self,

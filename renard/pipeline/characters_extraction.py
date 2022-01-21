@@ -25,6 +25,7 @@ class NaiveCharactersExtractor(PipelineStep):
         :param min_appearance:
         """
         self.min_appearance = min_appearance
+        super().__init__()
 
     def __call__(
         self, text: str, tokens: List[str], bio_tags: List[str], **kwargs
@@ -79,6 +80,7 @@ class GraphRulesCharactersExtractor(PipelineStep):
 
     def __init__(self) -> None:
         self.hypocorism_gazetteer = HypocorismGazetteer()
+        super().__init__()
 
     def __call__(
         self,

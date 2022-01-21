@@ -12,6 +12,7 @@ class CustomSubstitutionPreprocessor(PipelineStep):
             form (match, substitution).
         """
         self.substition_rules = substition_rules
+        super().__init__()
 
     def __call__(self, text: str, **kwargs) -> Dict[str, Any]:
         """

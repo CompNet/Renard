@@ -8,6 +8,7 @@ class NLTKWordTokenizer(PipelineStep):
     def __init__(self, language="eng"):
         """:param language: language, passed to :func:`nltk.word_tokenize`"""
         self.language = language
+        super().__init__()
 
     def __call__(self, text: str, **kwargs) -> Dict[str, Any]:
         """
@@ -36,6 +37,7 @@ class BertTokenizer(PipelineStep):
         from transformers import AutoTokenizer
 
         self.tokenizer = AutoTokenizer.from_pretrained(huggingface_model_id)
+        super().__init__()
 
     def __call__(self, text: str, **kwargs) -> Dict[str, Any]:
         """

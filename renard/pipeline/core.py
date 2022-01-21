@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Any, Dict, Tuple, Set, List, Optional, Union
+from typing import Any, Dict, Tuple, Set, List, Optional, Union, cast
 
 from tqdm import tqdm
 from transformers.tokenization_utils_base import BatchEncoding
@@ -19,6 +19,9 @@ class PipelineStep:
         The ``optional_needs`` method can be overriden by derived classes.
 
     """
+
+    def __init__(self) -> None:
+        self.progress_report = "tqdm"
 
     def __call__(self, text: str, **kwargs) -> Dict[str, Any]:
         raise NotImplementedError()
@@ -81,8 +84,18 @@ class PipelineState:
 class Pipeline:
     """A flexible NLP pipeline"""
 
-    def __init__(self, steps: Tuple[PipelineStep, ...]) -> None:
+    def __init__(
+        self, steps: Tuple[PipelineStep, ...], progress_report: Optional[str] = "tqdm"
+    ) -> None:
+        """
+        :param steps: a ``tuple`` of :class:``PipelineStep``, that will be executed in order
+        :param progress_report: if ``tqdm``, report the pipeline progress using tqdm. Otherwise,
+            does not report progress. This sets the ``progress_report`` attribute for all steps.
+        """
         self.steps = steps
+        self.progress_report = progress_report
+        for step in self.steps:
+            step.progress_report = progress_report
 
     def check_valid(self) -> Tuple[bool, List[str]]:
         """Check that the current pipeline can be run, which is
@@ -126,9 +139,17 @@ class Pipeline:
             print(f"[warning] : {warning}")
 
         state = PipelineState(text)
-        tqdm_steps = tqdm(self.steps, total=len(self.steps))
-        for step in tqdm_steps:
-            tqdm_steps.set_description_str(f"{step.__class__.__name__}")
+
+        if self.progress_report == "tqdm":
+            steps = tqdm(self.steps, total=len(self.steps))
+        else:
+            steps = self.steps
+
+        for step in steps:
+
+            if isinstance(steps, tqdm):
+                steps.set_description_str(f"{step.__class__.__name__}")
+
             out = step(**state.__dict__)
             for key, value in out.items():
                 setattr(state, key, value)
