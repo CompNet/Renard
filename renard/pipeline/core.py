@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from renard.pipeline.corefs import CoreferenceMention
 from typing import Any, Dict, Tuple, Set, List, Optional, Union, cast
 
 from tqdm import tqdm
@@ -54,7 +55,7 @@ class PipelineState:
     bert_batch_encoding: Optional[BatchEncoding] = None
 
     # coreference resolution
-    corefs: Optional[List[List[dict]]] = None
+    corefs: Optional[List["CoreferenceChain"]] = None
 
     # character detection
     characters: Optional[Set["Character"]] = None

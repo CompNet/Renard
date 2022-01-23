@@ -1,10 +1,16 @@
+import re
 from typing import Any, Dict, List, FrozenSet, Set, Optional
 from itertools import combinations
 from collections import defaultdict
 from dataclasses import dataclass
+
+from nameparser import config
+from nameparser import HumanName
+
 from renard.gender import Gender
 from renard.pipeline.ner import bio_entities
 from renard.pipeline.core import PipelineStep
+from renard.pipeline.corefs import CoreferenceChain
 from renard.resources.hypocorisms import HypocorismGazetteer
 from renard.resources.pronouns.pronouns import is_a_female_pronoun, is_a_male_pronoun
 
@@ -86,7 +92,7 @@ class GraphRulesCharactersExtractor(PipelineStep):
         self,
         tokens: List[str],
         bio_tags: List[str],
-        corefs: List[List[dict]] = None,
+        corefs: Optional[List[CoreferenceChain]] = None,
         **kwargs: dict
     ) -> Dict[str, Any]:
         assert len(tokens) == len(bio_tags)
@@ -99,7 +105,7 @@ class GraphRulesCharactersExtractor(PipelineStep):
             if tag.startswith("PER"):
                 G.add_node(mention)
 
-        # rules-based links
+        # link nodes based on several rules
         for (name1, name2) in combinations(G.nodes(), 2):
             if (
                 self.hypocorism_gazetteer.are_related(name1, name2)
@@ -110,18 +116,29 @@ class GraphRulesCharactersExtractor(PipelineStep):
             ):
                 G.add_edge(name1, name2)
 
-        # unlink rules
+        # delete the shortest path between two nodes if two names are found to be impossible to
+        # to be a mention of the same character
         for (name1, name2) in combinations(G.nodes(), 2):
             if corefs is None:
                 break
-            # if characters dont have the same infered gender,
-            # unlink the shortes path between them
+            # check if names dont have the same infered gender
             gender1 = self.infer_name_gender(name1, corefs)
             gender2 = self.infer_name_gender(name2, corefs)
-            if gender1 != gender2:
+            if gender1 != gender2 and not any(
+                [g == Gender.UNKNOWN for g in (gender1, gender2)]
+            ):
                 for path in nx.all_shortest_paths(G, source=name1, target=name2):
                     G.remove_edges_from(path)
-
+            # check if characters have the same last name but a
+            # different first name
+            human_name1 = HumanName(name1)
+            human_name2 = HumanName(name2)
+            if (
+                human_name1.last == human_name2.last
+                and human_name1.first != human_name2.first
+            ):
+                for path in nx.all_shortest_paths(G, source=name1, target=name2):
+                    G.remove_edges_from(path)
         return {
             "characters": [
                 Character(frozenset(names)) for names in nx.connected_components(G)
@@ -129,10 +146,7 @@ class GraphRulesCharactersExtractor(PipelineStep):
         }
 
     def names_are_related_after_title_removal(self, name1: str, name2: str) -> bool:
-        from nameparser import HumanName
-        from nameparser.config import CONSTANTS
-
-        CONSTANTS.string_format = "{first} {middle} {last}"
+        config.CONSTANTS.string_format = "{first} {middle} {last}"
         raw_name1 = HumanName(name1).full_name
         raw_name2 = HumanName(name2).full_name
 
@@ -140,22 +154,44 @@ class GraphRulesCharactersExtractor(PipelineStep):
             raw_name1, raw_name2
         )
 
-    def names_are_in_coref(self, name1: str, name2: str, corefs: List[List[dict]]):
+    def names_are_in_coref(
+        self, name1: str, name2: str, corefs: List[CoreferenceChain]
+    ):
         for coref_chain in corefs:
-            if any([name1 == m["mention"] for m in coref_chain]) and any(
-                [name2 == m["mention"] for m in coref_chain]
+            if any([name1 == m.mention for m in coref_chain.mentions]) and any(
+                [name2 == m.mention for m in coref_chain.mentions]
             ):
                 return True
         return False
 
-    def infer_name_gender(self, name: str, corefs: List[List[dict]]) -> Gender:
-        """Try to infer a character's gender from coreferences chains"""
+    def infer_name_gender(self, name: str, corefs: List[CoreferenceChain]) -> Gender:
+        """Try to infer a name's gender"""
+        # 1. try to infer gender based on honorifics
+        #    TODO: add more gendered honorifics to renard.resources
+        title = HumanName(name).title
+        if any(
+            [
+                re.match(pattern, title)
+                for pattern in (r"[Mm]r\.?", r"[Mm]\.?", r"[Ss]ir", r"[Ll]ord")
+            ]
+        ):
+            return Gender.MALE
+        elif title in any(
+            [
+                re.match(pattern, title)
+                for pattern in (r"[Mm]iss", r"[Mm]r?s\.?", r"[Ll]ady")
+            ]
+        ):
+            return Gender.FEMALE
 
+        # 2. if 1. didn't succeed, inspect coreferences chain
+        #    to see if if the name was coreferent with a
+        #    gendered pronoun
         female_count = 0
         male_count = 0
 
         for coref_chain in corefs:
-            mentions = {m["mention"] for m in coref_chain}
+            mentions = {m.mention for m in coref_chain.mentions}
             if not name in mentions:
                 continue
             for mention in mentions:
