@@ -18,6 +18,7 @@ class CoOccurencesGraphExtractor(PipelineStep):
         co_occurences_dist: int,
         dynamic: Optional[str] = None,
         dynamic_window: Optional[int] = None,
+        dynamic_overlap: int = 0,
     ) -> None:
         """
         :param co_occurences_dist:
@@ -26,13 +27,20 @@ class CoOccurencesGraphExtractor(PipelineStep):
 
             - if ``None`` (the defaul), a ``nx.graph`` is extracted
             - if ``'nx'``, several ``nx.graph`` are extracted. In that
-                case, ``dynamic_window`` *must* be specified.
+                case, ``dynamic_window`` *must* be specified, and
+                overlap *can* be specified.
             - if ``'gephi'``, a single ``nx.graph`` is extracted. This
                 graph has the nice property that exporting it to `gexf`
                 format using ``G.write_gexf()`` will produce a correct
                 dynamic graph that can be read by Gephi. Because of a
                 limitation in networkx, the dynamic weight attribute is
                 stored as ``dweight`` instead of ``weight``.
+
+        :param dynamic_window: dynamic window, in number of interactions.
+            a dynamic window of `n` means that each returned graph will
+            be formed by `n` interactions.
+
+        :param dynamic_overlap: overlap, in number of interactions.
         """
 
         self.co_occurences_dist = co_occurences_dist
@@ -42,7 +50,9 @@ class CoOccurencesGraphExtractor(PipelineStep):
             if dynamic == "nx":
                 assert not dynamic_window is None and dynamic_window > 0
         self.dynamic = dynamic
+        assert self.dynamic_window > self.dynamic_overlap
         self.dynamic_window = dynamic_window
+        self.dynamic_overlap = dynamic_overlap
         super().__init__()
 
     def __call__(
@@ -85,8 +95,8 @@ class CoOccurencesGraphExtractor(PipelineStep):
             # we already checked this at __init__ time
             self.dynamic_window = cast(int, self.dynamic_window)
             return {
-                "characters_graph": self._extract_dynamic_graph2(
-                    character_tokenidx, self.dynamic_window
+                "characters_graph": self._extract_dynamic_graph(
+                    character_tokenidx, self.dynamic_window, self.dynamic_overlap
                 )
             }
         return {"characters_graph": self._extract_graph(character_tokenidx)}
@@ -124,12 +134,12 @@ class CoOccurencesGraphExtractor(PipelineStep):
 
         return G
 
-    def _extract_dynamic_graph2(
-        self, character_tokenidx: List[Tuple[Character, int]], window: int
+    def _extract_dynamic_graph(
+        self, character_tokenidx: List[Tuple[Character, int]], window: int, overlap: int
     ) -> List[nx.Graph]:
         return [
             self._extract_graph([elt for elt in ct if not elt is None])
-            for ct in windowed(character_tokenidx, window)
+            for ct in windowed(character_tokenidx, window, step=window - overlap)
         ]
 
     def _extract_gephi_dynamic_graph(
