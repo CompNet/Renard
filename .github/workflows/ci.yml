@@ -30,7 +30,7 @@ jobs:
         uses: ammaraskar/sphinx-action@0.4
         with:
           docs-folder: "docs/"
-          build-command: "poetry run make html"
+          build-command: "source ../.venv/bin/activate && make html"
       - name: Deploy documentation
         uses: JamesIves/github-pages-deploy-action@v4.2.3
         with:
