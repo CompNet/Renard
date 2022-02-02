@@ -26,3 +26,13 @@ jobs:
         run: |
           source .venv/bin/activate
           python3 -m unittest discover tests
+      - name: Build documentation
+        uses: ammaraskar/sphinx-action@0.4
+        with:
+          docs-folder: "docs/"
+          build-command: "poetry run make html"
+      - name: Deploy documentation
+        uses: JamesIves/github-pages-deploy-action@v4.2.3
+        with:
+          branch: gh-pages
+          folder: "docs/_build/html"
