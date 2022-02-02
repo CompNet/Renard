@@ -45,6 +45,7 @@ autodoc_default_options = {
     "members": True,
     "special-members": True,
     "private-members": True,
+    "exclude-members": "__weakref__",
 }
 
 

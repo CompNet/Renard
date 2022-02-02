@@ -8,7 +8,7 @@ import networkx as nx
 
 
 class PipelineStep:
-    """An abstract pipeline step, executed sequentially
+    """An abstract pipeline step
 
     .. note::
 
@@ -28,39 +28,56 @@ class PipelineStep:
         raise NotImplementedError()
 
     def needs(self) -> Set[str]:
+        """
+        :return: a `set` of state attributes needed by this
+            :class:`PipelineStep`. This method must be overriden
+            by derived classes.
+        """
         raise NotImplementedError()
 
     def optional_needs(self) -> Set[str]:
+        """
+        :return: a `set` of state attributes optionally neeeded by this
+            :class:`PipelineStep`. This method can be overriden by derived
+            classes.
+        """
         return set()
 
     def production(self) -> Set[str]:
+        """
+        :return: a `set` of state attributes produced by this
+            :class:`PipelineStep`. This method must be overriden
+            by derived classes.
+        """
         raise NotImplementedError()
 
 
 @dataclass
 class PipelineState:
-    """The state of a pipeline, annotated in a Pipeline lifetime"""
+    """The state of a pipeline, annotated in a :class:`Pipeline` lifetime"""
 
+    #: input text
     text: str
 
-    # tokenization
+    #: text splitted in tokens
     tokens: Optional[List[str]] = None
-    ## BERT tokenization
+    #: word piece tokens, for BERT-like models
     wp_tokens: Optional[List[str]] = None
 
-    # NER
+    #: BIO NER tags, aligned with ``self.tokens``
     bio_tags: Optional[List[str]] = None
-    ## BERT NER
+    #: BIO NER tags, aligned with ``self.wp_tokens``
     wp_bio_tags: Optional[List[str]] = None
+    #: BERT batch encodings
     bert_batch_encoding: Optional[BatchEncoding] = None
 
-    # coreference resolution
+    #: coreference chains
     corefs: Optional[List["CoreferenceChain"]] = None
 
-    # character detection
+    #: detected characters
     characters: Optional[Set["Character"]] = None
 
-    # graph extraction
+    #: characters graph
     characters_graph: Optional[Union[List[nx.Graph], nx.Graph]] = None
 
     def export_graph_to_gexf(self, path: str):
