@@ -77,9 +77,11 @@
  | <a href="#I"><strong>I</strong></a>
  | <a href="#M"><strong>M</strong></a>
  | <a href="#N"><strong>N</strong></a>
+ | <a href="#O"><strong>O</strong></a>
  | <a href="#P"><strong>P</strong></a>
  | <a href="#R"><strong>R</strong></a>
  | <a href="#S"><strong>S</strong></a>
+ | <a href="#T"><strong>T</strong></a>
  | <a href="#W"><strong>W</strong></a>
  
 </div>
@@ -122,6 +124,8 @@
 </li>
       <li><a href="pipeline.html#renard.pipeline.characters_extraction.Character.__hash__">__hash__() (renard.pipeline.characters_extraction.Character method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="pipeline.html#renard.pipeline.characters_extraction.Character.__init__">__init__() (renard.pipeline.characters_extraction.Character method)</a>
 
       <ul>
@@ -152,8 +156,6 @@
         <li><a href="resources.html#renard.resources.hypocorisms.HypocorismGazetteer.__init__">(renard.resources.hypocorisms.HypocorismGazetteer method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="pipeline.html#renard.pipeline.characters_extraction.Character.__repr__">__repr__() (renard.pipeline.characters_extraction.Character method)</a>
 
       <ul>
@@ -162,18 +164,6 @@
       </ul></li>
       <li><a href="pipeline.html#renard.pipeline.characters_extraction.Character.__setattr__">__setattr__() (renard.pipeline.characters_extraction.Character method)</a>
 </li>
-      <li><a href="pipeline.html#renard.pipeline.characters_extraction.Character.__weakref__">__weakref__ (renard.pipeline.characters_extraction.Character attribute)</a>
-
-      <ul>
-        <li><a href="pipeline.html#renard.pipeline.core.Pipeline.__weakref__">(renard.pipeline.core.Pipeline attribute)</a>
-</li>
-        <li><a href="pipeline.html#renard.pipeline.core.PipelineState.__weakref__">(renard.pipeline.core.PipelineState attribute)</a>
-</li>
-        <li><a href="pipeline.html#renard.pipeline.core.PipelineStep.__weakref__">(renard.pipeline.core.PipelineStep attribute)</a>
-</li>
-        <li><a href="resources.html#renard.resources.hypocorisms.HypocorismGazetteer.__weakref__">(renard.resources.hypocorisms.HypocorismGazetteer attribute)</a>
-</li>
-      </ul></li>
   </ul></td>
 </tr></table>
 
@@ -188,6 +178,8 @@
 <h2 id="B">B</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="pipeline.html#renard.pipeline.core.PipelineState.bert_batch_encoding">bert_batch_encoding (renard.pipeline.core.PipelineState attribute)</a>
+</li>
       <li><a href="pipeline.html#renard.pipeline.ner.BertNamedEntityRecognizer">BertNamedEntityRecognizer (class in renard.pipeline.ner)</a>
 </li>
   </ul></td>
@@ -195,6 +187,8 @@
       <li><a href="pipeline.html#renard.pipeline.tokenization.BertTokenizer">BertTokenizer (class in renard.pipeline.tokenization)</a>
 </li>
       <li><a href="pipeline.html#renard.pipeline.ner.bio_entities">bio_entities() (in module renard.pipeline.ner)</a>
+</li>
+      <li><a href="pipeline.html#renard.pipeline.core.PipelineState.bio_tags">bio_tags (renard.pipeline.core.PipelineState attribute)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -204,11 +198,17 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="pipeline.html#renard.pipeline.characters_extraction.Character">Character (class in renard.pipeline.characters_extraction)</a>
 </li>
+      <li><a href="pipeline.html#renard.pipeline.core.PipelineState.characters">characters (renard.pipeline.core.PipelineState attribute)</a>
+</li>
+      <li><a href="pipeline.html#renard.pipeline.core.PipelineState.characters_graph">characters_graph (renard.pipeline.core.PipelineState attribute)</a>
+</li>
       <li><a href="pipeline.html#renard.pipeline.core.Pipeline.check_valid">check_valid() (renard.pipeline.core.Pipeline method)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="pipeline.html#renard.pipeline.graph_extraction.CoOccurencesGraphExtractor">CoOccurencesGraphExtractor (class in renard.pipeline.graph_extraction)</a>
+</li>
+      <li><a href="pipeline.html#renard.pipeline.core.PipelineState.corefs">corefs (renard.pipeline.core.PipelineState attribute)</a>
 </li>
       <li><a href="pipeline.html#renard.pipeline.stanford_corenlp.corenlp_annotations_bio_tags">corenlp_annotations_bio_tags() (in module renard.pipeline.stanford_corenlp)</a>
 </li>
@@ -264,8 +264,6 @@
       <ul>
         <li><a href="pipeline.html#module-renard.pipeline.characters_extraction">renard.pipeline.characters_extraction</a>
 </li>
-        <li><a href="pipeline.html#module-renard.pipeline.core">renard.pipeline.core</a>
-</li>
         <li><a href="pipeline.html#module-renard.pipeline.graph_extraction">renard.pipeline.graph_extraction</a>
 </li>
         <li><a href="pipeline.html#module-renard.pipeline.ner">renard.pipeline.ner</a>
@@ -285,6 +283,28 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="pipeline.html#renard.pipeline.characters_extraction.NaiveCharactersExtractor">NaiveCharactersExtractor (class in renard.pipeline.characters_extraction)</a>
 </li>
+      <li><a href="pipeline.html#renard.pipeline.characters_extraction.GraphRulesCharactersExtractor.needs">needs() (renard.pipeline.characters_extraction.GraphRulesCharactersExtractor method)</a>
+
+      <ul>
+        <li><a href="pipeline.html#renard.pipeline.characters_extraction.NaiveCharactersExtractor.needs">(renard.pipeline.characters_extraction.NaiveCharactersExtractor method)</a>
+</li>
+        <li><a href="pipeline.html#renard.pipeline.core.PipelineStep.needs">(renard.pipeline.core.PipelineStep method)</a>
+</li>
+        <li><a href="pipeline.html#renard.pipeline.graph_extraction.CoOccurencesGraphExtractor.needs">(renard.pipeline.graph_extraction.CoOccurencesGraphExtractor method)</a>
+</li>
+        <li><a href="pipeline.html#renard.pipeline.ner.BertNamedEntityRecognizer.needs">(renard.pipeline.ner.BertNamedEntityRecognizer method)</a>
+</li>
+        <li><a href="pipeline.html#renard.pipeline.ner.NLTKNamedEntityRecognizer.needs">(renard.pipeline.ner.NLTKNamedEntityRecognizer method)</a>
+</li>
+        <li><a href="pipeline.html#renard.pipeline.preprocessing.CustomSubstitutionPreprocessor.needs">(renard.pipeline.preprocessing.CustomSubstitutionPreprocessor method)</a>
+</li>
+        <li><a href="pipeline.html#renard.pipeline.stanford_corenlp.StanfordCoreNLPPipeline.needs">(renard.pipeline.stanford_corenlp.StanfordCoreNLPPipeline method)</a>
+</li>
+        <li><a href="pipeline.html#renard.pipeline.tokenization.BertTokenizer.needs">(renard.pipeline.tokenization.BertTokenizer method)</a>
+</li>
+        <li><a href="pipeline.html#renard.pipeline.tokenization.NLTKWordTokenizer.needs">(renard.pipeline.tokenization.NLTKWordTokenizer method)</a>
+</li>
+      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="pipeline.html#renard.pipeline.ner.NLTKNamedEntityRecognizer">NLTKNamedEntityRecognizer (class in renard.pipeline.ner)</a>
@@ -294,17 +314,49 @@
   </ul></td>
 </tr></table>
 
+<h2 id="O">O</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="pipeline.html#renard.pipeline.characters_extraction.GraphRulesCharactersExtractor.optional_needs">optional_needs() (renard.pipeline.characters_extraction.GraphRulesCharactersExtractor method)</a>
+
+      <ul>
+        <li><a href="pipeline.html#renard.pipeline.core.PipelineStep.optional_needs">(renard.pipeline.core.PipelineStep method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
 <h2 id="P">P</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="pipeline.html#renard.pipeline.core.Pipeline">Pipeline (class in renard.pipeline.core)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="pipeline.html#renard.pipeline.core.PipelineState">PipelineState (class in renard.pipeline.core)</a>
 </li>
       <li><a href="pipeline.html#renard.pipeline.core.PipelineStep">PipelineStep (class in renard.pipeline.core)</a>
 </li>
+      <li><a href="pipeline.html#renard.pipeline.characters_extraction.GraphRulesCharactersExtractor.production">production() (renard.pipeline.characters_extraction.GraphRulesCharactersExtractor method)</a>
+
+      <ul>
+        <li><a href="pipeline.html#renard.pipeline.characters_extraction.NaiveCharactersExtractor.production">(renard.pipeline.characters_extraction.NaiveCharactersExtractor method)</a>
+</li>
+        <li><a href="pipeline.html#renard.pipeline.core.PipelineStep.production">(renard.pipeline.core.PipelineStep method)</a>
+</li>
+        <li><a href="pipeline.html#renard.pipeline.graph_extraction.CoOccurencesGraphExtractor.production">(renard.pipeline.graph_extraction.CoOccurencesGraphExtractor method)</a>
+</li>
+        <li><a href="pipeline.html#renard.pipeline.ner.BertNamedEntityRecognizer.production">(renard.pipeline.ner.BertNamedEntityRecognizer method)</a>
+</li>
+        <li><a href="pipeline.html#renard.pipeline.ner.NLTKNamedEntityRecognizer.production">(renard.pipeline.ner.NLTKNamedEntityRecognizer method)</a>
+</li>
+        <li><a href="pipeline.html#renard.pipeline.preprocessing.CustomSubstitutionPreprocessor.production">(renard.pipeline.preprocessing.CustomSubstitutionPreprocessor method)</a>
+</li>
+        <li><a href="pipeline.html#renard.pipeline.stanford_corenlp.StanfordCoreNLPPipeline.production">(renard.pipeline.stanford_corenlp.StanfordCoreNLPPipeline method)</a>
+</li>
+        <li><a href="pipeline.html#renard.pipeline.tokenization.BertTokenizer.production">(renard.pipeline.tokenization.BertTokenizer method)</a>
+</li>
+        <li><a href="pipeline.html#renard.pipeline.tokenization.NLTKWordTokenizer.production">(renard.pipeline.tokenization.NLTKWordTokenizer method)</a>
+</li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
@@ -316,13 +368,6 @@
 
       <ul>
         <li><a href="pipeline.html#module-renard.pipeline.characters_extraction">module</a>
-</li>
-      </ul></li>
-      <li>
-    renard.pipeline.core
-
-      <ul>
-        <li><a href="pipeline.html#module-renard.pipeline.core">module</a>
 </li>
       </ul></li>
       <li>
@@ -377,13 +422,29 @@
   </ul></td>
 </tr></table>
 
+<h2 id="T">T</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="pipeline.html#renard.pipeline.core.PipelineState.text">text (renard.pipeline.core.PipelineState attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="pipeline.html#renard.pipeline.core.PipelineState.tokens">tokens (renard.pipeline.core.PipelineState attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
 <h2 id="W">W</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="pipeline.html#renard.pipeline.core.PipelineState.wp_bio_tags">wp_bio_tags (renard.pipeline.core.PipelineState attribute)</a>
+</li>
       <li><a href="pipeline.html#renard.pipeline.ner.BertNamedEntityRecognizer.wp_labels_to_token_labels">wp_labels_to_token_labels() (renard.pipeline.ner.BertNamedEntityRecognizer static method)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="pipeline.html#renard.pipeline.core.PipelineState.wp_tokens">wp_tokens (renard.pipeline.core.PipelineState attribute)</a>
+</li>
       <li><a href="pipeline.html#renard.pipeline.tokenization.BertTokenizer.wp_tokens_to_tokens">wp_tokens_to_tokens() (renard.pipeline.tokenization.BertTokenizer static method)</a>
 </li>
   </ul></td>
