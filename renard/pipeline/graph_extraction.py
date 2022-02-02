@@ -49,8 +49,8 @@ class CoOccurencesGraphExtractor(PipelineStep):
             assert dynamic in {"nx", "gephi"}
             if dynamic == "nx":
                 assert not dynamic_window is None and dynamic_window > 0
+                assert dynamic_window > dynamic_overlap
         self.dynamic = dynamic
-        assert self.dynamic_window > self.dynamic_overlap
         self.dynamic_window = dynamic_window
         self.dynamic_overlap = dynamic_overlap
         super().__init__()
