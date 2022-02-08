@@ -5,6 +5,7 @@ Welcome to Renard's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+   installation
    pipeline
    resources
 
