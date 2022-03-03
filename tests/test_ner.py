@@ -3,7 +3,7 @@ import unittest, string
 from hypothesis import given
 from hypothesis.control import assume
 from hypothesis.strategies import lists, sampled_from
-from renard.pipeline.ner import bio_entities, score_ner
+from renard.pipeline.ner import ner_entities, score_ner
 
 
 class TestScoreNer(unittest.TestCase):
@@ -21,7 +21,7 @@ class TestBioEntities(unittest.TestCase):
     @given(lists(sampled_from(string.ascii_uppercase)))
     def test_has_correct_number_of_entities(self, tokens: List[str]):
         bio_tags = ["B-PER" for _ in tokens]
-        entities = bio_entities(tokens, bio_tags)
+        entities = ner_entities(tokens, bio_tags)
         self.assertEqual(len(entities), len(tokens))
 
 

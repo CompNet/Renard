@@ -8,7 +8,7 @@ from nameparser import config
 from nameparser import HumanName
 
 from renard.gender import Gender
-from renard.pipeline.ner import bio_entities
+from renard.pipeline.ner import ner_entities
 from renard.pipeline.core import PipelineStep
 from renard.pipeline.corefs import CoreferenceChain
 from renard.resources.hypocorisms import HypocorismGazetteer
@@ -101,9 +101,9 @@ class GraphRulesCharactersExtractor(PipelineStep):
 
         # create a graph where each node is a mention detected by NER
         G = nx.Graph()
-        for mention, tag, token_idx in bio_entities(tokens, bio_tags):
-            if tag.startswith("PER"):
-                G.add_node(mention)
+        for entity in ner_entities(tokens, bio_tags):
+            if entity.tag.startswith("PER"):
+                G.add_node(" ".join(entity.tokens))
 
         # link nodes based on several rules
         for (name1, name2) in combinations(G.nodes(), 2):

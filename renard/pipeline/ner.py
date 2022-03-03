@@ -1,55 +1,74 @@
-from typing import List, Dict, Any, Set, Tuple, Optional, Union
-import torch
+from typing import List, Dict, Any, Set, Tuple, Optional
+from dataclasses import dataclass
 from transformers.tokenization_utils_base import BatchEncoding
 from tqdm import tqdm
 from renard.pipeline.core import PipelineStep
 
 
-def bio_entities(tokens: List[str], bio_tags: List[str]) -> List[Tuple[str, str, int]]:
-    """
+@dataclass
+class NEREntity:
+    #: entitiy tokens
+    tokens: List[str]
+    #: NER class (without BIO prefix as in ``PER`` and not ``B-PER``)
+    tag: str
+    #: entity start index
+    start_idx: int
+    #: entity end index
+    end_idx: int
+
+
+def ner_entities(
+    tokens: List[str], bio_tags: List[str], resolve_inconsistencies: bool = True
+) -> List[NEREntity]:
+    """Extract NER entities from a list of BIO tags
+
+    :param tokens:
+    :param bio_tags:
     :return: ``(full entity string, tag, token index)``
     """
     assert len(tokens) == len(bio_tags)
 
-    bio_entities = []
-
-    current_entity: Optional[str] = None
+    entities = []
     current_tag: Optional[str] = None
-    current_i: Optional[int] = None
+    current_tag_start_idx: Optional[int] = None
 
-    inconsistent_tags_count = 0
+    for i, tag in enumerate(bio_tags):
 
-    def maybe_push_current_entity():
-        nonlocal current_entity, current_tag, current_i
-        if current_entity is None:
-            return
-        bio_entities.append((current_entity, current_tag, current_i))
-        current_entity = None
-        current_tag = None
-        current_i = None
+        if not current_tag is None and not tag.startswith("I-"):
+            assert not current_tag_start_idx is None
+            entities.append(
+                NEREntity(
+                    tokens[current_tag_start_idx:i],
+                    current_tag,
+                    current_tag_start_idx,
+                    i - 1,
+                )
+            )
+            current_tag = None
+            current_tag_start_idx = None
 
-    for i, (token, tag) in enumerate(zip(tokens, bio_tags)):
         if tag.startswith("B-"):
-            maybe_push_current_entity()
-            current_entity = token
             current_tag = tag[2:]
-            current_i = i
+            current_tag_start_idx = i
+
         elif tag.startswith("I-"):
-            if current_entity is None:
-                inconsistent_tags_count += 1
-                current_entity = token
+            if current_tag is None and resolve_inconsistencies:
                 current_tag = tag[2:]
-                current_i = i
+                current_tag_start_idx = i
                 continue
-            current_entity += f" {token}"
-        else:
-            maybe_push_current_entity()
-    maybe_push_current_entity()
 
-    if inconsistent_tags_count > 0:
-        print(f"[warning] inconsistent bio tags (x{inconsistent_tags_count})")
+    if not current_tag is None:
+        assert not current_tag_start_idx is None
+        entities.append(
+            NEREntity(
+                tokens[current_tag_start_idx : len(tokens)],
+                current_tag,
+                current_tag_start_idx,
+                len(bio_tags) - 1,
+            )
+        )
 
-    return bio_entities
+    return entities
 
 
 def score_ner(

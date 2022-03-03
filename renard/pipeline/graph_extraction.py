@@ -6,7 +6,7 @@ import networkx as nx
 import numpy as np
 from more_itertools import windowed
 
-from renard.pipeline.ner import bio_entities
+from renard.pipeline.ner import ner_entities
 from renard.pipeline.core import PipelineStep
 
 
@@ -77,12 +77,13 @@ class CoOccurencesGraphExtractor(PipelineStep):
 
         # greedily assign mentions
         character_tokenidx = []
-        for mention, tag, token_idx in bio_entities(tokens, bio_tags):
-            if not tag.startswith("PER"):
+        for entity in ner_entities(tokens, bio_tags):
+            if not entity.tag.startswith("PER"):
                 continue
+            mention = " ".join(entity.tokens)
             for character in characters:
                 if mention in character.names:
-                    character_tokenidx.append((character, token_idx))
+                    character_tokenidx.append((character, entity.start_idx))
                     break
 
         if self.dynamic == "gephi":
