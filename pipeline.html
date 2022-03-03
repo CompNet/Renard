@@ -1126,6 +1126,11 @@ by derived classes.</p>
 <dt class="sig sig-object py" id="renard.pipeline.stanford_corenlp.StanfordCoreNLPPipeline">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">renard.pipeline.stanford_corenlp.</span></span><span class="sig-name descname"><span class="pre">StanfordCoreNLPPipeline</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">annotate_corefs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">corefs_algorithm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'statistical'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">corenlp_custom_properties</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">server_timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">9999999</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">server_kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.stanford_corenlp.StanfordCoreNLPPipeline" title="Permalink to this definition"></a></dt>
 <dd><p>a full NLP pipeline using stanford CoreNLP</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The Stanford CoreNLP pipeline requires the <code class="docutils literal notranslate"><span class="pre">stanza</span></code> library.
+You can install it with poetry using <code class="docutils literal notranslate"><span class="pre">poetry</span> <span class="pre">install</span> <span class="pre">-E</span> <span class="pre">stanza</span></code>.</p>
+</div>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>RAM usage might be high for coreference resolutions as it uses
