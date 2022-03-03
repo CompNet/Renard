@@ -674,6 +674,57 @@ of word piece tokens.</p>
 </dd></dl>
 
 <dl class="py class">
+<dt class="sig sig-object py" id="renard.pipeline.ner.NEREntity">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">renard.pipeline.ner.</span></span><span class="sig-name descname"><span class="pre">NEREntity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tokens</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tag</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_idx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_idx</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.ner.NEREntity" title="Permalink to this definition"></a></dt>
+<dd><dl class="py method">
+<dt class="sig sig-object py" id="renard.pipeline.ner.NEREntity.__eq__">
+<span class="sig-name descname"><span class="pre">__eq__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.ner.NEREntity.__eq__" title="Permalink to this definition"></a></dt>
+<dd><p>Return self==value.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="renard.pipeline.ner.NEREntity.__hash__">
+<span class="sig-name descname"><span class="pre">__hash__</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#renard.pipeline.ner.NEREntity.__hash__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="renard.pipeline.ner.NEREntity.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tokens</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tag</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_idx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_idx</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.ner.NEREntity.__init__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="renard.pipeline.ner.NEREntity.__repr__">
+<span class="sig-name descname"><span class="pre">__repr__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.ner.NEREntity.__repr__" title="Permalink to this definition"></a></dt>
+<dd><p>Return repr(self).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="renard.pipeline.ner.NEREntity.end_idx">
+<span class="sig-name descname"><span class="pre">end_idx</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#renard.pipeline.ner.NEREntity.end_idx" title="Permalink to this definition"></a></dt>
+<dd><p>entity end index</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="renard.pipeline.ner.NEREntity.start_idx">
+<span class="sig-name descname"><span class="pre">start_idx</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#renard.pipeline.ner.NEREntity.start_idx" title="Permalink to this definition"></a></dt>
+<dd><p>entity start index</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="renard.pipeline.ner.NEREntity.tag">
+<span class="sig-name descname"><span class="pre">tag</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#renard.pipeline.ner.NEREntity.tag" title="Permalink to this definition"></a></dt>
+<dd><p>NER class (without BIO prefix as in <code class="docutils literal notranslate"><span class="pre">PER</span></code> and not <code class="docutils literal notranslate"><span class="pre">B-PER</span></code>)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="renard.pipeline.ner.NEREntity.tokens">
+<span class="sig-name descname"><span class="pre">tokens</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#renard.pipeline.ner.NEREntity.tokens" title="Permalink to this definition"></a></dt>
+<dd><p>entitiy tokens</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
 <dt class="sig sig-object py" id="renard.pipeline.ner.NLTKNamedEntityRecognizer">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">renard.pipeline.ner.</span></span><span class="sig-name descname"><span class="pre">NLTKNamedEntityRecognizer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">language</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'eng'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.ner.NLTKNamedEntityRecognizer" title="Permalink to this definition"></a></dt>
 <dd><p>An entity recognizer based on NLTK</p>
@@ -736,14 +787,21 @@ by derived classes.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="renard.pipeline.ner.bio_entities">
-<span class="sig-prename descclassname"><span class="pre">renard.pipeline.ner.</span></span><span class="sig-name descname"><span class="pre">bio_entities</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tokens</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bio_tags</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.ner.bio_entities" title="Permalink to this definition"></a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]]</p>
+<dt class="sig sig-object py" id="renard.pipeline.ner.ner_entities">
+<span class="sig-prename descclassname"><span class="pre">renard.pipeline.ner.</span></span><span class="sig-name descname"><span class="pre">ner_entities</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tokens</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bio_tags</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolve_inconsistencies</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.ner.ner_entities" title="Permalink to this definition"></a></dt>
+<dd><p>Extract NER entities from a list of BIO tags</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tokens</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – </p></li>
+<li><p><strong>bio_tags</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – </p></li>
+</ul>
 </dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">(full</span> <span class="pre">entity</span> <span class="pre">string,</span> <span class="pre">tag,</span> <span class="pre">token</span> <span class="pre">index)</span></code></p>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<a class="reference internal" href="#renard.pipeline.ner.NEREntity" title="renard.pipeline.ner.NEREntity"><code class="xref py py-class docutils literal notranslate"><span class="pre">NEREntity</span></code></a>]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">(full</span> <span class="pre">entity</span> <span class="pre">string,</span> <span class="pre">tag,</span> <span class="pre">token</span> <span class="pre">index)</span></code></p>
 </dd>
 </dl>
 </dd></dl>
@@ -751,7 +809,7 @@ by derived classes.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="renard.pipeline.ner.score_ner">
 <span class="sig-prename descclassname"><span class="pre">renard.pipeline.ner.</span></span><span class="sig-name descname"><span class="pre">score_ner</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pred_bio_tags</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ref_bio_tags</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.ner.score_ner" title="Permalink to this definition"></a></dt>
-<dd><p>Score NER as in CoNLL-2003 shared task</p>
+<dd><p>Score NER as in CoNLL-2003 shared task using <code class="docutils literal notranslate"><span class="pre">seqeval</span></code></p>
 <p>Precision is the percentage of named entities in <code class="docutils literal notranslate"><span class="pre">ref_bio_tags</span></code>
 that are correct. Recall is the percentage of named entities in
 pred_bio_tags that are in ref_bio_tags. F1 is the harmonic mean of
@@ -764,7 +822,7 @@ both.</p>
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>], <code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>], <code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]]</p>
+<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]</p>
 </dd>
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">(precision,</span> <span class="pre">recall,</span> <span class="pre">F1</span> <span class="pre">score)</span></code></p>
