@@ -55,7 +55,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#module-renard.pipeline.ner">NER</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-renard.pipeline.characters_extraction">Characters Extraction</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-renard.pipeline.graph_extraction">Graph Extraction</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#stanford-corenlp-pipeline">Stanford CoreNLP Pipeline</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-renard.pipeline.stanford_corenlp">Stanford CoreNLP Pipeline</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="resources.html">Resources</a></li>
@@ -221,7 +221,7 @@ possible if all steps needs are satisfied</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="renard.pipeline.core.PipelineState.characters">
-<span class="sig-name descname"><span class="pre">characters</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Set</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#renard.pipeline.characters_extraction.Character" title="renard.pipeline.characters_extraction.Character"><span class="pre">Character</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#renard.pipeline.core.PipelineState.characters" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">characters</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Set</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#renard.pipeline.characters_extraction.Character" title="renard.pipeline.characters_extraction.Character"><span class="pre">renard.pipeline.characters_extraction.Character</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#renard.pipeline.core.PipelineState.characters" title="Permalink to this definition"></a></dt>
 <dd><p>detected characters</p>
 </dd></dl>
 
@@ -233,7 +233,7 @@ possible if all steps needs are satisfied</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="renard.pipeline.core.PipelineState.corefs">
-<span class="sig-name descname"><span class="pre">corefs</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">CoreferenceChain</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#renard.pipeline.core.PipelineState.corefs" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">corefs</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">renard.pipeline.corefs.CoreferenceChain</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#renard.pipeline.core.PipelineState.corefs" title="Permalink to this definition"></a></dt>
 <dd><p>coreference chains</p>
 </dd></dl>
 
@@ -1120,8 +1120,116 @@ by derived classes.</p>
 </dd></dl>
 
 </section>
-<section id="stanford-corenlp-pipeline">
-<h2>Stanford CoreNLP Pipeline<a class="headerlink" href="#stanford-corenlp-pipeline" title="Permalink to this headline"></a></h2>
+<section id="module-renard.pipeline.stanford_corenlp">
+<span id="stanford-corenlp-pipeline"></span><h2>Stanford CoreNLP Pipeline<a class="headerlink" href="#module-renard.pipeline.stanford_corenlp" title="Permalink to this headline"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="renard.pipeline.stanford_corenlp.StanfordCoreNLPPipeline">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">renard.pipeline.stanford_corenlp.</span></span><span class="sig-name descname"><span class="pre">StanfordCoreNLPPipeline</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">annotate_corefs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">corefs_algorithm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'statistical'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">corenlp_custom_properties</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">server_timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">9999999</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">server_kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.stanford_corenlp.StanfordCoreNLPPipeline" title="Permalink to this definition"></a></dt>
+<dd><p>a full NLP pipeline using stanford CoreNLP</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>RAM usage might be high for coreference resolutions as it uses
+the entire novel ! If CoreNLP terminates with an out of memory
+error, you can try allocating more memory for the server by
+using <code class="docutils literal notranslate"><span class="pre">server_kwargs</span></code> (example : <code class="docutils literal notranslate"><span class="pre">{&quot;memory&quot;:</span> <span class="pre">&quot;8G&quot;}</span></code>).</p>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="renard.pipeline.stanford_corenlp.StanfordCoreNLPPipeline.__call__">
+<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.stanford_corenlp.StanfordCoreNLPPipeline.__call__" title="Permalink to this definition"></a></dt>
+<dd><p>Call self as a function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="renard.pipeline.stanford_corenlp.StanfordCoreNLPPipeline.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">annotate_corefs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">corefs_algorithm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'statistical'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">corenlp_custom_properties</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">server_timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">9999999</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">server_kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.stanford_corenlp.StanfordCoreNLPPipeline.__init__" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>annotate_corefs</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – <code class="docutils literal notranslate"><span class="pre">True</span></code> if coreferences must be
+annotated, <code class="docutils literal notranslate"><span class="pre">False</span></code> otherwise. This parameter is not
+yet implemented.</p></li>
+<li><p><strong>corefs_algorithm</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – one of <code class="docutils literal notranslate"><span class="pre">{&quot;deterministic&quot;,</span> <span class="pre">&quot;statistical&quot;,</span> <span class="pre">&quot;neural&quot;}</span></code></p></li>
+<li><p><strong>corenlp_custom_properties</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]]) – custom properties dictionary to pass to the
+CoreNLP server. Note that some properties are already set when calling the
+server, so not all properties are supported : it is intended as a last
+resort escape hatch. In particular, do not set <code class="docutils literal notranslate"><span class="pre">'ner.applyFineGrained'</span></code>.
+If you need to set the coreference algorithm used, see <code class="docutils literal notranslate"><span class="pre">corefs_algorithm</span></code>.</p></li>
+<li><p><strong>server_timeout</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – CoreNLP server timeout in ms</p></li>
+<li><p><strong>server_kwargs</strong> – extra args for stanford CoreNLP server. <cite>be_quiet</cite>
+and <cite>max_char_length</cite> are <em>not</em> supported.
+See here for a list of possible args :
+<a class="reference external" href="https://stanfordnlp.github.io/stanza/client_properties.html#corenlp-server-start-options-server">https://stanfordnlp.github.io/stanza/client_properties.html#corenlp-server-start-options-server</a></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="renard.pipeline.stanford_corenlp.StanfordCoreNLPPipeline.needs">
+<span class="sig-name descname"><span class="pre">needs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.stanford_corenlp.StanfordCoreNLPPipeline.needs" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Set</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>a <cite>set</cite> of state attributes needed by this
+<code class="xref py py-class docutils literal notranslate"><span class="pre">PipelineStep</span></code>. This method must be overriden
+by derived classes.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="renard.pipeline.stanford_corenlp.StanfordCoreNLPPipeline.production">
+<span class="sig-name descname"><span class="pre">production</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.stanford_corenlp.StanfordCoreNLPPipeline.production" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Set</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>a <cite>set</cite> of state attributes produced by this
+<code class="xref py py-class docutils literal notranslate"><span class="pre">PipelineStep</span></code>. This method must be overriden
+by derived classes.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="renard.pipeline.stanford_corenlp.corenlp_annotations_bio_tags">
+<span class="sig-prename descclassname"><span class="pre">renard.pipeline.stanford_corenlp.</span></span><span class="sig-name descname"><span class="pre">corenlp_annotations_bio_tags</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">annotations</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.stanford_corenlp.corenlp_annotations_bio_tags" title="Permalink to this definition"></a></dt>
+<dd><p>Returns an array of bio tags extracted from stanford corenlp annotations</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>only PERSON, LOCATION, ORGANIZATION and MISC entities are considered.
+Other types of entities are discarded.
+(see <a class="reference external" href="https://stanfordnlp.github.io/CoreNLP/ner.html#description">https://stanfordnlp.github.io/CoreNLP/ner.html#description</a>) for
+a list of usual coreNLP types.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Weirdly, CoreNLP will annotate pronouns as entities. Only tokens having
+a NNP POS are kept by this function.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>annotations</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Document</span></code>) – stanford coreNLP text annotations</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>an array of bio tags.</p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
 </section>
 
