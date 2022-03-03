@@ -16,7 +16,7 @@ simple example :
 
 .. code-block:: python
 
-   from renard.pipeline.core import Pipeline
+   from renard.pipeline import Pipeline
    from renard.pipeline.tokenization import NLTKWordTokenizer
    from renard.pipeline.ner import NLTKNamedEntityRecognizer
    from renard.pipeline.characters_extraction import NaiveCharactersExtractor
