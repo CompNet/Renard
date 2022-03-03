@@ -2,6 +2,7 @@ from typing import List, Dict, Any, Set, Tuple, Optional
 from dataclasses import dataclass
 from transformers.tokenization_utils_base import BatchEncoding
 from tqdm import tqdm
+from seqeval.metrics import precision_score, recall_score, f1_score
 from renard.pipeline.core import PipelineStep
 
 
@@ -87,9 +88,6 @@ def score_ner(
 
     """
     assert len(pred_bio_tags) == len(ref_bio_tags)
-
-    from seqeval.metrics import precision_score, recall_score, f1_score
-
     return (
         precision_score([ref_bio_tags], [pred_bio_tags]),
         recall_score([ref_bio_tags], [pred_bio_tags]),
