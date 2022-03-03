@@ -69,6 +69,11 @@ def corenlp_annotations_bio_tags(annotations: CoreNLP_pb2.Document) -> List[str]
 class StanfordCoreNLPPipeline(PipelineStep):
     """a full NLP pipeline using stanford CoreNLP
 
+    .. note::
+
+        The Stanford CoreNLP pipeline requires the ``stanza`` library.
+        You can install it with poetry using ``poetry install -E stanza``.
+
     .. warning::
 
         RAM usage might be high for coreference resolutions as it uses
