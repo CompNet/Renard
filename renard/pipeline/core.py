@@ -1,10 +1,14 @@
+from __future__ import annotations
 from dataclasses import dataclass
-from renard.pipeline.corefs import CoreferenceMention
-from typing import Any, Dict, Tuple, Set, List, Optional, Union, cast
+from typing import Any, Dict, Tuple, Set, List, Optional, Union, TYPE_CHECKING
 
 from tqdm import tqdm
 from transformers.tokenization_utils_base import BatchEncoding
 import networkx as nx
+
+if TYPE_CHECKING:
+    from renard.pipeline.corefs import CoreferenceChain
+    from renard.pipeline.characters_extraction import Character
 
 
 class PipelineStep:
@@ -72,10 +76,10 @@ class PipelineState:
     bert_batch_encoding: Optional[BatchEncoding] = None
 
     #: coreference chains
-    corefs: Optional[List["CoreferenceChain"]] = None
+    corefs: Optional[List[CoreferenceChain]] = None
 
     #: detected characters
-    characters: Optional[Set["Character"]] = None
+    characters: Optional[Set[Character]] = None
 
     #: characters graph
     characters_graph: Optional[Union[List[nx.Graph], nx.Graph]] = None
