@@ -48,6 +48,7 @@ autodoc_default_options = {
     "exclude-members": "__weakref__",
 }
 
+autodoc_mock_imports = ["stanza"]
 
 # -- Options for HTML output -------------------------------------------------
 
