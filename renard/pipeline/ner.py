@@ -54,8 +54,8 @@ def bio_entities(tokens: List[str], bio_tags: List[str]) -> List[Tuple[str, str,
 
 def score_ner(
     pred_bio_tags: List[str], ref_bio_tags: List[str]
-) -> Tuple[Optional[float], Optional[float], Optional[float]]:
-    """Score NER as in CoNLL-2003 shared task
+) -> Tuple[float, float, float]:
+    """Score NER as in CoNLL-2003 shared task using ``seqeval``
 
     Precision is the percentage of named entities in ``ref_bio_tags``
     that are correct. Recall is the percentage of named entities in
@@ -69,59 +69,13 @@ def score_ner(
     """
     assert len(pred_bio_tags) == len(ref_bio_tags)
 
-    if len(pred_bio_tags) == 0:
-        return (None, None, None)
+    from seqeval.metrics import precision_score, recall_score, f1_score
 
-    pred_entities = []
-    ref_entities = []
-
-    for (entity_list, tags) in zip(
-        [pred_entities, ref_entities], [pred_bio_tags, ref_bio_tags]
-    ):
-
-        current_entity: Optional[Dict[str, Union[int, str]]] = None
-
-        for i, tag in enumerate(tags):
-
-            if tag.startswith("B-"):
-                if not current_entity is None:
-                    current_entity["end_idx"] = i
-                    entity_list.append(current_entity)
-                current_entity = {"start_idx": i, "type": tag[2:]}
-
-            elif tag.startswith("O"):
-                if not current_entity is None:
-                    current_entity["end_idx"] = i
-                    entity_list.append(current_entity)
-                current_entity = None
-
-        if not current_entity is None:
-            current_entity["end_idx"] = len(tags)
-            entity_list.append(current_entity)
-
-    # TODO: optim
-    correct_predictions = 0
-    for pred_entity in pred_entities:
-        if pred_entity in ref_entities:
-            correct_predictions += 1
-    precision = None
-    if len(pred_entities) > 0:
-        precision = correct_predictions / len(pred_entities)
-
-    # TODO: optim
-    recalled_entities = 0
-    for ref_entity in ref_entities:
-        if ref_entity in pred_entities:
-            recalled_entities += 1
-    recall = None
-    if len(ref_entities) > 0:
-        recall = recalled_entities / len(ref_entities)
-
-    if precision is None or recall is None or precision + recall == 0:
-        return (precision, recall, None)
-    f1 = 2 * precision * recall / (precision + recall)
-
-    return (precision, recall, f1)
+    return (
+        precision_score([ref_bio_tags], [pred_bio_tags]),
+        recall_score([ref_bio_tags], [pred_bio_tags]),
+        f1_score([ref_bio_tags], [pred_bio_tags]),
+    )
 
 
 class NLTKNamedEntityRecognizer(PipelineStep):
