@@ -25,7 +25,7 @@ def ner_entities(
 
     :param tokens:
     :param bio_tags:
-    :return: ``(full entity string, tag, token index)``
+    :return: A list of ner entities, in apparition order
     """
     assert len(tokens) == len(bio_tags)
 
