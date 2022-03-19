@@ -1,10 +1,114 @@
-from typing import Optional, Tuple
+from typing import Dict, List, Optional, Tuple
+import re
 from dataclasses import dataclass
 import torch
 from transformers import BertPreTrainedModel
 from transformers.models.bert.modeling_bert import BertModel
 from transformers.models.bert.configuration_bert import BertConfig
 from renard.utils import spans
+
+
+@dataclass
+class CoreferenceMention:
+    start_idx: int
+    end_idx: int
+    tokens: List[str]
+
+
+@dataclass
+class CoreferenceDocument:
+    tokens: List[str]
+    coref_chains: List[List[CoreferenceMention]]
+
+
+class WikiCorefDataset:
+    """The WikiCoref dataset (http://rali.iro.umontreal.ca/rali/?q=en/wikicoref)"""
+
+    def __init__(self, path: str) -> None:
+        """
+        :param path: path to the root of the WikiCoref dataset
+            downloaded from http://rali.iro.umontreal.ca/rali/?q=en/wikicoref
+        """
+        path = path.rstrip("/")
+
+        self.documents = []
+        document_tokens = []
+        # dict chain id => coref chain
+        document_chains: Dict[str, List[CoreferenceMention]] = {}
+        # dict chain id => list of mention start index
+        open_mentions: Dict[str, List[int]] = {}
+
+        with open(f"{path}/Evaluation/key-OntoNotesScheme") as f:
+
+            for line in f:
+
+                line = line.rstrip("\n")
+
+                if line.startswith("null") or re.fullmatch(r"\W*", line):
+                    continue
+
+                if line.startswith("#end document"):
+                    document = CoreferenceDocument(
+                        document_tokens, list(document_chains.values())
+                    )
+                    self.documents.append(document)
+                    continue
+
+                if line.startswith("#begin document"):
+                    document_tokens = []
+                    document_chains = {}
+                    open_mentions = {}
+                    continue
+
+                splitted = line.split("\t")
+                print(splitted)
+
+                # - tokens
+                document_tokens.append(splitted[3])
+
+                # - coreference datas parsing
+                #
+                # coreference datas are indicated as follows in the dataset. Either :
+                #
+                # * there is a single dash ("-"), indicating no datas
+                #
+                # * there is an ensemble of coref datas, separated by pipes ("|") if
+                #   there are more than 2. coref datas are of the form "(?[0-9]+)?"
+                #   (example : "(71", "(71)", "71)").
+                #   - A starting parenthesis indicate the start of a mention
+                #   - A ending parenthesis indicate the end of a mention
+                #   - The middle number indicates the ID of the coreference chain
+                #     the mention belongs to
+                if splitted[4] == "-":
+                    continue
+
+                coref_datas_list = splitted[4].split("|")
+                for coref_datas in coref_datas_list:
+
+                    mention_is_starting = coref_datas.find("(") != -1
+                    mention_is_ending = coref_datas.find(")") != -1
+                    chain_id = re.search(r"[0-9]+", coref_datas).group(0)
+
+                    if mention_is_starting:
+                        print(f"adding mention from chain {chain_id} to open mentions")
+                        open_mentions[chain_id] = open_mentions.get(chain_id, []) + [
+                            len(document_tokens) - 1
+                        ]
+
+                    if mention_is_ending:
+                        mention_start_idx = open_mentions[chain_id].pop()
+                        print(
+                            f"removing last mention from chain {chain_id} from open mentions"
+                        )
+                        mention_end_idx = len(document_tokens) - 1
+                        mention = CoreferenceMention(
+                            mention_start_idx,
+                            mention_end_idx,
+                            document_tokens[mention_start_idx : mention_end_idx + 1],
+                        )
+                        document_chains[chain_id] = document_chains.get(
+                            chain_id, []
+                        ) + [mention]
 
 
 @dataclass
