@@ -1,11 +1,13 @@
-from typing import Dict, List, Optional, Tuple
+from __future__ import annotations
+from typing import Dict, List, Optional, Tuple, cast
 import re
 from dataclasses import dataclass
+from more_itertools import windowed
 import torch
 from transformers import BertPreTrainedModel
 from transformers.models.bert.modeling_bert import BertModel
 from transformers.models.bert.configuration_bert import BertConfig
-from renard.utils import spans
+from renard.utils import spans, spans_indexs
 
 
 @dataclass
@@ -19,6 +21,40 @@ class CoreferenceMention:
 class CoreferenceDocument:
     tokens: List[str]
     coref_chains: List[List[CoreferenceMention]]
+
+    def document_labels(self, max_span_len: int) -> torch.Tensor:
+        """
+        :return: a tensor of shape ``(spans_nb, spans_nb + 1)``.
+            when ``out[i][j] == 1``, span j is the preceding
+            coreferent mention if span i. when ``j == spans_nb``,
+            i has no preceding coreferent mention.
+        """
+        spans_idx = spans_indexs(self.tokens, max_span_len)
+        spans_nb = len(spans_idx)
+
+        labels = torch.zeros(spans_nb, spans_nb + 1)
+
+        # spans with a preceding mention : mark the preceding mention
+        for chain in self.coref_chains:
+            for prev_mention, mention in windowed(chain, 2):
+                mention = cast(CoreferenceMention, mention)
+                prev_mention = cast(CoreferenceMention, prev_mention)
+                try:
+                    mention_idx = spans_idx.index((mention.start_idx, mention.end_idx))
+                    prev_mention_idx = spans_idx.index(
+                        (prev_mention.start_idx, prev_mention.end_idx)
+                    )
+                    labels[mention_idx][prev_mention_idx] = 1
+                except ValueError:
+                    continue
+
+        # spans without preceding mentions : mark preceding mention to
+        # be the null span
+        for i in range(labels.shape[0]):
+            if torch.equal(labels[i], torch.zeros(spans_nb + 1)):
+                labels[i][spans_nb] = 1
+
+        return labels
 
 
 class WikiCorefDataset:
@@ -114,7 +150,7 @@ class WikiCorefDataset:
 @dataclass
 class BertCoreferenceResolutionOutput:
     logits: torch.Tensor
-    loss: Optional[torch.FloatTensor] = None
+    loss: Optional[torch.Tensor] = None
     hidden_states: Optional[Tuple[torch.FloatTensor]] = None
     attentions: Optional[Tuple[torch.FloatTensor]] = None
 
@@ -274,28 +310,36 @@ class BertForCoreferenceResolution(BertPreTrainedModel):
         mention_compat_scores = mention_compat_scores.reshape(
             (batch_size, spans_nb, spans_nb)
         )
-        assert mention_compat_scores.shape == (batch_size, spans_nb, spans_nb)
+
+        mention_compat_scores = torch.cat(
+            [mention_compat_scores, torch.zeros(batch_size, spans_nb, 1)], dim=2
+        )
+        assert mention_compat_scores.shape == (batch_size, spans_nb, spans_nb + 1)
 
         # -- final mention scores computation --
-        #    s_m(m1) + s_m(m2) + s_c(m1, m2)
-        final_scores = (
-            # (batch_size, spans_nb, spans_nb)
-            torch.stack([mention_scores for _ in range(spans_nb)], dim=1)
-            # (batch_size, spans_nb, spans_nb)
-            + torch.stack([mention_scores for _ in range(spans_nb)], dim=1).transpose(
-                1, 2
-            )
-            # (batch_size, spans_nb, spans_nb)
-            + mention_compat_scores
+        # s_m(m1)
+        mention1_score = torch.cat(
+            [
+                torch.stack([mention_scores for _ in range(spans_nb)], dim=1),
+                torch.zeros(batch_size, spans_nb, 1),
+            ],
+            dim=2,
         )
-        assert final_scores.shape == (batch_size, spans_nb, spans_nb)
+        assert mention1_score.shape == (batch_size, spans_nb, spans_nb + 1)
+
+        # s_m(m2)
+        mention2_score = torch.stack(
+            [mention_scores for _ in range(spans_nb + 1)], dim=1
+        ).transpose(1, 2)
+        assert mention2_score.shape == (batch_size, spans_nb, spans_nb + 1)
+
+        #    s_m(m1) + s_m(m2) + s_c(m1, m2)
+        final_scores = mention1_score + mention2_score + mention_compat_scores
+        assert final_scores.shape == (batch_size, spans_nb, spans_nb + 1)
+
+        # TODO: when is the softmax supposed to go ?
         # (batch_size, spans_nb, spans_nb)
         # final_scores = torch.softmax(final_scores, dim=2)
-
-        # TODO: final_scores and labels should be (spans_nb, spans_nb + 1)
-        #       to account for the dummy antecedent. It seems that the
-        #       score of the combination with the dummy antecedent should
-        #       be 0.
 
         # -- loss computation --
         loss = None
@@ -311,9 +355,9 @@ class BertForCoreferenceResolution(BertPreTrainedModel):
 
     def loss(self, pred_scores: torch.Tensor, labels: torch.Tensor) -> torch.Tensor:
         """
-        :param pred_scores: ``(batch_size, spans_nb, spans_ nb)``
-        :param labels: ``(batch_size, spans_nb, spans_ nb)``
-        :return: ``(batch_size, spans_nb)``
+        :param pred_scores: ``(batch_size, spans_nb, spans_nb + 1)``
+        :param labels: ``(batch_size, spans_nb, spans_nb + 1)``
+        :return: ``(batch_size)``
         """
         # NOTE: reproduced from
         #       https://github.com/kentonl/e2e-coref/blob/master/coref_model.py
@@ -321,13 +365,16 @@ class BertForCoreferenceResolution(BertPreTrainedModel):
         batch_size = pred_scores.shape[0]
         spans_nb = pred_scores.shape[1]
 
-        gold_scores = pred_scores + torch.log(labels)
+        criterion = torch.nn.CrossEntropyLoss()
 
-        marginalized_gold_scores = torch.logsumexp(gold_scores, dim=2)
-        assert marginalized_gold_scores.shape == (batch_size, spans_nb)
+        return criterion(pred_scores.transpose(1, 2), labels.transpose(1, 2))
+        # gold_scores = pred_scores + torch.log(labels)
 
-        log_norm = torch.logsumexp(pred_scores, dim=2)
-        assert log_norm.shape == (batch_size, spans_nb)
+        # marginalized_gold_scores = torch.logsumexp(gold_scores, dim=1)
+        # assert marginalized_gold_scores.shape == (batch_size, spans_nb + 1)
 
-        # (batch_size, spans_nb)
-        return log_norm - marginalized_gold_scores
+        # log_norm = torch.logsumexp(pred_scores, dim=1)
+        # assert log_norm.shape == (batch_size, spans_nb + 1)
+
+        # # (batch_size)
+        # return torch.sum(log_norm - marginalized_gold_scores)
