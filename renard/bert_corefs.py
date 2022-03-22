@@ -1,12 +1,18 @@
 from __future__ import annotations
-from typing import Dict, List, Optional, Tuple, cast
+from typing import Dict, List, Literal, Optional, Tuple, Union, cast
 import re
 from dataclasses import dataclass
 from more_itertools import windowed
 import torch
+from torch.functional import tensordot
+from torch.utils.data import Dataset
 from transformers import BertPreTrainedModel
+from transformers import PreTrainedTokenizerFast
+from transformers.file_utils import PaddingStrategy
+from transformers.data.data_collator import DataCollatorMixin
 from transformers.models.bert.modeling_bert import BertModel
 from transformers.models.bert.configuration_bert import BertConfig
+from transformers.tokenization_utils_base import BatchEncoding, PreTrainedTokenizerBase
 from renard.utils import spans, spans_indexs
 
 
@@ -22,17 +28,18 @@ class CoreferenceDocument:
     tokens: List[str]
     coref_chains: List[List[CoreferenceMention]]
 
-    def document_labels(self, max_span_len: int) -> torch.Tensor:
+    def document_labels(self, max_span_size: int) -> List[List[int]]:
         """
-        :return: a tensor of shape ``(spans_nb, spans_nb + 1)``.
+        :return: a list of shape ``(spans_nb, spans_nb + 1)``.
             when ``out[i][j] == 1``, span j is the preceding
             coreferent mention if span i. when ``j == spans_nb``,
             i has no preceding coreferent mention.
         """
-        spans_idx = spans_indexs(self.tokens, max_span_len)
+        spans_idx = spans_indexs(self.tokens, max_span_size)
         spans_nb = len(spans_idx)
 
-        labels = torch.zeros(spans_nb, spans_nb + 1)
+        # labels = torch.zeros(spans_nb, spans_nb + 1)
+        labels = [[0] * (spans_nb + 1) for _ in range(spans_nb)]
 
         # spans with a preceding mention : mark the preceding mention
         for chain in self.coref_chains:
@@ -50,11 +57,183 @@ class CoreferenceDocument:
 
         # spans without preceding mentions : mark preceding mention to
         # be the null span
-        for i in range(labels.shape[0]):
-            if torch.equal(labels[i], torch.zeros(spans_nb + 1)):
+        for i in range(len(labels)):
+            if all(l == 0 for l in labels[i]):
                 labels[i][spans_nb] = 1
 
         return labels
+
+    def retokenized_document(
+        self, tokenizer: PreTrainedTokenizerFast
+    ) -> CoreferenceDocument:
+        """Returns a new document, retokenized thanks to ``tokenizer``.
+        In particular, coreference chains are adapted to the newly
+        tokenized text.
+
+        .. note::
+
+            The passed tokenizer is called using its ``__call__``
+            method. This means special tokens will be added.
+
+        :param tokenizer: tokenizer used to retokenized the document
+        :return: a new :class:`CoreferenceDocument`
+        """
+        # (silly) exemple for the tokens ["I", "am", "PG"]
+        # a BertTokenizer would produce ["[CLS]", "I", "am", "P", "##G", "[SEP]"]
+        batch = tokenizer(self.tokens, is_split_into_words=True)
+        tokens = tokenizer.convert_ids_to_tokens(batch["input_ids"])
+
+        # words_ids is used to correspond post-tokenization word pieces
+        # to their corresponding pre-tokenization tokens.
+        # for our above example, word_ids would then be : [None, 0, 1, 2, 2, None]
+        words_ids = batch.word_ids(batch_index=0)
+        # reversed words ids will be used to compute mention end index
+        # in the post-tokenization sentence later
+        r_words_ids = list(reversed(words_ids))
+
+        new_chains = []
+        for chain in self.coref_chains:
+            new_chains.append([])
+            for mention in chain:
+                # compute [start_index, end_index] of the mention in
+                # the retokenized sentence
+                # start_idx is the index of the first word-piece corresponding
+                # to the word at its original start index.
+                start_idx = words_ids.index(mention.start_idx)
+                # end_idx is the index of the last word-piece corresponding
+                # to the word at its original end index.
+                end_idx = len(words_ids) - 1 - r_words_ids.index(mention.end_idx)
+                new_chains[-1].append(
+                    CoreferenceMention(
+                        start_idx, end_idx, tokens[start_idx : end_idx + 1]
+                    )
+                )
+
+        return CoreferenceDocument(tokens, new_chains)
+
+    @staticmethod
+    def from_labels(
+        tokens: List[str], labels: List[List[int]], max_span_size: int
+    ) -> CoreferenceDocument:
+        """
+        :param tokens:
+        :param labels:
+        :param max_span_size:
+        """
+        spans_idx = spans_indexs(tokens, max_span_size)
+
+        # last known chain mention index => chain
+        chains: Dict[int, List[CoreferenceMention]] = {}
+        for i, labels_line in enumerate(labels):
+            if labels_line[-1] == 1:
+                # span has no antecedent : nothing to do
+                continue
+            antecedent_index = labels_line.index(1)
+            if not antecedent_index in chains:
+                # span has an antecedent and this antecedent is the first
+                # mention of a chain : create a new chain
+                start_idx, end_idx = spans_idx[antecedent_index]
+                chains[antecedent_index] = [
+                    CoreferenceMention(
+                        start_idx, end_idx, tokens[start_idx : end_idx + 1]
+                    )
+                ]
+            # add current span to its chain
+            start_idx, end_idx = spans_idx[i]
+            chains[antecedent_index].append(
+                CoreferenceMention(start_idx, end_idx, tokens[start_idx : end_idx + 1])
+            )
+            # set last known antecedent index to current index
+            chains[i] = chains.pop(antecedent_index)
+
+        return CoreferenceDocument(tokens, list(chains.values()))
+
+
+@dataclass
+class DataCollatorForSpanClassification(DataCollatorMixin):
+    """
+    .. note::
+
+        Only implements the torch data collator.
+    """
+
+    tokenizer: PreTrainedTokenizerBase
+    max_span_size: int
+    padding: Union[bool, str, PaddingStrategy] = True
+    max_length: Optional[int] = None
+    label_pad_token_id: int = -100
+    return_tensors: Literal["pt"] = "pt"
+
+    def torch_call(self, features) -> Union[dict, BatchEncoding]:
+        labels = (
+            [feature["labels"] for feature in features]
+            if "labels" in features[0].keys()
+            else None
+        )
+        batch = self.tokenizer.pad(
+            features,
+            padding=self.padding,
+            max_length=self.max_length,
+            # Conversion to tensors will fail if we have labels as they are not of the same length yet.
+            return_tensors="pt" if labels is None else None,
+        )
+
+        # keep encoding info
+        batch._encodings = [f.encodings[0] for f in features]
+
+        if labels is None:
+            return batch
+
+        documents = [
+            CoreferenceDocument.from_labels(
+                tokens, labels, max_span_size=self.max_span_size
+            )
+            for tokens, labels in zip(
+                [f["input_ids"] for f in features], [f["labels"] for f in features]
+            )
+        ]
+
+        for document, tokens in zip(documents, batch["input_ids"]):  # type: ignore
+            document.tokens = tokens
+        batch["labels"] = [
+            document.document_labels(self.max_span_size) for document in documents
+        ]
+
+        return BatchEncoding(
+            {k: torch.tensor(v, dtype=torch.int64) for k, v in batch.items()},
+            encoding=batch.encodings,
+        )
+
+
+class CoreferenceDataset(Dataset):
+    """
+    :ivar documents:
+    :ivar tokenizer:
+    :ivar max_span_len:
+    """
+
+    def __init__(
+        self,
+        documents: List[CoreferenceDocument],
+        tokenizer: PreTrainedTokenizerFast,
+        max_span_size: int,
+    ) -> None:
+        super().__init__()
+        self.documents = documents
+        self.tokenizer = tokenizer
+        self.max_span_size = max_span_size
+
+    def __len__(self) -> int:
+        return len(self.documents)
+
+    def __getitem__(self, index: int) -> BatchEncoding:
+        document = self.documents[index]
+        document = document.retokenized_document(self.tokenizer)
+        batch = self.tokenizer(
+            document.tokens, is_split_into_words=True, add_special_tokens=False
+        )
+        batch["labels"] = document.document_labels(self.max_span_size)
+        return batch
 
 
 class WikiCorefDataset:
@@ -333,13 +512,9 @@ class BertForCoreferenceResolution(BertPreTrainedModel):
         ).transpose(1, 2)
         assert mention2_score.shape == (batch_size, spans_nb, spans_nb + 1)
 
-        #    s_m(m1) + s_m(m2) + s_c(m1, m2)
+        # s_m(m1) + s_m(m2) + s_c(m1, m2)
         final_scores = mention1_score + mention2_score + mention_compat_scores
         assert final_scores.shape == (batch_size, spans_nb, spans_nb + 1)
-
-        # TODO: when is the softmax supposed to go ?
-        # (batch_size, spans_nb, spans_nb)
-        # final_scores = torch.softmax(final_scores, dim=2)
 
         # -- loss computation --
         loss = None
@@ -359,22 +534,5 @@ class BertForCoreferenceResolution(BertPreTrainedModel):
         :param labels: ``(batch_size, spans_nb, spans_nb + 1)``
         :return: ``(batch_size)``
         """
-        # NOTE: reproduced from
-        #       https://github.com/kentonl/e2e-coref/blob/master/coref_model.py
-        #       /!\ more understanding is needed.
-        batch_size = pred_scores.shape[0]
-        spans_nb = pred_scores.shape[1]
-
         criterion = torch.nn.CrossEntropyLoss()
-
-        return criterion(pred_scores.transpose(1, 2), labels.transpose(1, 2))
-        # gold_scores = pred_scores + torch.log(labels)
-
-        # marginalized_gold_scores = torch.logsumexp(gold_scores, dim=1)
-        # assert marginalized_gold_scores.shape == (batch_size, spans_nb + 1)
-
-        # log_norm = torch.logsumexp(pred_scores, dim=1)
-        # assert log_norm.shape == (batch_size, spans_nb + 1)
-
-        # # (batch_size)
-        # return torch.sum(log_norm - marginalized_gold_scores)
+        return criterion(pred_scores.transpose(1, 2), labels.transpose(1, 2).float())
