@@ -349,6 +349,8 @@ class BertForCoreferenceResolution(BertPreTrainedModel):
         self.mention_scorer = torch.nn.Linear(2 * config.hidden_size, 1)
         self.mention_compatibility_scorer = torch.nn.Linear(4 * config.hidden_size, 1)
 
+        self.loss_fn = torch.nn.CrossEntropyLoss()
+
     def mention_score(self, span_bounds: torch.Tensor) -> torch.Tensor:
         """Compute a score representing how likely it is that a span is a mention
 
@@ -367,6 +369,60 @@ class BertForCoreferenceResolution(BertPreTrainedModel):
         :return: a tensor of shape ``(batch_size)``
         """
         return self.mention_compatibility_scorer(span_bounds).squeeze(-1)
+
+    def pruned_mentions_indexs(
+        self, mention_scores: torch.Tensor, seq_size: int, k: int
+    ) -> torch.Tensor:
+        """Prune mentions, keeping only the k non-overlapping best of them
+
+        :param mention_scores: a tensor of shape ``(batch_size, spans_nb)``
+        :param seq_size:
+        :param k: the maximum number of spans to keep during the pruning process
+        :return: a tensor of shape ``(batch_size, <= k)``
+        """
+        batch_size = mention_scores.shape[0]
+        spans_nb = mention_scores.shape[1]
+
+        spans_idx = spans_indexs(list(range(seq_size)), self.max_span_size)
+
+        def spans_are_overlapping(
+            span1: Tuple[int, int], span2: Tuple[int, int]
+        ) -> bool:
+            return (span1[1] <= span2[1] and span1[1] >= span2[0]) or (
+                span1[0] >= span2[0] and span1[0] <= span2[1]
+            )
+
+        _, sorted_indexs = torch.sort(mention_scores, 1, descending=True)
+        # TODO: what if we can't have k mentions ??
+        mention_indexs = []
+        # TODO: optim
+        for i in range(batch_size):
+            mention_indexs.append([])
+            for j in range(spans_nb):
+                if len(mention_indexs[-1]) >= k:
+                    break
+                span_index = int(sorted_indexs[i][j].item())
+                if not any(
+                    [
+                        spans_are_overlapping(
+                            spans_idx[span_index], spans_idx[mention_idx]
+                        )
+                        for mention_idx in mention_indexs[-1]
+                    ]
+                ):
+                    mention_indexs[-1].append(sorted_indexs[i][j])
+        mention_indexs = torch.tensor(mention_indexs)
+        assert mention_indexs.shape == (batch_size, k)
+
+        return mention_indexs
+
+    def loss(self, pred_scores: torch.Tensor, labels: torch.Tensor) -> torch.Tensor:
+        """
+        :param pred_scores: ``(batch_size, spans_nb, spans_nb + 1)``
+        :param labels: ``(batch_size, spans_nb, spans_nb + 1)``
+        :return: ``(batch_size)``
+        """
+        return self.loss_fn(pred_scores.transpose(1, 2), labels.transpose(1, 2).float())
 
     def forward(
         self,
@@ -436,31 +492,40 @@ class BertForCoreferenceResolution(BertPreTrainedModel):
         mention_scores = mention_scores.reshape((batch_size, spans_nb))
         assert mention_scores.shape == (batch_size, spans_nb)
 
+        # -- TODO: pruning thanks to mention scores
+        #
+        #    See =section 5= of the E2ECoref paper
+        #    and the C++ kernel found in the
+        #    E2ECoref repository. the algorithm
+        #    seems to be as follows :
+        #    1. sort mention by individual scores
+        #    2. accept mentions from best score to
+        #       least. A mention can only be accepted
+        #       if no previously accepted span is
+        #       overlapping with it. There is a limit
+        #       on the number of accepted sents.
+        # -- WIP --
+        # TODO: k should be a parameter
+        # k = 3
+        # best_mentions_index = self.pruned_mentions_indexs(mention_scores, seq_size, k)
+        # assert best_mentions_index.shape == (batch_size, k)
+
+        # pruned_mention_scores = torch.gather(mention_scores, 1, best_mentions_index)
+        # assert pruned_mention_scores.shape == (batch_size, k)
+
         # -- mention compatibility scores computation --
         #
-        # - TODO: pruning thanks to mention scores
-        #         see =section 5= of the E2ECoref paper
-        #         and the C++ kernel found in the
-        #         E2ECoref repository. the algorithm
-        #         seems to be as follows :
-        #         1. sort mention by individual scores
-        #         2. accept mentions from best score to
-        #            least. A mention can only be accepted
-        #            if no previously accepted span is
-        #            overlapping with it. There is a limit
-        #            on the number of accepted sents.
-
-        # Q: > what is happening just below ?
-        # A: > we create a tensor containing the representation
-        #      of each possible pair of mentions (some
-        #      mentions will be pruned for optimisation, see
-        #      above). Each representation is of shape
-        #      (4, hidden_size). the first dimension (4)
-        #      represents the number of tokens used in a pair
-        #      representation (first token of first span,
-        #      last token of first span, first token of second
-        #      span and last token of second span). There are
-        #      spans_nb ^ 2 such representations.
+        # > what is happening just below ?
+        # > we create a tensor containing the representation
+        #   of each possible pair of mentions (some
+        #   mentions will be pruned for optimisation, see
+        #   above). Each representation is of shape
+        #   (4, hidden_size). the first dimension (4)
+        #   represents the number of tokens used in a pair
+        #   representation (first token of first span,
+        #   last token of first span, first token of second
+        #   span and last token of second span). There are
+        #   spans_nb ^ 2 such representations.
         #
         # /!\ below code could be optimised and has WIP status
         #     see https://github.com/mandarjoshi90/coref/blob/master/overlap.py
@@ -535,12 +600,3 @@ class BertForCoreferenceResolution(BertPreTrainedModel):
             hidden_states=bert_output.hidden_states,
             attentions=bert_output.attentions,
         )
-
-    def loss(self, pred_scores: torch.Tensor, labels: torch.Tensor) -> torch.Tensor:
-        """
-        :param pred_scores: ``(batch_size, spans_nb, spans_nb + 1)``
-        :param labels: ``(batch_size, spans_nb, spans_nb + 1)``
-        :return: ``(batch_size)``
-        """
-        criterion = torch.nn.CrossEntropyLoss()
-        return criterion(pred_scores.transpose(1, 2), labels.transpose(1, 2).float())
