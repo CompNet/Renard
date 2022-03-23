@@ -28,6 +28,9 @@ class CoreferenceDocument:
     tokens: List[str]
     coref_chains: List[List[CoreferenceMention]]
 
+    def __len__(self) -> int:
+        return len(self.tokens)
+
     def document_labels(self, max_span_size: int) -> List[List[int]]:
         """
         :return: a list of shape ``(spans_nb, spans_nb + 1)``.
@@ -80,7 +83,7 @@ class CoreferenceDocument:
         """
         # (silly) exemple for the tokens ["I", "am", "PG"]
         # a BertTokenizer would produce ["[CLS]", "I", "am", "P", "##G", "[SEP]"]
-        batch = tokenizer(self.tokens, is_split_into_words=True)
+        batch = tokenizer(self.tokens, is_split_into_words=True)  # type: ignore
         tokens = tokenizer.convert_ids_to_tokens(batch["input_ids"])
 
         # words_ids is used to correspond post-tokenization word pieces
@@ -231,22 +234,24 @@ class CoreferenceDataset(Dataset):
         document = document.retokenized_document(self.tokenizer)
         batch = self.tokenizer(
             document.tokens, is_split_into_words=True, add_special_tokens=False
-        )
+        )  # type: ignore
         batch["labels"] = document.document_labels(self.max_span_size)
         return batch
 
 
-class WikiCorefDataset:
+class WikiCorefDataset(CoreferenceDataset):
     """The WikiCoref dataset (http://rali.iro.umontreal.ca/rali/?q=en/wikicoref)"""
 
-    def __init__(self, path: str) -> None:
+    def __init__(
+        self, path: str, tokenizer: PreTrainedTokenizerFast, max_span_size: int
+    ) -> None:
         """
         :param path: path to the root of the WikiCoref dataset
             downloaded from http://rali.iro.umontreal.ca/rali/?q=en/wikicoref
         """
         path = path.rstrip("/")
 
-        self.documents = []
+        documents = []
         document_tokens = []
         # dict chain id => coref chain
         document_chains: Dict[str, List[CoreferenceMention]] = {}
@@ -266,7 +271,7 @@ class WikiCorefDataset:
                     document = CoreferenceDocument(
                         document_tokens, list(document_chains.values())
                     )
-                    self.documents.append(document)
+                    documents.append(document)
                     continue
 
                 if line.startswith("#begin document"):
@@ -276,7 +281,6 @@ class WikiCorefDataset:
                     continue
 
                 splitted = line.split("\t")
-                print(splitted)
 
                 # - tokens
                 document_tokens.append(splitted[3])
@@ -305,16 +309,12 @@ class WikiCorefDataset:
                     chain_id = re.search(r"[0-9]+", coref_datas).group(0)
 
                     if mention_is_starting:
-                        print(f"adding mention from chain {chain_id} to open mentions")
                         open_mentions[chain_id] = open_mentions.get(chain_id, []) + [
                             len(document_tokens) - 1
                         ]
 
                     if mention_is_ending:
                         mention_start_idx = open_mentions[chain_id].pop()
-                        print(
-                            f"removing last mention from chain {chain_id} from open mentions"
-                        )
                         mention_end_idx = len(document_tokens) - 1
                         mention = CoreferenceMention(
                             mention_start_idx,
@@ -324,6 +324,8 @@ class WikiCorefDataset:
                         document_chains[chain_id] = document_chains.get(
                             chain_id, []
                         ) + [mention]
+
+        super().__init__(documents, tokenizer, max_span_size)
 
 
 @dataclass
@@ -391,6 +393,8 @@ class BertForCoreferenceResolution(BertPreTrainedModel):
         seq_size = input_ids.shape[1]
         hidden_size = self.config.hidden_size
 
+        device = next(self.parameters()).device
+
         return_dict = (
             return_dict if return_dict is not None else self.config.use_return_dict
         )
@@ -417,7 +421,7 @@ class BertForCoreferenceResolution(BertPreTrainedModel):
         spans_nb = len(spans_idx)
         spans_selector = torch.flatten(
             torch.tensor([[span[0], span[-1]] for span in spans_idx], dtype=torch.long)
-        )
+        ).to(device)
         assert spans_selector.shape == (spans_nb * 2,)
         span_bounds = torch.index_select(encoded_input, 1, spans_selector).reshape(
             batch_size, spans_nb, 2, hidden_size
@@ -491,7 +495,11 @@ class BertForCoreferenceResolution(BertPreTrainedModel):
         )
 
         mention_compat_scores = torch.cat(
-            [mention_compat_scores, torch.zeros(batch_size, spans_nb, 1)], dim=2
+            [
+                mention_compat_scores,
+                torch.zeros(batch_size, spans_nb, 1, device=device),
+            ],
+            dim=2,
         )
         assert mention_compat_scores.shape == (batch_size, spans_nb, spans_nb + 1)
 
@@ -500,7 +508,7 @@ class BertForCoreferenceResolution(BertPreTrainedModel):
         mention1_score = torch.cat(
             [
                 torch.stack([mention_scores for _ in range(spans_nb)], dim=1),
-                torch.zeros(batch_size, spans_nb, 1),
+                torch.zeros(batch_size, spans_nb, 1, device=device),
             ],
             dim=2,
         )
