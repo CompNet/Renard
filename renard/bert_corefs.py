@@ -371,13 +371,24 @@ class BertForCoreferenceResolution(BertPreTrainedModel):
         return self.mention_compatibility_scorer(span_bounds).squeeze(-1)
 
     def pruned_mentions_indexs(
-        self, mention_scores: torch.Tensor, seq_size: int, k: int
+        self, mention_scores: torch.Tensor, seq_size: int, top_mentions_nb: int
     ) -> torch.Tensor:
         """Prune mentions, keeping only the k non-overlapping best of them
 
+        The algorithm works as follows :
+
+        1. Sort mentions by individual scores
+        2. Accept mention in orders, from best to worst score, until k of
+            them are accepted. A mention can only be accepted if no
+            previously accepted span os overlapping with it.
+
+        See section 5 of the E2ECoref paper and the C++ kernel in the
+        E2ECoref repository.
+
+
         :param mention_scores: a tensor of shape ``(batch_size, spans_nb)``
         :param seq_size:
-        :param k: the maximum number of spans to keep during the pruning process
+        :param top_mentions_nb: the maximum number of spans to keep during the pruning process
         :return: a tensor of shape ``(batch_size, <= k)``
         """
         batch_size = mention_scores.shape[0]
@@ -393,13 +404,13 @@ class BertForCoreferenceResolution(BertPreTrainedModel):
             )
 
         _, sorted_indexs = torch.sort(mention_scores, 1, descending=True)
-        # TODO: what if we can't have k mentions ??
+        # TODO: what if we can't have top_mentions_nb mentions ??
         mention_indexs = []
         # TODO: optim
         for i in range(batch_size):
             mention_indexs.append([])
             for j in range(spans_nb):
-                if len(mention_indexs[-1]) >= k:
+                if len(mention_indexs[-1]) >= top_mentions_nb:
                     break
                 span_index = int(sorted_indexs[i][j].item())
                 if not any(
@@ -412,9 +423,41 @@ class BertForCoreferenceResolution(BertPreTrainedModel):
                 ):
                     mention_indexs[-1].append(sorted_indexs[i][j])
         mention_indexs = torch.tensor(mention_indexs)
-        assert mention_indexs.shape == (batch_size, k)
+        assert mention_indexs.shape == (batch_size, top_mentions_nb)
 
         return mention_indexs
+
+    def closest_antecedents_indexs(
+        self, spans_nb, seq_size: int, antecedents_nb: int
+    ) -> torch.Tensor:
+        """Compute the indexs of the k closest mentions
+
+        TODO: optim
+
+        :param spans_nb:
+        :param seq_size:
+        :param antecedents_nb:
+        :return: a tensor of shape ``(spans_nb, antecedents_nb)``
+        """
+        device = next(self.parameters()).device
+
+        def antecedent_dist(
+            span: Tuple[int, int], antecedent: Tuple[int, int]
+        ) -> float:
+            if antecedent[1] >= span[0]:
+                return float("Inf")
+            return span[0] - antecedent[1]
+
+        spans_idx = spans_indexs(list(range(seq_size)), self.max_span_size)
+        dist_matrix = torch.zeros(spans_nb, spans_nb, device=device)
+        for i in range(spans_nb):
+            for j in range(spans_nb):
+                dist_matrix[i][j] = antecedent_dist(spans_idx[i], spans_idx[j])
+
+        _, close_indexs = torch.topk(-dist_matrix, antecedents_nb)
+        assert close_indexs.shape == (spans_nb, antecedents_nb)
+
+        return close_indexs
 
     def loss(self, pred_scores: torch.Tensor, labels: torch.Tensor) -> torch.Tensor:
         """
@@ -440,9 +483,9 @@ class BertForCoreferenceResolution(BertPreTrainedModel):
         """
         TODO: add return type
 
-        :param input_ids: a :class:`torch.Tensor` of shape ``(batch_size, seq_size)``
-        :param attention_mask:
-        :param labels: a :class:`torch.Tensor` of shape ``(batch_size, spans_nb, spans_nb)``
+        :param input_ids: a tensor of shape ``(batch_size, seq_size)``
+        :param attention_mask: a tensor of shape ``(batch_size, seq_size)``
+        :param labels: a tensor of shape ``(batch_size, spans_nb, spans_nb)``
         """
 
         batch_size = input_ids.shape[0]
@@ -492,29 +535,38 @@ class BertForCoreferenceResolution(BertPreTrainedModel):
         mention_scores = mention_scores.reshape((batch_size, spans_nb))
         assert mention_scores.shape == (batch_size, spans_nb)
 
-        # -- TODO: pruning thanks to mention scores
-        #
-        #    See =section 5= of the E2ECoref paper
-        #    and the C++ kernel found in the
-        #    E2ECoref repository. the algorithm
-        #    seems to be as follows :
-        #    1. sort mention by individual scores
-        #    2. accept mentions from best score to
-        #       least. A mention can only be accepted
-        #       if no previously accepted span is
-        #       overlapping with it. There is a limit
-        #       on the number of accepted sents.
-        # -- WIP --
-        # TODO: k should be a parameter
-        # k = 3
-        # best_mentions_index = self.pruned_mentions_indexs(mention_scores, seq_size, k)
-        # assert best_mentions_index.shape == (batch_size, k)
+        # -- pruning thanks to mention scores
+        # TODO: top_mentions_nb should be a parameter
+        #       depending on the length of input sentences
+        #       (it is denoted as 'lambda * T' in the paper)
+        top_mentions_nb = 3
+        best_mentions_index = self.pruned_mentions_indexs(
+            mention_scores, seq_size, top_mentions_nb
+        )
+        assert best_mentions_index.shape == (batch_size, top_mentions_nb)
+
+        antecedents_nb = min(3, top_mentions_nb)
+        antecedents_index = self.closest_antecedents_indexs(
+            spans_nb, seq_size, antecedents_nb=antecedents_nb
+        )
+        antecedents_index = torch.tile(antecedents_index, (batch_size, 1, 1))
+        assert antecedents_index.shape == (batch_size, seq_size, antecedents_nb)
 
         # pruned_mention_scores = torch.gather(mention_scores, 1, best_mentions_index)
-        # assert pruned_mention_scores.shape == (batch_size, k)
+        # assert pruned_mention_scores.shape == (batch_size, top_mentions_nb)
 
         # -- mention compatibility scores computation --
-        #
+        top_mentions_bounds = torch.gather(span_bounds, 1, best_mentions_index)
+        assert top_mentions_bounds.shape == (
+            batch_size,
+            top_mentions_nb,
+            2,
+            hidden_size,
+        )
+
+        antecedents_bounds = torch.gather(span_bounds, 1, antecedents_index)
+        assert antecedents_bounds.shape == (batch_size, antecedents_nb, 2, hidden_size)
+
         # > what is happening just below ?
         # > we create a tensor containing the representation
         #   of each possible pair of mentions (some
@@ -536,7 +588,13 @@ class BertForCoreferenceResolution(BertPreTrainedModel):
                 # representation for a pair of mentions
                 # (batch_size, 4, hidden_size)
                 torch.flatten(
-                    torch.cat((span_bounds[:, i, :, :], span_bounds[:, j, :, :]), 1),
+                    torch.cat(
+                        (
+                            top_mentions_bounds[:, i, :, :],
+                            antecedents_bounds[:, j, :, :],
+                        ),
+                        1,
+                    ),
                     start_dim=1,
                     end_dim=2,
                 )
@@ -559,6 +617,7 @@ class BertForCoreferenceResolution(BertPreTrainedModel):
             (batch_size, spans_nb, spans_nb)
         )
 
+        # add in dummy mention scores
         mention_compat_scores = torch.cat(
             [
                 mention_compat_scores,
