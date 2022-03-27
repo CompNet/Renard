@@ -13,7 +13,7 @@ from transformers.data.data_collator import DataCollatorMixin
 from transformers.models.bert.modeling_bert import BertModel
 from transformers.models.bert.configuration_bert import BertConfig
 from transformers.tokenization_utils_base import BatchEncoding, PreTrainedTokenizerBase
-from renard.utils import spans, spans_indexs
+from renard.utils import spans, spans_indexs, batch_index_select
 
 
 @dataclass
@@ -337,13 +337,33 @@ class BertCoreferenceResolutionOutput:
 
 
 class BertForCoreferenceResolution(BertPreTrainedModel):
-    """"""
+    """BERT for Coreference Resolution
 
-    def __init__(self, config: BertConfig, max_span_size: int = 3):
+    .. note ::
+
+        We use the following short notation to annotate shapes :
+
+        - b : batch_size
+        - s : seq_size
+        - p : spans_nb
+        - m : top_mentions_nb
+        - a : antecedents_nb
+        - h : hidden_size
+    """
+
+    def __init__(
+        self,
+        config: BertConfig,
+        top_mentions_nb: int,
+        antecedents_nb: int,
+        max_span_size: int,
+    ):
         super().__init__(config)
 
         self.bert = BertModel(config, add_pooling_layer=False)
 
+        self.top_mentions_nb = top_mentions_nb
+        self.antecedents_nb = antecedents_nb
         self.max_span_size = max_span_size
 
         self.mention_scorer = torch.nn.Linear(2 * config.hidden_size, 1)
@@ -489,9 +509,9 @@ class BertForCoreferenceResolution(BertPreTrainedModel):
         :param labels: a tensor of shape ``(batch_size, spans_nb, spans_nb)``
         """
 
-        batch_size = input_ids.shape[0]
-        seq_size = input_ids.shape[1]
-        hidden_size = self.config.hidden_size
+        batch_size = b = input_ids.shape[0]
+        seq_size = s = input_ids.shape[1]
+        hidden_size = h = self.config.hidden_size
 
         device = next(self.parameters()).device
 
@@ -512,73 +532,66 @@ class BertForCoreferenceResolution(BertPreTrainedModel):
         )
 
         encoded_input = bert_output.last_hidden_state
-        assert encoded_input.shape == (batch_size, seq_size, hidden_size)
+        assert encoded_input.shape == (b, s, h)
 
         # -- span bounds computation --
         # we select starting and ending bounds of spans of length up
         # to self.max_span_size
         spans_idx = spans(range(seq_size), self.max_span_size)
-        spans_nb = len(spans_idx)
+        spans_nb = p = len(spans_idx)
         spans_selector = torch.flatten(
             torch.tensor([[span[0], span[-1]] for span in spans_idx], dtype=torch.long)
         ).to(device)
-        assert spans_selector.shape == (spans_nb * 2,)
-        span_bounds = torch.index_select(encoded_input, 1, spans_selector).reshape(
-            batch_size, spans_nb, 2, hidden_size
-        )
-        assert span_bounds.shape == (batch_size, spans_nb, 2, hidden_size)
+        assert spans_selector.shape == (p * 2,)
+        span_bounds = torch.index_select(encoded_input, 1, spans_selector)
+        span_bounds = span_bounds.reshape(b, p, 2, h)
 
         # -- mention scores computation --
         mention_scores = self.mention_score(
             torch.flatten(span_bounds, start_dim=0, end_dim=1)
         )
-        assert mention_scores.shape == (batch_size * spans_nb,)
-        mention_scores = mention_scores.reshape((batch_size, spans_nb))
-        assert mention_scores.shape == (batch_size, spans_nb)
+        assert mention_scores.shape == (b * p,)
+        mention_scores = mention_scores.reshape(b, p)
 
         # -- pruning thanks to mention scores --
         # TODO: top_mentions_nb should be a parameter
         #       depending on the length of input sentences
         #       (it is denoted as 'lambda * T' in the paper)
-        top_mentions_nb = 3
-        # top_mentions_index is the index of the top_mentions_nb
-        # best non-overlapping mentions
+        top_mentions_nb = m = 3
+
+        # top_mentions_index is the index of the m best
+        # non-overlapping mentions
         top_mentions_index = self.pruned_mentions_indexs(
             mention_scores, seq_size, top_mentions_nb
         )
-        assert top_mentions_index.shape == (batch_size, top_mentions_nb)
+        assert top_mentions_index.shape == (b, m)
 
-        antecedents_nb = min(3, top_mentions_nb)
+        # antecedents_index contains the index of the a closest
+        # antecedents for each spans
+        antecedents_nb = a = min(3, top_mentions_nb)
         antecedents_index = self.closest_antecedents_indexs(
             spans_nb, seq_size, antecedents_nb
         )
         antecedents_index = torch.tile(antecedents_index, (batch_size, 1, 1))
-        assert antecedents_index.shape == (batch_size, spans_nb, antecedents_nb)
+        assert antecedents_index.shape == (b, p, a)
 
         # -- mention compatibility scores computation --
         # top_mentions_bounds keep only span bounds for spans with enough score
-        top_mentions_bounds = torch.gather(
-            span_bounds,
-            1,
-            # (batch_size, top_mentions_nb, 2, hidden_size)
-            top_mentions_index.reshape(batch_size, top_mentions_nb, 1, 1).expand(
-                -1, -1, 2, hidden_size
-            ),
-        )
-        assert top_mentions_bounds.shape == (
-            batch_size,
-            top_mentions_nb,
-            2,
-            hidden_size,
-        )
+        top_mentions_bounds = batch_index_select(span_bounds, 1, top_mentions_index)
+        assert top_mentions_bounds.shape == (b, m, 2, h)
 
-        # TODO:
-        antecedents_bounds = torch.index_select(span_bounds, 1, antecedents_index)
-        assert antecedents_bounds.shape == (batch_size, antecedents_nb, 2, hidden_size)
+        top_antecedents_index = batch_index_select(
+            antecedents_index, 1, top_mentions_index
+        )
+        assert top_antecedents_index.shape == (b, m, a)
+
+        top_antecedents_bounds = batch_index_select(
+            span_bounds, 1, top_antecedents_index.flatten(start_dim=1)
+        )
+        top_antecedents_bounds = top_antecedents_bounds.reshape(b, m, a, 2, h)
 
         # span_bounds_combination is a tensor containing the
-        # representation of each possible pair of mentions (some
-        # mentions will be pruned for optimisation, see above). Each
+        # representation of each possible pair of mentions. Each
         # representation is of shape (4, hidden_size). the first
         # dimension (4) represents the number of tokens used in a pair
         # representation (first token of first span, last token of
@@ -590,39 +603,30 @@ class BertForCoreferenceResolution(BertPreTrainedModel):
         #     for inspiration.
         span_bounds_combination = torch.stack(
             [
-                # representation for a pair of mentions
-                # (batch_size, 4, hidden_size)
-                torch.flatten(
-                    torch.cat(
-                        (
-                            top_mentions_bounds[:, i, :, :],
-                            antecedents_bounds[:, j, :, :],
-                        ),
-                        1,
-                    ),
-                    start_dim=1,
-                    end_dim=2,
+                # each tensor has shape : (batch_size, 4, hidden_size)
+                torch.cat(
+                    [
+                        # (batch_size, 2, hidden_size)
+                        top_mentions_bounds[:, i, :, :],
+                        # (batch_size, 2, hidden_size)
+                        top_antecedents_bounds[:, i, j, :, :],
+                    ],
+                    1,
                 )
                 for i in range(top_mentions_nb)
                 for j in range(antecedents_nb)
             ],
             dim=1,
         )
-        assert span_bounds_combination.shape == (
-            batch_size,
-            top_mentions_nb * antecedents_nb,
-            4 * hidden_size,
-        )
+        assert span_bounds_combination.shape == (b, m * a, 4, h)
+        span_bounds_combination = torch.flatten(span_bounds_combination, start_dim=2)
+        assert span_bounds_combination.shape == (b, m * a, 4 * h)
 
         mention_pair_scores = self.mention_compatibility_score(
             torch.flatten(span_bounds_combination, start_dim=0, end_dim=1)
         )
-        assert mention_pair_scores.shape == (
-            batch_size * top_mentions_nb * antecedents_nb,
-        )
-        mention_pair_scores = mention_pair_scores.reshape(
-            (batch_size, top_mentions_nb, antecedents_nb)
-        )
+        assert mention_pair_scores.shape == (b * m * a,)
+        mention_pair_scores = mention_pair_scores.reshape(b, m, a)
 
         # add in dummy mention scores
         dummy_scores = torch.zeros(batch_size, top_mentions_nb, 1, device=device)
@@ -633,15 +637,11 @@ class BertForCoreferenceResolution(BertPreTrainedModel):
             ],
             dim=2,
         )
-        assert mention_pair_scores.shape == (
-            batch_size,
-            top_mentions_nb,
-            antecedents_nb + 1,
-        )
+        assert mention_pair_scores.shape == (b, m, a + 1)
 
         # -- final mention scores computation --
         top_mention_scores = torch.gather(mention_scores, 1, top_mentions_index)
-        assert top_mention_scores.shape == (batch_size, top_mentions_nb)
+        assert top_mention_scores.shape == (b, m)
 
         # s_m(m1)
         # TODO: use torch.tile
@@ -654,26 +654,37 @@ class BertForCoreferenceResolution(BertPreTrainedModel):
             ],
             dim=2,
         )
-        assert mention1_score.shape == (batch_size, top_mentions_nb, antecedents_nb + 1)
+        assert mention1_score.shape == (b, m, a + 1)
 
         # s_m(m2)
         # TODO: use torch.tile
         mention2_score = torch.stack(
-            [mention_scores for _ in range(antecedents_nb + 1)], dim=1
+            [top_mention_scores for _ in range(antecedents_nb + 1)], dim=1
         ).transpose(1, 2)
-        assert mention2_score.shape == (batch_size, top_mentions_nb, antecedents_nb + 1)
+        assert mention2_score.shape == (b, m, a + 1)
 
         # s_m(m1) + s_m(m2) + s_c(m1, m2)
         final_scores = mention1_score + mention2_score + mention_pair_scores
-        assert final_scores.shape == (batch_size, top_mentions_nb, antecedents_nb + 1)
+        assert final_scores.shape == (b, m, a + 1)
 
-        # TODO: reconstruct scores
-        breakpoint()
+        # reconstruct scores
+        # TODO: perf
+        # TODO: correctness
+        full_final_scores = torch.full(
+            (b, p, p + 1), -100, device=device, dtype=torch.float
+        )
+        for b in range(batch_size):
+            for i in range(top_mentions_nb):
+                m_idx = int(top_mentions_index[b][i].item())
+                for j in range(antecedents_nb):  # TODO: + 1
+                    a_idx = int(antecedents_index[b][i][j].item())
+                    full_final_scores[b][m_idx][a_idx] = final_scores[b][i][j]
+                full_final_scores[b][m_idx][-1] = final_scores[b][i][-1]
 
         # -- loss computation --
         loss = None
         if labels is not None:
-            loss = self.loss(final_scores, labels)
+            loss = self.loss(full_final_scores, labels)
 
         return BertCoreferenceResolutionOutput(
             logits=final_scores,
