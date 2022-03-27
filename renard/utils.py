@@ -1,5 +1,6 @@
-from more_itertools.more import windowed
 from typing import List, Tuple, TypeVar, Iterable, cast
+from more_itertools.more import windowed
+import torch
 
 
 T = TypeVar("T")
@@ -33,3 +34,29 @@ def spans_indexs(seq: List, max_len: int) -> List[Tuple[int, int]]:
             span = cast(Tuple[int, ...], span)
             indexs.append((min(span), max(span)))
     return indexs
+
+
+def batch_index_select(
+    input: torch.Tensor, dim: int, index: torch.Tensor
+) -> torch.Tensor:
+    """Batched version of :func:`torch.index_select`.
+    Inspired by https://discuss.pytorch.org/t/batched-index-select/9115/8
+
+    :param input: a torch tensor of shape ``(B, *)`` where ``*``
+        is any number of additional dimensions.
+    :param dim: the dimension in which to index
+    :param index: index tensor of shape ``(B, I)``
+
+    :return: a tensor which indexes ``input`` along dimension ``dim``
+        using ``index``. This tensor has the same shape as ``input``,
+        except in dimension ``dim``, where it has dimension ``I``.
+    """
+    batch_size = input.shape[0]
+
+    view = [batch_size] + [1 if i != dim else -1 for i in range(1, len(input.shape))]
+
+    expansion = list(input.shape)
+    expansion[0] = batch_size
+    expansion[dim] = -1
+
+    return torch.gather(input, dim, index.view(view).expand(expansion))
