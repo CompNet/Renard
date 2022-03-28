@@ -677,7 +677,7 @@ class BertForCoreferenceResolution(BertPreTrainedModel):
             for i in range(top_mentions_nb):
                 m_idx = int(top_mentions_index[b][i].item())
                 for j in range(antecedents_nb):  # TODO: + 1
-                    a_idx = int(antecedents_index[b][i][j].item())
+                    a_idx = int(antecedents_index[b][m_idx][j].item())
                     full_final_scores[b][m_idx][a_idx] = final_scores[b][i][j]
                 full_final_scores[b][m_idx][-1] = final_scores[b][i][-1]
 
