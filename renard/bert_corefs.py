@@ -44,17 +44,18 @@ class CoreferenceDocument:
         # labels = torch.zeros(spans_nb, spans_nb + 1)
         labels = [[0] * (spans_nb + 1) for _ in range(spans_nb)]
 
-        # spans with a preceding mention : mark the preceding mention
+        # spans in a coref chain : mark all antecedents
         for chain in self.coref_chains:
-            for prev_mention, mention in windowed(chain, 2):
-                mention = cast(CoreferenceMention, mention)
-                prev_mention = cast(CoreferenceMention, prev_mention)
+            for mention in chain:
                 try:
                     mention_idx = spans_idx.index((mention.start_idx, mention.end_idx))
-                    prev_mention_idx = spans_idx.index(
-                        (prev_mention.start_idx, prev_mention.end_idx)
-                    )
-                    labels[mention_idx][prev_mention_idx] = 1
+                    for other_mention in chain:
+                        if other_mention == mention:
+                            continue
+                        other_mention_idx = spans_idx.index(
+                            (other_mention.start_idx, other_mention.end_idx)
+                        )
+                        labels[mention_idx][other_mention_idx] = 1
                 except ValueError:
                     continue
 
@@ -116,6 +117,41 @@ class CoreferenceDocument:
 
     @staticmethod
     def from_labels(
+        tokens: List[str], labels: List[List[int]], max_span_size: int
+    ) -> CoreferenceDocument:
+        """Construct a CoreferenceDocument using labels
+
+        :param tokens:
+        :param labels: ``(spans_nb, spans_nb + 1)``
+        :param max_span_size:
+        """
+        spans_idx = spans_indexs(tokens, max_span_size)
+
+        chains = []
+        already_visited_mentions = []
+        for i, mention_labels in enumerate(labels):
+            if mention_labels[-1] == 1:
+                continue
+            if i in already_visited_mentions:
+                continue
+            start_idx, end_idx = spans_idx[i]
+            mention_tokens = tokens[start_idx : end_idx + 1]
+            chain = [CoreferenceMention(start_idx, end_idx, tokens=mention_tokens)]
+            for j, label in enumerate(mention_labels):
+                if label == 0:
+                    continue
+                start_idx, end_idx = spans_idx[j]
+                mention_tokens = tokens[start_idx : end_idx + 1]
+                chain.append(
+                    CoreferenceMention(start_idx, end_idx, tokens=mention_tokens)
+                )
+                already_visited_mentions.append(j)
+            chains.append(chain)
+
+        return CoreferenceDocument(tokens, chains)
+
+    @staticmethod
+    def from_labels_old(
         tokens: List[str], labels: List[List[int]], max_span_size: int
     ) -> CoreferenceDocument:
         """
@@ -330,10 +366,87 @@ class WikiCorefDataset(CoreferenceDataset):
 
 @dataclass
 class BertCoreferenceResolutionOutput:
+
+    # (batch_size, top_mentions_nb, antecedents_nb + 1)
     logits: torch.Tensor
+
+    # (batch_size, top_mentions_nb)
+    top_mentions_index: torch.Tensor
+
+    # (batch_size, top_mentions_nb, antecedents_nb)
+    top_antecedents_index: torch.Tensor
+
+    max_span_size: int
+
     loss: Optional[torch.Tensor] = None
+
     hidden_states: Optional[Tuple[torch.FloatTensor]] = None
     attentions: Optional[Tuple[torch.FloatTensor]] = None
+
+    def coreference_documents(
+        self, tokens: List[List[str]]
+    ) -> List[CoreferenceDocument]:
+        """"""
+
+        batch_size = self.logits.shape[0]
+        top_mentions_nb = self.logits.shape[1]
+        antecedents_nb = self.logits.shape[2]
+
+        _, antecedents_idx = torch.max(self.logits, 2)
+        assert antecedents_idx.shape == (batch_size, top_mentions_nb)
+
+        documents = []
+
+        for i in range(batch_size):
+
+            spans_idx = spans_indexs(tokens[i], self.max_span_size)
+
+            document = CoreferenceDocument(tokens[i], [])
+            span_coord_to_chain_id: Dict[Tuple[int, int], int] = {}
+
+            for j in range(top_mentions_nb):
+
+                span_idx = int(self.top_mentions_index[i][j].item())
+                span_coords = spans_idx[span_idx]
+
+                top_antecedent_idx = int(antecedents_idx[i][j].item())
+
+                # the antecedent is the dummy mention : skip
+                if top_antecedent_idx == antecedents_nb - 1:
+                    continue
+
+                antecedent_idx = int(
+                    self.top_antecedents_index[i][j][top_antecedent_idx].item()
+                )
+
+                antecedent_coords = spans_idx[antecedent_idx]
+
+                # antecedent
+                if antecedent_coords in span_coord_to_chain_id:
+                    chain_id = span_coord_to_chain_id[antecedent_coords]
+                else:
+                    # new chain
+                    chain_id = len(document.coref_chains)
+                    # create a new chain in the document
+                    start_idx, end_idx = antecedent_coords[0], antecedent_coords[1]
+                    mention = CoreferenceMention(
+                        start_idx, end_idx, tokens[i][start_idx : end_idx + 1]
+                    )
+                    document.coref_chains.append([mention])
+                    # register the id of this chain
+                    span_coord_to_chain_id[(start_idx, end_idx)] = chain_id
+
+                # current span
+                start_idx, end_idx = span_coords[0], span_coords[1]
+                mention = CoreferenceMention(
+                    start_idx, end_idx, tokens[i][start_idx : end_idx + 1]
+                )
+                document.coref_chains[chain_id].append(mention)
+                span_coord_to_chain_id[(start_idx, end_idx)] = chain_id
+
+            documents.append(document)
+
+        return documents
 
 
 class BertForCoreferenceResolution(BertPreTrainedModel):
@@ -354,7 +467,7 @@ class BertForCoreferenceResolution(BertPreTrainedModel):
     def __init__(
         self,
         config: BertConfig,
-        top_mentions_nb: int,
+        mentions_per_tokens: float,
         antecedents_nb: int,
         max_span_size: int,
     ):
@@ -362,12 +475,17 @@ class BertForCoreferenceResolution(BertPreTrainedModel):
 
         self.bert = BertModel(config, add_pooling_layer=False)
 
-        self.top_mentions_nb = top_mentions_nb
+        self.mentions_per_tokens = mentions_per_tokens
         self.antecedents_nb = antecedents_nb
         self.max_span_size = max_span_size
 
-        self.mention_scorer = torch.nn.Linear(2 * config.hidden_size, 1)
-        self.mention_compatibility_scorer = torch.nn.Linear(4 * config.hidden_size, 1)
+        self.mention_scorer_hidden = torch.nn.Linear(2 * config.hidden_size, 150)
+        self.mention_scorer = torch.nn.Linear(150, 1)
+
+        self.mention_compatibility_scorer_hidden = torch.nn.Linear(
+            4 * config.hidden_size, 150
+        )
+        self.mention_compatibility_scorer = torch.nn.Linear(150, 1)
 
         self.loss_fn = torch.nn.CrossEntropyLoss()
 
@@ -379,8 +497,13 @@ class BertForCoreferenceResolution(BertPreTrainedModel):
 
         :return: a tensor of shape ``(batch_size)``.
         """
+        # (batch, 150)
+        score = self.mention_scorer_hidden(torch.flatten(span_bounds, 1))
+        score = torch.relu(score)
+        # (batch)
+        return self.mention_scorer(score).squeeze(-1)
         # (batch_size)
-        return self.mention_scorer(torch.flatten(span_bounds, 1)).squeeze(-1)
+        # return self.mention_scorer(torch.flatten(span_bounds, 1)).squeeze(-1)
 
     def mention_compatibility_score(self, span_bounds: torch.Tensor) -> torch.Tensor:
         """
@@ -388,7 +511,11 @@ class BertForCoreferenceResolution(BertPreTrainedModel):
 
         :return: a tensor of shape ``(batch_size)``
         """
-        return self.mention_compatibility_scorer(span_bounds).squeeze(-1)
+        # (batch_size, 150)
+        score = self.mention_compatibility_scorer_hidden(span_bounds)
+        score = torch.relu(score)
+        return self.mention_compatibility_scorer(score).squeeze(-1)
+        # return self.mention_compatibility_scorer(span_bounds).squeeze(-1)
 
     def pruned_mentions_indexs(
         self, mention_scores: torch.Tensor, seq_size: int, top_mentions_nb: int
@@ -408,12 +535,16 @@ class BertForCoreferenceResolution(BertPreTrainedModel):
 
         :param mention_scores: a tensor of shape ``(batch_size, spans_nb)``
         :param seq_size:
-        :param top_mentions_nb: the maximum number of spans to keep during the pruning process
-        :return: a tensor of shape ``(batch_size, <= k)``
+        :param top_mentions_nb: the maximum number of spans to keep
+            during the pruning process
+
+        :return: a tensor of shape ``(batch_size, <= top_mentions_nb)``
         """
         batch_size = mention_scores.shape[0]
         spans_nb = mention_scores.shape[1]
         device = next(self.parameters()).device
+
+        assert top_mentions_nb <= spans_nb
 
         spans_idx = spans_indexs(list(range(seq_size)), self.max_span_size)
 
@@ -443,8 +574,14 @@ class BertForCoreferenceResolution(BertPreTrainedModel):
                     ]
                 ):
                     mention_indexs[-1].append(sorted_indexs[i][j])
+
+        # To construct a tensor, we need all lists of mention to be
+        # the same size : to do so, we cut them to have the length of
+        # the smallest one
+        min_top_mentions_nb = min([len(m) for m in mention_indexs])
+        mention_indexs = [m[:min_top_mentions_nb] for m in mention_indexs]
+
         mention_indexs = torch.tensor(mention_indexs, device=device)
-        assert mention_indexs.shape == (batch_size, top_mentions_nb)
 
         return mention_indexs
 
@@ -482,11 +619,16 @@ class BertForCoreferenceResolution(BertPreTrainedModel):
 
     def loss(self, pred_scores: torch.Tensor, labels: torch.Tensor) -> torch.Tensor:
         """
-        :param pred_scores: ``(batch_size, spans_nb, spans_nb + 1)``
-        :param labels: ``(batch_size, spans_nb, spans_nb + 1)``
+        :param pred_scores: ``(batch_size, top_mentions_nb, antecedents_nb + 1)``
+        :param labels: ``(batch_size, top_mentions_nb, antecedents_nb + 1)``
         :return: ``(batch_size)``
         """
-        return self.loss_fn(pred_scores.transpose(1, 2), labels.transpose(1, 2).float())
+        # (batch_size, top_mentions_nb, antecedents_nb + 1)
+        coreference_log_probs = torch.log_softmax(pred_scores, dim=-1)
+        # (batch_size, top_mentions_nb, antecedents_nb + 1)
+        correct_antecedent_log_probs = coreference_log_probs + labels.log()
+        # (1)
+        return -torch.logsumexp(correct_antecedent_log_probs, dim=-1).sum(dim=1)
 
     def forward(
         self,
@@ -554,21 +696,20 @@ class BertForCoreferenceResolution(BertPreTrainedModel):
         mention_scores = mention_scores.reshape(b, p)
 
         # -- pruning thanks to mention scores --
-        # TODO: top_mentions_nb should be a parameter
-        #       depending on the length of input sentences
-        #       (it is denoted as 'lambda * T' in the paper)
-        top_mentions_nb = m = 3
 
         # top_mentions_index is the index of the m best
         # non-overlapping mentions
+        top_mentions_nb = m = int(self.mentions_per_tokens * seq_size)
         top_mentions_index = self.pruned_mentions_indexs(
             mention_scores, seq_size, top_mentions_nb
         )
+        # TODO: hack
+        top_mentions_nb = m = int(top_mentions_index.shape[1])
         assert top_mentions_index.shape == (b, m)
 
         # antecedents_index contains the index of the a closest
         # antecedents for each spans
-        antecedents_nb = a = min(3, top_mentions_nb)
+        antecedents_nb = a = min(self.antecedents_nb, top_mentions_nb)
         antecedents_index = self.closest_antecedents_indexs(
             spans_nb, seq_size, antecedents_nb
         )
@@ -643,51 +784,46 @@ class BertForCoreferenceResolution(BertPreTrainedModel):
         top_mention_scores = torch.gather(mention_scores, 1, top_mentions_index)
         assert top_mention_scores.shape == (b, m)
 
-        # s_m(m1)
-        # TODO: use torch.tile
-        mention1_score = torch.cat(
-            [
-                torch.stack(
-                    [top_mention_scores for _ in range(top_mentions_nb)], dim=1
-                ),
-                torch.zeros(batch_size, top_mentions_nb, 1, device=device),
-            ],
-            dim=2,
-        )
-        assert mention1_score.shape == (b, m, a + 1)
+        top_antecedent_scores = batch_index_select(
+            mention_scores, 1, top_antecedents_index.flatten(start_dim=1)
+        ).reshape(b, m, a)
 
-        # s_m(m2)
-        # TODO: use torch.tile
-        mention2_score = torch.stack(
-            [top_mention_scores for _ in range(antecedents_nb + 1)], dim=1
-        ).transpose(1, 2)
-        assert mention2_score.shape == (b, m, a + 1)
+        top_partial_scores = top_mention_scores.unsqueeze(-1) + top_antecedent_scores
+        assert top_partial_scores.shape == (b, m, a)
 
-        # s_m(m1) + s_m(m2) + s_c(m1, m2)
-        final_scores = mention1_score + mention2_score + mention_pair_scores
+        dummy = torch.zeros(b, m, 1, device=device)
+        top_partial_scores = torch.cat([top_partial_scores, dummy], dim=2)
+        assert top_partial_scores.shape == (b, m, a + 1)
+
+        final_scores = top_partial_scores + mention_pair_scores
         assert final_scores.shape == (b, m, a + 1)
-
-        # reconstruct scores
-        # TODO: perf
-        # TODO: correctness
-        full_final_scores = torch.full(
-            (b, p, p + 1), -100, device=device, dtype=torch.float
-        )
-        for b in range(batch_size):
-            for i in range(top_mentions_nb):
-                m_idx = int(top_mentions_index[b][i].item())
-                for j in range(antecedents_nb):  # TODO: + 1
-                    a_idx = int(antecedents_index[b][m_idx][j].item())
-                    full_final_scores[b][m_idx][a_idx] = final_scores[b][i][j]
-                full_final_scores[b][m_idx][-1] = final_scores[b][i][-1]
 
         # -- loss computation --
         loss = None
         if labels is not None:
-            loss = self.loss(full_final_scores, labels)
+
+            selected_labels = batch_index_select(labels, 1, top_mentions_index)
+            assert selected_labels.shape == (b, m, p + 1)
+
+            selected_labels = batch_index_select(
+                selected_labels.flatten(start_dim=0, end_dim=1),
+                1,
+                top_antecedents_index,
+            ).reshape(b, m, a)
+
+            # mentions with no antecedents are assumed to have the dummy antecedent
+            dummy_labels = (1 - selected_labels).prod(-1, keepdim=True)
+
+            selected_labels = torch.cat((selected_labels, dummy_labels), dim=2)
+            assert selected_labels.shape == (b, m, a + 1)
+
+            loss = self.loss(final_scores, selected_labels).mean()
 
         return BertCoreferenceResolutionOutput(
-            logits=final_scores,
+            final_scores,
+            top_mentions_index,
+            top_antecedents_index,
+            self.max_span_size,
             loss=loss,
             hidden_states=bert_output.hidden_states,
             attentions=bert_output.attentions,
