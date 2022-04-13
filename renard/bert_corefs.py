@@ -150,43 +150,6 @@ class CoreferenceDocument:
 
         return CoreferenceDocument(tokens, chains)
 
-    @staticmethod
-    def from_labels_old(
-        tokens: List[str], labels: List[List[int]], max_span_size: int
-    ) -> CoreferenceDocument:
-        """
-        :param tokens:
-        :param labels:
-        :param max_span_size:
-        """
-        spans_idx = spans_indexs(tokens, max_span_size)
-
-        # last known chain mention index => chain
-        chains: Dict[int, List[CoreferenceMention]] = {}
-        for i, labels_line in enumerate(labels):
-            if labels_line[-1] == 1:
-                # span has no antecedent : nothing to do
-                continue
-            antecedent_index = labels_line.index(1)
-            if not antecedent_index in chains:
-                # span has an antecedent and this antecedent is the first
-                # mention of a chain : create a new chain
-                start_idx, end_idx = spans_idx[antecedent_index]
-                chains[antecedent_index] = [
-                    CoreferenceMention(
-                        start_idx, end_idx, tokens[start_idx : end_idx + 1]
-                    )
-                ]
-            # add current span to its chain
-            start_idx, end_idx = spans_idx[i]
-            chains[antecedent_index].append(
-                CoreferenceMention(start_idx, end_idx, tokens[start_idx : end_idx + 1])
-            )
-            # set last known antecedent index to current index
-            chains[i] = chains.pop(antecedent_index)
-
-        return CoreferenceDocument(tokens, list(chains.values()))
-
 
 @dataclass
 class DataCollatorForSpanClassification(DataCollatorMixin):
@@ -402,7 +365,6 @@ class BertCoreferenceResolutionOutput:
             spans_idx = spans_indexs(tokens[i], self.max_span_size)
 
             document = CoreferenceDocument(tokens[i], [])
-            span_coord_to_chain_id: Dict[Tuple[int, int], int] = {}
 
             for j in range(top_mentions_nb):
 
@@ -422,9 +384,12 @@ class BertCoreferenceResolutionOutput:
                 antecedent_coords = spans_idx[antecedent_idx]
 
                 # antecedent
-                if antecedent_coords in span_coord_to_chain_id:
-                    chain_id = span_coord_to_chain_id[antecedent_coords]
-                else:
+                chain_id = None
+                for chain_i, chain in enumerate(document.coref_chains):
+                    for mention in chain:
+                        if antecedent_coords == (mention.start_idx, mention.end_idx):
+                            chain_id = chain_i
+                if chain_id is None:
                     # new chain
                     chain_id = len(document.coref_chains)
                     # create a new chain in the document
@@ -433,8 +398,6 @@ class BertCoreferenceResolutionOutput:
                         start_idx, end_idx, tokens[i][start_idx : end_idx + 1]
                     )
                     document.coref_chains.append([mention])
-                    # register the id of this chain
-                    span_coord_to_chain_id[(start_idx, end_idx)] = chain_id
 
                 # current span
                 start_idx, end_idx = span_coords[0], span_coords[1]
@@ -442,7 +405,6 @@ class BertCoreferenceResolutionOutput:
                     start_idx, end_idx, tokens[i][start_idx : end_idx + 1]
                 )
                 document.coref_chains[chain_id].append(mention)
-                span_coord_to_chain_id[(start_idx, end_idx)] = chain_id
 
             documents.append(document)
 
@@ -470,8 +432,9 @@ class BertForCoreferenceResolution(BertPreTrainedModel):
         mentions_per_tokens: float,
         antecedents_nb: int,
         max_span_size: int,
+        **kwargs,
     ):
-        super().__init__(config)
+        super().__init__(config, **kwargs)
 
         self.bert = BertModel(config, add_pooling_layer=False)
 
@@ -551,9 +514,9 @@ class BertForCoreferenceResolution(BertPreTrainedModel):
         def spans_are_overlapping(
             span1: Tuple[int, int], span2: Tuple[int, int]
         ) -> bool:
-            return (span1[1] <= span2[1] and span1[1] >= span2[0]) or (
-                span1[0] >= span2[0] and span1[0] <= span2[1]
-            )
+            return (
+                span1[0] < span2[0] and span2[0] <= span1[1] and span1[1] < span2[1]
+            ) or (span2[0] < span1[0] and span1[0] <= span2[1] and span2[1] < span1[1])
 
         _, sorted_indexs = torch.sort(mention_scores, 1, descending=True)
         # TODO: what if we can't have top_mentions_nb mentions ??
@@ -817,7 +780,7 @@ class BertForCoreferenceResolution(BertPreTrainedModel):
             selected_labels = torch.cat((selected_labels, dummy_labels), dim=2)
             assert selected_labels.shape == (b, m, a + 1)
 
-            loss = self.loss(final_scores, selected_labels).mean()
+            loss = self.loss(final_scores, selected_labels)
 
         return BertCoreferenceResolutionOutput(
             final_scores,
