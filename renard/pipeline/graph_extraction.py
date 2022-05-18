@@ -21,7 +21,8 @@ class CoOccurencesGraphExtractor(PipelineStep):
     ) -> None:
         """
         :param co_occurences_dist: max accepted distance between two
-            character appearances.
+            character appearances to form a co-occurence interaction,
+            in number of tokens.
 
         :param dynamic: either ``None``, or one of ``{'nx', 'gephi'}``
 
