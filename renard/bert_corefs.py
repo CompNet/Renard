@@ -1,11 +1,10 @@
 from __future__ import annotations
-from typing import Dict, List, Literal, Optional, Tuple, Union, cast
+from typing import Dict, List, Literal, Optional, Tuple, Union
 import re
 from dataclasses import dataclass
-from more_itertools import windowed
 import torch
-from torch.functional import tensordot
 from torch.utils.data import Dataset
+from torch.utils.data.dataloader import DataLoader
 from transformers import BertPreTrainedModel
 from transformers import PreTrainedTokenizerFast
 from transformers.file_utils import PaddingStrategy
@@ -13,6 +12,7 @@ from transformers.data.data_collator import DataCollatorMixin
 from transformers.models.bert.modeling_bert import BertModel
 from transformers.models.bert.configuration_bert import BertConfig
 from transformers.tokenization_utils_base import BatchEncoding, PreTrainedTokenizerBase
+from tqdm import tqdm
 from renard.utils import spans, spans_indexs, batch_index_select
 
 
@@ -791,3 +791,51 @@ class BertForCoreferenceResolution(BertPreTrainedModel):
             hidden_states=bert_output.hidden_states,
             attentions=bert_output.attentions,
         )
+
+    def predict(
+        self,
+        documents: List[List[str]],
+        tokenizer: PreTrainedTokenizerFast,
+        batch_size: int,
+    ) -> List[CoreferenceDocument]:
+        """Predict coreference chains for a list of documents.
+
+        .. warning::
+
+            WIP: the returned documents tokens are wordpieces and not the original tokens.
+
+        :param documents: A list of tokenized documents.
+        :param tokenizer:
+        :param batch_size:
+
+        :return: a list of ``CoreferenceDocument``, with annotated
+                 coreference chains.
+        """
+
+        dataset = CoreferenceDataset(
+            [CoreferenceDocument(doc, []) for doc in documents],
+            tokenizer,
+            self.max_span_size,
+        )
+        data_collator = DataCollatorForSpanClassification(tokenizer, self.max_span_size)
+        dataloader = DataLoader(
+            dataset, batch_size=batch_size, collate_fn=data_collator, shuffle=False
+        )
+
+        self = self.eval()
+
+        preds = []
+
+        with torch.no_grad():
+
+            for batch in tqdm(dataloader):
+
+                out: BertCoreferenceResolutionOutput = self(**batch)
+                preds += out.coreference_documents(
+                    [
+                        [tokenizer.decode(t) for t in input_ids]
+                        for input_ids in batch["input_ids"]
+                    ]
+                )
+
+        return preds
