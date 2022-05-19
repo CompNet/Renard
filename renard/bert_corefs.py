@@ -591,7 +591,7 @@ class BertForCoreferenceResolution(BertPreTrainedModel):
         # (batch_size, top_mentions_nb, antecedents_nb + 1)
         correct_antecedent_log_probs = coreference_log_probs + labels.log()
         # (1)
-        return -torch.logsumexp(correct_antecedent_log_probs, dim=-1).sum(dim=1)
+        return -torch.logsumexp(correct_antecedent_log_probs, dim=-1).sum(dim=1).mean()
 
     def forward(
         self,
