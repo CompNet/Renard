@@ -822,6 +822,8 @@ class BertForCoreferenceResolution(BertPreTrainedModel):
             dataset, batch_size=batch_size, collate_fn=data_collator, shuffle=False
         )
 
+        device = next(self.parameters()).device
+
         self = self.eval()
 
         preds = []
@@ -829,6 +831,8 @@ class BertForCoreferenceResolution(BertPreTrainedModel):
         with torch.no_grad():
 
             for batch in tqdm(dataloader):
+
+                batch = batch.to(device)
 
                 out: BertCoreferenceResolutionOutput = self(**batch)
                 preds += out.coreference_documents(
