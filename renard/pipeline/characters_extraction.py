@@ -1,5 +1,5 @@
 import re
-from typing import Any, Dict, List, FrozenSet, Set, Optional
+from typing import Any, Dict, List, FrozenSet, Set, Optional, Tuple
 from itertools import combinations
 from collections import defaultdict
 from dataclasses import dataclass
@@ -84,8 +84,20 @@ class GraphRulesCharactersExtractor(PipelineStep):
 
     """
 
-    def __init__(self) -> None:
+    def __init__(
+        self,
+        additional_hypocorisms: Optional[List[Tuple[str, List[str]]]] = None,
+    ) -> None:
+        """
+        :param additional_hypocorisms: a tuple of additional
+            hypocorisms.  Each hypocorism is a tuple where the first
+            element is a name, and the second element is a set of
+            nicknames associated with it
+        """
         self.hypocorism_gazetteer = HypocorismGazetteer()
+        if not additional_hypocorisms is None:
+            for name, nicknames in additional_hypocorisms:
+                self.hypocorism_gazetteer._add_hypocorism_(name, nicknames)
         super().__init__()
 
     def __call__(
@@ -139,6 +151,7 @@ class GraphRulesCharactersExtractor(PipelineStep):
             ):
                 for path in nx.all_shortest_paths(G, source=name1, target=name2):
                     G.remove_edges_from(path)
+
         return {
             "characters": [
                 Character(frozenset(names)) for names in nx.connected_components(G)

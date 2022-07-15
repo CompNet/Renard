@@ -1,4 +1,4 @@
-from typing import Dict, Set
+from typing import Dict, List, Set, Tuple
 from collections import defaultdict
 import os
 
@@ -17,7 +17,7 @@ class HypocorismGazetteer:
 
     def __init__(self):
 
-        self.name_to_nicknames = {}
+        self.name_to_nicknames = defaultdict(set)
         self.nickname_to_names = defaultdict(set)
 
         with open(f"{script_dir}/datas/hypocorisms.csv") as f:
@@ -32,9 +32,19 @@ class HypocorismGazetteer:
                 name = splitted[0]
                 nicknames = splitted[1:]
 
-                self.name_to_nicknames[name] = set(nicknames)
-                for nickname in nicknames:
-                    self.nickname_to_names[nickname].add(name)
+                self._add_hypocorism_(name, nicknames)
+
+    def _add_hypocorism_(self, name: str, nicknames: List[str]):
+        """Add a name associated with several nicknames
+
+        :param name:
+        :param nicknames: nicknames to associate to the given name
+        """
+        name = name.lower()
+        nicknames = [n.lower() for n in nicknames]
+        for nickname in nicknames:
+            self.nickname_to_names[nickname].add(name)
+            self.name_to_nicknames[name].add(nickname)
 
     def get_nicknames(self, name: str) -> Set[str]:
         """Return all possible nickname for the given name"""
