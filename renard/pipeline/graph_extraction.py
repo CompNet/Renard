@@ -1,6 +1,5 @@
-from os import name
 from renard.pipeline.characters_extraction import Character
-from typing import Dict, Any, List, Set, Optional, Tuple, cast
+from typing import Dict, Any, List, Set, Optional, Tuple, cast, Literal
 
 import networkx as nx
 import numpy as np
@@ -16,29 +15,35 @@ class CoOccurencesGraphExtractor(PipelineStep):
     def __init__(
         self,
         co_occurences_dist: int,
-        dynamic: Optional[str] = None,
+        dynamic: Optional[Literal["nx", "gephi"]] = None,
         dynamic_window: Optional[int] = None,
         dynamic_overlap: int = 0,
     ) -> None:
         """
-        :param co_occurences_dist:
+        :param co_occurences_dist: max accepted distance between two
+            character appearances to form a co-occurence interaction,
+            in number of tokens.
 
         :param dynamic: either ``None``, or one of ``{'nx', 'gephi'}``
 
-            - if ``None`` (the defaul), a ``nx.graph`` is extracted
-            - if ``'nx'``, several ``nx.graph`` are extracted. In that
-                case, ``dynamic_window`` *must* be specified, and
-                overlap *can* be specified.
-            - if ``'gephi'``, a single ``nx.graph`` is extracted. This
-                graph has the nice property that exporting it to `gexf`
-                format using ``G.write_gexf()`` will produce a correct
-                dynamic graph that can be read by Gephi. Because of a
-                limitation in networkx, the dynamic weight attribute is
-                stored as ``dweight`` instead of ``weight``.
+                - if ``None`` (the defaul), a ``nx.graph`` is
+                  extracted
 
-        :param dynamic_window: dynamic window, in number of interactions.
-            a dynamic window of `n` means that each returned graph will
-            be formed by `n` interactions.
+                - if ``'nx'``, several ``nx.graph`` are extracted.  In
+                  that case, ``dynamic_window`` *must* be specified,
+                  and overlap *can* be specified.
+
+                - if ``'gephi'``, a single ``nx.graph`` is extracted.
+                  This graph has the nice property that exporting it
+                  to `gexf` format using ``G.write_gexf()`` will
+                  produce a correct dynamic graph that can be read by
+                  Gephi.  Because of a limitation in networkx, the
+                  dynamic weight attribute is stored as ``dweight``
+                  instead of ``weight``.
+
+        :param dynamic_window: dynamic window, in number of
+            interactions.  a dynamic window of `n` means that each
+            returned graph will be formed by `n` interactions.
 
         :param dynamic_overlap: overlap, in number of interactions.
         """
