@@ -1,7 +1,7 @@
 import re
 from typing import Any, Dict, List, FrozenSet, Set, Optional, Tuple
 from itertools import combinations
-from collections import defaultdict
+from collections import Counter
 from dataclasses import dataclass
 
 from nameparser import config
@@ -22,15 +22,19 @@ class Character:
     def longest_name(self) -> str:
         return max(self.names, key=len)
 
+    def __hash__(self) -> int:
+        return hash(tuple(sorted(self.names)))
+
 
 class NaiveCharactersExtractor(PipelineStep):
     """A basic character extractor using NER"""
 
-    def __init__(self, min_appearance: int) -> None:
+    def __init__(self, min_appearances: int = 0) -> None:
         """
-        :param min_appearance:
+        :param min_appearances: minimum number of appearances of a
+            character for it to be extracted
         """
-        self.min_appearance = min_appearance
+        self.min_appearances = min_appearances
         super().__init__()
 
     def __call__(
@@ -43,24 +47,11 @@ class NaiveCharactersExtractor(PipelineStep):
         """
         assert len(tokens) == len(bio_tags)
 
-        entities = defaultdict(int)
-        current_entity: List[str] = []
-        for token, tag in zip(tokens, bio_tags):
-            if len(current_entity) == 0:
-                if tag.startswith("B-PER"):
-                    current_entity.append(token)
-            else:
-                if tag.startswith("I-PER"):
-                    current_entity.append(token)
-                else:  # end of entity
-                    entities[" ".join(current_entity)] += 1
-                    current_entity = []
+        entities = ner_entities(tokens, bio_tags)
+        entities_c = Counter([" ".join(e.tokens) for e in entities])
+        entities = [e for e, c in entities_c.items() if c >= self.min_appearances]
 
-        characters = [
-            Character(frozenset((entity,)))
-            for entity, count in entities.items()
-            if count >= self.min_appearance
-        ]
+        characters = [Character(frozenset((entity,))) for entity in entities]
 
         return {"characters": characters}
 
@@ -86,18 +77,24 @@ class GraphRulesCharactersExtractor(PipelineStep):
 
     def __init__(
         self,
+        min_appearances: int = 0,
         additional_hypocorisms: Optional[List[Tuple[str, List[str]]]] = None,
     ) -> None:
         """
+        :param min_appearances: minimum number of appearances of a
+            character for it to be extracted.
         :param additional_hypocorisms: a tuple of additional
             hypocorisms.  Each hypocorism is a tuple where the first
             element is a name, and the second element is a set of
             nicknames associated with it
         """
+        self.min_appearances = min_appearances
+
         self.hypocorism_gazetteer = HypocorismGazetteer()
         if not additional_hypocorisms is None:
             for name, nicknames in additional_hypocorisms:
                 self.hypocorism_gazetteer._add_hypocorism_(name, nicknames)
+
         super().__init__()
 
     def __call__(
@@ -111,11 +108,12 @@ class GraphRulesCharactersExtractor(PipelineStep):
 
         import networkx as nx
 
+        occurences = [" ".join(e.tokens) for e in ner_entities(tokens, bio_tags)]
+
         # create a graph where each node is a mention detected by NER
         G = nx.Graph()
-        for entity in ner_entities(tokens, bio_tags):
-            if entity.tag.startswith("PER"):
-                G.add_node(" ".join(entity.tokens))
+        for occurence in occurences:
+            G.add_node(occurence)
 
         # link nodes based on several rules
         for (name1, name2) in combinations(G.nodes(), 2):
@@ -152,11 +150,20 @@ class GraphRulesCharactersExtractor(PipelineStep):
                 for path in nx.all_shortest_paths(G, source=name1, target=name2):
                     G.remove_edges_from(path)
 
-        return {
-            "characters": [
-                Character(frozenset(names)) for names in nx.connected_components(G)
-            ]
-        }
+        # create characters from the computed graph
+        characters = [
+            Character(frozenset(names)) for names in nx.connected_components(G)
+        ]
+
+        # filter characters based on the number of time they appear
+        characters_c = Counter()
+        for character in characters:
+            for occurence in occurences:
+                if occurence in character.names:
+                    characters_c[character] += 1
+        characters = [c for c in characters if characters_c[c] >= self.min_appearances]
+
+        return {"characters": characters}
 
     def names_are_related_after_title_removal(self, name1: str, name2: str) -> bool:
         config.CONSTANTS.string_format = "{first} {middle} {last}"
