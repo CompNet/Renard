@@ -105,7 +105,7 @@ class GraphRulesCharactersExtractor(PipelineStep):
         tokens: List[str],
         bio_tags: List[str],
         corefs: Optional[List[CoreferenceChain]] = None,
-        **kwargs: dict
+        **kwargs: dict,
     ) -> Dict[str, Any]:
         assert len(tokens) == len(bio_tags)
 
@@ -120,38 +120,80 @@ class GraphRulesCharactersExtractor(PipelineStep):
 
         # link nodes based on several rules
         for (name1, name2) in combinations(G.nodes(), 2):
-            if (
-                self.hypocorism_gazetteer.are_related(name1, name2)
-                or self.names_are_related_after_title_removal(name1, name2)
-                or (
-                    not corefs is None and self.names_are_in_coref(name1, name2, corefs)
-                )
-            ):
+
+            # is one name a known hypocorism of the other ?
+            if self.hypocorism_gazetteer.are_related(name1, name2):
                 G.add_edge(name1, name2)
+                continue
+
+            # if we remove the title, is one name related to the other
+            # ?
+            if self.names_are_related_after_title_removal(name1, name2):
+                G.add_edge(name1, name2)
+                continue
+
+            # add an edge if two characters have the same first name or family names
+            human_name1 = HumanName(name1)
+            human_name2 = HumanName(name2)
+            if len(human_name1.last) > 0 and human_name1.last == human_name2.last:
+                G.add_edge(name1, name2)
+                continue
+            if len(human_name1.first) > 0 and human_name1.first == human_name2.first:
+                G.add_edge(name1, name2)
+                continue
+
+            # corefs are needed by the rules below
+            if corefs is None:
+                continue
+
+            if self.names_are_in_coref(name1, name2, corefs):
+                G.add_edge(name1, name2)
+
+        def try_remove_edges(edges):
+            try:
+                G.remove_edges_from(edges)
+            except nx.NetworkXNoPath:
+                pass
 
         # delete the shortest path between two nodes if two names are found to be impossible to
         # to be a mention of the same character
         for (name1, name2) in combinations(G.nodes(), 2):
+
+            # check if characters have the same last name but a
+            # different first name.
+            human_name1 = HumanName(name1)
+            human_name2 = HumanName(name2)
+            if (
+                len(human_name1.last) > 0
+                and len(human_name2.last) > 0
+                and human_name1.last == human_name2.last
+                and human_name1.first != human_name2.first
+            ):
+                try_remove_edges(nx.all_shortest_paths(G, source=name1, target=name2))
+                continue
+
+            # check if characters have the same first name but different
+            # last names
+            if (
+                human_name1.first == human_name2.first
+                and len(human_name1.last) > 0
+                and len(human_name2.last) > 0
+                and human_name1.last != human_name2.last
+            ):
+                try_remove_edges(nx.all_shortest_paths(G, source=name1, target=name2))
+                continue
+
+            # corefs are needed by the rules below
             if corefs is None:
-                break
+                continue
+
             # check if names dont have the same infered gender
             gender1 = self.infer_name_gender(name1, corefs)
             gender2 = self.infer_name_gender(name2, corefs)
             if gender1 != gender2 and not any(
                 [g == Gender.UNKNOWN for g in (gender1, gender2)]
             ):
-                for path in nx.all_shortest_paths(G, source=name1, target=name2):
-                    G.remove_edges_from(path)
-            # check if characters have the same last name but a
-            # different first name
-            human_name1 = HumanName(name1)
-            human_name2 = HumanName(name2)
-            if (
-                human_name1.last == human_name2.last
-                and human_name1.first != human_name2.first
-            ):
-                for path in nx.all_shortest_paths(G, source=name1, target=name2):
-                    G.remove_edges_from(path)
+                try_remove_edges(nx.all_shortest_paths(G, source=name1, target=name2))
 
         # create characters from the computed graph
         characters = [
