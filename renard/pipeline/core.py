@@ -1,6 +1,6 @@
 from __future__ import annotations
 from dataclasses import dataclass
-from typing import Any, Dict, Tuple, Set, List, Optional, Union, TYPE_CHECKING
+from typing import Any, Dict, Literal, Tuple, Set, List, Optional, Union, TYPE_CHECKING
 
 from tqdm import tqdm
 from transformers.tokenization_utils_base import BatchEncoding
@@ -84,10 +84,13 @@ class PipelineState:
     #: characters graph
     characters_graph: Optional[Union[List[nx.Graph], nx.Graph]] = None
 
-    def export_graph_to_gexf(self, path: str):
+    def export_graph_to_gexf(
+        self, path: str, name_style: Literal["longest", "shortest"] = "longest"
+    ):
         """Export characters graph to Gephi's gexf format
 
         :param path: export file path
+        :param name_style: characters name style in the resulting graph
         """
         if not isinstance(self.characters_graph, nx.Graph):
             raise RuntimeError(
@@ -96,7 +99,9 @@ class PipelineState:
         G = nx.relabel_nodes(
             self.characters_graph,
             {
-                character: character.longest_name()  # type: ignore
+                character: character.shortest_name()  # type: ignore
+                if name_style == "shortest"
+                else character.longest_name()  # type: ignore
                 for character in self.characters_graph.nodes()
             },
         )

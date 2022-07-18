@@ -22,6 +22,9 @@ class Character:
     def longest_name(self) -> str:
         return max(self.names, key=len)
 
+    def shortest_name(self) -> str:
+        return min(self.names, key=len)
+
     def __hash__(self) -> int:
         return hash(tuple(sorted(self.names)))
 
