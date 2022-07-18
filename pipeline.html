@@ -852,6 +852,11 @@ both.</p>
 <dt class="sig sig-object py" id="renard.pipeline.characters_extraction.Character.__hash__">
 <span class="sig-name descname"><span class="pre">__hash__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.characters_extraction.Character.__hash__" title="Permalink to this definition"></a></dt>
 <dd><p>Return hash(self).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -875,7 +880,7 @@ both.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="renard.pipeline.characters_extraction.GraphRulesCharactersExtractor">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">renard.pipeline.characters_extraction.</span></span><span class="sig-name descname"><span class="pre">GraphRulesCharactersExtractor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">additional_hypocorisms</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.characters_extraction.GraphRulesCharactersExtractor" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">renard.pipeline.characters_extraction.</span></span><span class="sig-name descname"><span class="pre">GraphRulesCharactersExtractor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">min_appearances</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">additional_hypocorisms</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.characters_extraction.GraphRulesCharactersExtractor" title="Permalink to this definition"></a></dt>
 <dd><p>Extract characters by creating a graph where mentions are
 linked when they refer to the same character, and then
 merging this graph nodes.</p>
@@ -897,13 +902,17 @@ merging this graph nodes.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="renard.pipeline.characters_extraction.GraphRulesCharactersExtractor.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">additional_hypocorisms</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.characters_extraction.GraphRulesCharactersExtractor.__init__" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">min_appearances</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">additional_hypocorisms</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.characters_extraction.GraphRulesCharactersExtractor.__init__" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>additional_hypocorisms</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]]]) – a tuple of additional
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>min_appearances</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – minimum number of appearances of a
+character for it to be extracted.</p></li>
+<li><p><strong>additional_hypocorisms</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]]]) – a tuple of additional
 hypocorisms.  Each hypocorism is a tuple where the first
 element is a name, and the second element is a set of
-nicknames associated with it</p>
+nicknames associated with it</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -968,7 +977,7 @@ by derived classes.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="renard.pipeline.characters_extraction.NaiveCharactersExtractor">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">renard.pipeline.characters_extraction.</span></span><span class="sig-name descname"><span class="pre">NaiveCharactersExtractor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">min_appearance</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.characters_extraction.NaiveCharactersExtractor" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">renard.pipeline.characters_extraction.</span></span><span class="sig-name descname"><span class="pre">NaiveCharactersExtractor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">min_appearances</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.characters_extraction.NaiveCharactersExtractor" title="Permalink to this definition"></a></dt>
 <dd><p>A basic character extractor using NER</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="renard.pipeline.characters_extraction.NaiveCharactersExtractor.__call__">
@@ -989,10 +998,11 @@ by derived classes.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="renard.pipeline.characters_extraction.NaiveCharactersExtractor.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">min_appearance</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.characters_extraction.NaiveCharactersExtractor.__init__" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">min_appearances</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.characters_extraction.NaiveCharactersExtractor.__init__" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>min_appearance</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – </p>
+<dd class="field-odd"><p><strong>min_appearances</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – minimum number of appearances of a
+character for it to be extracted</p>
 </dd>
 </dl>
 </dd></dl>
