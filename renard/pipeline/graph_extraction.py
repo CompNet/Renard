@@ -155,17 +155,14 @@ class CoOccurencesGraphExtractor(PipelineStep):
         # TODO: might want to try and get shorter names if longest names aren't
         #       unique
         characters = set([e[0] for e in character_tokenidx])
-        character_names = set([e[0].longest_name() for e in character_tokenidx])
-        assert len(character_names) == len(characters)
 
         G = nx.Graph()
 
-        name_tokenidx = [(e[0].longest_name(), e[1]) for e in character_tokenidx]
-        character_to_last_appearance: Dict[str, Optional[int]] = {
-            name: None for name in character_names
+        character_to_last_appearance: Dict[Character, Optional[int]] = {
+            character: None for character in characters
         }
 
-        for i, (character, tokenidx) in enumerate(name_tokenidx):
+        for i, (character, tokenidx) in enumerate(character_tokenidx):
             if not character in characters:
                 continue
             character_to_last_appearance[character] = tokenidx
@@ -191,7 +188,7 @@ class CoOccurencesGraphExtractor(PipelineStep):
                 # value, start and end of current weight attribute
                 last_weight_value = weights[-1][0] if len(weights) > 0 else 0
                 G.edges[character, close_character]["dweight"].append(
-                    [float(last_weight_value) + 1, i, len(name_tokenidx)]
+                    [float(last_weight_value) + 1, i, len(character_tokenidx)]
                 )
 
         return G
