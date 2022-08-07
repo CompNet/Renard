@@ -465,8 +465,6 @@ class BertForCoreferenceResolution(BertPreTrainedModel):
         score = torch.relu(score)
         # (batch)
         return self.mention_scorer(score).squeeze(-1)
-        # (batch_size)
-        # return self.mention_scorer(torch.flatten(span_bounds, 1)).squeeze(-1)
 
     def mention_compatibility_score(self, span_bounds: torch.Tensor) -> torch.Tensor:
         """
@@ -550,32 +548,44 @@ class BertForCoreferenceResolution(BertPreTrainedModel):
 
     def closest_antecedents_indexs(
         self, spans_nb: int, seq_size: int, antecedents_nb: int
-    ) -> torch.Tensor:
+    ):
         """Compute the indexs of the k closest mentions
 
-        TODO: optim
-
-        :param spans_nb:
-        :param seq_size:
-        :param antecedents_nb:
+        :param spans_nb: number of spans in the sequence
+        :param seq_size: size of the sequence
+        :param antecedents_nb: number of antecedents to consider
         :return: a tensor of shape ``(spans_nb, antecedents_nb)``
         """
+        p = spans_nb
         device = next(self.parameters()).device
 
-        def antecedent_dist(
-            span: Tuple[int, int], antecedent: Tuple[int, int]
-        ) -> float:
-            if antecedent[1] >= span[0]:
-                return float("Inf")
-            return span[0] - antecedent[1]
-
+        # a list of spans indices
+        # [(start, end), ..., (start, end)]
         spans_idx = spans_indexs(list(range(seq_size)), self.max_span_size)
-        dist_matrix = torch.zeros(spans_nb, spans_nb, device=device)
-        for i in range(spans_nb):
-            for j in range(spans_nb):
-                dist_matrix[i][j] = antecedent_dist(spans_idx[i], spans_idx[j])
 
-        _, close_indexs = torch.topk(-dist_matrix, antecedents_nb)
+        # (spans_nb,)
+        start_idx = torch.tensor([start for start, _ in spans_idx]).to(device)
+        # (spans_nb,)
+        end_idx = torch.tensor([end for _, end in spans_idx]).to(device)
+
+        # All possible combination of start / end indexs
+        start_end_idx_combinations = torch.cartesian_prod(start_idx, end_idx).float()
+        assert start_end_idx_combinations.shape == (p * p, 2)
+
+        # distance between a span and its antecedent is defined to be
+        # the span start index minus the antecedent span end index
+        dist = start_end_idx_combinations[:, 0] - start_end_idx_combinations[:, 1]
+        assert dist.shape == (p * p,)
+        dist = dist.reshape(spans_nb, spans_nb)
+
+        # when the distance between a span and a possible antecedent
+        # is 0 or negative, it means the possible antecedents is after
+        # the span. Therefore, it can't be an antecedents. We set
+        # those distances to Inf for torch.topk usage just after
+        dist[dist <= 0] = float("Inf")
+
+        # top-k closest antecedents
+        _, close_indexs = torch.topk(-dist, antecedents_nb)
         assert close_indexs.shape == (spans_nb, antecedents_nb)
 
         return close_indexs
