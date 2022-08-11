@@ -112,7 +112,7 @@ class Pipeline:
     """A flexible NLP pipeline"""
 
     def __init__(
-        self, steps: Tuple[PipelineStep, ...], progress_report: Optional[str] = "tqdm"
+        self, steps: List[PipelineStep], progress_report: Optional[str] = "tqdm"
     ) -> None:
         """
         :param steps: a ``tuple`` of :class:``PipelineStep``, that will be executed in order
@@ -124,15 +124,18 @@ class Pipeline:
         for step in self.steps:
             step.progress_report = progress_report
 
-    def check_valid(self) -> Tuple[bool, List[str]]:
+    def check_valid(self, *args) -> Tuple[bool, List[str]]:
         """Check that the current pipeline can be run, which is
         possible if all steps needs are satisfied
 
-        :return: a tuple : ``(True, [warnings])`` if the pipeline is valid,
-            ``(False, [errors])`` otherwise
+        :param args: list of additional attributes to add to the
+            starting pipeline state.
+
+        :return: a tuple : ``(True, [warnings])`` if the pipeline is
+                 valid, ``(False, [errors])`` otherwise
         """
 
-        pipeline_state = {"text"}
+        pipeline_state = set(args).union({"text"})
         warnings = []
 
         for i, step in enumerate(self.steps):
@@ -154,18 +157,18 @@ class Pipeline:
 
         return (True, warnings)
 
-    def __call__(self, text: str) -> PipelineState:
+    def __call__(self, text: str, **kwargs) -> PipelineState:
         """Run the pipeline sequentially
 
         :return: the output of the last step of the pipeline
         """
-        is_valid, warnings_or_errors = self.check_valid()
+        is_valid, warnings_or_errors = self.check_valid(*kwargs.keys())
         if not is_valid:
             raise ValueError(warnings_or_errors)
         for warning in warnings_or_errors:
             print(f"[warning] : {warning}")
 
-        state = PipelineState(text)
+        state = PipelineState(text, **kwargs)
 
         if self.progress_report == "tqdm":
             steps = tqdm(self.steps, total=len(self.steps))
