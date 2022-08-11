@@ -26,12 +26,12 @@ simple example :
        text = f.read()
 
    pipeline = Pipeline(
-       (
+       [
            NLTKWordTokenizer(),
            NLTKNamedEntityRecognizer(),
            NaiveCharactersExtractor(min_appearance=10),
            CoOccurencesGraphExtractor(co_occurences_dist=25)
-       )
+       ]
    )
 
    out = pipeline(text)
@@ -45,6 +45,33 @@ troubleshoot those issues more easily, a
 :class:`renard.pipeline.core.Pipeline` checks its validity at
 instantiation time, and throws an exception with an helpful message in
 case it is intractable.
+
+You can also specify the result of certains steps manually when
+calling the pipeline if you already have those results or if you wan't
+to compute them yourself :
+
+.. code-block:: python
+
+   from renard.pipeline import Pipeline
+   from renard.pipeline.ner import NLTKNamedEntityRecognizer
+   from renard.pipeline.characters_extraction import NaiveCharactersExtractor
+   from renard.pipeline.graph_extraction import CoOccurencesGraphExtractor
+
+   with open("./my_doc.txt") as f:
+       text = f.read()
+
+   # note that this pipeline doesn't have any tokenizer
+   pipeline = Pipeline(
+       [
+           NLTKNamedEntityRecognizer(),
+           NaiveCharactersExtractor(min_appearance=10),
+           CoOccurencesGraphExtractor(co_occurences_dist=25)
+       ]
+   )
+
+   # tokens are passed at call time
+   out = pipeline(text, tokens=my_tokenization_function(text))
+   out.export_graph_to_gexf("./network.gexf")	
 
 
 .. autoclass:: renard.pipeline.core.Pipeline
