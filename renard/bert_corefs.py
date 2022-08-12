@@ -67,12 +67,12 @@ class CoreferenceDocument:
 
         return labels
 
-    def retokenized_document(
-        self, tokenizer: PreTrainedTokenizerFast
-    ) -> CoreferenceDocument:
-        """Returns a new document, retokenized thanks to ``tokenizer``.
-        In particular, coreference chains are adapted to the newly
-        tokenized text.
+    def prepared_document(
+        self, tokenizer: PreTrainedTokenizerFast, max_span_size: int
+    ) -> Tuple[CoreferenceDocument, BatchEncoding]:
+        """Prepare a document for being inputted into a model.  The
+        document is retokenized thanks to ``tokenizer``, and
+        coreference chains are adapted to the newly tokenized text.
 
         .. note::
 
@@ -80,12 +80,16 @@ class CoreferenceDocument:
             method. This means special tokens will be added.
 
         :param tokenizer: tokenizer used to retokenized the document
-        :return: a new :class:`CoreferenceDocument`
+        :return: a tuple :
+
+                - a new :class:`CoreferenceDocument`
+
+                - a :class:`BatchEncoding` with added labels
         """
         # (silly) exemple for the tokens ["I", "am", "PG"]
         # a BertTokenizer would produce ["[CLS]", "I", "am", "P", "##G", "[SEP]"]
-        batch = tokenizer(self.tokens, is_split_into_words=True)  # type: ignore
-        tokens = tokenizer.convert_ids_to_tokens(batch["input_ids"])
+        batch = tokenizer(self.tokens, is_split_into_words=True, truncation=True)  # type: ignore
+        tokens = tokenizer.convert_ids_to_tokens(batch["input_ids"])  # type: ignore
 
         # words_ids is used to correspond post-tokenization word pieces
         # to their corresponding pre-tokenization tokens.
@@ -97,23 +101,34 @@ class CoreferenceDocument:
 
         new_chains = []
         for chain in self.coref_chains:
-            new_chains.append([])
+            chain = []
             for mention in chain:
-                # compute [start_index, end_index] of the mention in
-                # the retokenized sentence
-                # start_idx is the index of the first word-piece corresponding
-                # to the word at its original start index.
-                start_idx = words_ids.index(mention.start_idx)
-                # end_idx is the index of the last word-piece corresponding
-                # to the word at its original end index.
-                end_idx = len(words_ids) - 1 - r_words_ids.index(mention.end_idx)
-                new_chains[-1].append(
+                try:
+                    # compute [start_index, end_index] of the mention in
+                    # the retokenized sentence
+                    # start_idx is the index of the first word-piece corresponding
+                    # to the word at its original start index.
+                    start_idx = words_ids.index(mention.start_idx)
+                    # end_idx is the index of the last word-piece corresponding
+                    # to the word at its original end index.
+                    end_idx = len(words_ids) - 1 - r_words_ids.index(mention.end_idx)
+                # ValueError : mention.start_idx or mention.end_idx
+                # was not in word_ids due to truncation : this mention
+                # is discarded
+                except ValueError:
+                    continue
+                chain.append(
                     CoreferenceMention(
                         start_idx, end_idx, tokens[start_idx : end_idx + 1]
                     )
                 )
+            if len(chain) > 0:
+                new_chains.append(chain)
 
-        return CoreferenceDocument(tokens, new_chains)
+        document = CoreferenceDocument(tokens, new_chains)
+        batch["labels"] = document.document_labels(max_span_size)
+
+        return document, batch
 
     @staticmethod
     def from_labels(
@@ -230,11 +245,7 @@ class CoreferenceDataset(Dataset):
 
     def __getitem__(self, index: int) -> BatchEncoding:
         document = self.documents[index]
-        document = document.retokenized_document(self.tokenizer)
-        batch = self.tokenizer(
-            document.tokens, is_split_into_words=True, add_special_tokens=False
-        )  # type: ignore
-        batch["labels"] = document.document_labels(self.max_span_size)
+        _, batch = document.prepared_document(self.tokenizer, self.max_span_size)
         return batch
 
 
