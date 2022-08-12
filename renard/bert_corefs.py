@@ -101,7 +101,7 @@ class CoreferenceDocument:
 
         new_chains = []
         for chain in self.coref_chains:
-            chain = []
+            new_chain = []
             for mention in chain:
                 try:
                     # compute [start_index, end_index] of the mention in
@@ -117,13 +117,13 @@ class CoreferenceDocument:
                 # is discarded
                 except ValueError:
                     continue
-                chain.append(
+                new_chain.append(
                     CoreferenceMention(
                         start_idx, end_idx, tokens[start_idx : end_idx + 1]
                     )
                 )
-            if len(chain) > 0:
-                new_chains.append(chain)
+            if len(new_chain) > 1:
+                new_chains.append(new_chain)
 
         document = CoreferenceDocument(tokens, new_chains)
         batch["labels"] = document.document_labels(max_span_size)
