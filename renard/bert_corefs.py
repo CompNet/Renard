@@ -1,7 +1,8 @@
 from __future__ import annotations
 from typing import Dict, List, Literal, Optional, Tuple, Union
-import re
+import re, glob
 from dataclasses import dataclass
+from more_itertools.recipes import flatten
 import torch
 from torch.utils.data import Dataset
 from torch.utils.data.dataloader import DataLoader
@@ -240,26 +241,20 @@ class CoreferenceDataset(Dataset):
         self.tokenizer = tokenizer
         self.max_span_size = max_span_size
 
-    def __len__(self) -> int:
-        return len(self.documents)
-
-    def __getitem__(self, index: int) -> BatchEncoding:
-        document = self.documents[index]
-        _, batch = document.prepared_document(self.tokenizer, self.max_span_size)
-        return batch
-
-
-class WikiCorefDataset(CoreferenceDataset):
-    """The WikiCoref dataset (http://rali.iro.umontreal.ca/rali/?q=en/wikicoref)"""
-
-    def __init__(
-        self, path: str, tokenizer: PreTrainedTokenizerFast, max_span_size: int
-    ) -> None:
+    @staticmethod
+    def from_conll2012_file(
+        path: str,
+        tokenizer: PreTrainedTokenizerFast,
+        max_span_size: int,
+        tokens_split_idx: int,
+        corefs_split_idx: int,
+    ) -> CoreferenceDataset:
         """
-        :param path: path to the root of the WikiCoref dataset
-            downloaded from http://rali.iro.umontreal.ca/rali/?q=en/wikicoref
+        :param tokens_split_idx: index of the tokens column in the
+            CoNLL-2012 formatted file
+        :param corefs_split_idx: index of the corefs column in the
+            CoNLL-2012 formatted file
         """
-        path = path.rstrip("/")
 
         documents = []
         document_tokens = []
@@ -268,7 +263,7 @@ class WikiCorefDataset(CoreferenceDataset):
         # dict chain id => list of mention start index
         open_mentions: Dict[str, List[int]] = {}
 
-        with open(f"{path}/Evaluation/key-OntoNotesScheme") as f:
+        with open(path) as f:
 
             for line in f:
 
@@ -293,7 +288,7 @@ class WikiCorefDataset(CoreferenceDataset):
                 splitted = line.split("\t")
 
                 # - tokens
-                document_tokens.append(splitted[3])
+                document_tokens.append(splitted[tokens_split_idx])
 
                 # - coreference datas parsing
                 #
@@ -311,12 +306,16 @@ class WikiCorefDataset(CoreferenceDataset):
                 if splitted[4] == "-":
                     continue
 
-                coref_datas_list = splitted[4].split("|")
+                coref_datas_list = splitted[corefs_split_idx].split("|")
                 for coref_datas in coref_datas_list:
 
                     mention_is_starting = coref_datas.find("(") != -1
                     mention_is_ending = coref_datas.find(")") != -1
-                    chain_id = re.search(r"[0-9]+", coref_datas).group(0)
+                    try:
+                        chain_id = re.search(r"[0-9]+", coref_datas).group(0)
+                    except AttributeError:
+                        # malformated datas (empty string...)
+                        continue
 
                     if mention_is_starting:
                         open_mentions[chain_id] = open_mentions.get(chain_id, []) + [
@@ -335,7 +334,60 @@ class WikiCorefDataset(CoreferenceDataset):
                             chain_id, []
                         ) + [mention]
 
-        super().__init__(documents, tokenizer, max_span_size)
+        return CoreferenceDataset(documents, tokenizer, max_span_size)
+
+    @staticmethod
+    def merged_datasets(datasets: List[CoreferenceDataset]) -> CoreferenceDataset:
+        """Merge several datasets in one.
+
+        .. note::
+
+            all datasets must have the same ``max_span_size``
+
+        :param datasets: list of datasets to merge together
+        :return: the merged datasets.
+        """
+        assert len(datasets) > 0
+        assert len(set([d.max_span_size for d in datasets])) == 1
+        return CoreferenceDataset(
+            list(flatten([d.documents for d in datasets])),
+            datasets[0].tokenizer,
+            datasets[0].max_span_size,
+        )
+
+    def __len__(self) -> int:
+        return len(self.documents)
+
+    def __getitem__(self, index: int) -> BatchEncoding:
+        document = self.documents[index]
+        _, batch = document.prepared_document(self.tokenizer, self.max_span_size)
+        return batch
+
+
+def load_wikicoref_dataset(
+    root_path: str, tokenizer: PreTrainedTokenizerFast, max_span_size: int
+) -> CoreferenceDataset:
+    """Load the WikiCoref dataset (can be downloaded from
+    http://rali.iro.umontreal.ca/rali/?q=en/wikicoref)
+    """
+    root_path = root_path.rstrip("/")
+    return CoreferenceDataset.from_conll2012_file(
+        f"{root_path}/Evaluation/key-OntoNotesScheme", tokenizer, max_span_size, 3, 4
+    )
+
+
+def load_litbank_dataset(
+    root_path: str, tokenizer: PreTrainedTokenizerFast, max_span_size: int
+) -> CoreferenceDataset:
+    root_path = root_path.rstrip("/")
+    return CoreferenceDataset.merged_datasets(
+        [
+            CoreferenceDataset.from_conll2012_file(
+                fpath, tokenizer, max_span_size, 3, 12
+            )
+            for fpath in glob.glob(f"{root_path}/coref/conll/*.conll")
+        ]
+    )
 
 
 @dataclass
