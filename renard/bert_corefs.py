@@ -1,9 +1,10 @@
 from __future__ import annotations
-from typing import Dict, List, Literal, Optional, Tuple, Union
+from typing import Dict, Iterator, List, Literal, Optional, Tuple, Union
 import re, glob
 from dataclasses import dataclass
 from more_itertools.recipes import flatten
 import torch
+from torch.nn.parameter import Parameter
 from torch.utils.data import Dataset
 from torch.utils.data.dataloader import DataLoader
 from transformers import BertPreTrainedModel
@@ -514,6 +515,19 @@ class BertForCoreferenceResolution(BertPreTrainedModel):
         self.mention_compatibility_scorer = torch.nn.Linear(150, 1)
 
         self.loss_fn = torch.nn.CrossEntropyLoss()
+
+    def bert_parameters(self) -> Iterator[Parameter]:
+        """Get BERT encoder parameters"""
+        return self.bert.parameters()
+
+    def task_parameters(self) -> List[Parameter]:
+        """Get parameters for layers other than BERT"""
+        return (
+            list(self.mention_scorer.parameters())
+            + list(self.mention_scorer_hidden.parameters())
+            + list(self.mention_compatibility_scorer.parameters())
+            + list(self.mention_compatibility_scorer_hidden.parameters())
+        )
 
     def mention_score(self, span_bounds: torch.Tensor) -> torch.Tensor:
         """Compute a score representing how likely it is that a span is a mention
