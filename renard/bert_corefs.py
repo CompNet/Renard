@@ -759,7 +759,7 @@ class BertForCoreferenceResolution(BertPreTrainedModel):
 
         # antecedents_index contains the index of the a closest
         # antecedents for each spans
-        antecedents_nb = a = min(self.antecedents_nb, top_mentions_nb)
+        antecedents_nb = a = min(self.antecedents_nb, spans_nb)
         antecedents_index = self.closest_antecedents_indexs(
             spans_nb, seq_size, antecedents_nb
         )
