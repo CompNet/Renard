@@ -7,7 +7,7 @@ from stanza.server import CoreNLPClient
 from stanza.resources.installation import DEFAULT_CORENLP_DIR
 
 from renard.pipeline.core import PipelineStep
-from renard.pipeline.corefs import CoreferenceMention, CoreferenceChain
+from renard.pipeline.corefs.mentions import CoreferenceMention
 
 
 def corenlp_is_installed() -> bool:
@@ -182,7 +182,7 @@ class StanfordCoreNLPPipeline(PipelineStep):
 
                 for coref_chain in annotations.corefChain:  # type: ignore
 
-                    chain = CoreferenceChain()
+                    chain = []
 
                     for mention in coref_chain.mention:  # type: ignore
 
@@ -199,11 +199,11 @@ class StanfordCoreNLPPipeline(PipelineStep):
                             mention_sent.token[mention.endIndex - 1].word
                         )
 
-                        chain.mentions.append(
+                        chain.append(
                             CoreferenceMention(
                                 sent_start_idx + mention.beginIndex,
                                 sent_start_idx + mention.endIndex,
-                                "".join(mention_words),
+                                mention_words,
                             )
                         )
 
@@ -211,7 +211,7 @@ class StanfordCoreNLPPipeline(PipelineStep):
 
         out_dict = {"tokens": tokens, "bio_tags": bio_tags}
         if self.annotate_corefs:
-            out_dict["corefs"] = coref_chains
+            out_dict["corefs"] = coref_chains  # type: ignore
         return out_dict
 
     def needs(self) -> Set[str]:

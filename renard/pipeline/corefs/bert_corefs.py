@@ -7,8 +7,8 @@ import torch
 from torch.nn.parameter import Parameter
 from torch.utils.data import Dataset
 from torch.utils.data.dataloader import DataLoader
-from transformers import BertPreTrainedModel
-from transformers import PreTrainedTokenizerFast
+from transformers import BertPreTrainedModel  # type: ignore
+from transformers import PreTrainedTokenizerFast  # type: ignore
 from transformers.file_utils import PaddingStrategy
 from transformers.data.data_collator import DataCollatorMixin
 from transformers.models.bert.modeling_bert import BertModel
@@ -16,13 +16,7 @@ from transformers.models.bert.configuration_bert import BertConfig
 from transformers.tokenization_utils_base import BatchEncoding, PreTrainedTokenizerBase
 from tqdm import tqdm
 from renard.utils import spans, spans_indexs, batch_index_select
-
-
-@dataclass
-class CoreferenceMention:
-    start_idx: int
-    end_idx: int
-    tokens: List[str]
+from renard.pipeline.corefs.mentions import CoreferenceMention
 
 
 @dataclass
@@ -131,6 +125,38 @@ class CoreferenceDocument:
         batch["labels"] = document.document_labels(max_span_size)
 
         return document, batch
+
+    def from_wpieced_to_tokenized(
+        self, tokens: List[str], batch: BatchEncoding, batch_idx: int
+    ) -> CoreferenceDocument:
+        """Convert the current document, tokenized with wordpieces, to a document 'normally' tokenized
+
+        :param tokens: the original tokens
+        :param batch:
+        :param batch_idx:
+        :return:
+        """
+        seq_size = batch["input_ids"].shape[1]  # type: ignore
+        wp_to_token = [
+            batch.token_to_word(batch_idx, token_index=i) for i in range(seq_size)
+        ]
+
+        new_chains = []
+        for chain in self.coref_chains:
+            new_chain = []
+            for mention in chain:
+                new_start_idx = wp_to_token[mention.start_idx]
+                new_end_idx = wp_to_token[mention.end_idx]
+                new_chain.append(
+                    CoreferenceMention(
+                        new_start_idx,
+                        new_end_idx,
+                        tokens[new_start_idx : new_end_idx + 1],
+                    )
+                )
+            new_chains.append(new_chain)
+
+        return CoreferenceDocument(tokens, new_chains)
 
     @staticmethod
     def from_labels(
@@ -887,10 +913,6 @@ class BertForCoreferenceResolution(BertPreTrainedModel):
     ) -> List[CoreferenceDocument]:
         """Predict coreference chains for a list of documents.
 
-        .. warning::
-
-            WIP: the returned documents tokens are wordpieces and not the original tokens.
-
         :param documents: A list of tokenized documents.
         :param tokenizer:
         :param batch_size:
@@ -904,29 +926,43 @@ class BertForCoreferenceResolution(BertPreTrainedModel):
             tokenizer,
             self.max_span_size,
         )
-        data_collator = DataCollatorForSpanClassification(tokenizer, self.max_span_size)
+        data_collator = DataCollatorForSpanClassification(tokenizer, self.max_span_size)  # type: ignore
         dataloader = DataLoader(
             dataset, batch_size=batch_size, collate_fn=data_collator, shuffle=False
         )
 
-        device = next(self.parameters()).device
+        device = next(self.parameters()).device  # type: ignore
 
-        self = self.eval()
+        self = self.eval()  # type: ignore
 
         preds = []
 
         with torch.no_grad():
 
-            for batch in tqdm(dataloader):
+            for i, batch in enumerate(tqdm(dataloader)):
+
+                local_batch_size = batch["input_ids"].shape[0]
+
+                start_idx = batch_size * i
+                end_idx = batch_size * i + local_batch_size
+                batch_docs = dataset.documents[start_idx:end_idx]
 
                 batch = batch.to(device)
-
                 out: BertCoreferenceResolutionOutput = self(**batch)
-                preds += out.coreference_documents(
+                out_docs = out.coreference_documents(
                     [
-                        [tokenizer.decode(t) for t in input_ids]
+                        [tokenizer.decode(t) for t in input_ids]  # type: ignore
                         for input_ids in batch["input_ids"]
                     ]
                 )
+                out_docs = [
+                    out_doc.from_wpieced_to_tokenized(
+                        original_doc.tokens, batch, batch_i
+                    )
+                    for batch_i, (original_doc, out_doc) in enumerate(
+                        zip(batch_docs, out_docs)
+                    )
+                ]
+                preds += out_docs
 
         return preds
