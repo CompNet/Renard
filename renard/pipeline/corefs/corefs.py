@@ -1,4 +1,4 @@
-from typing import List, Set, Dict, Any, cast
+from typing import List, Literal, Set, Dict, Any, cast
 from more_itertools.recipes import flatten
 import torch
 from transformers import BertTokenizerFast  # type: ignore
@@ -23,6 +23,7 @@ class BertCoreferenceResolver(PipelineStep):
         tokenizer: str = "bert-base-cased",
         batch_size: int = 4,
         block_size: int = 128,
+        device: Literal["auto", "cuda", "cpu"] = "auto",
     ) -> None:
         """
         .. note::
@@ -41,17 +42,19 @@ class BertCoreferenceResolver(PipelineStep):
         :param tokenizer: name of the hugginface tokenizer
         :param batch_size: batch size at inference
         :param block_size: size of text blocks to consider
+        :param device: computation device
         """
+        if device == "auto":
+            torch_device = torch.device("cuda" if torch.cuda.is_available else "cpu")
+        else:
+            torch_device = torch.device(device)
+
         self.bert_for_corefs = BertForCoreferenceResolution.from_pretrained(
             model, mentions_per_tokens, antecedents_nb, max_span_size
         )  # type: ignore
         self.bert_for_corefs = cast(BertForCoreferenceResolution, self.bert_for_corefs)
-        # TODO: param
-        self.bert_for_corefs = self.bert_for_corefs.to(
-            torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        )  # type: ignore
+        self.bert_for_corefs = self.bert_for_corefs.to(torch_device)  # type: ignore
 
-        # TODO: tokenizer key
         self.tokenizer = BertTokenizerFast.from_pretrained(tokenizer)  # type: ignore
 
         self.batch_size = batch_size
