@@ -7,8 +7,8 @@ from transformers.tokenization_utils_base import BatchEncoding
 import networkx as nx
 
 if TYPE_CHECKING:
-    from renard.pipeline.corefs import CoreferenceChain
     from renard.pipeline.characters_extraction import Character
+    from renard.pipeline.corefs.bert_corefs import CoreferenceMention
 
 
 class PipelineStep:
@@ -76,7 +76,7 @@ class PipelineState:
     bert_batch_encoding: Optional[BatchEncoding] = None
 
     #: coreference chains
-    corefs: Optional[List[CoreferenceChain]] = None
+    corefs: Optional[List[List[CoreferenceMention]]] = None
 
     #: detected characters
     characters: Optional[Set[Character]] = None
