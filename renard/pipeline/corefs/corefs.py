@@ -1,8 +1,10 @@
 from typing import List, Set, Dict, Any, cast
+from more_itertools.recipes import flatten
 import torch
 from transformers import BertTokenizerFast  # type: ignore
 from renard.pipeline import PipelineStep
 from renard.pipeline.corefs.bert_corefs import BertForCoreferenceResolution
+from renard.pipeline.corefs.mentions import CoreferenceMention
 
 
 class BertCoreferenceResolver(PipelineStep):
@@ -71,8 +73,24 @@ class BertCoreferenceResolver(PipelineStep):
         coref_docs = self.bert_for_corefs.predict(
             blocks, self.tokenizer, self.batch_size
         )
+        # chains found in coref_docs are each local to their
+        # blocks. The following code adjusts their start and end index
+        # to match their global coordinate in the text.
+        coref_chains = []
+        cur_doc_start = 0
+        for doc in coref_docs:
+            for chain in doc.coref_chains:
+                adjusted_chain = []
+                for mention in chain:
+                    start_idx = mention.start_idx + cur_doc_start
+                    end_idx = mention.end_idx + cur_doc_start
+                    adjusted_chain.append(
+                        CoreferenceMention(start_idx, end_idx, mention.tokens)
+                    )
+                coref_chains.append(adjusted_chain)
+            cur_doc_start += len(doc)
 
-        return {"corefs": [doc.coref_chains for doc in coref_docs]}
+        return {"corefs": coref_chains}
 
     def needs(self) -> Set[str]:
         return {"tokens"}
