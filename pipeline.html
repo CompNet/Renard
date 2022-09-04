@@ -52,7 +52,11 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#module-renard.pipeline.preprocessing">Preprocessing</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-renard.pipeline.tokenization">Tokenization</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#module-renard.pipeline.ner">NER</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-renard.pipeline.ner">Named Entity Recognition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-renard.pipeline.corefs.mentions">Coreference Resolution</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#bert-coreference-resolution-model">BERT Coreference Resolution model</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="#module-renard.pipeline.characters_extraction">Characters Extraction</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-renard.pipeline.graph_extraction">Graph Extraction</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-renard.pipeline.stanford_corenlp">Stanford CoreNLP Pipeline</a></li>
@@ -262,7 +266,7 @@ valid, <code class="docutils literal notranslate"><span class="pre">(False,</spa
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="renard.pipeline.core.PipelineState.corefs">
-<span class="sig-name descname"><span class="pre">corefs</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">renard.pipeline.corefs.mentions.CoreferenceMention</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#renard.pipeline.core.PipelineState.corefs" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">corefs</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#renard.pipeline.corefs.mentions.CoreferenceMention" title="renard.pipeline.corefs.mentions.CoreferenceMention"><span class="pre">renard.pipeline.corefs.mentions.CoreferenceMention</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#renard.pipeline.core.PipelineState.corefs" title="Permalink to this definition"></a></dt>
 <dd><p>coreference chains</p>
 </dd></dl>
 
@@ -619,7 +623,7 @@ by derived classes.</p>
 
 </section>
 <section id="module-renard.pipeline.ner">
-<span id="ner"></span><h2>NER<a class="headerlink" href="#module-renard.pipeline.ner" title="Permalink to this headline"></a></h2>
+<span id="named-entity-recognition"></span><h2>Named Entity Recognition<a class="headerlink" href="#module-renard.pipeline.ner" title="Permalink to this headline"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="renard.pipeline.ner.BertNamedEntityRecognizer">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">renard.pipeline.ner.</span></span><span class="sig-name descname"><span class="pre">BertNamedEntityRecognizer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'dslim/bert-base-NER'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.ner.BertNamedEntityRecognizer" title="Permalink to this definition"></a></dt>
@@ -862,6 +866,549 @@ both.</p>
 </dl>
 </dd></dl>
 
+</section>
+<section id="module-renard.pipeline.corefs.mentions">
+<span id="coreference-resolution"></span><h2>Coreference Resolution<a class="headerlink" href="#module-renard.pipeline.corefs.mentions" title="Permalink to this headline"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="renard.pipeline.corefs.mentions.CoreferenceMention">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">renard.pipeline.corefs.mentions.</span></span><span class="sig-name descname"><span class="pre">CoreferenceMention</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start_idx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_idx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tokens</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.corefs.mentions.CoreferenceMention" title="Permalink to this definition"></a></dt>
+<dd><dl class="py method">
+<dt class="sig sig-object py" id="renard.pipeline.corefs.mentions.CoreferenceMention.__eq__">
+<span class="sig-name descname"><span class="pre">__eq__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.corefs.mentions.CoreferenceMention.__eq__" title="Permalink to this definition"></a></dt>
+<dd><p>Return self==value.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="renard.pipeline.corefs.mentions.CoreferenceMention.__hash__">
+<span class="sig-name descname"><span class="pre">__hash__</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#renard.pipeline.corefs.mentions.CoreferenceMention.__hash__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="renard.pipeline.corefs.mentions.CoreferenceMention.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start_idx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_idx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tokens</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.corefs.mentions.CoreferenceMention.__init__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="renard.pipeline.corefs.mentions.CoreferenceMention.__repr__">
+<span class="sig-name descname"><span class="pre">__repr__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.corefs.mentions.CoreferenceMention.__repr__" title="Permalink to this definition"></a></dt>
+<dd><p>Return repr(self).</p>
+</dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-renard.pipeline.corefs.corefs"></span><dl class="py class">
+<dt class="sig sig-object py" id="renard.pipeline.corefs.corefs.BertCoreferenceResolver">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">renard.pipeline.corefs.corefs.</span></span><span class="sig-name descname"><span class="pre">BertCoreferenceResolver</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mentions_per_tokens</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">antecedents_nb</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_span_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tokenizer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'bert-base-cased'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">block_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">128</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.corefs.corefs.BertCoreferenceResolver" title="Permalink to this definition"></a></dt>
+<dd><p>A coreference resolver using BERT.  Loosely based on ‘End-to-end
+Neural Coreference Resolution’ (Lee et at.  2017) and ‘BERT for
+coreference resolution’ (Joshi et al.  2019).</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="renard.pipeline.corefs.corefs.BertCoreferenceResolver.__call__">
+<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tokens</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.corefs.corefs.BertCoreferenceResolver.__call__" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>text</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – </p></li>
+<li><p><strong>tokens</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="renard.pipeline.corefs.corefs.BertCoreferenceResolver.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mentions_per_tokens</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">antecedents_nb</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_span_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tokenizer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'bert-base-cased'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">block_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">128</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.corefs.corefs.BertCoreferenceResolver.__init__" title="Permalink to this definition"></a></dt>
+<dd><div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>In the future, only <code class="docutils literal notranslate"><span class="pre">mentions_per_tokens</span></code>,
+<code class="docutils literal notranslate"><span class="pre">antecedents_nb</span></code> and <code class="docutils literal notranslate"><span class="pre">max_span_size</span></code> shall be read
+directly from the model’s config.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – key of the huggingface model</p></li>
+<li><p><strong>mentions_per_tokens</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – number of candidate mention per
+wordpiece token</p></li>
+<li><p><strong>antecedents_nb</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – max number of candidate antecedents for
+each candidate mention</p></li>
+<li><p><strong>max_span_size</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – maximum size of candidate spans, in
+wordpiece tokens</p></li>
+<li><p><strong>tokenizer</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – name of the hugginface tokenizer</p></li>
+<li><p><strong>batch_size</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – batch size at inference</p></li>
+<li><p><strong>block_size</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – size of text blocks to consider</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="renard.pipeline.corefs.corefs.BertCoreferenceResolver.needs">
+<span class="sig-name descname"><span class="pre">needs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.corefs.corefs.BertCoreferenceResolver.needs" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Set</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>a <cite>set</cite> of state attributes needed by this
+<code class="xref py py-class docutils literal notranslate"><span class="pre">PipelineStep</span></code>. This method must be overriden
+by derived classes.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="renard.pipeline.corefs.corefs.BertCoreferenceResolver.production">
+<span class="sig-name descname"><span class="pre">production</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.corefs.corefs.BertCoreferenceResolver.production" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Set</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>a <cite>set</cite> of state attributes produced by this
+<code class="xref py py-class docutils literal notranslate"><span class="pre">PipelineStep</span></code>. This method must be overriden
+by derived classes.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<section id="bert-coreference-resolution-model">
+<h3>BERT Coreference Resolution model<a class="headerlink" href="#bert-coreference-resolution-model" title="Permalink to this headline"></a></h3>
+<p>This module implements a Huggingface-like end-to-end neural
+coreference resolution model.</p>
+<span class="target" id="module-renard.pipeline.corefs.bert_corefs"></span><dl class="py class">
+<dt class="sig sig-object py" id="renard.pipeline.corefs.bert_corefs.BertCoreferenceResolutionOutput">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">renard.pipeline.corefs.bert_corefs.</span></span><span class="sig-name descname"><span class="pre">BertCoreferenceResolutionOutput</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logits</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">top_mentions_index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">top_antecedents_index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_span_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loss</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hidden_states</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attentions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.corefs.bert_corefs.BertCoreferenceResolutionOutput" title="Permalink to this definition"></a></dt>
+<dd><dl class="py method">
+<dt class="sig sig-object py" id="renard.pipeline.corefs.bert_corefs.BertCoreferenceResolutionOutput.__eq__">
+<span class="sig-name descname"><span class="pre">__eq__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.corefs.bert_corefs.BertCoreferenceResolutionOutput.__eq__" title="Permalink to this definition"></a></dt>
+<dd><p>Return self==value.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="renard.pipeline.corefs.bert_corefs.BertCoreferenceResolutionOutput.__hash__">
+<span class="sig-name descname"><span class="pre">__hash__</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#renard.pipeline.corefs.bert_corefs.BertCoreferenceResolutionOutput.__hash__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="renard.pipeline.corefs.bert_corefs.BertCoreferenceResolutionOutput.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logits</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">top_mentions_index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">top_antecedents_index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_span_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loss</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hidden_states</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attentions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.corefs.bert_corefs.BertCoreferenceResolutionOutput.__init__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="renard.pipeline.corefs.bert_corefs.BertCoreferenceResolutionOutput.__repr__">
+<span class="sig-name descname"><span class="pre">__repr__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.corefs.bert_corefs.BertCoreferenceResolutionOutput.__repr__" title="Permalink to this definition"></a></dt>
+<dd><p>Return repr(self).</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="renard.pipeline.corefs.bert_corefs.BertForCoreferenceResolution">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">renard.pipeline.corefs.bert_corefs.</span></span><span class="sig-name descname"><span class="pre">BertForCoreferenceResolution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mentions_per_tokens</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">antecedents_nb</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_span_size</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.corefs.bert_corefs.BertForCoreferenceResolution" title="Permalink to this definition"></a></dt>
+<dd><p>BERT for Coreference Resolution</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>We use the following short notation to annotate shapes :</p>
+<ul class="simple">
+<li><p>b : batch_size</p></li>
+<li><p>s : seq_size</p></li>
+<li><p>p : spans_nb</p></li>
+<li><p>m : top_mentions_nb</p></li>
+<li><p>a : antecedents_nb</p></li>
+<li><p>h : hidden_size</p></li>
+</ul>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="renard.pipeline.corefs.bert_corefs.BertForCoreferenceResolution.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mentions_per_tokens</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">antecedents_nb</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_span_size</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.corefs.bert_corefs.BertForCoreferenceResolution.__init__" title="Permalink to this definition"></a></dt>
+<dd><p>Initializes internal Module state, shared by both nn.Module and ScriptModule.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="renard.pipeline.corefs.bert_corefs.BertForCoreferenceResolution.bert_parameters">
+<span class="sig-name descname"><span class="pre">bert_parameters</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.corefs.bert_corefs.BertForCoreferenceResolution.bert_parameters" title="Permalink to this definition"></a></dt>
+<dd><p>Get BERT encoder parameters</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Iterator</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Parameter</span></code>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="renard.pipeline.corefs.bert_corefs.BertForCoreferenceResolution.closest_antecedents_indexs">
+<span class="sig-name descname"><span class="pre">closest_antecedents_indexs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spans_nb</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seq_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">antecedents_nb</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.corefs.bert_corefs.BertForCoreferenceResolution.closest_antecedents_indexs" title="Permalink to this definition"></a></dt>
+<dd><p>Compute the indexs of the k closest mentions</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>spans_nb</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – number of spans in the sequence</p></li>
+<li><p><strong>seq_size</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – size of the sequence</p></li>
+<li><p><strong>antecedents_nb</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – number of antecedents to consider</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>a tensor of shape <code class="docutils literal notranslate"><span class="pre">(spans_nb,</span> <span class="pre">antecedents_nb)</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="renard.pipeline.corefs.bert_corefs.BertForCoreferenceResolution.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_ids</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attention_mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">token_type_ids</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">position_ids</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">head_mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inputs_embeds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_attentions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_hidden_states</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_dict</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.corefs.bert_corefs.BertForCoreferenceResolution.forward" title="Permalink to this definition"></a></dt>
+<dd><p>TODO: add return type</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input_ids</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code>) – a tensor of shape <code class="docutils literal notranslate"><span class="pre">(batch_size,</span> <span class="pre">seq_size)</span></code></p></li>
+<li><p><strong>attention_mask</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code>]) – a tensor of shape <code class="docutils literal notranslate"><span class="pre">(batch_size,</span> <span class="pre">seq_size)</span></code></p></li>
+<li><p><strong>labels</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">LongTensor</span></code>]) – a tensor of shape <code class="docutils literal notranslate"><span class="pre">(batch_size,</span> <span class="pre">spans_nb,</span> <span class="pre">spans_nb)</span></code></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="renard.pipeline.corefs.bert_corefs.BertForCoreferenceResolution.loss">
+<span class="sig-name descname"><span class="pre">loss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pred_scores</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.corefs.bert_corefs.BertForCoreferenceResolution.loss" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pred_scores</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code>) – <code class="docutils literal notranslate"><span class="pre">(batch_size,</span> <span class="pre">top_mentions_nb,</span> <span class="pre">antecedents_nb</span> <span class="pre">+</span> <span class="pre">1)</span></code></p></li>
+<li><p><strong>labels</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code>) – <code class="docutils literal notranslate"><span class="pre">(batch_size,</span> <span class="pre">top_mentions_nb,</span> <span class="pre">antecedents_nb</span> <span class="pre">+</span> <span class="pre">1)</span></code></p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">(batch_size)</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="renard.pipeline.corefs.bert_corefs.BertForCoreferenceResolution.mention_compatibility_score">
+<span class="sig-name descname"><span class="pre">mention_compatibility_score</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">span_bounds</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.corefs.bert_corefs.BertForCoreferenceResolution.mention_compatibility_score" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>span_bounds</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code>) – <code class="docutils literal notranslate"><span class="pre">(batch_size,</span> <span class="pre">4</span> <span class="pre">*</span> <span class="pre">hidden_size)</span></code></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>a tensor of shape <code class="docutils literal notranslate"><span class="pre">(batch_size)</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="renard.pipeline.corefs.bert_corefs.BertForCoreferenceResolution.mention_score">
+<span class="sig-name descname"><span class="pre">mention_score</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">span_bounds</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.corefs.bert_corefs.BertForCoreferenceResolution.mention_score" title="Permalink to this definition"></a></dt>
+<dd><p>Compute a score representing how likely it is that a span is a mention</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>span_bounds</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code>) – a tensor of shape <code class="docutils literal notranslate"><span class="pre">(batch_size,</span> <span class="pre">2,</span> <span class="pre">hidden_size)</span></code>,
+representing the first and last token of a span.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>a tensor of shape <code class="docutils literal notranslate"><span class="pre">(batch_size)</span></code>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="renard.pipeline.corefs.bert_corefs.BertForCoreferenceResolution.predict">
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">documents</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tokenizer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.corefs.bert_corefs.BertForCoreferenceResolution.predict" title="Permalink to this definition"></a></dt>
+<dd><p>Predict coreference chains for a list of documents.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>documents</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – A list of tokenized documents.</p></li>
+<li><p><strong>tokenizer</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">PreTrainedTokenizerFast</span></code>) – </p></li>
+<li><p><strong>batch_size</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<a class="reference internal" href="#renard.pipeline.corefs.bert_corefs.CoreferenceDocument" title="renard.pipeline.corefs.bert_corefs.CoreferenceDocument"><code class="xref py py-class docutils literal notranslate"><span class="pre">CoreferenceDocument</span></code></a>]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>a list of <code class="docutils literal notranslate"><span class="pre">CoreferenceDocument</span></code>, with annotated
+coreference chains.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="renard.pipeline.corefs.bert_corefs.BertForCoreferenceResolution.pruned_mentions_indexs">
+<span class="sig-name descname"><span class="pre">pruned_mentions_indexs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mention_scores</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seq_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">top_mentions_nb</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.corefs.bert_corefs.BertForCoreferenceResolution.pruned_mentions_indexs" title="Permalink to this definition"></a></dt>
+<dd><p>Prune mentions, keeping only the k non-overlapping best of them</p>
+<p>The algorithm works as follows :</p>
+<ol class="arabic simple">
+<li><p>Sort mentions by individual scores</p></li>
+<li><dl class="simple">
+<dt>Accept mention in orders, from best to worst score, until k of</dt><dd><p>them are accepted. A mention can only be accepted if no
+previously accepted span os overlapping with it.</p>
+</dd>
+</dl>
+</li>
+</ol>
+<p>See section 5 of the E2ECoref paper and the C++ kernel in the
+E2ECoref repository.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mention_scores</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code>) – a tensor of shape <code class="docutils literal notranslate"><span class="pre">(batch_size,</span> <span class="pre">spans_nb)</span></code></p></li>
+<li><p><strong>seq_size</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – </p></li>
+<li><p><strong>top_mentions_nb</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – the maximum number of spans to keep
+during the pruning process</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>a tensor of shape <code class="docutils literal notranslate"><span class="pre">(batch_size,</span> <span class="pre">&lt;=</span> <span class="pre">top_mentions_nb)</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="renard.pipeline.corefs.bert_corefs.BertForCoreferenceResolution.task_parameters">
+<span class="sig-name descname"><span class="pre">task_parameters</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.corefs.bert_corefs.BertForCoreferenceResolution.task_parameters" title="Permalink to this definition"></a></dt>
+<dd><p>Get parameters for layers other than BERT</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Parameter</span></code>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="renard.pipeline.corefs.bert_corefs.CoreferenceDataset">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">renard.pipeline.corefs.bert_corefs.</span></span><span class="sig-name descname"><span class="pre">CoreferenceDataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">documents</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tokenizer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_span_size</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.corefs.bert_corefs.CoreferenceDataset" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Variables</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>documents</strong> – </p></li>
+<li><p><strong>tokenizer</strong> – </p></li>
+<li><p><strong>max_span_len</strong> – </p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="renard.pipeline.corefs.bert_corefs.CoreferenceDataset.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">documents</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tokenizer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_span_size</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.corefs.bert_corefs.CoreferenceDataset.__init__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="renard.pipeline.corefs.bert_corefs.CoreferenceDataset.from_conll2012_file">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_conll2012_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tokenizer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_span_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tokens_split_idx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">corefs_split_idx</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.corefs.bert_corefs.CoreferenceDataset.from_conll2012_file" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tokens_split_idx</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – index of the tokens column in the
+CoNLL-2012 formatted file</p></li>
+<li><p><strong>corefs_split_idx</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – index of the corefs column in the
+CoNLL-2012 formatted file</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#renard.pipeline.corefs.bert_corefs.CoreferenceDataset" title="renard.pipeline.corefs.bert_corefs.CoreferenceDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">CoreferenceDataset</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="renard.pipeline.corefs.bert_corefs.CoreferenceDataset.merged_datasets">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">merged_datasets</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">datasets</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.corefs.bert_corefs.CoreferenceDataset.merged_datasets" title="Permalink to this definition"></a></dt>
+<dd><p>Merge several datasets in one.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>all datasets must have the same <code class="docutils literal notranslate"><span class="pre">max_span_size</span></code></p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>datasets</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<a class="reference internal" href="#renard.pipeline.corefs.bert_corefs.CoreferenceDataset" title="renard.pipeline.corefs.bert_corefs.CoreferenceDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">CoreferenceDataset</span></code></a>]) – list of datasets to merge together</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#renard.pipeline.corefs.bert_corefs.CoreferenceDataset" title="renard.pipeline.corefs.bert_corefs.CoreferenceDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">CoreferenceDataset</span></code></a></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>the merged datasets.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="renard.pipeline.corefs.bert_corefs.CoreferenceDocument">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">renard.pipeline.corefs.bert_corefs.</span></span><span class="sig-name descname"><span class="pre">CoreferenceDocument</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tokens</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coref_chains</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.corefs.bert_corefs.CoreferenceDocument" title="Permalink to this definition"></a></dt>
+<dd><dl class="py method">
+<dt class="sig sig-object py" id="renard.pipeline.corefs.bert_corefs.CoreferenceDocument.__eq__">
+<span class="sig-name descname"><span class="pre">__eq__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.corefs.bert_corefs.CoreferenceDocument.__eq__" title="Permalink to this definition"></a></dt>
+<dd><p>Return self==value.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="renard.pipeline.corefs.bert_corefs.CoreferenceDocument.__hash__">
+<span class="sig-name descname"><span class="pre">__hash__</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#renard.pipeline.corefs.bert_corefs.CoreferenceDocument.__hash__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="renard.pipeline.corefs.bert_corefs.CoreferenceDocument.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tokens</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coref_chains</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.corefs.bert_corefs.CoreferenceDocument.__init__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="renard.pipeline.corefs.bert_corefs.CoreferenceDocument.__repr__">
+<span class="sig-name descname"><span class="pre">__repr__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.corefs.bert_corefs.CoreferenceDocument.__repr__" title="Permalink to this definition"></a></dt>
+<dd><p>Return repr(self).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="renard.pipeline.corefs.bert_corefs.CoreferenceDocument.document_labels">
+<span class="sig-name descname"><span class="pre">document_labels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">max_span_size</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.corefs.bert_corefs.CoreferenceDocument.document_labels" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]]</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>a list of shape <code class="docutils literal notranslate"><span class="pre">(spans_nb,</span> <span class="pre">spans_nb</span> <span class="pre">+</span> <span class="pre">1)</span></code>.
+when <code class="docutils literal notranslate"><span class="pre">out[i][j]</span> <span class="pre">==</span> <span class="pre">1</span></code>, span j is the preceding
+coreferent mention if span i. when <code class="docutils literal notranslate"><span class="pre">j</span> <span class="pre">==</span> <span class="pre">spans_nb</span></code>,
+i has no preceding coreferent mention.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="renard.pipeline.corefs.bert_corefs.CoreferenceDocument.from_labels">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_labels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tokens</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_span_size</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.corefs.bert_corefs.CoreferenceDocument.from_labels" title="Permalink to this definition"></a></dt>
+<dd><p>Construct a CoreferenceDocument using labels</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tokens</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – </p></li>
+<li><p><strong>labels</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]]) – <code class="docutils literal notranslate"><span class="pre">(spans_nb,</span> <span class="pre">spans_nb</span> <span class="pre">+</span> <span class="pre">1)</span></code></p></li>
+<li><p><strong>max_span_size</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#renard.pipeline.corefs.bert_corefs.CoreferenceDocument" title="renard.pipeline.corefs.bert_corefs.CoreferenceDocument"><code class="xref py py-class docutils literal notranslate"><span class="pre">CoreferenceDocument</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="renard.pipeline.corefs.bert_corefs.CoreferenceDocument.from_wpieced_to_tokenized">
+<span class="sig-name descname"><span class="pre">from_wpieced_to_tokenized</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tokens</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_idx</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.corefs.bert_corefs.CoreferenceDocument.from_wpieced_to_tokenized" title="Permalink to this definition"></a></dt>
+<dd><p>Convert the current document, tokenized with wordpieces, to a document ‘normally’ tokenized</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tokens</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – the original tokens</p></li>
+<li><p><strong>batch</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">BatchEncoding</span></code>) – </p></li>
+<li><p><strong>batch_idx</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#renard.pipeline.corefs.bert_corefs.CoreferenceDocument" title="renard.pipeline.corefs.bert_corefs.CoreferenceDocument"><code class="xref py py-class docutils literal notranslate"><span class="pre">CoreferenceDocument</span></code></a></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="renard.pipeline.corefs.bert_corefs.CoreferenceDocument.prepared_document">
+<span class="sig-name descname"><span class="pre">prepared_document</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tokenizer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_span_size</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.corefs.bert_corefs.CoreferenceDocument.prepared_document" title="Permalink to this definition"></a></dt>
+<dd><p>Prepare a document for being inputted into a model.  The
+document is retokenized thanks to <code class="docutils literal notranslate"><span class="pre">tokenizer</span></code>, and
+coreference chains are adapted to the newly tokenized text.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The passed tokenizer is called using its <code class="docutils literal notranslate"><span class="pre">__call__</span></code>
+method. This means special tokens will be added.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>tokenizer</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">PreTrainedTokenizerFast</span></code>) – tokenizer used to retokenized the document</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<a class="reference internal" href="#renard.pipeline.corefs.bert_corefs.CoreferenceDocument" title="renard.pipeline.corefs.bert_corefs.CoreferenceDocument"><code class="xref py py-class docutils literal notranslate"><span class="pre">CoreferenceDocument</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">BatchEncoding</span></code>]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><p>a tuple :</p>
+<ul class="simple">
+<li><p>a new <a class="reference internal" href="#renard.pipeline.corefs.bert_corefs.CoreferenceDocument" title="renard.pipeline.corefs.bert_corefs.CoreferenceDocument"><code class="xref py py-class docutils literal notranslate"><span class="pre">CoreferenceDocument</span></code></a></p></li>
+<li><p>a <code class="xref py py-class docutils literal notranslate"><span class="pre">BatchEncoding</span></code> with added labels</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="renard.pipeline.corefs.bert_corefs.DataCollatorForSpanClassification">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">renard.pipeline.corefs.bert_corefs.</span></span><span class="sig-name descname"><span class="pre">DataCollatorForSpanClassification</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tokenizer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_span_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">padding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label_pad_token_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_tensors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'pt'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.corefs.bert_corefs.DataCollatorForSpanClassification" title="Permalink to this definition"></a></dt>
+<dd><div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Only implements the torch data collator.</p>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="renard.pipeline.corefs.bert_corefs.DataCollatorForSpanClassification.__eq__">
+<span class="sig-name descname"><span class="pre">__eq__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.corefs.bert_corefs.DataCollatorForSpanClassification.__eq__" title="Permalink to this definition"></a></dt>
+<dd><p>Return self==value.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="renard.pipeline.corefs.bert_corefs.DataCollatorForSpanClassification.__hash__">
+<span class="sig-name descname"><span class="pre">__hash__</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#renard.pipeline.corefs.bert_corefs.DataCollatorForSpanClassification.__hash__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="renard.pipeline.corefs.bert_corefs.DataCollatorForSpanClassification.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tokenizer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_span_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">padding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label_pad_token_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_tensors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'pt'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.corefs.bert_corefs.DataCollatorForSpanClassification.__init__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="renard.pipeline.corefs.bert_corefs.DataCollatorForSpanClassification.__repr__">
+<span class="sig-name descname"><span class="pre">__repr__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.corefs.bert_corefs.DataCollatorForSpanClassification.__repr__" title="Permalink to this definition"></a></dt>
+<dd><p>Return repr(self).</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="renard.pipeline.corefs.bert_corefs.load_wikicoref_dataset">
+<span class="sig-prename descclassname"><span class="pre">renard.pipeline.corefs.bert_corefs.</span></span><span class="sig-name descname"><span class="pre">load_wikicoref_dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tokenizer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_span_size</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.corefs.bert_corefs.load_wikicoref_dataset" title="Permalink to this definition"></a></dt>
+<dd><p>Load the WikiCoref dataset (can be downloaded from
+<a class="reference external" href="http://rali.iro.umontreal.ca/rali/?q=en/wikicoref">http://rali.iro.umontreal.ca/rali/?q=en/wikicoref</a>)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#renard.pipeline.corefs.bert_corefs.CoreferenceDataset" title="renard.pipeline.corefs.bert_corefs.CoreferenceDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">CoreferenceDataset</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
 </section>
 <section id="module-renard.pipeline.characters_extraction">
 <span id="characters-extraction"></span><h2>Characters Extraction<a class="headerlink" href="#module-renard.pipeline.characters_extraction" title="Permalink to this headline"></a></h2>
