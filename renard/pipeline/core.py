@@ -84,6 +84,24 @@ class PipelineState:
     #: characters graph
     characters_graph: Optional[Union[List[nx.Graph], nx.Graph]] = None
 
+    @staticmethod
+    def graph_with_names(
+        G: nx.Graph, name_style: Literal["longest", "shortest"] = "longest"
+    ) -> nx.Graph:
+        """Relabel a characters graph, using a single name for each node
+
+        :param name_style: characters name style in the resulting graph
+        """
+        return nx.relabel_nodes(
+            G,
+            {
+                character: character.shortest_name()  # type: ignore
+                if name_style == "shortest"
+                else character.longest_name()  # type: ignore
+                for character in G.nodes()
+            },
+        )
+
     def export_graph_to_gexf(
         self, path: str, name_style: Literal["longest", "shortest"] = "longest"
     ):
@@ -96,16 +114,32 @@ class PipelineState:
             raise RuntimeError(
                 f"characters graph cant be exported : {self.characters_graph}"
             )
-        G = nx.relabel_nodes(
-            self.characters_graph,
-            {
-                character: character.shortest_name()  # type: ignore
-                if name_style == "shortest"
-                else character.longest_name()  # type: ignore
-                for character in self.characters_graph.nodes()
-            },
-        )
+        G = self.graph_with_names(self.characters_graph, name_style)
         nx.write_gexf(G, path)
+
+    def draw_graph(self, name_style: Literal["longest", "shortest"] = "longest"):
+        """Draw ``self.characters_graph``
+
+        :param name_style: characters name style in the resulting graph
+        """
+        import matplotlib.pyplot as plt
+
+        assert not self.characters_graph is None
+
+        if isinstance(self.characters_graph, nx.Graph):
+            G = self.graph_with_names(self.characters_graph, name_style)
+            nx.draw_networkx(G)
+            plt.show()
+
+        elif isinstance(self.characters_graph, list):
+            fig, axs = plt.subplots(1, len(self.characters_graph))
+            for G, ax in zip(self.characters_graph, axs):
+                G = self.graph_with_names(G, name_style)
+                nx.draw_networkx(G, ax=ax)
+            plt.show()
+
+        else:
+            raise RuntimeError
 
 
 class Pipeline:
