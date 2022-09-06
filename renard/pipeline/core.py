@@ -12,6 +12,7 @@ from typing import (
     Union,
     TYPE_CHECKING,
 )
+import math
 
 from tqdm import tqdm
 from transformers.tokenization_utils_base import BatchEncoding
@@ -131,7 +132,9 @@ class PipelineState:
         """Export characters graph to Gephi's gexf format
 
         :param path: export file path
-        :param name_style: characters name style in the resulting graph
+        :param name_style: characters name style in the resulting
+            graph - see :func:`PipelineState.graph_with_names` for
+            more details
         """
         if not isinstance(self.characters_graph, nx.Graph):
             raise RuntimeError(
@@ -146,24 +149,45 @@ class PipelineState:
             Literal["longest", "shortest"], Callable[[Character], str]
         ] = "longest",
     ):
-        """Draw ``self.characters_graph``
+        """Draw ``self.characters_graph`` using reasonable default
+        parameters
 
-        :param name_style: characters name style in the resulting graph
+        :param name_style: characters name style in the resulting
+            graph - see :func:`PipelineState.graph_with_names` for
+            more details
         """
         import matplotlib.pyplot as plt
 
         assert not self.characters_graph is None
 
+        def draw(G: nx.Graph, ax=None):
+            pos = nx.spring_layout(G)
+            nx.draw_networkx_nodes(
+                G,
+                pos,
+                node_color=[degree for _, degree in G.degree],
+                node_size=[degree * 10 for _, degree in G.degree],
+                ax=ax,
+            )
+            nx.draw_networkx_edges(
+                G,
+                pos,
+                edge_color=[math.log(d["weight"]) for _, _, d in G.edges.data()],  # type: ignore
+                alpha=0.35,
+                ax=ax,
+            )
+            nx.draw_networkx_labels(G, pos=pos, ax=ax, verticalalignment="top")
+
         if isinstance(self.characters_graph, nx.Graph):
             G = self.graph_with_names(self.characters_graph, name_style)
-            nx.draw_networkx(G)
+            draw(G)
             plt.show()
 
         elif isinstance(self.characters_graph, list):
             fig, axs = plt.subplots(1, len(self.characters_graph))
             for G, ax in zip(self.characters_graph, axs):
                 G = self.graph_with_names(G, name_style)
-                nx.draw_networkx(G, ax=ax)
+                draw(G, ax)
             plt.show()
 
         else:
