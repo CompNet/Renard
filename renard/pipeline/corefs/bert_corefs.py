@@ -910,12 +910,15 @@ class BertForCoreferenceResolution(BertPreTrainedModel):
         documents: List[List[str]],
         tokenizer: PreTrainedTokenizerFast,
         batch_size: int,
+        quiet: bool = False,
     ) -> List[CoreferenceDocument]:
         """Predict coreference chains for a list of documents.
 
         :param documents: A list of tokenized documents.
         :param tokenizer:
         :param batch_size:
+        :param quiet: If ``True``, will report progress using
+            ``tqdm``.
 
         :return: a list of ``CoreferenceDocument``, with annotated
                  coreference chains.
@@ -939,7 +942,7 @@ class BertForCoreferenceResolution(BertPreTrainedModel):
 
         with torch.no_grad():
 
-            for i, batch in enumerate(tqdm(dataloader)):
+            for i, batch in enumerate(tqdm(dataloader, disable=quiet)):
 
                 local_batch_size = batch["input_ids"].shape[0]
 
