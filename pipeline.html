@@ -1163,7 +1163,7 @@ representing the first and last token of a span.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="renard.pipeline.corefs.bert_corefs.BertForCoreferenceResolution.predict">
-<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">documents</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tokenizer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.corefs.bert_corefs.BertForCoreferenceResolution.predict" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">documents</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tokenizer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quiet</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.corefs.bert_corefs.BertForCoreferenceResolution.predict" title="Permalink to this definition"></a></dt>
 <dd><p>Predict coreference chains for a list of documents.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1171,6 +1171,8 @@ representing the first and last token of a span.</p>
 <li><p><strong>documents</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – A list of tokenized documents.</p></li>
 <li><p><strong>tokenizer</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">PreTrainedTokenizerFast</span></code>) – </p></li>
 <li><p><strong>batch_size</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – </p></li>
+<li><p><strong>quiet</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, will report progress using
+<code class="docutils literal notranslate"><span class="pre">tqdm</span></code>.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>
