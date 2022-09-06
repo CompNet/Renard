@@ -273,10 +273,13 @@ valid, <code class="docutils literal notranslate"><span class="pre">(False,</spa
 <dl class="py method">
 <dt class="sig sig-object py" id="renard.pipeline.core.PipelineState.draw_graph">
 <span class="sig-name descname"><span class="pre">draw_graph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name_style</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'longest'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.core.PipelineState.draw_graph" title="Permalink to this definition"></a></dt>
-<dd><p>Draw <code class="docutils literal notranslate"><span class="pre">self.characters_graph</span></code></p>
+<dd><p>Draw <code class="docutils literal notranslate"><span class="pre">self.characters_graph</span></code> using reasonable default
+parameters</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>name_style</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code>[‘longest’, ‘shortest’], <code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code>[[<a class="reference internal" href="#renard.pipeline.characters_extraction.Character" title="renard.pipeline.characters_extraction.Character"><code class="xref py py-class docutils literal notranslate"><span class="pre">Character</span></code></a>], <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – characters name style in the resulting graph</p>
+<dd class="field-odd"><p><strong>name_style</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code>[‘longest’, ‘shortest’], <code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code>[[<a class="reference internal" href="#renard.pipeline.characters_extraction.Character" title="renard.pipeline.characters_extraction.Character"><code class="xref py py-class docutils literal notranslate"><span class="pre">Character</span></code></a>], <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – characters name style in the resulting
+graph - see <a class="reference internal" href="#renard.pipeline.core.PipelineState.graph_with_names" title="renard.pipeline.core.PipelineState.graph_with_names"><code class="xref py py-func docutils literal notranslate"><span class="pre">PipelineState.graph_with_names()</span></code></a> for
+more details</p>
 </dd>
 </dl>
 </dd></dl>
@@ -289,7 +292,9 @@ valid, <code class="docutils literal notranslate"><span class="pre">(False,</spa
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>path</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – export file path</p></li>
-<li><p><strong>name_style</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code>[‘longest’, ‘shortest’], <code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code>[[<a class="reference internal" href="#renard.pipeline.characters_extraction.Character" title="renard.pipeline.characters_extraction.Character"><code class="xref py py-class docutils literal notranslate"><span class="pre">Character</span></code></a>], <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – characters name style in the resulting graph</p></li>
+<li><p><strong>name_style</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code>[‘longest’, ‘shortest’], <code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code>[[<a class="reference internal" href="#renard.pipeline.characters_extraction.Character" title="renard.pipeline.characters_extraction.Character"><code class="xref py py-class docutils literal notranslate"><span class="pre">Character</span></code></a>], <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – characters name style in the resulting
+graph - see <a class="reference internal" href="#renard.pipeline.core.PipelineState.graph_with_names" title="renard.pipeline.core.PipelineState.graph_with_names"><code class="xref py py-func docutils literal notranslate"><span class="pre">PipelineState.graph_with_names()</span></code></a> for
+more details</p></li>
 </ul>
 </dd>
 </dl>
