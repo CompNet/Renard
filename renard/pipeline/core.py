@@ -1,6 +1,17 @@
 from __future__ import annotations
 from dataclasses import dataclass
-from typing import Any, Dict, Literal, Tuple, Set, List, Optional, Union, TYPE_CHECKING
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    Literal,
+    Tuple,
+    Set,
+    List,
+    Optional,
+    Union,
+    TYPE_CHECKING,
+)
 
 from tqdm import tqdm
 from transformers.tokenization_utils_base import BatchEncoding
@@ -86,24 +97,36 @@ class PipelineState:
 
     @staticmethod
     def graph_with_names(
-        G: nx.Graph, name_style: Literal["longest", "shortest"] = "longest"
+        G: nx.Graph,
+        name_style: Union[
+            Literal["longest", "shortest"], Callable[[Character], str]
+        ] = "longest",
     ) -> nx.Graph:
-        """Relabel a characters graph, using a single name for each node
+        """Relabel a characters graph, using a single name for each
+        node
 
-        :param name_style: characters name style in the resulting graph
+        :param name_style: characters name style in the resulting
+            graph.  Either a string (``'longest`` or ``shortest``) or
+            a custom function associating a character to its name
         """
+        if name_style == "longest":
+            name_style_fn = lambda character: character.shortest_name()
+        elif name_style == "shortest":
+            name_style_fn = lambda character: character.longest_name()
+        else:
+            name_style_fn = name_style
+
         return nx.relabel_nodes(
             G,
-            {
-                character: character.shortest_name()  # type: ignore
-                if name_style == "shortest"
-                else character.longest_name()  # type: ignore
-                for character in G.nodes()
-            },
+            {character: name_style_fn(character) for character in G.nodes()},  # type: ignore
         )
 
     def export_graph_to_gexf(
-        self, path: str, name_style: Literal["longest", "shortest"] = "longest"
+        self,
+        path: str,
+        name_style: Union[
+            Literal["longest", "shortest"], Callable[[Character], str]
+        ] = "longest",
     ):
         """Export characters graph to Gephi's gexf format
 
@@ -117,7 +140,12 @@ class PipelineState:
         G = self.graph_with_names(self.characters_graph, name_style)
         nx.write_gexf(G, path)
 
-    def draw_graph(self, name_style: Literal["longest", "shortest"] = "longest"):
+    def draw_graph(
+        self,
+        name_style: Union[
+            Literal["longest", "shortest"], Callable[[Character], str]
+        ] = "longest",
+    ):
         """Draw ``self.characters_graph``
 
         :param name_style: characters name style in the resulting graph
