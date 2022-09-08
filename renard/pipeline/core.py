@@ -12,11 +12,13 @@ from typing import (
     Union,
     TYPE_CHECKING,
 )
-import math
+import math, os
 
 from tqdm import tqdm
 from transformers.tokenization_utils_base import BatchEncoding
 import networkx as nx
+
+from renard.plot_utils import draw_nx_graph_reasonably
 
 if TYPE_CHECKING:
     from renard.pipeline.characters_extraction import Character
@@ -132,9 +134,8 @@ class PipelineState:
         """Export characters graph to Gephi's gexf format
 
         :param path: export file path
-        :param name_style: characters name style in the resulting
-            graph - see :func:`PipelineState.graph_with_names` for
-            more details
+        :param name_style: see :func:`PipelineState.graph_with_names`
+            for more details
         """
         if not isinstance(self.characters_graph, nx.Graph):
             raise RuntimeError(
@@ -142,6 +143,57 @@ class PipelineState:
             )
         G = self.graph_with_names(self.characters_graph, name_style)
         nx.write_gexf(G, path)
+
+    def draw_graphs_to_dir(
+        self,
+        directory: str,
+        name_style: Union[
+            Literal["longest", "shortest"], Callable[[Character], str]
+        ] = "longest",
+    ):
+        """Draw ``self.character_graph`` using reasonable default
+        parameters, and save the produced figures in the specified
+        directory.
+
+        :param name_style: see :func:`PipelineState.graph_with_names`
+            for more details
+        """
+        import matplotlib.pyplot as plt
+
+        assert not self.characters_graph is None
+        if isinstance(self.characters_graph, nx.Graph):
+            raise ValueError("this function is supposed to be used on a dynamic graph")
+
+        directory = directory.rstrip("/")
+        os.makedirs(directory, exist_ok=True)
+        for i, G in enumerate(self.characters_graph):
+            fig, ax = plt.subplots()
+            G = self.graph_with_names(G, name_style=name_style)
+            draw_nx_graph_reasonably(G, ax=ax)
+            plt.savefig(f"{directory}/{i}.png")
+
+    def draw_graph_to_file(
+        self,
+        path: str,
+        name_style: Union[
+            Literal["longest", "shortest"], Callable[[Character], str]
+        ] = "longest",
+    ):
+        """Draw ``self.character_graph`` using reasonable parameters,
+        and save the produced figure to a file
+
+        :param name_style: see :func:`PipelineState.graph_with_names`
+            for more details
+        """
+        import matplotlib.pyplot as plt
+
+        assert not self.characters_graph is None
+        if isinstance(self.characters_graph, list):
+            raise ValueError("this function is supposed to be used on a static graph")
+
+        G = self.graph_with_names(self.characters_graph, name_style=name_style)
+        draw_nx_graph_reasonably(G)
+        plt.savefig(path)
 
     def draw_graph(
         self,
@@ -152,51 +204,28 @@ class PipelineState:
         """Draw ``self.characters_graph`` using reasonable default
         parameters
 
-        :param name_style: characters name style in the resulting
-            graph - see :func:`PipelineState.graph_with_names` for
-            more details
+        :param name_style: see :func:`PipelineState.graph_with_names`
+            for more details
         """
         import matplotlib.pyplot as plt
         from matplotlib.widgets import Slider
 
         assert not self.characters_graph is None
 
-        def draw(G: nx.Graph, ax=None):
-            pos = nx.spring_layout(G)
-            nx.draw_networkx_nodes(
-                G,
-                pos,
-                node_color=[degree for _, degree in G.degree],
-                cmap=plt.get_cmap("winter_r"),
-                node_size=[degree * 10 for _, degree in G.degree],
-                ax=ax,
-            )
-            nx.draw_networkx_edges(
-                G,
-                pos,
-                edge_color=[math.log(d["weight"]) for _, _, d in G.edges.data()],  # type: ignore
-                edge_cmap=plt.get_cmap("winter_r"),
-                width=[1 + math.log(d["weight"]) for _, _, d in G.edges.data()],
-                alpha=0.35,
-                ax=ax,
-            )
-            nx.draw_networkx_labels(G, pos=pos, ax=ax, verticalalignment="top")
-
         if isinstance(self.characters_graph, nx.Graph):
             G = self.graph_with_names(self.characters_graph, name_style)
-            draw(G)
+            draw_nx_graph_reasonably(G)
             plt.show()
 
         elif isinstance(self.characters_graph, list):
             fig, ax = plt.subplots()
 
             def update(slider_value):
-                assert not self.characters_graph is None
                 ax.clear()
                 G = self.graph_with_names(
                     self.characters_graph[int(slider_value)], name_style
                 )
-                draw(G, ax)
+                draw_nx_graph_reasonably(G, ax)
 
             slider_ax = fig.add_axes([0.1, 0.05, 0.8, 0.04])
             slider = Slider(
@@ -209,7 +238,7 @@ class PipelineState:
             slider.on_changed(update)
 
             G = self.graph_with_names(self.characters_graph[0], name_style)
-            draw(G, ax)
+            draw_nx_graph_reasonably(G, ax)
             plt.show()
 
         else:
