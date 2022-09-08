@@ -157,6 +157,7 @@ class PipelineState:
             more details
         """
         import matplotlib.pyplot as plt
+        from matplotlib.widgets import Slider
 
         assert not self.characters_graph is None
 
@@ -166,6 +167,7 @@ class PipelineState:
                 G,
                 pos,
                 node_color=[degree for _, degree in G.degree],
+                cmap=plt.get_cmap("winter_r"),
                 node_size=[degree * 10 for _, degree in G.degree],
                 ax=ax,
             )
@@ -173,6 +175,8 @@ class PipelineState:
                 G,
                 pos,
                 edge_color=[math.log(d["weight"]) for _, _, d in G.edges.data()],  # type: ignore
+                edge_cmap=plt.get_cmap("winter_r"),
+                width=[1 + math.log(d["weight"]) for _, _, d in G.edges.data()],
                 alpha=0.35,
                 ax=ax,
             )
@@ -184,10 +188,28 @@ class PipelineState:
             plt.show()
 
         elif isinstance(self.characters_graph, list):
-            fig, axs = plt.subplots(1, len(self.characters_graph))
-            for G, ax in zip(self.characters_graph, axs):
-                G = self.graph_with_names(G, name_style)
+            fig, ax = plt.subplots()
+
+            def update(slider_value):
+                assert not self.characters_graph is None
+                ax.clear()
+                G = self.graph_with_names(
+                    self.characters_graph[int(slider_value)], name_style
+                )
                 draw(G, ax)
+
+            slider_ax = fig.add_axes([0.1, 0.05, 0.8, 0.04])
+            slider = Slider(
+                ax=slider_ax,
+                label="Graph",
+                valmin=0,
+                valmax=len(self.characters_graph) - 1,
+                valstep=list(range(len(self.characters_graph))),
+            )
+            slider.on_changed(update)
+
+            G = self.graph_with_names(self.characters_graph[0], name_style)
+            draw(G, ax)
             plt.show()
 
         else:
