@@ -30,8 +30,13 @@ class CoOccurencesGraphExtractor(PipelineStep):
                   extracted
 
                 - if ``'nx'``, several ``nx.graph`` are extracted.  In
-                  that case, ``dynamic_window`` *must* be specified,
-                  and overlap *can* be specified.
+                  that case, ``dynamic_window`` and
+                  ``dynamic_overlap``*can* be specified.  If
+                  ``dynamic_window`` is not specified, this step is
+                  expecting the text to be cut into chapters', and a
+                  graph will be extracted for each 'chapter'.  In that
+                  case, ``chapters`` must be passed to the pipeline as
+                  a ``List[str]`` at runtime.
 
                 - if ``'gephi'``, a single ``nx.graph`` is extracted.
                   This graph has the nice property that exporting it
@@ -53,11 +58,13 @@ class CoOccurencesGraphExtractor(PipelineStep):
         if not dynamic is None:
             assert dynamic in {"nx", "gephi"}
             if dynamic == "nx":
-                assert not dynamic_window is None and dynamic_window > 0
-                assert dynamic_window > dynamic_overlap
+                if not dynamic_window is None:
+                    assert dynamic_window > 0
+                    assert dynamic_window > dynamic_overlap
         self.dynamic = dynamic
         self.dynamic_window = dynamic_window
         self.dynamic_overlap = dynamic_overlap
+        self.dynamic_needs_chapter = dynamic == "nx" and dynamic_window is None
         super().__init__()
 
     def __call__(
@@ -66,7 +73,8 @@ class CoOccurencesGraphExtractor(PipelineStep):
         tokens: List[str],
         bio_tags: List[str],
         characters: Set[Character],
-        **kwargs
+        chapter_tokens: Optional[List[str]] = None,
+        **kwargs,
     ) -> Dict[str, Any]:
         """Extract a characters graph
 
@@ -98,11 +106,12 @@ class CoOccurencesGraphExtractor(PipelineStep):
                 )
             }
         elif self.dynamic == "nx":
-            # we already checked this at __init__ time
-            self.dynamic_window = cast(int, self.dynamic_window)
             return {
                 "characters_graph": self._extract_dynamic_graph(
-                    character_tokenidx, self.dynamic_window, self.dynamic_overlap
+                    character_tokenidx,
+                    self.dynamic_window,
+                    self.dynamic_overlap,
+                    chapter_tokens,
                 )
             }
         return {"characters_graph": self._extract_graph(character_tokenidx)}
@@ -141,12 +150,50 @@ class CoOccurencesGraphExtractor(PipelineStep):
         return G
 
     def _extract_dynamic_graph(
-        self, character_tokenidx: List[Tuple[Character, int]], window: int, overlap: int
+        self,
+        character_tokenidx: List[Tuple[Character, int]],
+        window: Optional[int],
+        overlap: int,
+        chapter_tokens: Optional[List[str]],
     ) -> List[nx.Graph]:
-        return [
-            self._extract_graph([elt for elt in ct if not elt is None])
-            for ct in windowed(character_tokenidx, window, step=window - overlap)
-        ]
+        """
+        .. note::
+
+            only one of ``window`` or ``chapter_tokens`` should be specified
+
+        :param character_tokenidx: a list of tuple with a character
+            and the index of the starting token of one of its
+            appearance
+        :param window: dynamic window, in tokens.
+        :param overlap: window overlap
+        :param chapter_tokens: list of tokens for each chapter.  If
+            given, one graph will be extracted per chapter.
+        """
+        assert window is None or chapter_tokens is None
+
+        if not window is None:
+            return [
+                self._extract_graph([elt for elt in ct if not elt is None])
+                for ct in windowed(character_tokenidx, window, step=window - overlap)
+            ]
+
+        assert not chapter_tokens is None
+        chapter_start_i = 0
+        chapter_end_i = 0
+        graphs = []
+        for chapter in chapter_tokens:
+            chapter_end_i += len(chapter)
+            chapter_character_tokenidx = []
+            for character, c_token_i in character_tokenidx:
+                if c_token_i < chapter_start_i:
+                    continue
+                if c_token_i > chapter_end_i:
+                    break
+                chapter_character_tokenidx.append((character, c_token_i))
+            graphs.append(self._extract_graph(chapter_character_tokenidx))
+            chapter_start_i = chapter_end_i
+
+        return graphs
 
     def _extract_gephi_dynamic_graph(
         self, character_tokenidx: List[Tuple[Character, int]]
@@ -194,7 +241,10 @@ class CoOccurencesGraphExtractor(PipelineStep):
         return G
 
     def needs(self) -> Set[str]:
-        return {"tokens", "bio_tags", "characters"}
+        needs = {"tokens", "bio_tags", "characters"}
+        if self.dynamic_needs_chapter:
+            needs.add("chapter_tokens")
+        return needs
 
     def production(self) -> Set[str]:
         return {"characters_graph"}

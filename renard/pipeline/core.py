@@ -75,10 +75,15 @@ class PipelineState:
     """The state of a pipeline, annotated in a :class:`Pipeline` lifetime"""
 
     #: input text
-    text: str
+    text: Optional[str]
+
+    #: text split into chapters
+    chapters: Optional[List[str]] = None
 
     #: text splitted in tokens
     tokens: Optional[List[str]] = None
+    #: text splitted in tokens, by chapter
+    chapter_tokens: Optional[List[List[str]]] = None
     #: word piece tokens, for BERT-like models
     wp_tokens: Optional[List[str]] = None
 
@@ -294,7 +299,7 @@ class Pipeline:
 
         return (True, warnings)
 
-    def __call__(self, text: str, **kwargs) -> PipelineState:
+    def __call__(self, text: Optional[str], **kwargs) -> PipelineState:
         """Run the pipeline sequentially
 
         :return: the output of the last step of the pipeline
