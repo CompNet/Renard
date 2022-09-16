@@ -10,9 +10,9 @@ def cumulative_graph(graphs: List[nx.Graph]) -> List[nx.Graph]:
     if len(graphs) == 0:
         return []
 
-    cumulative_graph = []
-    G = graphs[0]
+    cumulative_graph = [graphs[0]]
     for H in graphs[1:]:
+        G = cumulative_graph[-1]
         # nx.compose creates a new graph with the nodes and edges
         # from both graphs...
         K = nx.compose(H, G)
