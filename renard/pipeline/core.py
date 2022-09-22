@@ -205,12 +205,14 @@ class PipelineState:
         name_style: Union[
             Literal["longest", "shortest"], Callable[[Character], str]
         ] = "longest",
+        fig: Optional["matplotlib.pyplot.Figure"] = None,
     ):
         """Draw ``self.characters_graph`` using reasonable default
         parameters
 
         :param name_style: see :func:`PipelineState.graph_with_names`
             for more details
+        :param fig: if specified, this matplotlib figure will be used for drawing
         """
         import matplotlib.pyplot as plt
         from matplotlib.widgets import Slider
@@ -219,13 +221,20 @@ class PipelineState:
 
         if isinstance(self.characters_graph, nx.Graph):
             G = self.graph_with_names(self.characters_graph, name_style)
-            draw_nx_graph_reasonably(G)
-            plt.show()
+            ax = None
+            if not fig is None:
+                ax = fig.add_subplot(111)
+            draw_nx_graph_reasonably(G, ax=ax)
 
         elif isinstance(self.characters_graph, list):
-            fig, ax = plt.subplots()
+            if fig is None:
+                fig, ax = plt.subplots()
+            else:
+                ax = fig.add_subplot(111)
+            assert not fig is None
 
             def update(slider_value):
+                assert isinstance(self.characters_graph, list)
                 ax.clear()
                 G = self.graph_with_names(
                     self.characters_graph[int(slider_value)], name_style
@@ -233,18 +242,19 @@ class PipelineState:
                 draw_nx_graph_reasonably(G, ax)
 
             slider_ax = fig.add_axes([0.1, 0.05, 0.8, 0.04])
-            slider = Slider(
+            # HACK: we save the slider to the figure. This ensure the
+            # slider is still alive at drawing time.
+            fig.slider = Slider(
                 ax=slider_ax,
                 label="Graph",
                 valmin=0,
                 valmax=len(self.characters_graph) - 1,
                 valstep=list(range(len(self.characters_graph))),
             )
-            slider.on_changed(update)
+            fig.slider.on_changed(update)
 
             G = self.graph_with_names(self.characters_graph[0], name_style)
             draw_nx_graph_reasonably(G, ax)
-            plt.show()
 
         else:
             raise RuntimeError
