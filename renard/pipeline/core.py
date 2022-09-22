@@ -118,9 +118,9 @@ class PipelineState:
             a custom function associating a character to its name
         """
         if name_style == "longest":
-            name_style_fn = lambda character: character.shortest_name()
-        elif name_style == "shortest":
             name_style_fn = lambda character: character.longest_name()
+        elif name_style == "shortest":
+            name_style_fn = lambda character: character.shortest_name()
         else:
             name_style_fn = name_style
 
