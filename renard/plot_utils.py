@@ -9,7 +9,7 @@ def draw_nx_graph_reasonably(G: nx.Graph, ax=None):
     :param G: the graph to draw
     :param ax: matplotlib axes
     """
-    pos = nx.spring_layout(G)
+    pos = nx.spring_layout(G, k=0.5 * math.sqrt(len(G.nodes)))
     nx.draw_networkx_nodes(
         G,
         pos,
