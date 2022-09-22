@@ -19,6 +19,7 @@ from transformers.tokenization_utils_base import BatchEncoding
 import networkx as nx
 
 from renard.plot_utils import draw_nx_graph_reasonably
+from renard.graph_utils import cumulative_graph
 
 if TYPE_CHECKING:
     from renard.pipeline.characters_extraction import Character
@@ -206,13 +207,18 @@ class PipelineState:
             Literal["longest", "shortest"], Callable[[Character], str]
         ] = "longest",
         fig: Optional["matplotlib.pyplot.Figure"] = None,
+        cumulative: bool = False,
     ):
         """Draw ``self.characters_graph`` using reasonable default
         parameters
 
         :param name_style: see :func:`PipelineState.graph_with_names`
             for more details
-        :param fig: if specified, this matplotlib figure will be used for drawing
+        :param fig: if specified, this matplotlib figure will be used
+            for drawing
+        :param cumulative: if ``True`` and ``self.characters_graph``
+            is dynamic, draw a cumulative graph instead of a
+            sequential one
         """
         import matplotlib.pyplot as plt
         from matplotlib.widgets import Slider
@@ -234,11 +240,20 @@ class PipelineState:
             assert not fig is None
 
             def update(slider_value):
+
                 assert isinstance(self.characters_graph, list)
-                ax.clear()
+
+                characters_graphs = self.characters_graph
+                if cumulative:
+                    # PERF: cumulative_graph is reconstructed every
+                    # time the slider is moved
+                    characters_graphs = cumulative_graph(self.characters_graph)
+
                 G = self.graph_with_names(
-                    self.characters_graph[int(slider_value) - 1], name_style
+                    characters_graphs[int(slider_value) - 1], name_style
                 )
+
+                ax.clear()
                 draw_nx_graph_reasonably(G, ax)
 
             slider_ax = fig.add_axes([0.1, 0.05, 0.8, 0.04])
@@ -253,8 +268,7 @@ class PipelineState:
             )
             fig.slider.on_changed(update)
 
-            G = self.graph_with_names(self.characters_graph[0], name_style)
-            draw_nx_graph_reasonably(G, ax)
+            update(1)
 
         else:
             raise RuntimeError
