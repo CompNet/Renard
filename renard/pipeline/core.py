@@ -237,7 +237,7 @@ class PipelineState:
                 assert isinstance(self.characters_graph, list)
                 ax.clear()
                 G = self.graph_with_names(
-                    self.characters_graph[int(slider_value)], name_style
+                    self.characters_graph[int(slider_value) - 1], name_style
                 )
                 draw_nx_graph_reasonably(G, ax)
 
@@ -247,9 +247,9 @@ class PipelineState:
             fig.slider = Slider(
                 ax=slider_ax,
                 label="Graph",
-                valmin=0,
-                valmax=len(self.characters_graph) - 1,
-                valstep=list(range(len(self.characters_graph))),
+                valmin=1,
+                valmax=len(self.characters_graph),
+                valstep=[i + 1 for i in range(len(self.characters_graph))],
             )
             fig.slider.on_changed(update)
 
