@@ -208,9 +208,17 @@ class PipelineState:
         ] = "longest",
         fig: Optional["matplotlib.pyplot.Figure"] = None,
         cumulative: bool = False,
+        graph_start_idx: int = 1,
     ):
         """Draw ``self.characters_graph`` using reasonable default
         parameters
+
+        .. note::
+
+            when drawing a dynamic graph, a ``slider`` attribute is
+            added to ``fig`` when it is given, in order to keep a
+            reference to the slider.
+
 
         :param name_style: see :func:`PipelineState.graph_with_names`
             for more details
@@ -219,6 +227,8 @@ class PipelineState:
         :param cumulative: if ``True`` and ``self.characters_graph``
             is dynamic, draw a cumulative graph instead of a
             sequential one
+        :param graph_start_idx: index of the first graph to draw,
+            starting at 1 (not 0, since the graph slider starts at 1)
         """
         import matplotlib.pyplot as plt
         from matplotlib.widgets import Slider
@@ -240,7 +250,6 @@ class PipelineState:
             assert not fig is None
 
             def update(slider_value):
-
                 assert isinstance(self.characters_graph, list)
 
                 characters_graphs = self.characters_graph
@@ -267,8 +276,7 @@ class PipelineState:
                 valstep=[i + 1 for i in range(len(self.characters_graph))],
             )
             fig.slider.on_changed(update)
-
-            update(1)
+            fig.slider.set_val(graph_start_idx)
 
         else:
             raise RuntimeError
