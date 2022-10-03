@@ -18,7 +18,7 @@ from tqdm import tqdm
 from transformers.tokenization_utils_base import BatchEncoding
 import networkx as nx
 
-from renard.plot_utils import draw_nx_graph_reasonably
+from renard.plot_utils import draw_nx_graph_reasonably, layout_nx_graph_reasonably
 from renard.graph_utils import cumulative_graph
 
 if TYPE_CHECKING:
@@ -156,6 +156,8 @@ class PipelineState:
         name_style: Union[
             Literal["longest", "shortest"], Callable[[Character], str]
         ] = "longest",
+        cumulative: bool = False,
+        stable_layout: bool = False,
     ):
         """Draw ``self.character_graph`` using reasonable default
         parameters, and save the produced figures in the specified
@@ -163,6 +165,12 @@ class PipelineState:
 
         :param name_style: see :func:`PipelineState.graph_with_names`
             for more details
+        :param cumulative: if ``True`` draw a cumulative graph instead
+            of a sequential one
+        :param stable_layout: If this parameter is ``True``,
+            characters will keep the same position in space at each
+            timestep.  Characters' positions are based on the final
+            cumulative graph layout.
         """
         import matplotlib.pyplot as plt
 
@@ -172,10 +180,24 @@ class PipelineState:
 
         directory = directory.rstrip("/")
         os.makedirs(directory, exist_ok=True)
+
+        graphs = self.characters_graph
+        if cumulative:
+            graphs = cumulative_graph(self.characters_graph)
+
+        layout = None
+        if stable_layout:
+            layout_graph = (
+                graphs[-1]
+                if cumulative
+                else cumulative_graph(self.characters_graph)[-1]
+            )
+            layout = layout_nx_graph_reasonably(self.graph_with_names(layout_graph))
+
         for i, G in enumerate(self.characters_graph):
             fig, ax = plt.subplots()
             G = self.graph_with_names(G, name_style=name_style)
-            draw_nx_graph_reasonably(G, ax=ax)
+            draw_nx_graph_reasonably(G, ax=ax, layout=layout)
             plt.savefig(f"{directory}/{i}.png")
 
     def draw_graph_to_file(
@@ -209,6 +231,7 @@ class PipelineState:
         fig: Optional["matplotlib.pyplot.Figure"] = None,
         cumulative: bool = False,
         graph_start_idx: int = 1,
+        stable_layout: bool = False,
     ):
         """Draw ``self.characters_graph`` using reasonable default
         parameters
@@ -219,7 +242,6 @@ class PipelineState:
             added to ``fig`` when it is given, in order to keep a
             reference to the slider.
 
-
         :param name_style: see :func:`PipelineState.graph_with_names`
             for more details
         :param fig: if specified, this matplotlib figure will be used
@@ -227,59 +249,72 @@ class PipelineState:
         :param cumulative: if ``True`` and ``self.characters_graph``
             is dynamic, draw a cumulative graph instead of a
             sequential one
-        :param graph_start_idx: index of the first graph to draw,
-            starting at 1 (not 0, since the graph slider starts at 1)
+        :param graph_start_idx: When ``self.characters_graph`` is
+            dynamic, index of the first graph to draw, starting at 1
+            (not 0, since the graph slider starts at 1)
+        :param stable_layout: if ``self.characters_graph`` is dynamic
+            and this parameter is ``True``, characters will keep the
+            same position in space at each timestep.  Characters'
+            positions are based on the final cumulative graph layout.
         """
         import matplotlib.pyplot as plt
         from matplotlib.widgets import Slider
 
         assert not self.characters_graph is None
 
+        # self.characters_graph is a static graph
         if isinstance(self.characters_graph, nx.Graph):
             G = self.graph_with_names(self.characters_graph, name_style)
             ax = None
             if not fig is None:
                 ax = fig.add_subplot(111)
             draw_nx_graph_reasonably(G, ax=ax)
+            return
 
-        elif isinstance(self.characters_graph, list):
-            if fig is None:
-                fig, ax = plt.subplots()
-            else:
-                ax = fig.add_subplot(111)
-            assert not fig is None
+        if not isinstance(self.characters_graph, list):
+            raise TypeError
 
-            def update(slider_value):
-                assert isinstance(self.characters_graph, list)
-
-                characters_graphs = self.characters_graph
-                if cumulative:
-                    # PERF: cumulative_graph is reconstructed every
-                    # time the slider is moved
-                    characters_graphs = cumulative_graph(self.characters_graph)
-
-                G = self.graph_with_names(
-                    characters_graphs[int(slider_value) - 1], name_style
-                )
-
-                ax.clear()
-                draw_nx_graph_reasonably(G, ax)
-
-            slider_ax = fig.add_axes([0.1, 0.05, 0.8, 0.04])
-            # HACK: we save the slider to the figure. This ensure the
-            # slider is still alive at drawing time.
-            fig.slider = Slider(
-                ax=slider_ax,
-                label="Graph",
-                valmin=1,
-                valmax=len(self.characters_graph),
-                valstep=[i + 1 for i in range(len(self.characters_graph))],
-            )
-            fig.slider.on_changed(update)
-            fig.slider.set_val(graph_start_idx)
-
+        # self.characters_graph is a list: plot a dynamic graph
+        if fig is None:
+            fig, ax = plt.subplots()
         else:
-            raise RuntimeError
+            ax = fig.add_subplot(111)
+        assert not fig is None
+
+        cumulative_characters_graphs = cumulative_graph(self.characters_graph)
+        if stable_layout:
+            layout = layout_nx_graph_reasonably(
+                self.graph_with_names(cumulative_characters_graphs[-1], name_style)
+            )
+
+        def update(slider_value):
+            assert isinstance(self.characters_graph, list)
+
+            characters_graphs = self.characters_graph
+            if cumulative:
+                characters_graphs = cumulative_characters_graphs
+
+            G = self.graph_with_names(
+                characters_graphs[int(slider_value) - 1], name_style
+            )
+
+            ax.clear()
+            draw_nx_graph_reasonably(G, ax=ax, layout=layout if stable_layout else None)
+            ax.set_xlim(-1.2, 1.2)
+            ax.set_ylim(-1.2, 1.2)
+
+        slider_ax = fig.add_axes([0.1, 0.05, 0.8, 0.04])
+        # HACK: we save the slider to the figure. This ensure the
+        # slider is still alive at drawing time.
+        fig.slider = Slider(
+            ax=slider_ax,
+            label="Graph",
+            valmin=1,
+            valmax=len(self.characters_graph),
+            valstep=[i + 1 for i in range(len(self.characters_graph))],
+        )
+        fig.slider.on_changed(update)
+        fig.slider.set_val(graph_start_idx)
 
 
 class Pipeline:
