@@ -1,14 +1,14 @@
 import re
 from typing import Any, Dict, List, FrozenSet, Set, Optional, Tuple
 from itertools import combinations
-from collections import Counter
+from collections import Counter, defaultdict
 from dataclasses import dataclass
 from nameparser import config
 from nameparser import HumanName
 from networkx.exception import NetworkXNoPath
 from renard.gender import Gender
 from renard.pipeline.corefs.mentions import CoreferenceMention
-from renard.pipeline.ner import ner_entities
+from renard.pipeline.ner import NEREntity, ner_entities
 from renard.pipeline.core import PipelineStep
 from renard.resources.hypocorisms import HypocorismGazetteer
 from renard.resources.pronouns.pronouns import is_a_female_pronoun, is_a_male_pronoun
@@ -17,6 +17,7 @@ from renard.resources.pronouns.pronouns import is_a_female_pronoun, is_a_male_pr
 @dataclass(eq=True, frozen=True)
 class Character:
     names: FrozenSet[str]
+    mentions: List[NEREntity]
 
     def longest_name(self) -> str:
         return max(self.names, key=len)
@@ -50,10 +51,18 @@ class NaiveCharactersExtractor(PipelineStep):
         assert len(tokens) == len(bio_tags)
 
         entities = ner_entities(tokens, bio_tags)
-        entities_c = Counter([" ".join(e.tokens) for e in entities])
-        entities = [e for e, c in entities_c.items() if c >= self.min_appearances]
 
-        characters = [Character(frozenset((entity,))) for entity in entities]
+        characters = defaultdict(list)
+        for entity in entities:
+            characters[" ".join(entity.tokens)].append(entity)
+
+        characters = [
+            Character(frozenset(" ".join(name)), mentions)
+            for name, mentions in characters.items()
+        ]
+
+        # filter characters based on the number of time they appear
+        characters = [c for c in characters if len(c.mentions) >= self.min_appearances]
 
         return {"characters": characters}
 
@@ -110,12 +119,13 @@ class GraphRulesCharactersExtractor(PipelineStep):
 
         import networkx as nx
 
-        occurences = [" ".join(e.tokens) for e in ner_entities(tokens, bio_tags)]
+        mentions = ner_entities(tokens, bio_tags)
+        mentions_str = [" ".join(m.tokens) for m in mentions]
 
         # create a graph where each node is a mention detected by NER
         G = nx.Graph()
-        for occurence in occurences:
-            G.add_node(occurence)
+        for mention_str in mentions_str:
+            G.add_node(mention_str)
 
         # link nodes based on several rules
         for (name1, name2) in combinations(G.nodes(), 2):
@@ -195,17 +205,17 @@ class GraphRulesCharactersExtractor(PipelineStep):
                 try_remove_edges(nx.all_shortest_paths(G, source=name1, target=name2))
 
         # create characters from the computed graph
+        # TODO: using this method, it's possible to have a mention mis-attribution if
+        #       two characters
         characters = [
-            Character(frozenset(names)) for names in nx.connected_components(G)
+            Character(
+                frozenset(names), [m for m in mentions if " ".join(m.tokens) in names]
+            )
+            for names in nx.connected_components(G)
         ]
 
         # filter characters based on the number of time they appear
-        characters_c = Counter()
-        for character in characters:
-            for occurence in occurences:
-                if occurence in character.names:
-                    characters_c[character] += 1
-        characters = [c for c in characters if characters_c[c] >= self.min_appearances]
+        characters = [c for c in characters if len(c.mentions) >= self.min_appearances]
 
         return {"characters": characters}
 
