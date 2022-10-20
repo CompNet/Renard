@@ -5,7 +5,7 @@ import networkx as nx
 import numpy as np
 from more_itertools import windowed
 
-from renard.pipeline.ner import ner_entities
+from renard.pipeline.ner import NEREntity
 from renard.pipeline.core import PipelineStep
 
 
@@ -88,43 +88,37 @@ class CoOccurencesGraphExtractor(PipelineStep):
         """
         assert len(tokens) == len(bio_tags)
 
-        # greedily assign mentions
-        character_tokenidx = []
-        for entity in ner_entities(tokens, bio_tags):
-            if not entity.tag.startswith("PER"):
-                continue
-            mention = " ".join(entity.tokens)
-            for character in characters:
-                if mention in character.names:
-                    character_tokenidx.append((character, entity.start_idx))
-                    break
+        mentions = []
+        for character in characters:
+            for mention in character.mentions:
+                mentions.append((character, mention))
+        mentions = sorted(mentions, key=lambda cm: cm[1].start_idx)
 
         if self.dynamic == "gephi":
-            return {
-                "characters_graph": self._extract_gephi_dynamic_graph(
-                    character_tokenidx
-                )
-            }
+            return {"characters_graph": self._extract_gephi_dynamic_graph(mentions)}
         elif self.dynamic == "nx":
             return {
                 "characters_graph": self._extract_dynamic_graph(
-                    character_tokenidx,
+                    mentions,
                     self.dynamic_window,
                     self.dynamic_overlap,
                     chapter_tokens,
                 )
             }
-        return {"characters_graph": self._extract_graph(character_tokenidx)}
+        return {"characters_graph": self._extract_graph(mentions)}
 
-    def _extract_graph(self, character_tokenidx: List[Tuple[Character, int]]):
+    def _extract_graph(self, mentions: List[Tuple[Character, NEREntity]]):
+        """
+        :param mentions: A list of character mentions, ordered by appearance
+        """
 
         # co-occurence matrix, where C[i][j] is 1 when appearance
         # i co-occur with j if i < j, or 0 when it doesn't
-        C = np.zeros((len(character_tokenidx), len(character_tokenidx)))
-        for i, (char1, token_idx) in enumerate(character_tokenidx):
+        C = np.zeros((len(mentions), len(mentions)))
+        for i, (char1, mention_1) in enumerate(mentions):
             # check ahead for co-occurences
-            for j, (char2, token_idx2) in enumerate(character_tokenidx[i + 1 :]):
-                if token_idx2 - token_idx > self.co_occurences_dist:
+            for j, (char2, mention_2) in enumerate(mentions[i + 1 :]):
+                if mention_2.start_idx - mention_1.start_idx > self.co_occurences_dist:
                     # dist between current token and future token is
                     # too great : we finished co-occurences search for
                     # the current token
@@ -137,12 +131,12 @@ class CoOccurencesGraphExtractor(PipelineStep):
 
         # construct graph from co-occurence matrix
         G = nx.Graph()
-        for i in range(len(character_tokenidx)):
-            for j in range(len(character_tokenidx)):
+        for i in range(len(mentions)):
+            for j in range(len(mentions)):
                 if C[i][j] == 0:
                     continue
-                char1 = character_tokenidx[i][0]
-                char2 = character_tokenidx[j][0]
+                char1 = mentions[i][0]
+                char2 = mentions[j][0]
                 if not G.has_edge(char1, char2):
                     G.add_edge(char1, char2, weight=0)
                 G.edges[char1, char2]["weight"] += 1
@@ -151,7 +145,7 @@ class CoOccurencesGraphExtractor(PipelineStep):
 
     def _extract_dynamic_graph(
         self,
-        character_tokenidx: List[Tuple[Character, int]],
+        mentions: List[Tuple[Character, NEREntity]],
         window: Optional[int],
         overlap: int,
         chapter_tokens: Optional[List[str]],
@@ -161,9 +155,7 @@ class CoOccurencesGraphExtractor(PipelineStep):
 
             only one of ``window`` or ``chapter_tokens`` should be specified
 
-        :param character_tokenidx: a list of tuple with a character
-            and the index of the starting token of one of its
-            appearance
+        :param mentions: A list of character mentions, ordered by appearance
         :param window: dynamic window, in tokens.
         :param overlap: window overlap
         :param chapter_tokens: list of tokens for each chapter.  If
@@ -174,7 +166,7 @@ class CoOccurencesGraphExtractor(PipelineStep):
         if not window is None:
             return [
                 self._extract_graph([elt for elt in ct if not elt is None])
-                for ct in windowed(character_tokenidx, window, step=window - overlap)
+                for ct in windowed(mentions, window, step=window - overlap)
             ]
 
         assert not chapter_tokens is None
@@ -184,24 +176,27 @@ class CoOccurencesGraphExtractor(PipelineStep):
         for chapter in chapter_tokens:
             chapter_end_i += len(chapter)
             chapter_character_tokenidx = []
-            for character, c_token_i in character_tokenidx:
-                if c_token_i < chapter_start_i:
+            for character, mention in mentions:
+                if mention.start_idx < chapter_start_i:
                     continue
-                if c_token_i > chapter_end_i:
+                if mention.start_idx > chapter_end_i:
                     break
-                chapter_character_tokenidx.append((character, c_token_i))
+                chapter_character_tokenidx.append((character, mention.start_idx))
             graphs.append(self._extract_graph(chapter_character_tokenidx))
             chapter_start_i = chapter_end_i
 
         return graphs
 
     def _extract_gephi_dynamic_graph(
-        self, character_tokenidx: List[Tuple[Character, int]]
+        self, mentions: List[Tuple[Character, NEREntity]]
     ) -> nx.Graph:
+        """
+        :param mentions: A list of character mentions, ordered by appearance
+        """
         # keep only longest name in graph node : possible only if it is unique
         # TODO: might want to try and get shorter names if longest names aren't
         #       unique
-        characters = set([e[0] for e in character_tokenidx])
+        characters = set([e[0] for e in mentions])
 
         G = nx.Graph()
 
@@ -209,15 +204,15 @@ class CoOccurencesGraphExtractor(PipelineStep):
             character: None for character in characters
         }
 
-        for i, (character, tokenidx) in enumerate(character_tokenidx):
+        for i, (character, mention) in enumerate(mentions):
             if not character in characters:
                 continue
-            character_to_last_appearance[character] = tokenidx
+            character_to_last_appearance[character] = mention.start_idx
             close_characters = [
                 c
                 for c, last_appearance in character_to_last_appearance.items()
                 if not last_appearance is None
-                and tokenidx - last_appearance <= self.co_occurences_dist
+                and mention.start_idx - last_appearance <= self.co_occurences_dist
                 and not c == character
             ]
             for close_character in close_characters:
@@ -235,7 +230,7 @@ class CoOccurencesGraphExtractor(PipelineStep):
                 # value, start and end of current weight attribute
                 last_weight_value = weights[-1][0] if len(weights) > 0 else 0
                 G.edges[character, close_character]["dweight"].append(
-                    [float(last_weight_value) + 1, i, len(character_tokenidx)]
+                    [float(last_weight_value) + 1, i, len(mentions)]
                 )
 
         return G
