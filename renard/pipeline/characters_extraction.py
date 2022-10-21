@@ -124,6 +124,9 @@ class NaiveCharactersExtractor(PipelineStep):
     def needs(self) -> Set[str]:
         return {"tokens", "bio_tags"}
 
+    def optional_needs(self) -> Set[str]:
+        return {"corefs"}
+
     def production(self) -> Set[str]:
         return {"characters"}
 
