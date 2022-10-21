@@ -6,8 +6,7 @@ from stanza.protobuf import CoreNLP_pb2
 from stanza.server import CoreNLPClient
 from stanza.resources.installation import DEFAULT_CORENLP_DIR
 
-from renard.pipeline.core import PipelineStep
-from renard.pipeline.corefs.mentions import CoreferenceMention
+from renard.pipeline.core import PipelineStep, Mention
 
 
 def corenlp_is_installed() -> bool:
@@ -200,10 +199,10 @@ class StanfordCoreNLPPipeline(PipelineStep):
                         )
 
                         chain.append(
-                            CoreferenceMention(
+                            Mention(
+                                mention_words,
                                 sent_start_idx + mention.beginIndex,
                                 sent_start_idx + mention.endIndex,
-                                mention_words,
                             )
                         )
 

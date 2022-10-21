@@ -16,13 +16,13 @@ from transformers.models.bert.configuration_bert import BertConfig
 from transformers.tokenization_utils_base import BatchEncoding, PreTrainedTokenizerBase
 from tqdm import tqdm
 from renard.utils import spans, spans_indexs, batch_index_select
-from renard.pipeline.corefs.mentions import CoreferenceMention
+from renard.pipeline.core import Mention
 
 
 @dataclass
 class CoreferenceDocument:
     tokens: List[str]
-    coref_chains: List[List[CoreferenceMention]]
+    coref_chains: List[List[Mention]]
 
     def __len__(self) -> int:
         return len(self.tokens)
@@ -114,9 +114,7 @@ class CoreferenceDocument:
                 except ValueError:
                     continue
                 new_chain.append(
-                    CoreferenceMention(
-                        start_idx, end_idx, tokens[start_idx : end_idx + 1]
-                    )
+                    Mention(tokens[start_idx : end_idx + 1], start_idx, end_idx)
                 )
             if len(new_chain) > 1:
                 new_chains.append(new_chain)
@@ -148,10 +146,10 @@ class CoreferenceDocument:
                 new_start_idx = wp_to_token[mention.start_idx]
                 new_end_idx = wp_to_token[mention.end_idx]
                 new_chain.append(
-                    CoreferenceMention(
+                    Mention(
+                        tokens[new_start_idx : new_end_idx + 1],
                         new_start_idx,
                         new_end_idx,
-                        tokens[new_start_idx : new_end_idx + 1],
                     )
                 )
             new_chains.append(new_chain)
@@ -179,15 +177,13 @@ class CoreferenceDocument:
                 continue
             start_idx, end_idx = spans_idx[i]
             mention_tokens = tokens[start_idx : end_idx + 1]
-            chain = [CoreferenceMention(start_idx, end_idx, tokens=mention_tokens)]
+            chain = [Mention(mention_tokens, start_idx, end_idx)]
             for j, label in enumerate(mention_labels):
                 if label == 0:
                     continue
                 start_idx, end_idx = spans_idx[j]
                 mention_tokens = tokens[start_idx : end_idx + 1]
-                chain.append(
-                    CoreferenceMention(start_idx, end_idx, tokens=mention_tokens)
-                )
+                chain.append(Mention(mention_tokens, start_idx, end_idx))
                 already_visited_mentions.append(j)
             chains.append(chain)
 
@@ -286,7 +282,7 @@ class CoreferenceDataset(Dataset):
         documents = []
         document_tokens = []
         # dict chain id => coref chain
-        document_chains: Dict[str, List[CoreferenceMention]] = {}
+        document_chains: Dict[str, List[Mention]] = {}
         # dict chain id => list of mention start index
         open_mentions: Dict[str, List[int]] = {}
 
@@ -352,10 +348,10 @@ class CoreferenceDataset(Dataset):
                     if mention_is_ending:
                         mention_start_idx = open_mentions[chain_id].pop()
                         mention_end_idx = len(document_tokens) - 1
-                        mention = CoreferenceMention(
+                        mention = Mention(
+                            document_tokens[mention_start_idx : mention_end_idx + 1],
                             mention_start_idx,
                             mention_end_idx,
-                            document_tokens[mention_start_idx : mention_end_idx + 1],
                         )
                         document_chains[chain_id] = document_chains.get(
                             chain_id, []
@@ -484,15 +480,15 @@ class BertCoreferenceResolutionOutput:
                     chain_id = len(document.coref_chains)
                     # create a new chain in the document
                     start_idx, end_idx = antecedent_coords[0], antecedent_coords[1]
-                    mention = CoreferenceMention(
-                        start_idx, end_idx, tokens[i][start_idx : end_idx + 1]
+                    mention = Mention(
+                        tokens[i][start_idx : end_idx + 1], start_idx, end_idx
                     )
                     document.coref_chains.append([mention])
 
                 # current span
                 start_idx, end_idx = span_coords[0], span_coords[1]
-                mention = CoreferenceMention(
-                    start_idx, end_idx, tokens[i][start_idx : end_idx + 1]
+                mention = Mention(
+                    tokens[i][start_idx : end_idx + 1], start_idx, end_idx
                 )
                 document.coref_chains[chain_id].append(mention)
 

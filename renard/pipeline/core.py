@@ -23,7 +23,13 @@ from renard.graph_utils import cumulative_graph
 
 if TYPE_CHECKING:
     from renard.pipeline.characters_extraction import Character
-    from renard.pipeline.corefs.bert_corefs import CoreferenceMention
+
+
+@dataclass
+class Mention:
+    tokens: List[str]
+    start_idx: int
+    end_idx: int
 
 
 class PipelineStep:
@@ -96,10 +102,10 @@ class PipelineState:
     bert_batch_encoding: Optional[BatchEncoding] = None
 
     #: coreference chains
-    corefs: Optional[List[List[CoreferenceMention]]] = None
+    corefs: Optional[List[List[Mention]]] = None
 
     #: detected characters
-    characters: Optional[Set[Character]] = None
+    characters: Optional[List[Character]] = None
 
     #: characters graph
     characters_graph: Optional[Union[List[nx.Graph], nx.Graph]] = None

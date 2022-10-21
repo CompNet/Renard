@@ -1,10 +1,8 @@
 from typing import List, Literal, Set, Dict, Any, cast
-from more_itertools.recipes import flatten
 import torch
 from transformers import BertTokenizerFast  # type: ignore
-from renard.pipeline import PipelineStep
+from renard.pipeline import PipelineStep, Mention
 from renard.pipeline.corefs.bert_corefs import BertForCoreferenceResolution
-from renard.pipeline.corefs.mentions import CoreferenceMention
 
 
 class BertCoreferenceResolver(PipelineStep):
@@ -90,9 +88,7 @@ class BertCoreferenceResolver(PipelineStep):
                 for mention in chain:
                     start_idx = mention.start_idx + cur_doc_start
                     end_idx = mention.end_idx + cur_doc_start
-                    adjusted_chain.append(
-                        CoreferenceMention(start_idx, end_idx, mention.tokens)
-                    )
+                    adjusted_chain.append(Mention(mention.tokens, start_idx, end_idx))
                 coref_chains.append(adjusted_chain)
             cur_doc_start += len(doc)
 

@@ -1,5 +1,5 @@
-import re
 from typing import Any, Dict, List, FrozenSet, Set, Optional, Tuple
+import re, copy
 from itertools import combinations
 from collections import Counter, defaultdict
 from dataclasses import dataclass
@@ -7,9 +7,8 @@ from nameparser import config
 from nameparser import HumanName
 from networkx.exception import NetworkXNoPath
 from renard.gender import Gender
-from renard.pipeline.corefs.mentions import CoreferenceMention
 from renard.pipeline.ner import NEREntity, ner_entities
-from renard.pipeline.core import PipelineStep
+from renard.pipeline.core import Mention, PipelineStep
 from renard.resources.hypocorisms import HypocorismGazetteer
 from renard.resources.pronouns.pronouns import is_a_female_pronoun, is_a_male_pronoun
 
@@ -17,7 +16,7 @@ from renard.resources.pronouns.pronouns import is_a_female_pronoun, is_a_male_pr
 @dataclass(eq=True, frozen=True)
 class Character:
     names: FrozenSet[str]
-    mentions: List[NEREntity]
+    mentions: List[Mention]
 
     def longest_name(self) -> str:
         return max(self.names, key=len)
@@ -27,6 +26,54 @@ class Character:
 
     def __hash__(self) -> int:
         return hash(tuple(sorted(self.names)))
+
+
+def _assign_coreference_mentions(
+    characters: List[Character], corefs: List[List[Mention]]
+) -> List[Character]:
+    """Assign mentions to characters from coreference chains.
+
+    Each coreference chain is assigned to the character whose names
+    have the most occurences in the chain.  When it seems that no
+    characters appear in the chain, it is discarded.
+
+    :param characters: A list of characters, where ``character.names``
+        contains the list of all names of a character.
+    :param corefs:
+    """
+
+    char_mentions: Dict[Character, List[Mention]] = {
+        character: character.mentions for character in characters
+    }
+
+    # we assign each chain to the character with highest name
+    # occurence in it
+    for chain in corefs:
+
+        # determine the characters with the highest number of
+        # occurences
+        occ_counter = {}
+        for character in char_mentions.keys():
+            occ_counter[character] = sum(
+                [
+                    1 if " ".join(mention.tokens) in character.names else 0
+                    for mention in chain
+                ]
+            )
+        best_character = max(occ_counter, key=occ_counter.get)  # type: ignore
+
+        # no character occurences in this chain: don't assign
+        # it to any character
+        if occ_counter[best_character] == 0:
+            continue
+
+        # assign the chain to the character with the most occurences
+        for mention in chain:
+            # TODO: complexity
+            if not mention in char_mentions[best_character]:
+                char_mentions[best_character].append(mention)
+
+    return [Character(c.names, mentions) for c, mentions in char_mentions.items()]
 
 
 class NaiveCharactersExtractor(PipelineStep):
@@ -41,7 +88,12 @@ class NaiveCharactersExtractor(PipelineStep):
         super().__init__()
 
     def __call__(
-        self, text: str, tokens: List[str], bio_tags: List[str], **kwargs
+        self,
+        text: str,
+        tokens: List[str],
+        bio_tags: List[str],
+        corefs: Optional[List[List[Mention]]] = None,
+        **kwargs
     ) -> Dict[str, Any]:
         """
         :param text:
@@ -60,6 +112,9 @@ class NaiveCharactersExtractor(PipelineStep):
             Character(frozenset(" ".join(name)), mentions)
             for name, mentions in characters.items()
         ]
+
+        if not corefs is None:
+            characters = _assign_coreference_mentions(characters, corefs)
 
         # filter characters based on the number of time they appear
         characters = [c for c in characters if len(c.mentions) >= self.min_appearances]
@@ -112,7 +167,7 @@ class GraphRulesCharactersExtractor(PipelineStep):
         self,
         tokens: List[str],
         bio_tags: List[str],
-        corefs: Optional[List[List[CoreferenceMention]]] = None,
+        corefs: Optional[List[List[Mention]]] = None,
         **kwargs: dict
     ) -> Dict[str, Any]:
         assert len(tokens) == len(bio_tags)
@@ -205,14 +260,17 @@ class GraphRulesCharactersExtractor(PipelineStep):
                 try_remove_edges(nx.all_shortest_paths(G, source=name1, target=name2))
 
         # create characters from the computed graph
-        # TODO: using this method, it's possible to have a mention mis-attribution if
-        #       two characters
         characters = [
             Character(
                 frozenset(names), [m for m in mentions if " ".join(m.tokens) in names]
             )
             for names in nx.connected_components(G)
         ]
+
+        # link characters to all of to their coreferential mentions
+        # (pronouns...)
+        if not corefs is None:
+            character = _assign_coreference_mentions(characters, corefs)
 
         # filter characters based on the number of time they appear
         characters = [c for c in characters if len(c.mentions) >= self.min_appearances]
@@ -228,9 +286,7 @@ class GraphRulesCharactersExtractor(PipelineStep):
             raw_name1, raw_name2
         )
 
-    def names_are_in_coref(
-        self, name1: str, name2: str, corefs: List[List[CoreferenceMention]]
-    ):
+    def names_are_in_coref(self, name1: str, name2: str, corefs: List[List[Mention]]):
         for coref_chain in corefs:
             if any([name1 == " ".join(m.tokens) for m in coref_chain]) and any(
                 [name2 == " ".join(m.tokens) for m in coref_chain]
@@ -238,9 +294,7 @@ class GraphRulesCharactersExtractor(PipelineStep):
                 return True
         return False
 
-    def infer_name_gender(
-        self, name: str, corefs: List[List[CoreferenceMention]]
-    ) -> Gender:
+    def infer_name_gender(self, name: str, corefs: List[List[Mention]]) -> Gender:
         """Try to infer a name's gender"""
         # 1. try to infer gender based on honorifics
         #    TODO: add more gendered honorifics to renard.resources

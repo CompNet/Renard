@@ -3,19 +3,13 @@ from dataclasses import dataclass
 from transformers.tokenization_utils_base import BatchEncoding
 from tqdm import tqdm
 from seqeval.metrics import precision_score, recall_score, f1_score
-from renard.pipeline.core import PipelineStep
+from renard.pipeline.core import PipelineStep, Mention
 
 
 @dataclass
-class NEREntity:
-    #: entitiy tokens
-    tokens: List[str]
+class NEREntity(Mention):
     #: NER class (without BIO prefix as in ``PER`` and not ``B-PER``)
     tag: str
-    #: entity start index
-    start_idx: int
-    #: entity end index
-    end_idx: int
 
 
 def ner_entities(
@@ -40,9 +34,9 @@ def ner_entities(
             entities.append(
                 NEREntity(
                     tokens[current_tag_start_idx:i],
-                    current_tag,
                     current_tag_start_idx,
                     i - 1,
+                    current_tag,
                 )
             )
             current_tag = None
@@ -63,9 +57,9 @@ def ner_entities(
         entities.append(
             NEREntity(
                 tokens[current_tag_start_idx : len(tokens)],
-                current_tag,
                 current_tag_start_idx,
                 len(bio_tags) - 1,
+                current_tag,
             )
         )
 
