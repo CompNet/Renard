@@ -53,7 +53,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#module-renard.pipeline.preprocessing">Preprocessing</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-renard.pipeline.tokenization">Tokenization</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-renard.pipeline.ner">Named Entity Recognition</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#module-renard.pipeline.corefs.mentions">Coreference Resolution</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#module-renard.pipeline.corefs.corefs">Coreference Resolution</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#bert-coreference-resolution-model">BERT Coreference Resolution model</a></li>
 </ul>
 </li>
@@ -266,7 +266,7 @@ valid, <code class="docutils literal notranslate"><span class="pre">(False,</spa
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="renard.pipeline.core.PipelineState.characters">
-<span class="sig-name descname"><span class="pre">characters</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Set</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#renard.pipeline.characters_extraction.Character" title="renard.pipeline.characters_extraction.Character"><span class="pre">renard.pipeline.characters_extraction.Character</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#renard.pipeline.core.PipelineState.characters" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">characters</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#renard.pipeline.characters_extraction.Character" title="renard.pipeline.characters_extraction.Character"><span class="pre">renard.pipeline.characters_extraction.Character</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#renard.pipeline.core.PipelineState.characters" title="Permalink to this definition"></a></dt>
 <dd><p>detected characters</p>
 </dd></dl>
 
@@ -278,7 +278,7 @@ valid, <code class="docutils literal notranslate"><span class="pre">(False,</spa
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="renard.pipeline.core.PipelineState.corefs">
-<span class="sig-name descname"><span class="pre">corefs</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#renard.pipeline.corefs.mentions.CoreferenceMention" title="renard.pipeline.corefs.mentions.CoreferenceMention"><span class="pre">renard.pipeline.corefs.mentions.CoreferenceMention</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#renard.pipeline.core.PipelineState.corefs" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">corefs</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">renard.pipeline.core.Mention</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#renard.pipeline.core.PipelineState.corefs" title="Permalink to this definition"></a></dt>
 <dd><p>coreference chains</p>
 </dd></dl>
 
@@ -809,7 +809,7 @@ of word piece tokens.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="renard.pipeline.ner.NEREntity">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">renard.pipeline.ner.</span></span><span class="sig-name descname"><span class="pre">NEREntity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tokens</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tag</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_idx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_idx</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.ner.NEREntity" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">renard.pipeline.ner.</span></span><span class="sig-name descname"><span class="pre">NEREntity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tokens</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_idx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_idx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tag</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.ner.NEREntity" title="Permalink to this definition"></a></dt>
 <dd><dl class="py method">
 <dt class="sig sig-object py" id="renard.pipeline.ner.NEREntity.__eq__">
 <span class="sig-name descname"><span class="pre">__eq__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.ner.NEREntity.__eq__" title="Permalink to this definition"></a></dt>
@@ -823,7 +823,7 @@ of word piece tokens.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="renard.pipeline.ner.NEREntity.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tokens</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tag</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_idx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_idx</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.ner.NEREntity.__init__" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tokens</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_idx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_idx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tag</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.ner.NEREntity.__init__" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -833,27 +833,9 @@ of word piece tokens.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="renard.pipeline.ner.NEREntity.end_idx">
-<span class="sig-name descname"><span class="pre">end_idx</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#renard.pipeline.ner.NEREntity.end_idx" title="Permalink to this definition"></a></dt>
-<dd><p>entity end index</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="renard.pipeline.ner.NEREntity.start_idx">
-<span class="sig-name descname"><span class="pre">start_idx</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#renard.pipeline.ner.NEREntity.start_idx" title="Permalink to this definition"></a></dt>
-<dd><p>entity start index</p>
-</dd></dl>
-
-<dl class="py attribute">
 <dt class="sig sig-object py" id="renard.pipeline.ner.NEREntity.tag">
 <span class="sig-name descname"><span class="pre">tag</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#renard.pipeline.ner.NEREntity.tag" title="Permalink to this definition"></a></dt>
 <dd><p>NER class (without BIO prefix as in <code class="docutils literal notranslate"><span class="pre">PER</span></code> and not <code class="docutils literal notranslate"><span class="pre">B-PER</span></code>)</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="renard.pipeline.ner.NEREntity.tokens">
-<span class="sig-name descname"><span class="pre">tokens</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#renard.pipeline.ner.NEREntity.tokens" title="Permalink to this definition"></a></dt>
-<dd><p>entitiy tokens</p>
 </dd></dl>
 
 </dd></dl>
@@ -965,36 +947,9 @@ both.</p>
 </dd></dl>
 
 </section>
-<section id="module-renard.pipeline.corefs.mentions">
-<span id="coreference-resolution"></span><h2>Coreference Resolution<a class="headerlink" href="#module-renard.pipeline.corefs.mentions" title="Permalink to this headline"></a></h2>
+<section id="module-renard.pipeline.corefs.corefs">
+<span id="coreference-resolution"></span><h2>Coreference Resolution<a class="headerlink" href="#module-renard.pipeline.corefs.corefs" title="Permalink to this headline"></a></h2>
 <dl class="py class">
-<dt class="sig sig-object py" id="renard.pipeline.corefs.mentions.CoreferenceMention">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">renard.pipeline.corefs.mentions.</span></span><span class="sig-name descname"><span class="pre">CoreferenceMention</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start_idx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_idx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tokens</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.corefs.mentions.CoreferenceMention" title="Permalink to this definition"></a></dt>
-<dd><dl class="py method">
-<dt class="sig sig-object py" id="renard.pipeline.corefs.mentions.CoreferenceMention.__eq__">
-<span class="sig-name descname"><span class="pre">__eq__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.corefs.mentions.CoreferenceMention.__eq__" title="Permalink to this definition"></a></dt>
-<dd><p>Return self==value.</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="renard.pipeline.corefs.mentions.CoreferenceMention.__hash__">
-<span class="sig-name descname"><span class="pre">__hash__</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#renard.pipeline.corefs.mentions.CoreferenceMention.__hash__" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="renard.pipeline.corefs.mentions.CoreferenceMention.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start_idx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_idx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tokens</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.corefs.mentions.CoreferenceMention.__init__" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="renard.pipeline.corefs.mentions.CoreferenceMention.__repr__">
-<span class="sig-name descname"><span class="pre">__repr__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.corefs.mentions.CoreferenceMention.__repr__" title="Permalink to this definition"></a></dt>
-<dd><p>Return repr(self).</p>
-</dd></dl>
-
-</dd></dl>
-
-<span class="target" id="module-renard.pipeline.corefs.corefs"></span><dl class="py class">
 <dt class="sig sig-object py" id="renard.pipeline.corefs.corefs.BertCoreferenceResolver">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">renard.pipeline.corefs.corefs.</span></span><span class="sig-name descname"><span class="pre">BertCoreferenceResolver</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mentions_per_tokens</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">antecedents_nb</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_span_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tokenizer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'bert-base-cased'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">block_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">128</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'auto'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.corefs.corefs.BertCoreferenceResolver" title="Permalink to this definition"></a></dt>
 <dd><p>A coreference resolver using BERT.  Loosely based on ‘End-to-end
@@ -1661,7 +1616,7 @@ by derived classes.</p>
 <dd><p>A basic character extractor using NER</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="renard.pipeline.characters_extraction.NaiveCharactersExtractor.__call__">
-<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tokens</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bio_tags</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.characters_extraction.NaiveCharactersExtractor.__call__" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tokens</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bio_tags</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">corefs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.characters_extraction.NaiveCharactersExtractor.__call__" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -1717,6 +1672,27 @@ by derived classes.</p>
 </dl>
 </dd></dl>
 
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="renard.pipeline.characters_extraction._assign_coreference_mentions">
+<span class="sig-prename descclassname"><span class="pre">renard.pipeline.characters_extraction.</span></span><span class="sig-name descname"><span class="pre">_assign_coreference_mentions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">characters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">corefs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.characters_extraction._assign_coreference_mentions" title="Permalink to this definition"></a></dt>
+<dd><p>Assign mentions to characters from coreference chains.</p>
+<p>Each coreference chain is assigned to the character whose names
+have the most occurences in the chain.  When it seems that no
+characters appear in the chain, it is discarded.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>characters</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<a class="reference internal" href="#renard.pipeline.characters_extraction.Character" title="renard.pipeline.characters_extraction.Character"><code class="xref py py-class docutils literal notranslate"><span class="pre">Character</span></code></a>]) – A list of characters, where <code class="docutils literal notranslate"><span class="pre">character.names</span></code>
+contains the list of all names of a character.</p></li>
+<li><p><strong>corefs</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Mention</span></code>]]) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<a class="reference internal" href="#renard.pipeline.characters_extraction.Character" title="renard.pipeline.characters_extraction.Character"><code class="xref py py-class docutils literal notranslate"><span class="pre">Character</span></code></a>]</p>
+</dd>
+</dl>
 </dd></dl>
 
 </section>
