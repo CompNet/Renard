@@ -591,6 +591,14 @@ by derived classes.</p>
 <dt class="sig sig-object py" id="renard.pipeline.tokenization.BertTokenizer">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">renard.pipeline.tokenization.</span></span><span class="sig-name descname"><span class="pre">BertTokenizer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">huggingface_model_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'bert-base-cased'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.tokenization.BertTokenizer" title="Permalink to this definition"></a></dt>
 <dd><p>Tokenizer for bert based models</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>While this tokenizer produces <code class="docutils literal notranslate"><span class="pre">wp_tokens</span></code> and
+<code class="docutils literal notranslate"><span class="pre">bert_batch_encoding</span></code> using a word piece
+tokenizer, it also produces <code class="docutils literal notranslate"><span class="pre">tokens</span></code>,
+<code class="docutils literal notranslate"><span class="pre">chapter_tokens</span></code> and <code class="docutils literal notranslate"><span class="pre">sentences</span></code> using NLTK’s
+tokenizers.</p>
+</div>
 <dl class="py method">
 <dt class="sig sig-object py" id="renard.pipeline.tokenization.BertTokenizer.__call__">
 <span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chapters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.tokenization.BertTokenizer.__call__" title="Permalink to this definition"></a></dt>
