@@ -1,4 +1,4 @@
-from typing import Callable, Dict, Any, List, Optional, Set
+from typing import Dict, Any, List, Optional, Set
 import torch
 from more_itertools.recipes import flatten
 from renard.pipeline.core import PipelineStep
@@ -23,22 +23,38 @@ class NLTKWordTokenizer(PipelineStep):
         nltk.download("punkt", quiet=True)
 
         if chapters is None:
-            tokens = nltk.word_tokenize(text)
-            return {"tokens": tokens, "chapter_tokens": [tokens]}
+            chapters = [text]
 
-        chapter_tokens = [nltk.word_tokenize(c) for c in chapters]
+        chapter_sentences = [nltk.sent_tokenize(c) for c in chapters]
+        chapter_tokens = list(
+            flatten([nltk.word_tokenize(s) for s in chapter_sentences])
+        )
+        sentences = list(flatten([chapter_sentences]))
         tokens = list(flatten(chapter_tokens))
-        return {"tokens": tokens, "chapter_tokens": chapter_tokens}
+        return {
+            "tokens": tokens,
+            "chapter_tokens": chapter_tokens,
+            "sentences": sentences,
+        }
 
     def needs(self) -> Set[str]:
         return {"text"}
 
     def production(self) -> Set[str]:
-        return {"tokens", "chapter_tokens"}
+        return {"tokens", "chapter_tokens", "sentences"}
 
 
 class BertTokenizer(PipelineStep):
-    """Tokenizer for bert based models"""
+    """Tokenizer for bert based models
+
+    .. note::
+
+        While this tokenizer produces ``wp_tokens`` and
+        ``bert_batch_encoding`` using a word piece
+        tokenizer, it also produces ``tokens``,
+        ``chapter_tokens`` and ``sentences`` using NLTK's
+        tokenizers.
+    """
 
     def __init__(self, huggingface_model_id: str = "bert-base-cased") -> None:
         """
