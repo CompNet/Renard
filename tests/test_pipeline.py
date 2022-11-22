@@ -1,5 +1,5 @@
 from typing import Set
-import unittest
+import os, unittest
 from hypothesis import given, settings
 import hypothesis.strategies as st
 from renard.pipeline.core import Pipeline, PipelineStep
@@ -56,6 +56,7 @@ class TestPipelineValidity(unittest.TestCase):
         self.assertFalse(pipeline.check_valid()[0])
 
 
+@unittest.skipIf(os.getenv("RENARD_TEST_ALL") != "1", "skipped for performance")
 class TestCompleteNLTKPipeline(unittest.TestCase):
     """"""
 
