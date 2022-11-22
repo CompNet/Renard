@@ -93,6 +93,9 @@ class PipelineState:
     chapter_tokens: Optional[List[List[str]]] = None
     #: word piece tokens, for BERT-like models
     wp_tokens: Optional[List[str]] = None
+    #: text splitted into sentences, each sentence being a list of
+    #: tokens
+    sentences: Optional[List[List[str]]] = None
 
     #: BIO NER tags, aligned with ``self.tokens``
     bio_tags: Optional[List[str]] = None
