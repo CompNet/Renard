@@ -97,6 +97,9 @@ class PipelineState:
     #: tokens
     sentences: Optional[List[List[str]]] = None
 
+    #: polarity of each sentence
+    sentences_polarities: Optional[List[float]] = None
+
     #: BIO NER tags, aligned with ``self.tokens``
     bio_tags: Optional[List[str]] = None
     #: BIO NER tags, aligned with ``self.wp_tokens``
