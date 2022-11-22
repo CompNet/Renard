@@ -333,7 +333,10 @@ class Pipeline:
     """A flexible NLP pipeline"""
 
     def __init__(
-        self, steps: List[PipelineStep], progress_report: Optional[str] = "tqdm"
+        self,
+        steps: List[PipelineStep],
+        progress_report: Optional[str] = "tqdm",
+        warn: bool = True,
     ) -> None:
         """
         :param steps: a ``tuple`` of :class:``PipelineStep``, that will be executed in order
@@ -344,6 +347,7 @@ class Pipeline:
         self.progress_report = progress_report
         for step in self.steps:
             step.progress_report = progress_report
+        self.warn = warn
 
     def check_valid(self, *args) -> Tuple[bool, List[str]]:
         """Check that the current pipeline can be run, which is
@@ -386,8 +390,9 @@ class Pipeline:
         is_valid, warnings_or_errors = self.check_valid(*kwargs.keys())
         if not is_valid:
             raise ValueError(warnings_or_errors)
-        for warning in warnings_or_errors:
-            print(f"[warning] : {warning}")
+        if self.warn:
+            for warning in warnings_or_errors:
+                print(f"[warning] : {warning}")
 
         state = PipelineState(text, **kwargs)
 
