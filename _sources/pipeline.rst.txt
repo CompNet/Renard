@@ -17,7 +17,7 @@ simple example :
 .. code-block:: python
 
    from renard.pipeline import Pipeline
-   from renard.pipeline.tokenization import NLTKWordTokenizer
+   from renard.pipeline.tokenization import NLTKTokenizer
    from renard.pipeline.ner import NLTKNamedEntityRecognizer
    from renard.pipeline.characters_extraction import NaiveCharactersExtractor
    from renard.pipeline.graph_extraction import CoOccurencesGraphExtractor
@@ -27,7 +27,7 @@ simple example :
 
    pipeline = Pipeline(
        [
-           NLTKWordTokenizer(),
+           NLTKTokenizer(),
            NLTKNamedEntityRecognizer(),
            NaiveCharactersExtractor(min_appearance=10),
            CoOccurencesGraphExtractor(co_occurences_dist=25)
