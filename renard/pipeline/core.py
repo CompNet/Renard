@@ -93,6 +93,12 @@ class PipelineState:
     chapter_tokens: Optional[List[List[str]]] = None
     #: word piece tokens, for BERT-like models
     wp_tokens: Optional[List[str]] = None
+    #: text splitted into sentences, each sentence being a list of
+    #: tokens
+    sentences: Optional[List[List[str]]] = None
+
+    #: polarity of each sentence
+    sentences_polarities: Optional[List[float]] = None
 
     #: BIO NER tags, aligned with ``self.tokens``
     bio_tags: Optional[List[str]] = None
@@ -327,7 +333,10 @@ class Pipeline:
     """A flexible NLP pipeline"""
 
     def __init__(
-        self, steps: List[PipelineStep], progress_report: Optional[str] = "tqdm"
+        self,
+        steps: List[PipelineStep],
+        progress_report: Optional[str] = "tqdm",
+        warn: bool = True,
     ) -> None:
         """
         :param steps: a ``tuple`` of :class:``PipelineStep``, that will be executed in order
@@ -338,6 +347,7 @@ class Pipeline:
         self.progress_report = progress_report
         for step in self.steps:
             step.progress_report = progress_report
+        self.warn = warn
 
     def check_valid(self, *args) -> Tuple[bool, List[str]]:
         """Check that the current pipeline can be run, which is
@@ -380,8 +390,9 @@ class Pipeline:
         is_valid, warnings_or_errors = self.check_valid(*kwargs.keys())
         if not is_valid:
             raise ValueError(warnings_or_errors)
-        for warning in warnings_or_errors:
-            print(f"[warning] : {warning}")
+        if self.warn:
+            for warning in warnings_or_errors:
+                print(f"[warning] : {warning}")
 
         state = PipelineState(text, **kwargs)
 

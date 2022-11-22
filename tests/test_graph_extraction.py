@@ -8,11 +8,22 @@ import networkx as nx
 from networkx.algorithms import isomorphism
 from renard.pipeline.graph_extraction import CoOccurencesGraphExtractor
 from renard.pipeline.characters_extraction import Character
-from renard.pipeline.ner import ner_entities
+from renard.pipeline.ner import ner_entities, NEREntity
 
 
 class TestCoOccurencesGraphExtractor(unittest.TestCase):
     """"""
+
+    @staticmethod
+    def _characters_from_mentions(mentions: List[NEREntity]) -> List[Character]:
+        """Generate characters from a list of mentions"""
+        name_to_mentions = defaultdict(list)
+        for mention in mentions:
+            name_to_mentions[mention.tokens[0]].append(mention)
+        return [
+            Character(frozenset((name,)), mentions)
+            for name, mentions in name_to_mentions.items()
+        ]
 
     # max size used for performance reasons
     @given(lists(sampled_from(string.ascii_uppercase), max_size=7))
@@ -20,13 +31,7 @@ class TestCoOccurencesGraphExtractor(unittest.TestCase):
         bio_tags = ["B-PER" for _ in tokens]
 
         mentions = ner_entities(tokens, bio_tags)
-        characters = defaultdict(list)
-        for mention in mentions:
-            characters[mention.tokens[0]].append(mention)
-        characters = [
-            Character(frozenset((name,)), mentions)
-            for name, mentions in characters.items()
-        ]
+        characters = TestCoOccurencesGraphExtractor._characters_from_mentions(mentions)
 
         graph_extractor = CoOccurencesGraphExtractor(len(tokens))
         out = graph_extractor(" ".join(tokens), tokens, bio_tags, set(characters))
@@ -69,20 +74,38 @@ class TestCoOccurencesGraphExtractor(unittest.TestCase):
         bio_tags = ["B-PER" for _ in tokens]
 
         mentions = ner_entities(tokens, bio_tags)
-        characters = defaultdict(list)
-        for mention in mentions:
-            characters[mention.tokens[0]].append(mention)
-        characters = [
-            Character(frozenset((name,)), mentions)
-            for name, mentions in characters.items()
-        ]
+        characters = TestCoOccurencesGraphExtractor._characters_from_mentions(mentions)
 
         graph_extractor = CoOccurencesGraphExtractor(
             len(tokens), dynamic="nx", dynamic_window=dynamic_window
         )
-        out = graph_extractor(" ".join(tokens), tokens, bio_tags, characters)
+        out = graph_extractor(" ".join(tokens), tokens, bio_tags, set(characters))
 
         self.assertGreater(len(out["characters_graph"]), 0)
+
+    @given(lists(sampled_from(string.ascii_uppercase)))
+    def test_polarity_extraction(self, tokens: List[str]):
+        graph_extractor = CoOccurencesGraphExtractor(10)
+
+        bio_tags = ["B-PER"] * len(tokens)
+
+        mentions = ner_entities(tokens, bio_tags)
+        characters = TestCoOccurencesGraphExtractor._characters_from_mentions(mentions)
+
+        out = graph_extractor(
+            " ".join(tokens),
+            tokens,
+            bio_tags,
+            set(characters),
+            sentences=[tokens],
+            sentences_polarities=[1.0],
+        )
+
+        for character1, character2 in itertools.combinations(characters, 2):
+            if out["characters_graph"].has_edge(character1, character2):
+                self.assertIn(
+                    "polarity", out["characters_graph"].edges[character1, character2]
+                )
 
 
 if __name__ == "__main__":
