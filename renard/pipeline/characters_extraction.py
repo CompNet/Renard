@@ -109,7 +109,7 @@ class NaiveCharactersExtractor(PipelineStep):
             characters[" ".join(entity.tokens)].append(entity)
 
         characters = [
-            Character(frozenset(" ".join(name)), mentions)
+            Character(frozenset([name]), mentions)
             for name, mentions in characters.items()
         ]
 
