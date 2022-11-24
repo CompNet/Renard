@@ -12,7 +12,7 @@ from typing import (
     Union,
     TYPE_CHECKING,
 )
-import math, os
+import os
 
 from tqdm import tqdm
 from transformers.tokenization_utils_base import BatchEncoding
@@ -23,6 +23,7 @@ from renard.graph_utils import cumulative_graph
 
 if TYPE_CHECKING:
     from renard.pipeline.characters_extraction import Character
+    import matplotlib.pyplot as plt
 
 
 @dataclass
@@ -240,7 +241,7 @@ class PipelineState:
         name_style: Union[
             Literal["longest", "shortest"], Callable[[Character], str]
         ] = "longest",
-        fig: Optional["matplotlib.pyplot.Figure"] = None,
+        fig: Optional[plt.Figure] = None,
         cumulative: bool = False,
         graph_start_idx: int = 1,
         stable_layout: bool = False,
@@ -285,8 +286,8 @@ class PipelineState:
 
         if not isinstance(self.characters_graph, list):
             raise TypeError
-
         # self.characters_graph is a list: plot a dynamic graph
+
         if fig is None:
             fig, ax = plt.subplots()
         else:
@@ -318,15 +319,15 @@ class PipelineState:
         slider_ax = fig.add_axes([0.1, 0.05, 0.8, 0.04])
         # HACK: we save the slider to the figure. This ensure the
         # slider is still alive at drawing time.
-        fig.slider = Slider(
+        fig.slider = Slider(  # type: ignore
             ax=slider_ax,
             label="Graph",
             valmin=1,
             valmax=len(self.characters_graph),
             valstep=[i + 1 for i in range(len(self.characters_graph))],
         )
-        fig.slider.on_changed(update)
-        fig.slider.set_val(graph_start_idx)
+        fig.slider.on_changed(update)  # type: ignore
+        fig.slider.set_val(graph_start_idx)  # type: ignore
 
 
 class Pipeline:

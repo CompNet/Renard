@@ -60,3 +60,20 @@ def batch_index_select(
     expansion[dim] = -1
 
     return torch.gather(input, dim, index.view(view).expand(expansion))
+
+
+R = TypeVar("R")
+
+
+def search_pattern(seq: Iterable[R], pattern: List[R]) -> List[int]:
+    """Search a pattern in sequence
+
+    :param seq: sequence in which to search
+    :param pattern: searched pattern
+    :return: a list of patterns start index
+    """
+    start_indices = []
+    for subseq_i, subseq in enumerate(windowed(seq, len(pattern))):
+        if list(subseq) == pattern:
+            start_indices.append(subseq_i)
+    return start_indices

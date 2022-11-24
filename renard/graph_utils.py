@@ -1,4 +1,5 @@
-from typing import List
+from typing import List, Set
+from itertools import chain
 import networkx as nx
 
 
@@ -27,3 +28,8 @@ def cumulative_graph(graphs: List[nx.Graph]) -> List[nx.Graph]:
         cumulative_graph.append(K)
 
     return cumulative_graph
+
+
+def graph_edges_attributes(G: nx.Graph) -> Set[str]:
+    """Compute the set of all attributes of a graph"""
+    return set(chain(data.keys() for *_, data in G.edges.data()))

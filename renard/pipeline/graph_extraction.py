@@ -284,7 +284,7 @@ class CoOccurencesGraphExtractor(PipelineStep):
         for chapter_i, chapter in enumerate(chapter_tokens):
 
             # TODO: optim
-            mentions = mentions_for_chapter(chapter_tokens, chapter_i, mentions)
+            chapter_mentions = mentions_for_chapter(chapter_tokens, chapter_i, mentions)
 
             chapter_sentences = None
             chapter_sentences_polarities = None
@@ -301,7 +301,7 @@ class CoOccurencesGraphExtractor(PipelineStep):
 
             graphs.append(
                 self._extract_graph(
-                    mentions,
+                    chapter_mentions,
                     chapter_sentences,
                     chapter_sentences_polarities,
                 )
