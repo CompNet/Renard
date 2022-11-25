@@ -27,6 +27,9 @@ class Character:
     def __hash__(self) -> int:
         return hash(tuple(sorted(self.names)))
 
+    def __repr__(self) -> str:
+        return f"<{self.longest_name()}, {len(self.mentions)} mentions>"
+
 
 def _assign_coreference_mentions(
     characters: List[Character], corefs: List[List[Mention]]
@@ -93,7 +96,7 @@ class NaiveCharactersExtractor(PipelineStep):
         tokens: List[str],
         bio_tags: List[str],
         corefs: Optional[List[List[Mention]]] = None,
-        **kwargs
+        **kwargs,
     ) -> Dict[str, Any]:
         """
         :param text:
@@ -171,7 +174,7 @@ class GraphRulesCharactersExtractor(PipelineStep):
         tokens: List[str],
         bio_tags: List[str],
         corefs: Optional[List[List[Mention]]] = None,
-        **kwargs: dict
+        **kwargs: dict,
     ) -> Dict[str, Any]:
         assert len(tokens) == len(bio_tags)
 
