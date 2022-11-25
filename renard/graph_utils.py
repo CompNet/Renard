@@ -11,18 +11,23 @@ def cumulative_graph(graphs: List[nx.Graph]) -> List[nx.Graph]:
     if len(graphs) == 0:
         return []
 
+    all_attrs = set(flatten([graph_edges_attributes(G) for G in graphs]))
+
     cumulative_graph = [graphs[0]]
     for H in graphs[1:]:
         G = cumulative_graph[-1]
         # nx.compose creates a new graph with the nodes and edges
         # from both graphs...
         K = nx.compose(H, G)
-        # ... however it doesn't sum the weights : we readjust
+        # ... however it doesn't sum the attributes : we readjust
         # these here.
         for n1, n2 in K.edges:
-            G_weight = G.edges.get([n1, n2], default={"weight": 0})["weight"]
-            H_weight = H.edges.get([n1, n2], default={"weight": 0})["weight"]
-            K.add_edge(n1, n2, weight=G_weight + H_weight)
+            attrs = {}
+            for attr in all_attrs:
+                G_attr = G.edges.get([n1, n2], default={attr: 0})[attr]
+                H_attr = H.edges.get([n1, n2], default={attr: 0})[attr]
+                attrs[attr] = G_attr + H_attr
+            K.add_edge(n1, n2, **attrs)
         # finally, add the newly created graph to the sequence of
         # cumulative graphs
         cumulative_graph.append(K)
