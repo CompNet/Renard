@@ -38,7 +38,10 @@ def draw_nx_graph_reasonably(
         # we draw the polarity of interactions if the 'polarity'
         # attribute is present in the graph
         edge_color = [d.get("polarity", 0) for *_, d in G.edges.data()]
+        # edge_color = colors.CenteredNorm()(edge_color)
+        # edge_color = [-1 if c < 0 else 1 for c in edge_color]
         edge_cmap = plt.get_cmap("RdYlGn")
+
     else:
         edge_color = [math.log(d["weight"]) for *_, d in G.edges.data()]
         edge_cmap = plt.get_cmap("winter_r")
@@ -47,6 +50,8 @@ def draw_nx_graph_reasonably(
         pos,
         edge_color=edge_color,
         edge_cmap=edge_cmap,
+        edge_vmax=1,
+        edge_vmin=-1,
         width=[1 + math.log(d["weight"]) for _, _, d in G.edges.data()],  # type: ignore
         alpha=0.35,
         ax=ax,
