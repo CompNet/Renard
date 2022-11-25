@@ -851,6 +851,23 @@ of word piece tokens.</p>
 <dd><p>Return repr(self).</p>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="renard.pipeline.ner.NEREntity.shifted">
+<span class="sig-name descname"><span class="pre">shifted</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shift</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.ner.NEREntity.shifted" title="Permalink to this definition"></a></dt>
+<dd><div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This method is implemtented here to avoid type issues.  Since
+<code class="xref py py-func docutils literal notranslate"><span class="pre">Mention.shifted()</span></code> cannot be annotated as returning
+<code class="docutils literal notranslate"><span class="pre">Self</span></code>, this method annotate the correct return type when
+using <a class="reference internal" href="#renard.pipeline.ner.NEREntity.shifted" title="renard.pipeline.ner.NEREntity.shifted"><code class="xref py py-func docutils literal notranslate"><span class="pre">NEREntity.shifted()</span></code></a>.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#renard.pipeline.ner.NEREntity" title="renard.pipeline.ner.NEREntity"><code class="xref py py-class docutils literal notranslate"><span class="pre">NEREntity</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py attribute">
 <dt class="sig sig-object py" id="renard.pipeline.ner.NEREntity.tag">
 <span class="sig-name descname"><span class="pre">tag</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#renard.pipeline.ner.NEREntity.tag" title="Permalink to this definition"></a></dt>
