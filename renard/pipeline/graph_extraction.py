@@ -31,13 +31,19 @@ def sent_indices_for_chapter(
     """
     chapter_start_idx = sum([len(c) for i, c in enumerate(chapters) if i < chapter_idx])
     chapter_end_idx = chapter_start_idx + len(chapters[chapter_idx])
-    sents_start_indices = accumulate(
-        [len(s) for s in sentences], operator.add, initial=0
-    )
-    return (
-        next((i for i in sents_start_indices if i >= chapter_start_idx)),
-        next((i for i in sents_start_indices if i >= chapter_end_idx)) - 1,
-    )
+    sents_start_idx = None
+    sents_end_idx = None
+    count = 0
+    for sent_i, sent in enumerate(sentences):
+        start_idx, end_idx = (count, count + len(sent))
+        count = end_idx
+        if sents_start_idx is None and start_idx >= chapter_start_idx:
+            sents_start_idx = sent_i
+        if sents_end_idx is None and end_idx >= chapter_end_idx:
+            sents_end_idx = sent_i
+            break
+    assert not sents_start_idx is None and not sents_end_idx is None
+    return (sents_start_idx, sents_end_idx)
 
 
 def mentions_for_chapter(
@@ -285,6 +291,13 @@ class CoOccurencesGraphExtractor(PipelineStep):
 
             # TODO: optim
             chapter_mentions = mentions_for_chapter(chapter_tokens, chapter_i, mentions)
+            chapter_start_idx = sum(
+                [len(c) for i, c in enumerate(chapter_tokens) if i < chapter_i]
+            )
+            # make mentions coordinates chapter local
+            chapter_mentions = [
+                (c, m.shifted(-chapter_start_idx)) for c, m in chapter_mentions
+            ]
 
             chapter_sentences = None
             chapter_sentences_polarities = None

@@ -1,3 +1,4 @@
+from __future__ import annotations
 from typing import List, Dict, Any, Set, Tuple, Optional
 from dataclasses import dataclass
 from transformers.tokenization_utils_base import BatchEncoding
@@ -10,6 +11,17 @@ from renard.pipeline.core import PipelineStep, Mention
 class NEREntity(Mention):
     #: NER class (without BIO prefix as in ``PER`` and not ``B-PER``)
     tag: str
+
+    def shifted(self, shift: int) -> NEREntity:
+        """
+        .. note::
+
+            This method is implemtented here to avoid type issues.  Since
+            :func:`Mention.shifted` cannot be annotated as returning
+            ``Self``, this method annotate the correct return type when
+            using :func:`NEREntity.shifted`.
+        """
+        return super().shifted(shift)  # type: ignore
 
 
 def ner_entities(

@@ -32,6 +32,12 @@ class Mention:
     start_idx: int
     end_idx: int
 
+    def shifted(self, shift: int) -> Mention:
+        self_dict = vars(self)
+        self_dict["start_idx"] = self.start_idx + shift
+        self_dict["end_idx"] = self.end_idx + shift
+        return self.__class__(**self_dict)
+
 
 class PipelineStep:
     """An abstract pipeline step
