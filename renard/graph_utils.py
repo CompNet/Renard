@@ -1,5 +1,5 @@
 from typing import List, Set
-from itertools import chain
+from more_itertools.recipes import flatten
 import networkx as nx
 
 
@@ -32,4 +32,4 @@ def cumulative_graph(graphs: List[nx.Graph]) -> List[nx.Graph]:
 
 def graph_edges_attributes(G: nx.Graph) -> Set[str]:
     """Compute the set of all attributes of a graph"""
-    return set(chain(data.keys() for *_, data in G.edges.data()))
+    return set(flatten(list(data.keys()) for *_, data in G.edges.data()))  # type: ignore
