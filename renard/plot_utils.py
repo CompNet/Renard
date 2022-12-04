@@ -37,10 +37,9 @@ def draw_nx_graph_reasonably(
     if "polarity" in edges_attrs:
         # we draw the polarity of interactions if the 'polarity'
         # attribute is present in the graph
-        edge_color = [d.get("polarity", 0) for *_, d in G.edges.data()]
-        # edge_color = colors.CenteredNorm()(edge_color)
-        # edge_color = [-1 if c < 0 else 1 for c in edge_color]
-        edge_cmap = plt.get_cmap("RdYlGn")
+        polarities = [d.get("polarity", 0) for *_, d in G.edges.data()]  # type: ignore
+        edge_color = ["g" if p > 0 else "r" for p in polarities]
+        edge_cmap = None
 
     else:
         edge_color = [math.log(d["weight"]) for *_, d in G.edges.data()]
