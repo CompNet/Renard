@@ -1,7 +1,7 @@
 from collections import defaultdict
 from typing import List
 import unittest, itertools, string
-from hypothesis import given
+from hypothesis import assume, given
 from hypothesis.strategies import lists, sampled_from
 from hypothesis.strategies._internal.numbers import integers
 import networkx as nx
@@ -34,7 +34,9 @@ class TestCoOccurencesGraphExtractor(unittest.TestCase):
         characters = TestCoOccurencesGraphExtractor._characters_from_mentions(mentions)
 
         graph_extractor = CoOccurencesGraphExtractor(len(tokens))
-        out = graph_extractor(" ".join(tokens), tokens, bio_tags, set(characters))
+        out = graph_extractor(
+            " ".join(tokens), tokens, bio_tags, set(characters), [tokens]
+        )
 
         G = nx.Graph()
         for i, j in itertools.combinations(range(len(tokens)), 2):
@@ -79,7 +81,9 @@ class TestCoOccurencesGraphExtractor(unittest.TestCase):
         graph_extractor = CoOccurencesGraphExtractor(
             len(tokens), dynamic="nx", dynamic_window=dynamic_window
         )
-        out = graph_extractor(" ".join(tokens), tokens, bio_tags, set(characters))
+        out = graph_extractor(
+            " ".join(tokens), tokens, bio_tags, set(characters), [tokens]
+        )
 
         self.assertGreater(len(out["characters_graph"]), 0)
 
@@ -106,6 +110,27 @@ class TestCoOccurencesGraphExtractor(unittest.TestCase):
                 self.assertIn(
                     "polarity", out["characters_graph"].edges[character1, character2]
                 )
+
+    @given(lists(sampled_from(string.ascii_uppercase), min_size=1))
+    def test_sent_co_occurence_dist(self, sent1: List[str]):
+        # sent2 is guaranteed to be different from sent1, so that we
+        # have 2 different characters
+        sent2 = [chr(ord(token) + 1) for token in sent1]
+
+        graph_extractor = CoOccurencesGraphExtractor((1, "sentences"))
+
+        sentences = [sent1, sent2]
+        tokens = sent1 + sent2
+        tags = ["B-PER"] * len(tokens)
+        characters = TestCoOccurencesGraphExtractor._characters_from_mentions(
+            ner_entities(tokens, tags)
+        )
+
+        out = graph_extractor(
+            " ".join(tokens), tokens, tags, set(characters), sentences
+        )
+
+        self.assertGreater(len(out["characters_graph"]), 0)
 
 
 if __name__ == "__main__":

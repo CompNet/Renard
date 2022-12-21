@@ -1,4 +1,4 @@
-from typing import Dict, Any, List, Set, Optional, Tuple, Literal
+from typing import Dict, Any, List, Set, Optional, Tuple, Literal, Union
 import operator
 from itertools import accumulate
 
@@ -72,19 +72,25 @@ class CoOccurencesGraphExtractor(PipelineStep):
 
     def __init__(
         self,
-        co_occurences_dist: int,
+        co_occurences_dist: Union[int, Tuple[int, Literal["tokens", "sentences"]]],
         dynamic: Optional[Literal["nx", "gephi"]] = None,
         dynamic_window: Optional[int] = None,
         dynamic_overlap: int = 0,
     ) -> None:
         """
         :param co_occurences_dist: max accepted distance between two
-            character appearances to form a co-occurence interaction,
-            in number of tokens.
+            character appearances to form a co-occurence interaction.
+
+                - if an ``int`` is given, the distance is in number of
+                  tokens
+
+                - if a ``tuple`` is given, the first element of the
+                  tuple is a distance while the second is an unit.
+                  Examples : ``(1, "sentences")``, ``(3, "tokens")``.
 
         :param dynamic: either ``None``, or one of ``{'nx', 'gephi'}``
 
-                - if ``None`` (the defaul), a ``nx.graph`` is
+                - if ``None`` (the default), a ``nx.graph`` is
                   extracted
 
                 - if ``'nx'``, several ``nx.graph`` are extracted.  In
@@ -111,6 +117,8 @@ class CoOccurencesGraphExtractor(PipelineStep):
         :param dynamic_overlap: overlap, in number of interactions.
         """
 
+        if isinstance(co_occurences_dist, int):
+            co_occurences_dist = (co_occurences_dist, "tokens")
         self.co_occurences_dist = co_occurences_dist
 
         if not dynamic is None:
@@ -131,8 +139,8 @@ class CoOccurencesGraphExtractor(PipelineStep):
         tokens: List[str],
         bio_tags: List[str],
         characters: Set[Character],
+        sentences: List[List[str]],
         chapter_tokens: Optional[List[List[str]]] = None,
-        sentences: Optional[List[List[str]]] = None,
         sentences_polarities: Optional[List[float]] = None,
         **kwargs,
     ) -> Dict[str, Any]:
@@ -143,7 +151,7 @@ class CoOccurencesGraphExtractor(PipelineStep):
         :param characters:
 
         :return: a ``dict`` with key ``'characters_graph'`` and a
-            ``networkx.Graph`` or a list of ``networkx.Graph`` as
+            :class:`nx.Graph` or a list of :class:`nx.Graph` as
             value.
         """
         assert len(tokens) == len(bio_tags)
@@ -155,9 +163,13 @@ class CoOccurencesGraphExtractor(PipelineStep):
         mentions = sorted(mentions, key=lambda cm: cm[1].start_idx)
 
         if self.dynamic == "gephi":
-            if not sentences is None and not sentences_polarities is None:
+            if not sentences_polarities is None:
                 print("[warning] 'gephi' does not support sentence polarities")
-            return {"characters_graph": self._extract_gephi_dynamic_graph(mentions)}
+            return {
+                "characters_graph": self._extract_gephi_dynamic_graph(
+                    mentions, sentences
+                )
+            }
 
         elif self.dynamic == "nx":
             return {
@@ -178,10 +190,40 @@ class CoOccurencesGraphExtractor(PipelineStep):
             )
         }
 
+    def _mentions_interact(
+        self,
+        mention_1: NEREntity,
+        mention_2: NEREntity,
+        sentences: Optional[List[List[str]]] = None,
+    ) -> bool:
+        """Check if two mentions are close enough to be in interactions.
+
+        .. note::
+
+            the attribute ``self.co_occurences_dist`` is used to know wether mentions are in co_occurences
+
+        :param mention_1:
+        :param mention_2:
+        :param sentences:
+        :return: a boolean indicating wether the two mentions are co-occuring
+        """
+        if self.co_occurences_dist[1] == "tokens":
+            return (
+                abs(mention_2.start_idx - mention_1.start_idx)
+                <= self.co_occurences_dist[0]
+            )
+        elif self.co_occurences_dist[1] == "sentences":
+            assert not sentences is None
+            mention_1_sent = sent_index_for_token_index(mention_1.start_idx, sentences)
+            mention_2_sent = sent_index_for_token_index(mention_2.end_idx, sentences)
+            return abs(mention_2_sent - mention_1_sent) <= self.co_occurences_dist[0]
+        else:
+            raise NotImplementedError
+
     def _extract_graph(
         self,
         mentions: List[Tuple[Character, NEREntity]],
-        sentences: Optional[List[List[str]]],
+        sentences: List[List[str]],
         sentences_polarities: Optional[List[float]],
     ):
         """
@@ -196,7 +238,7 @@ class CoOccurencesGraphExtractor(PipelineStep):
             between two interactions is computed as the strongest
             sentence polarity between those two mentions.
         """
-        compute_polarity = not sentences is None and not sentences_polarities is None
+        compute_polarity = not sentences_polarities is None
 
         # co-occurence matrix, where C[i][j] is 1 when appearance
         # i co-occur with j if i < j, or 0 when it doesn't
@@ -204,7 +246,7 @@ class CoOccurencesGraphExtractor(PipelineStep):
         for i, (char1, mention_1) in enumerate(mentions):
             # check ahead for co-occurences
             for j, (char2, mention_2) in enumerate(mentions[i + 1 :]):
-                if mention_2.start_idx - mention_1.start_idx > self.co_occurences_dist:
+                if not self._mentions_interact(mention_1, mention_2, sentences):
                     # dist between current token and future token is
                     # too great : we finished co-occurences search for
                     # the current token
@@ -256,7 +298,7 @@ class CoOccurencesGraphExtractor(PipelineStep):
         window: Optional[int],
         overlap: int,
         chapter_tokens: Optional[List[List[str]]],
-        sentences: Optional[List[List[str]]],
+        sentences: List[List[str]],
         sentences_polarities: Optional[List[float]],
     ) -> List[nx.Graph]:
         """
@@ -299,15 +341,14 @@ class CoOccurencesGraphExtractor(PipelineStep):
                 (c, m.shifted(-chapter_start_idx)) for c, m in chapter_mentions
             ]
 
-            chapter_sentences = None
+            sent_start_idx, sent_end_idx = sent_indices_for_chapter(
+                chapter_tokens, chapter_i, sentences
+            )
+            chapter_sentences = sentences[sent_start_idx : sent_end_idx + 1]
+
             chapter_sentences_polarities = None
             if compute_polarity:
-                assert not sentences is None
                 assert not sentences_polarities is None
-                sent_start_idx, sent_end_idx = sent_indices_for_chapter(
-                    chapter_tokens, chapter_i, sentences
-                )
-                chapter_sentences = sentences[sent_start_idx : sent_end_idx + 1]
                 chapter_sentences_polarities = sentences_polarities[
                     sent_start_idx : sent_end_idx + 1
                 ]
@@ -323,10 +364,11 @@ class CoOccurencesGraphExtractor(PipelineStep):
         return graphs
 
     def _extract_gephi_dynamic_graph(
-        self, mentions: List[Tuple[Character, NEREntity]]
+        self, mentions: List[Tuple[Character, NEREntity]], sentences: List[List[str]]
     ) -> nx.Graph:
         """
         :param mentions: A list of character mentions, ordered by appearance
+        :param sentences:
         """
         # keep only longest name in graph node : possible only if it is unique
         # TODO: might want to try and get shorter names if longest names aren't
@@ -335,19 +377,19 @@ class CoOccurencesGraphExtractor(PipelineStep):
 
         G = nx.Graph()
 
-        character_to_last_appearance: Dict[Character, Optional[int]] = {
+        character_to_last_appearance: Dict[Character, Optional[NEREntity]] = {
             character: None for character in characters
         }
 
         for i, (character, mention) in enumerate(mentions):
             if not character in characters:
                 continue
-            character_to_last_appearance[character] = mention.start_idx
+            character_to_last_appearance[character] = mention
             close_characters = [
                 c
                 for c, last_appearance in character_to_last_appearance.items()
                 if not last_appearance is None
-                and mention.start_idx - last_appearance <= self.co_occurences_dist
+                and self._mentions_interact(mention, last_appearance, sentences)
                 and not c == character
             ]
             for close_character in close_characters:
@@ -371,7 +413,7 @@ class CoOccurencesGraphExtractor(PipelineStep):
         return G
 
     def needs(self) -> Set[str]:
-        needs = {"tokens", "bio_tags", "characters"}
+        needs = {"tokens", "bio_tags", "characters", "sentences"}
         if self.dynamic_needs_chapter:
             needs.add("chapter_tokens")
         return needs
@@ -380,4 +422,4 @@ class CoOccurencesGraphExtractor(PipelineStep):
         return {"characters_graph"}
 
     def optional_needs(self) -> Set[str]:
-        return {"sentences_polarities", "sentences"}
+        return {"sentences_polarities"}
