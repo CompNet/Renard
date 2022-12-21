@@ -1760,7 +1760,7 @@ contains the list of all names of a character.</p></li>
 <dd><p>A simple character graph extractor using co-occurences</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="renard.pipeline.graph_extraction.CoOccurencesGraphExtractor.__call__">
-<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tokens</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bio_tags</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">characters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chapter_tokens</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sentences</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sentences_polarities</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.graph_extraction.CoOccurencesGraphExtractor.__call__" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tokens</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bio_tags</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">characters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sentences</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chapter_tokens</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sentences_polarities</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.graph_extraction.CoOccurencesGraphExtractor.__call__" title="Permalink to this definition"></a></dt>
 <dd><p>Extract a characters graph</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1775,7 +1775,7 @@ contains the list of all names of a character.</p></li>
 </dd>
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>a <code class="docutils literal notranslate"><span class="pre">dict</span></code> with key <code class="docutils literal notranslate"><span class="pre">'characters_graph'</span></code> and a
-<code class="docutils literal notranslate"><span class="pre">networkx.Graph</span></code> or a list of <code class="docutils literal notranslate"><span class="pre">networkx.Graph</span></code> as
+<code class="xref py py-class docutils literal notranslate"><span class="pre">nx.Graph</span></code> or a list of <code class="xref py py-class docutils literal notranslate"><span class="pre">nx.Graph</span></code> as
 value.</p>
 </dd>
 </dl>
@@ -1787,12 +1787,21 @@ value.</p>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>co_occurences_dist</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – max accepted distance between two
-character appearances to form a co-occurence interaction,
-in number of tokens.</p></li>
+<li><p><strong>co_occurences_dist</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code>[‘tokens’, ‘sentences’]]]) – <p>max accepted distance between two
+character appearances to form a co-occurence interaction.</p>
+<blockquote>
+<div><ul>
+<li><p>if an <code class="docutils literal notranslate"><span class="pre">int</span></code> is given, the distance is in number of
+tokens</p></li>
+<li><p>if a <code class="docutils literal notranslate"><span class="pre">tuple</span></code> is given, the first element of the
+tuple is a distance while the second is an unit.
+Examples : <code class="docutils literal notranslate"><span class="pre">(1,</span> <span class="pre">&quot;sentences&quot;)</span></code>, <code class="docutils literal notranslate"><span class="pre">(3,</span> <span class="pre">&quot;tokens&quot;)</span></code>.</p></li>
+</ul>
+</div></blockquote>
+</p></li>
 <li><p><strong>dynamic</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code>[‘nx’, ‘gephi’]]) – <p>either <code class="docutils literal notranslate"><span class="pre">None</span></code>, or one of <code class="docutils literal notranslate"><span class="pre">{'nx',</span> <span class="pre">'gephi'}</span></code></p>
 <ul>
-<li><p>if <code class="docutils literal notranslate"><span class="pre">None</span></code> (the defaul), a <code class="docutils literal notranslate"><span class="pre">nx.graph</span></code> is
+<li><p>if <code class="docutils literal notranslate"><span class="pre">None</span></code> (the default), a <code class="docutils literal notranslate"><span class="pre">nx.graph</span></code> is
 extracted</p></li>
 <li><p>if <code class="docutils literal notranslate"><span class="pre">'nx'</span></code>, several <code class="docutils literal notranslate"><span class="pre">nx.graph</span></code> are extracted.  In
 that case, <code class="docutils literal notranslate"><span class="pre">dynamic_window</span></code> and
@@ -1845,10 +1854,13 @@ given, one graph will be extracted per chapter.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="renard.pipeline.graph_extraction.CoOccurencesGraphExtractor._extract_gephi_dynamic_graph">
-<span class="sig-name descname"><span class="pre">_extract_gephi_dynamic_graph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mentions</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.graph_extraction.CoOccurencesGraphExtractor._extract_gephi_dynamic_graph" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">_extract_gephi_dynamic_graph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mentions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sentences</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.graph_extraction.CoOccurencesGraphExtractor._extract_gephi_dynamic_graph" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>mentions</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<a class="reference internal" href="#renard.pipeline.characters_extraction.Character" title="renard.pipeline.characters_extraction.Character"><code class="xref py py-class docutils literal notranslate"><span class="pre">Character</span></code></a>, <a class="reference internal" href="#renard.pipeline.ner.NEREntity" title="renard.pipeline.ner.NEREntity"><code class="xref py py-class docutils literal notranslate"><span class="pre">NEREntity</span></code></a>]]) – A list of character mentions, ordered by appearance</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mentions</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<a class="reference internal" href="#renard.pipeline.characters_extraction.Character" title="renard.pipeline.characters_extraction.Character"><code class="xref py py-class docutils literal notranslate"><span class="pre">Character</span></code></a>, <a class="reference internal" href="#renard.pipeline.ner.NEREntity" title="renard.pipeline.ner.NEREntity"><code class="xref py py-class docutils literal notranslate"><span class="pre">NEREntity</span></code></a>]]) – A list of character mentions, ordered by appearance</p></li>
+<li><p><strong>sentences</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – </p></li>
+</ul>
 </dd>
 <dt class="field-even">Return type</dt>
 <dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Graph</span></code></p>
@@ -1864,7 +1876,7 @@ given, one graph will be extracted per chapter.</p></li>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>mentions</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<a class="reference internal" href="#renard.pipeline.characters_extraction.Character" title="renard.pipeline.characters_extraction.Character"><code class="xref py py-class docutils literal notranslate"><span class="pre">Character</span></code></a>, <a class="reference internal" href="#renard.pipeline.ner.NEREntity" title="renard.pipeline.ner.NEREntity"><code class="xref py py-class docutils literal notranslate"><span class="pre">NEREntity</span></code></a>]]) – A list of character mentions, ordered by
 appearance</p></li>
-<li><p><strong>sentences</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]]) – if specified, <code class="docutils literal notranslate"><span class="pre">sentences_polarities</span></code> must
+<li><p><strong>sentences</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – if specified, <code class="docutils literal notranslate"><span class="pre">sentences_polarities</span></code> must
 be specified as well.</p></li>
 <li><p><strong>sentences_polarities</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]]) – if specified, <code class="docutils literal notranslate"><span class="pre">sentences</span></code> must
 be specified as well.  In that case, edges are annotated
@@ -1873,6 +1885,31 @@ of the relationship between two characters.  Polarity
 between two interactions is computed as the strongest
 sentence polarity between those two mentions.</p></li>
 </ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="renard.pipeline.graph_extraction.CoOccurencesGraphExtractor._mentions_interact">
+<span class="sig-name descname"><span class="pre">_mentions_interact</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mention_1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mention_2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sentences</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.graph_extraction.CoOccurencesGraphExtractor._mentions_interact" title="Permalink to this definition"></a></dt>
+<dd><p>Check if two mentions are close enough to be in interactions.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>the attribute <code class="docutils literal notranslate"><span class="pre">self.co_occurences_dist</span></code> is used to know wether mentions are in co_occurences</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mention_1</strong> (<a class="reference internal" href="#renard.pipeline.ner.NEREntity" title="renard.pipeline.ner.NEREntity"><code class="xref py py-class docutils literal notranslate"><span class="pre">NEREntity</span></code></a>) – </p></li>
+<li><p><strong>mention_2</strong> (<a class="reference internal" href="#renard.pipeline.ner.NEREntity" title="renard.pipeline.ner.NEREntity"><code class="xref py py-class docutils literal notranslate"><span class="pre">NEREntity</span></code></a>) – </p></li>
+<li><p><strong>sentences</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]]) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>a boolean indicating wether the two mentions are co-occuring</p>
 </dd>
 </dl>
 </dd></dl>
