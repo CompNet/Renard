@@ -1,4 +1,4 @@
-from typing import Dict, Any, List, Set
+from typing import Dict, Any, List, Set, Optional
 import nltk
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
 from renard.pipeline.core import PipelineStep
@@ -17,6 +17,11 @@ class NLTKSentimentAnalyzer(PipelineStep):
         nltk.download("vader_lexicon", quiet=True)
         self.sentiment_analyzer = SentimentIntensityAnalyzer()
         super().__init__()
+
+    def _pipeline_init(self, progress_report: Optional[str], lang: str):
+        if lang != "eng":
+            raise ValueError(f"NLTKSentimentAnalyzer does not support language {lang}")
+        super()._pipeline_init(progress_report, lang)
 
     def __call__(
         self, text: str, sentences: List[List[str]], **kwargs

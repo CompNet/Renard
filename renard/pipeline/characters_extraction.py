@@ -169,6 +169,13 @@ class GraphRulesCharactersExtractor(PipelineStep):
 
         super().__init__()
 
+    def _pipeline_init(self, progress_report: Optional[str], lang: str):
+        if lang != "eng":
+            raise ValueError(
+                f"GraphRulesCharactersExtractor does not support language {lang}"
+            )
+        super()._pipeline_init(progress_report, lang)
+
     def __call__(
         self,
         tokens: List[str],
@@ -276,7 +283,7 @@ class GraphRulesCharactersExtractor(PipelineStep):
         # link characters to all of to their coreferential mentions
         # (pronouns...)
         if not corefs is None:
-            character = _assign_coreference_mentions(characters, corefs)
+            characters = _assign_coreference_mentions(characters, corefs)
 
         # filter characters based on the number of time they appear
         characters = [c for c in characters if len(c.mentions) >= self.min_appearances]

@@ -53,8 +53,18 @@ class PipelineStep:
 
     """
 
-    def __init__(self) -> None:
-        self.progress_report = "tqdm"
+    def __init__(self):
+        """Initialize the :class:`PipelineStep` with a given configuration."""
+        pass
+
+    def _pipeline_init(self, progress_report: Optional[str], lang: str):
+        """Set the step configuration that is common to the whole pipeline.
+
+        :param progress_report:
+        :param lang: ISO 639-3 language string
+        """
+        self.progress_report = progress_report
+        self.lang = lang
 
     def __call__(self, text: str, **kwargs) -> Dict[str, Any]:
         raise NotImplementedError()
@@ -343,17 +353,25 @@ class Pipeline:
         self,
         steps: List[PipelineStep],
         progress_report: Optional[str] = "tqdm",
+        lang: str = "eng",
         warn: bool = True,
     ) -> None:
         """
-        :param steps: a ``tuple`` of :class:``PipelineStep``, that will be executed in order
-        :param progress_report: if ``tqdm``, report the pipeline progress using tqdm. Otherwise,
-            does not report progress. This sets the ``progress_report`` attribute for all steps.
+        :param steps: a ``tuple`` of :class:``PipelineStep``, that
+            will be executed in order
+        :param progress_report: if ``tqdm``, report the pipeline
+            progress using tqdm.  if ``None``, does not report
+            progress.
+        :param lang: ISO 639-3 language code
+        :param warn:
         """
         self.steps = steps
+
+        for step in steps:
+            step._pipeline_init(progress_report, lang)
         self.progress_report = progress_report
-        for step in self.steps:
-            step.progress_report = progress_report
+
+        self.lang = lang
         self.warn = warn
 
     def check_valid(self, *args) -> Tuple[bool, List[str]]:
