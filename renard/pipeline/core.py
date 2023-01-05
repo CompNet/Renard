@@ -13,6 +13,7 @@ from typing import (
     TYPE_CHECKING,
 )
 import os
+from torch._C import Value
 
 from tqdm import tqdm
 from transformers.tokenization_utils_base import BatchEncoding
@@ -57,17 +58,28 @@ class PipelineStep:
         """Initialize the :class:`PipelineStep` with a given configuration."""
         pass
 
-    def _pipeline_init(self, progress_report: Optional[str], lang: str):
+    def _pipeline_init(self, lang: str):
         """Set the step configuration that is common to the whole pipeline.
 
-        :param progress_report:
         :param lang: ISO 639-3 language string
+        :param progress_report:
         """
-        self.progress_report = progress_report
+        supported_langs = self.supported_langs()
+        if not supported_langs == "any" and not lang in supported_langs:
+            raise ValueError(
+                f"[error] {self.__class__} does not support lang {lang} (supported language: {supported_langs})."
+            )
         self.lang = lang
 
     def __call__(self, text: str, **kwargs) -> Dict[str, Any]:
         raise NotImplementedError()
+
+    def supported_langs(self) -> Union[Set[str], Literal["any"]]:
+        """
+        :return: a list of supported languages, as ISO 639-3 codes, or
+                 the string ``'any'``
+        """
+        return {"eng"}
 
     def needs(self) -> Set[str]:
         """
@@ -352,7 +364,6 @@ class Pipeline:
     def __init__(
         self,
         steps: List[PipelineStep],
-        progress_report: Optional[str] = "tqdm",
         lang: str = "eng",
         warn: bool = True,
     ) -> None:
@@ -368,8 +379,7 @@ class Pipeline:
         self.steps = steps
 
         for step in steps:
-            step._pipeline_init(progress_report, lang)
-        self.progress_report = progress_report
+            step._pipeline_init(lang)
 
         self.lang = lang
         self.warn = warn
@@ -421,10 +431,7 @@ class Pipeline:
 
         state = PipelineState(text, **kwargs)
 
-        if self.progress_report == "tqdm":
-            steps = tqdm(self.steps, total=len(self.steps))
-        else:
-            steps = self.steps
+        steps = tqdm(self.steps, total=len(self.steps))
 
         for step in steps:
 

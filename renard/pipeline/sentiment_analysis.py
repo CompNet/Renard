@@ -18,11 +18,6 @@ class NLTKSentimentAnalyzer(PipelineStep):
         self.sentiment_analyzer = SentimentIntensityAnalyzer()
         super().__init__()
 
-    def _pipeline_init(self, progress_report: Optional[str], lang: str):
-        if lang != "eng":
-            raise ValueError(f"NLTKSentimentAnalyzer does not support language {lang}")
-        super()._pipeline_init(progress_report, lang)
-
     def __call__(
         self, text: str, sentences: List[List[str]], **kwargs
     ) -> Dict[str, Any]:

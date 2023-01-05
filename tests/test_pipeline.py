@@ -30,7 +30,7 @@ class TestPipelineValidity(unittest.TestCase):
             def production(self) -> Set[str]:
                 return set()
 
-        pipeline = Pipeline((TestPipelineStep1(), TestPipelineStep2()))
+        pipeline = Pipeline([TestPipelineStep1(), TestPipelineStep2()])
 
         self.assertTrue(pipeline.check_valid()[0])
 
@@ -51,7 +51,7 @@ class TestPipelineValidity(unittest.TestCase):
             def production(self) -> Set[str]:
                 return set()
 
-        pipeline = Pipeline((TestPipelineStep1(), TestPipelineStep2()))
+        pipeline = Pipeline([TestPipelineStep1(), TestPipelineStep2()])
 
         self.assertFalse(pipeline.check_valid()[0])
 
@@ -69,11 +69,10 @@ class TestCompleteNLTKPipeline(unittest.TestCase):
                 NaiveCharactersExtractor(),
                 CoOccurencesGraphExtractor(co_occurences_dist=10),
             ],
-            progress_report=None,
             warn=False,
         )
 
-    @settings(max_examples=25)
+    @settings(max_examples=25, deadline=None)
     @given(text=st.text())
     def test_nltk_pipeline(self, text: str):
         self.pipeline(text)

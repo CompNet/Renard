@@ -1,11 +1,10 @@
-from typing import Any, Dict, List, FrozenSet, Set, Optional, Tuple
-import re, copy
+from typing import Any, Dict, List, FrozenSet, Set, Optional, Tuple, Union, Literal
+import re
 from itertools import combinations
-from collections import Counter, defaultdict
+from collections import defaultdict
 from dataclasses import dataclass
 from nameparser import config
 from nameparser import HumanName
-from networkx.exception import NetworkXNoPath
 from renard.gender import Gender
 from renard.pipeline.ner import NEREntity, ner_entities
 from renard.pipeline.core import Mention, PipelineStep
@@ -124,6 +123,9 @@ class NaiveCharactersExtractor(PipelineStep):
 
         return {"characters": characters}
 
+    def supported_langs(self) -> Union[Set[str], Literal["any"]]:
+        return "any"
+
     def needs(self) -> Set[str]:
         return {"tokens", "bio_tags"}
 
@@ -168,13 +170,6 @@ class GraphRulesCharactersExtractor(PipelineStep):
                 self.hypocorism_gazetteer._add_hypocorism_(name, nicknames)
 
         super().__init__()
-
-    def _pipeline_init(self, progress_report: Optional[str], lang: str):
-        if lang != "eng":
-            raise ValueError(
-                f"GraphRulesCharactersExtractor does not support language {lang}"
-            )
-        super()._pipeline_init(progress_report, lang)
 
     def __call__(
         self,

@@ -10,6 +10,7 @@ class TestNLTKTokenizer(unittest.TestCase):
 
     def setUp(self) -> None:
         self.tokenizer = NLTKTokenizer()
+        self.tokenizer._pipeline_init("eng")
 
     @given(input_text=st.text())
     def test_tokens_and_sentences_are_aligned(self, input_text: str):
@@ -24,6 +25,7 @@ class TestBertTokenizer(unittest.TestCase):
 
     def setUp(self) -> None:
         self.tokenizer = BertTokenizer()
+        self.tokenizer._pipeline_init("eng")
 
     @given(input_text=st.text(alphabet=string.ascii_letters, min_size=1))
     def test_tokens_and_sentences_are_aligned(self, input_text: str):

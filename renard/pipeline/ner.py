@@ -1,10 +1,11 @@
 from __future__ import annotations
-from typing import List, Dict, Any, Set, Tuple, Optional
+from typing import List, Dict, Any, Set, Tuple, Optional, Union, Literal
 from dataclasses import dataclass
 from torch._C import Value
 from transformers.tokenization_utils_base import BatchEncoding
 from tqdm import tqdm
 from seqeval.metrics import precision_score, recall_score, f1_score
+from renard.nltk_utils import NLTK_ISO_STRING_TO_LANG
 from renard.pipeline.core import PipelineStep, Mention
 
 
@@ -130,6 +131,9 @@ class NLTKNamedEntityRecognizer(PipelineStep):
         )
         return {"bio_tags": [wti[2] for wti in word_tag_iobtags]}
 
+    def supported_langs(self) -> Union[Set[str], Literal["any"]]:
+        return set(NLTK_ISO_STRING_TO_LANG.keys())
+
     def needs(self) -> Set[str]:
         return {"tokens"}
 
@@ -155,10 +159,10 @@ class BertNamedEntityRecognizer(PipelineStep):
         self.batch_size = batch_size
         super().__init__()
 
-    def _pipeline_init(self, progress_report: Optional[str], lang: str):
+    def _pipeline_init(self, lang: str):
         from transformers import AutoModelForTokenClassification
 
-        super()._pipeline_init(progress_report, lang)
+        super()._pipeline_init(lang)
 
         if not self.huggingface_model_id is None:
             self.model = AutoModelForTokenClassification.from_pretrained(
@@ -201,12 +205,7 @@ class BertNamedEntityRecognizer(PipelineStep):
         with torch.no_grad():
             wp_labels = []
 
-            batch_i_s = (
-                tqdm(range(batches_nb))
-                if self.progress_report == "tqdm"
-                else range(batches_nb)
-            )
-            for batch_i in batch_i_s:
+            for batch_i in tqdm(range(batches_nb)):
                 batch_start = batch_i * self.batch_size
                 batch_end = batch_start + self.batch_size
                 out = self.model(
@@ -249,6 +248,9 @@ class BertNamedEntityRecognizer(PipelineStep):
             if not wp_token.startswith("##"):
                 labels.append(wp_label)
         return labels
+
+    def supported_langs(self) -> Union[Set[str], Literal["any"]]:
+        return {"eng", "fra"}
 
     def needs(self) -> Set[str]:
         return {"bert_batch_encoding", "wp_tokens"}

@@ -1,4 +1,4 @@
-from typing import Dict, Any, List, Optional, Set
+from typing import Dict, Any, List, Optional, Set, Union, Literal
 import torch
 import nltk
 from more_itertools.recipes import flatten
@@ -12,11 +12,6 @@ class NLTKTokenizer(PipelineStep):
     def __init__(self):
         nltk.download("punkt", quiet=True)
         super().__init__()
-
-    def _pipeline_init(self, progress_report: Optional[str], lang: str):
-        if not lang in NLTK_ISO_STRING_TO_LANG:
-            raise ValueError(f"NLTKTokenizer does not support language {lang}")
-        super()._pipeline_init(progress_report, lang)
 
     def __call__(
         self, text: str, chapters: Optional[List[str]] = None, **kwargs
@@ -51,6 +46,9 @@ class NLTKTokenizer(PipelineStep):
             "sentences": sentences,
         }
 
+    def supported_langs(self) -> Union[Set[str], Literal["any"]]:
+        return set(NLTK_ISO_STRING_TO_LANG.keys())
+
     def needs(self) -> Set[str]:
         return {"text"}
 
@@ -78,10 +76,10 @@ class BertTokenizer(PipelineStep):
         nltk.download("punkt", quiet=True)
         super().__init__()
 
-    def _pipeline_init(self, progress_report: Optional[str], lang: str):
+    def _pipeline_init(self, lang: str):
         from transformers import AutoTokenizer
 
-        super()._pipeline_init(progress_report, lang)
+        super()._pipeline_init(lang)
 
         if not self.huggingface_model_id is None:
             self.tokenizer = AutoTokenizer.from_pretrained(self.huggingface_model_id)
@@ -145,6 +143,9 @@ class BertTokenizer(PipelineStep):
             "bert_batch_encoding": batchs,
             "wp_tokens": wp_tokens,
         }
+
+    def supported_langs(self) -> Union[Set[str], Literal["any"]]:
+        return {"eng", "fra"}
 
     def needs(self) -> Set[str]:
         return {"text"}
