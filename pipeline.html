@@ -155,7 +155,7 @@ to compute them yourself :</p>
 </div>
 <dl class="py class">
 <dt class="sig sig-object py" id="renard.pipeline.core.Pipeline">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">renard.pipeline.core.</span></span><span class="sig-name descname"><span class="pre">Pipeline</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">steps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress_report</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'tqdm'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">warn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.core.Pipeline" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">renard.pipeline.core.</span></span><span class="sig-name descname"><span class="pre">Pipeline</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">steps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lang</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'eng'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">warn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.core.Pipeline" title="Permalink to this definition"></a></dt>
 <dd><p>A flexible NLP pipeline</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="renard.pipeline.core.Pipeline.__call__">
@@ -173,13 +173,17 @@ to compute them yourself :</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="renard.pipeline.core.Pipeline.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">steps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress_report</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'tqdm'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">warn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.core.Pipeline.__init__" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">steps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lang</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'eng'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">warn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.core.Pipeline.__init__" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>steps</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<a class="reference internal" href="#renard.pipeline.core.PipelineStep" title="renard.pipeline.core.PipelineStep"><code class="xref py py-class docutils literal notranslate"><span class="pre">PipelineStep</span></code></a>]) – a <code class="docutils literal notranslate"><span class="pre">tuple</span></code> of :class:<code class="docutils literal notranslate"><span class="pre">PipelineStep</span></code>, that will be executed in order</p></li>
-<li><p><strong>progress_report</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – if <code class="docutils literal notranslate"><span class="pre">tqdm</span></code>, report the pipeline progress using tqdm. Otherwise,
-does not report progress. This sets the <code class="docutils literal notranslate"><span class="pre">progress_report</span></code> attribute for all steps.</p></li>
+<li><p><strong>steps</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<a class="reference internal" href="#renard.pipeline.core.PipelineStep" title="renard.pipeline.core.PipelineStep"><code class="xref py py-class docutils literal notranslate"><span class="pre">PipelineStep</span></code></a>]) – a <code class="docutils literal notranslate"><span class="pre">tuple</span></code> of :class:<code class="docutils literal notranslate"><span class="pre">PipelineStep</span></code>, that
+will be executed in order</p></li>
+<li><p><strong>progress_report</strong> – if <code class="docutils literal notranslate"><span class="pre">tqdm</span></code>, report the pipeline
+progress using tqdm.  if <code class="docutils literal notranslate"><span class="pre">None</span></code>, does not report
+progress.</p></li>
+<li><p><strong>lang</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – ISO 639-3 language code</p></li>
+<li><p><strong>warn</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – </p></li>
 </ul>
 </dd>
 </dl>
@@ -453,7 +457,22 @@ overriden by derived classes.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="renard.pipeline.core.PipelineStep.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.core.PipelineStep.__init__" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Initialize the <a class="reference internal" href="#renard.pipeline.core.PipelineStep" title="renard.pipeline.core.PipelineStep"><code class="xref py py-class docutils literal notranslate"><span class="pre">PipelineStep</span></code></a> with a given configuration.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="renard.pipeline.core.PipelineStep._pipeline_init">
+<span class="sig-name descname"><span class="pre">_pipeline_init</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lang</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.core.PipelineStep._pipeline_init" title="Permalink to this definition"></a></dt>
+<dd><p>Set the step configuration that is common to the whole pipeline.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lang</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – ISO 639-3 language string</p></li>
+<li><p><strong>progress_report</strong> – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="renard.pipeline.core.PipelineStep.needs">
@@ -496,6 +515,20 @@ classes.</p>
 <dd class="field-even"><p>a <cite>set</cite> of state attributes produced by this
 <a class="reference internal" href="#renard.pipeline.core.PipelineStep" title="renard.pipeline.core.PipelineStep"><code class="xref py py-class docutils literal notranslate"><span class="pre">PipelineStep</span></code></a>. This method must be overriden
 by derived classes.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="renard.pipeline.core.PipelineStep.supported_langs">
+<span class="sig-name descname"><span class="pre">supported_langs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.core.PipelineStep.supported_langs" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Set</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>], <code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code>[‘any’]]</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>a list of supported languages, as ISO 639-3 codes, or
+the string <code class="docutils literal notranslate"><span class="pre">'any'</span></code></p>
 </dd>
 </dl>
 </dd></dl>
@@ -602,7 +635,7 @@ by derived classes.</p>
 <span id="tokenization"></span><h2>Tokenization<a class="headerlink" href="#module-renard.pipeline.tokenization" title="Permalink to this headline"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="renard.pipeline.tokenization.BertTokenizer">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">renard.pipeline.tokenization.</span></span><span class="sig-name descname"><span class="pre">BertTokenizer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">huggingface_model_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'bert-base-cased'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.tokenization.BertTokenizer" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">renard.pipeline.tokenization.</span></span><span class="sig-name descname"><span class="pre">BertTokenizer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">huggingface_model_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.tokenization.BertTokenizer" title="Permalink to this definition"></a></dt>
 <dd><p>Tokenizer for bert based models</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -625,10 +658,26 @@ obtained using NLTK’s sentence tokenizer.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="renard.pipeline.tokenization.BertTokenizer.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">huggingface_model_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'bert-base-cased'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.tokenization.BertTokenizer.__init__" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">huggingface_model_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.tokenization.BertTokenizer.__init__" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>huggingface_model_id</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – </p>
+<dd class="field-odd"><p><strong>huggingface_model_id</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – A custom huggingface model id.
+This allows to bypass the <code class="docutils literal notranslate"><span class="pre">lang</span></code> pipeline parameter,
+which normally choose a huggingface model automatically.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="renard.pipeline.tokenization.BertTokenizer._pipeline_init">
+<span class="sig-name descname"><span class="pre">_pipeline_init</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lang</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.tokenization.BertTokenizer._pipeline_init" title="Permalink to this definition"></a></dt>
+<dd><p>Set the step configuration that is common to the whole pipeline.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lang</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – ISO 639-3 language string</p></li>
+<li><p><strong>progress_report</strong> – </p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -664,6 +713,20 @@ by derived classes.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="renard.pipeline.tokenization.BertTokenizer.supported_langs">
+<span class="sig-name descname"><span class="pre">supported_langs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.tokenization.BertTokenizer.supported_langs" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Set</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>], <code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code>[‘any’]]</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>a list of supported languages, as ISO 639-3 codes, or
+the string <code class="docutils literal notranslate"><span class="pre">'any'</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="renard.pipeline.tokenization.BertTokenizer.wp_tokens_to_tokens">
 <em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">wp_tokens_to_tokens</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wp_tokens</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.tokenization.BertTokenizer.wp_tokens_to_tokens" title="Permalink to this definition"></a></dt>
 <dd><p>Convert word piece tokens to ‘regular’ tokens</p>
@@ -681,7 +744,7 @@ by derived classes.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="renard.pipeline.tokenization.NLTKTokenizer">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">renard.pipeline.tokenization.</span></span><span class="sig-name descname"><span class="pre">NLTKTokenizer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">language</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'english'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.tokenization.NLTKTokenizer" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">renard.pipeline.tokenization.</span></span><span class="sig-name descname"><span class="pre">NLTKTokenizer</span></span><a class="headerlink" href="#renard.pipeline.tokenization.NLTKTokenizer" title="Permalink to this definition"></a></dt>
 <dd><p>Construct a nltk word tokenizer</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="renard.pipeline.tokenization.NLTKTokenizer.__call__">
@@ -698,12 +761,8 @@ by derived classes.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="renard.pipeline.tokenization.NLTKTokenizer.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">language</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'english'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.tokenization.NLTKTokenizer.__init__" title="Permalink to this definition"></a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>language</strong> – language, passed to <code class="xref py py-func docutils literal notranslate"><span class="pre">nltk.word_tokenize()</span></code></p>
-</dd>
-</dl>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.tokenization.NLTKTokenizer.__init__" title="Permalink to this definition"></a></dt>
+<dd><p>Initialize the <code class="xref py py-class docutils literal notranslate"><span class="pre">PipelineStep</span></code> with a given configuration.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -736,6 +795,20 @@ by derived classes.</p>
 </dl>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="renard.pipeline.tokenization.NLTKTokenizer.supported_langs">
+<span class="sig-name descname"><span class="pre">supported_langs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.tokenization.NLTKTokenizer.supported_langs" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Set</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>], <code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code>[‘any’]]</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>a list of supported languages, as ISO 639-3 codes, or
+the string <code class="docutils literal notranslate"><span class="pre">'any'</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
 </dd></dl>
 
 </section>
@@ -743,7 +816,7 @@ by derived classes.</p>
 <span id="named-entity-recognition"></span><h2>Named Entity Recognition<a class="headerlink" href="#module-renard.pipeline.ner" title="Permalink to this headline"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="renard.pipeline.ner.BertNamedEntityRecognizer">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">renard.pipeline.ner.</span></span><span class="sig-name descname"><span class="pre">BertNamedEntityRecognizer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'dslim/bert-base-NER'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.ner.BertNamedEntityRecognizer" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">renard.pipeline.ner.</span></span><span class="sig-name descname"><span class="pre">BertNamedEntityRecognizer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">huggingface_model_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.ner.BertNamedEntityRecognizer" title="Permalink to this definition"></a></dt>
 <dd><p>An entity recognizer based on BERT</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="renard.pipeline.ner.BertNamedEntityRecognizer.__call__">
@@ -764,13 +837,28 @@ by derived classes.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="renard.pipeline.ner.BertNamedEntityRecognizer.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'dslim/bert-base-NER'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.ner.BertNamedEntityRecognizer.__init__" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">huggingface_model_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.ner.BertNamedEntityRecognizer.__init__" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>model</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – huggingface model id or path to a custom model.
-Is passed to the huggingface <code class="docutils literal notranslate"><span class="pre">from_pretrained</span></code> method.</p></li>
+<li><p><strong>huggingface_model_id</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – a custom huggingface model id.
+This allows to bypass the <code class="docutils literal notranslate"><span class="pre">lang</span></code> pipeline parameter
+which normally choose a huggingface model automatically.</p></li>
 <li><p><strong>batch_size</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="renard.pipeline.ner.BertNamedEntityRecognizer._pipeline_init">
+<span class="sig-name descname"><span class="pre">_pipeline_init</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lang</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.ner.BertNamedEntityRecognizer._pipeline_init" title="Permalink to this definition"></a></dt>
+<dd><p>Set the step configuration that is common to the whole pipeline.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lang</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – ISO 639-3 language string</p></li>
+<li><p><strong>progress_report</strong> – </p></li>
 </ul>
 </dd>
 </dl>
@@ -802,6 +890,20 @@ by derived classes.</p>
 <dd class="field-even"><p>a <cite>set</cite> of state attributes produced by this
 <code class="xref py py-class docutils literal notranslate"><span class="pre">PipelineStep</span></code>. This method must be overriden
 by derived classes.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="renard.pipeline.ner.BertNamedEntityRecognizer.supported_langs">
+<span class="sig-name descname"><span class="pre">supported_langs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.ner.BertNamedEntityRecognizer.supported_langs" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Set</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>], <code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code>[‘any’]]</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>a list of supported languages, as ISO 639-3 codes, or
+the string <code class="docutils literal notranslate"><span class="pre">'any'</span></code></p>
 </dd>
 </dl>
 </dd></dl>
@@ -878,7 +980,7 @@ using <a class="reference internal" href="#renard.pipeline.ner.NEREntity.shifted
 
 <dl class="py class">
 <dt class="sig sig-object py" id="renard.pipeline.ner.NLTKNamedEntityRecognizer">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">renard.pipeline.ner.</span></span><span class="sig-name descname"><span class="pre">NLTKNamedEntityRecognizer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">language</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'eng'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.ner.NLTKNamedEntityRecognizer" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">renard.pipeline.ner.</span></span><span class="sig-name descname"><span class="pre">NLTKNamedEntityRecognizer</span></span><a class="headerlink" href="#renard.pipeline.ner.NLTKNamedEntityRecognizer" title="Permalink to this definition"></a></dt>
 <dd><p>An entity recognizer based on NLTK</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="renard.pipeline.ner.NLTKNamedEntityRecognizer.__call__">
@@ -898,10 +1000,10 @@ using <a class="reference internal" href="#renard.pipeline.ner.NEREntity.shifted
 
 <dl class="py method">
 <dt class="sig sig-object py" id="renard.pipeline.ner.NLTKNamedEntityRecognizer.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">language</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'eng'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.ner.NLTKNamedEntityRecognizer.__init__" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.ner.NLTKNamedEntityRecognizer.__init__" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>language</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – iso 639-2 3-letter language code</p>
+<dd class="field-odd"><p><strong>language</strong> – iso 639-2 3-letter language code</p>
 </dd>
 </dl>
 </dd></dl>
@@ -932,6 +1034,20 @@ by derived classes.</p>
 <dd class="field-even"><p>a <cite>set</cite> of state attributes produced by this
 <code class="xref py py-class docutils literal notranslate"><span class="pre">PipelineStep</span></code>. This method must be overriden
 by derived classes.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="renard.pipeline.ner.NLTKNamedEntityRecognizer.supported_langs">
+<span class="sig-name descname"><span class="pre">supported_langs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.ner.NLTKNamedEntityRecognizer.supported_langs" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Set</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>], <code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code>[‘any’]]</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>a list of supported languages, as ISO 639-3 codes, or
+the string <code class="docutils literal notranslate"><span class="pre">'any'</span></code></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1728,6 +1844,20 @@ by derived classes.</p>
 </dl>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="renard.pipeline.characters_extraction.NaiveCharactersExtractor.supported_langs">
+<span class="sig-name descname"><span class="pre">supported_langs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.characters_extraction.NaiveCharactersExtractor.supported_langs" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Set</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>], <code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code>[‘any’]]</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>a list of supported languages, as ISO 639-3 codes, or
+the string <code class="docutils literal notranslate"><span class="pre">'any'</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="py function">
@@ -1955,6 +2085,20 @@ classes.</p>
 <dd class="field-even"><p>a <cite>set</cite> of state attributes produced by this
 <code class="xref py py-class docutils literal notranslate"><span class="pre">PipelineStep</span></code>. This method must be overriden
 by derived classes.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="renard.pipeline.graph_extraction.CoOccurencesGraphExtractor.supported_langs">
+<span class="sig-name descname"><span class="pre">supported_langs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.graph_extraction.CoOccurencesGraphExtractor.supported_langs" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Set</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>], <code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code>[‘any’]]</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>a list of supported languages, as ISO 639-3 codes, or
+the string <code class="docutils literal notranslate"><span class="pre">'any'</span></code></p>
 </dd>
 </dl>
 </dd></dl>
