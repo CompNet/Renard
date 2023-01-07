@@ -1,4 +1,4 @@
-from typing import Dict, Any, List, Set
+from typing import Dict, Any, List, Set, Optional
 import nltk
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
 from renard.pipeline.core import PipelineStep

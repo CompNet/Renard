@@ -1,0 +1,21 @@
+#: ISO 639-3 language string correspondance with nltk language string
+NLTK_ISO_STRING_TO_LANG = {
+    "eng": "english",
+    "ces": "czech",
+    "dan": "danish",
+    "nld": "dutch",
+    "est": "estonian",
+    "fin": "finnish",
+    "fra": "french",
+    "deu": "german",
+    "ell": "greek",
+    "ita": "italian",
+    "nor": "norwegian",
+    "pol": "polish",
+    "por": "portuguese",
+    "rus": "russian",
+    "slv": "slovene",
+    "spa": "spanish",
+    "swe": "swedish",
+    "tur": "turkish",
+}

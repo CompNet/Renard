@@ -412,6 +412,9 @@ class CoOccurencesGraphExtractor(PipelineStep):
 
         return G
 
+    def supported_langs(self) -> Union[Set[str], Literal["any"]]:
+        return "any"
+
     def needs(self) -> Set[str]:
         needs = {"tokens", "bio_tags", "characters", "sentences"}
         if self.dynamic_needs_chapter:

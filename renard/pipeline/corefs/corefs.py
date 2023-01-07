@@ -75,7 +75,6 @@ class BertCoreferenceResolver(PipelineStep):
             blocks,
             self.tokenizer,
             self.batch_size,
-            quiet=self.progress_report != "tqdm",
         )
         # chains found in coref_docs are each local to their
         # blocks. The following code adjusts their start and end index

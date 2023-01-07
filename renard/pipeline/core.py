@@ -4,19 +4,24 @@ from typing import (
     Any,
     Callable,
     Dict,
+    Generator,
     Literal,
+    Iterable,
     Tuple,
     Set,
     List,
     Optional,
     Union,
+    TypeVar,
     TYPE_CHECKING,
 )
 import os
+from torch._C import Value
 
 from tqdm import tqdm
 from transformers.tokenization_utils_base import BatchEncoding
 import networkx as nx
+from renard.pipeline.progress import ProgressReporter, get_progress_reporter, progress_
 
 from renard.plot_utils import draw_nx_graph_reasonably, layout_nx_graph_reasonably
 from renard.graph_utils import cumulative_graph
@@ -53,11 +58,48 @@ class PipelineStep:
 
     """
 
-    def __init__(self) -> None:
-        self.progress_report = "tqdm"
+    def __init__(self):
+        """Initialize the :class:`PipelineStep` with a given configuration."""
+        pass
+
+    def _pipeline_init(self, lang: str, progress_reporter: ProgressReporter):
+        """Set the step configuration that is common to the whole pipeline.
+
+        :param lang: ISO 639-3 language string
+        :param progress_report:
+        """
+        supported_langs = self.supported_langs()
+        if not supported_langs == "any" and not lang in supported_langs:
+            raise ValueError(
+                f"[error] {self.__class__} does not support lang {lang} (supported language: {supported_langs})."
+            )
+        self.lang = lang
+
+        self.progress_reporter = progress_reporter
+
+    T = TypeVar("T")
+
+    def _progress_(
+        self, it: Iterable[T], total: Optional[int] = None
+    ) -> Generator[T, None, None]:
+        for elt in progress_(self.progress_reporter, it, total):
+            yield elt
+
+    def _progress_start_(self, total: int):
+        self.progress_reporter.start_(total)
+
+    def _update_progress_(self, added_progress: int):
+        self.progress_reporter.update_progress_(added_progress)
 
     def __call__(self, text: str, **kwargs) -> Dict[str, Any]:
         raise NotImplementedError()
+
+    def supported_langs(self) -> Union[Set[str], Literal["any"]]:
+        """
+        :return: a list of supported languages, as ISO 639-3 codes, or
+                 the string ``'any'``
+        """
+        return {"eng"}
 
     def needs(self) -> Set[str]:
         """
@@ -342,18 +384,27 @@ class Pipeline:
     def __init__(
         self,
         steps: List[PipelineStep],
-        progress_report: Optional[str] = "tqdm",
+        lang: str = "eng",
+        progress_report: Optional[Literal["tqdm"]] = "tqdm",
         warn: bool = True,
     ) -> None:
         """
-        :param steps: a ``tuple`` of :class:``PipelineStep``, that will be executed in order
-        :param progress_report: if ``tqdm``, report the pipeline progress using tqdm. Otherwise,
-            does not report progress. This sets the ``progress_report`` attribute for all steps.
+        :param steps: a ``tuple`` of :class:``PipelineStep``, that
+            will be executed in order
+        :param progress_report: if ``tqdm``, report the pipeline
+            progress using tqdm.  if ``None``, does not report
+            progress.
+        :param lang: ISO 639-3 language code
+        :param warn:
         """
         self.steps = steps
-        self.progress_report = progress_report
-        for step in self.steps:
-            step.progress_report = progress_report
+
+        steps_progress_reporter = get_progress_reporter(progress_report)
+        for step in steps:
+            step._pipeline_init(lang, steps_progress_reporter)
+        self.progress_reporter = get_progress_reporter(progress_report)
+
+        self.lang = lang
         self.warn = warn
 
     def check_valid(self, *args) -> Tuple[bool, List[str]]:
@@ -403,15 +454,9 @@ class Pipeline:
 
         state = PipelineState(text, **kwargs)
 
-        if self.progress_report == "tqdm":
-            steps = tqdm(self.steps, total=len(self.steps))
-        else:
-            steps = self.steps
+        for step in progress_(self.progress_reporter, self.steps):
 
-        for step in steps:
-
-            if isinstance(steps, tqdm):
-                steps.set_description_str(f"{step.__class__.__name__}")
+            self.progress_reporter.update_message_(f"{step.__class__.__name__}")
 
             out = step(**state.__dict__)
             for key, value in out.items():

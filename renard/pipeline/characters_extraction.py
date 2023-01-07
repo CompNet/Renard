@@ -1,11 +1,10 @@
-from typing import Any, Dict, List, FrozenSet, Set, Optional, Tuple
-import re, copy
+from typing import Any, Dict, List, FrozenSet, Set, Optional, Tuple, Union, Literal
+import re
 from itertools import combinations
-from collections import Counter, defaultdict
+from collections import defaultdict
 from dataclasses import dataclass
 from nameparser import config
 from nameparser import HumanName
-from networkx.exception import NetworkXNoPath
 from renard.gender import Gender
 from renard.pipeline.ner import NEREntity, ner_entities
 from renard.pipeline.core import Mention, PipelineStep
@@ -123,6 +122,9 @@ class NaiveCharactersExtractor(PipelineStep):
         characters = [c for c in characters if len(c.mentions) >= self.min_appearances]
 
         return {"characters": characters}
+
+    def supported_langs(self) -> Union[Set[str], Literal["any"]]:
+        return "any"
 
     def needs(self) -> Set[str]:
         return {"tokens", "bio_tags"}
@@ -276,7 +278,7 @@ class GraphRulesCharactersExtractor(PipelineStep):
         # link characters to all of to their coreferential mentions
         # (pronouns...)
         if not corefs is None:
-            character = _assign_coreference_mentions(characters, corefs)
+            characters = _assign_coreference_mentions(characters, corefs)
 
         # filter characters based on the number of time they appear
         characters = [c for c in characters if len(c.mentions) >= self.min_appearances]
