@@ -132,7 +132,8 @@ class NLTKNamedEntityRecognizer(PipelineStep):
         return {"bio_tags": [wti[2] for wti in word_tag_iobtags]}
 
     def supported_langs(self) -> Union[Set[str], Literal["any"]]:
-        return set(NLTK_ISO_STRING_TO_LANG.keys())
+        # POS Tagging only supports english and russian
+        return {"eng", "rus"}
 
     def needs(self) -> Set[str]:
         return {"tokens"}
