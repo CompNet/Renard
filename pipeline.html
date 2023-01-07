@@ -155,7 +155,7 @@ to compute them yourself :</p>
 </div>
 <dl class="py class">
 <dt class="sig sig-object py" id="renard.pipeline.core.Pipeline">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">renard.pipeline.core.</span></span><span class="sig-name descname"><span class="pre">Pipeline</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">steps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lang</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'eng'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">warn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.core.Pipeline" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">renard.pipeline.core.</span></span><span class="sig-name descname"><span class="pre">Pipeline</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">steps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lang</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'eng'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress_report</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'tqdm'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">warn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.core.Pipeline" title="Permalink to this definition"></a></dt>
 <dd><p>A flexible NLP pipeline</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="renard.pipeline.core.Pipeline.__call__">
@@ -173,13 +173,13 @@ to compute them yourself :</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="renard.pipeline.core.Pipeline.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">steps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lang</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'eng'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">warn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.core.Pipeline.__init__" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">steps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lang</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'eng'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress_report</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'tqdm'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">warn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.core.Pipeline.__init__" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>steps</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<a class="reference internal" href="#renard.pipeline.core.PipelineStep" title="renard.pipeline.core.PipelineStep"><code class="xref py py-class docutils literal notranslate"><span class="pre">PipelineStep</span></code></a>]) – a <code class="docutils literal notranslate"><span class="pre">tuple</span></code> of :class:<code class="docutils literal notranslate"><span class="pre">PipelineStep</span></code>, that
 will be executed in order</p></li>
-<li><p><strong>progress_report</strong> – if <code class="docutils literal notranslate"><span class="pre">tqdm</span></code>, report the pipeline
+<li><p><strong>progress_report</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code>[‘tqdm’]]) – if <code class="docutils literal notranslate"><span class="pre">tqdm</span></code>, report the pipeline
 progress using tqdm.  if <code class="docutils literal notranslate"><span class="pre">None</span></code>, does not report
 progress.</p></li>
 <li><p><strong>lang</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – ISO 639-3 language code</p></li>
@@ -462,7 +462,7 @@ overriden by derived classes.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="renard.pipeline.core.PipelineStep._pipeline_init">
-<span class="sig-name descname"><span class="pre">_pipeline_init</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lang</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.core.PipelineStep._pipeline_init" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">_pipeline_init</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lang</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress_reporter</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.core.PipelineStep._pipeline_init" title="Permalink to this definition"></a></dt>
 <dd><p>Set the step configuration that is common to the whole pipeline.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -670,7 +670,7 @@ which normally choose a huggingface model automatically.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="renard.pipeline.tokenization.BertTokenizer._pipeline_init">
-<span class="sig-name descname"><span class="pre">_pipeline_init</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lang</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.tokenization.BertTokenizer._pipeline_init" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">_pipeline_init</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lang</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress_reporter</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.tokenization.BertTokenizer._pipeline_init" title="Permalink to this definition"></a></dt>
 <dd><p>Set the step configuration that is common to the whole pipeline.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -852,7 +852,7 @@ which normally choose a huggingface model automatically.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="renard.pipeline.ner.BertNamedEntityRecognizer._pipeline_init">
-<span class="sig-name descname"><span class="pre">_pipeline_init</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lang</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.ner.BertNamedEntityRecognizer._pipeline_init" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">_pipeline_init</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lang</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress_reporter</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.ner.BertNamedEntityRecognizer._pipeline_init" title="Permalink to this definition"></a></dt>
 <dd><p>Set the step configuration that is common to the whole pipeline.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
