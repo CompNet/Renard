@@ -70,6 +70,7 @@ class TestCompleteNLTKPipeline(unittest.TestCase):
                 CoOccurencesGraphExtractor(co_occurences_dist=10),
             ],
             warn=False,
+            progress_report=None,
         )
 
     @settings(max_examples=25, deadline=None)

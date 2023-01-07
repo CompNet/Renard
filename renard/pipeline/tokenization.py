@@ -3,6 +3,7 @@ import torch
 import nltk
 from more_itertools.recipes import flatten
 from renard.pipeline.core import PipelineStep
+from renard.pipeline.progress import ProgressReporter
 from renard.nltk_utils import NLTK_ISO_STRING_TO_LANG
 
 
@@ -23,7 +24,7 @@ class NLTKTokenizer(PipelineStep):
         if chapters is None:
             chapters = [text]
 
-        chapters_sentences = [
+        chapters_sentences: List[List[str]] = [
             nltk.sent_tokenize(c, language=NLTK_ISO_STRING_TO_LANG[self.lang])
             for c in chapters
         ]
@@ -31,7 +32,7 @@ class NLTKTokenizer(PipelineStep):
         sentences = []
         tokens = []
         chapter_tokens = []
-        for chapter_sentences in chapters_sentences:
+        for chapter_sentences in self._progress_(chapters_sentences):
             tokenized_chapter_sentences = [
                 nltk.word_tokenize(s) for s in chapter_sentences
             ]
@@ -76,10 +77,10 @@ class BertTokenizer(PipelineStep):
         nltk.download("punkt", quiet=True)
         super().__init__()
 
-    def _pipeline_init(self, lang: str):
+    def _pipeline_init(self, lang: str, progress_reporter: ProgressReporter):
         from transformers import AutoTokenizer
 
-        super()._pipeline_init(lang)
+        super()._pipeline_init(lang, progress_reporter)
 
         if not self.huggingface_model_id is None:
             self.tokenizer = AutoTokenizer.from_pretrained(self.huggingface_model_id)

@@ -3,6 +3,7 @@ from hypothesis import given
 import hypothesis.strategies as st
 from more_itertools.recipes import flatten
 from renard.pipeline.tokenization import NLTKTokenizer, BertTokenizer
+from renard.pipeline.progress import get_progress_reporter
 
 
 class TestNLTKTokenizer(unittest.TestCase):
@@ -10,7 +11,7 @@ class TestNLTKTokenizer(unittest.TestCase):
 
     def setUp(self) -> None:
         self.tokenizer = NLTKTokenizer()
-        self.tokenizer._pipeline_init("eng")
+        self.tokenizer._pipeline_init("eng", get_progress_reporter(None))
 
     @given(input_text=st.text())
     def test_tokens_and_sentences_are_aligned(self, input_text: str):
@@ -25,7 +26,7 @@ class TestBertTokenizer(unittest.TestCase):
 
     def setUp(self) -> None:
         self.tokenizer = BertTokenizer()
-        self.tokenizer._pipeline_init("eng")
+        self.tokenizer._pipeline_init("eng", get_progress_reporter(None))
 
     @given(input_text=st.text(alphabet=string.ascii_letters, min_size=1))
     def test_tokens_and_sentences_are_aligned(self, input_text: str):

@@ -3,10 +3,10 @@ from typing import List, Dict, Any, Set, Tuple, Optional, Union, Literal
 from dataclasses import dataclass
 from torch._C import Value
 from transformers.tokenization_utils_base import BatchEncoding
-from tqdm import tqdm
 from seqeval.metrics import precision_score, recall_score, f1_score
 from renard.nltk_utils import NLTK_ISO_STRING_TO_LANG
 from renard.pipeline.core import PipelineStep, Mention
+from renard.pipeline.progress import ProgressReporter
 
 
 @dataclass
@@ -159,7 +159,7 @@ class BertNamedEntityRecognizer(PipelineStep):
         self.batch_size = batch_size
         super().__init__()
 
-    def _pipeline_init(self, lang: str):
+    def _pipeline_init(self, lang: str, progress_reporter: ProgressReporter):
         from transformers import AutoModelForTokenClassification
 
         super()._pipeline_init(lang)
@@ -205,7 +205,7 @@ class BertNamedEntityRecognizer(PipelineStep):
         with torch.no_grad():
             wp_labels = []
 
-            for batch_i in tqdm(range(batches_nb)):
+            for batch_i in self._progress_(range(batches_nb)):
                 batch_start = batch_i * self.batch_size
                 batch_end = batch_start + self.batch_size
                 out = self.model(
