@@ -77,10 +77,10 @@ class BertTokenizer(PipelineStep):
         nltk.download("punkt", quiet=True)
         super().__init__()
 
-    def _pipeline_init(self, lang: str, progress_reporter: ProgressReporter):
+    def _pipeline_init_(self, lang: str, progress_reporter: ProgressReporter):
         from transformers import AutoTokenizer
 
-        super()._pipeline_init(lang, progress_reporter)
+        super()._pipeline_init_(lang, progress_reporter)
 
         if not self.huggingface_model_id is None:
             self.tokenizer = AutoTokenizer.from_pretrained(self.huggingface_model_id)

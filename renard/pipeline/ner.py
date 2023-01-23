@@ -160,10 +160,10 @@ class BertNamedEntityRecognizer(PipelineStep):
         self.batch_size = batch_size
         super().__init__()
 
-    def _pipeline_init(self, lang: str, progress_reporter: ProgressReporter):
-        from transformers import AutoModelForTokenClassification
+    def _pipeline_init_(self, lang: str, progress_reporter: ProgressReporter):
+        from transformers import AutoModelForTokenClassification  # type: ignore
 
-        super()._pipeline_init(lang)
+        super()._pipeline_init_(lang, progress_reporter)
 
         if not self.huggingface_model_id is None:
             self.model = AutoModelForTokenClassification.from_pretrained(

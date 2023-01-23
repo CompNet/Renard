@@ -50,19 +50,19 @@ class PipelineStep:
     .. note::
 
         The ``__call__``, ``needs`` and ``production`` methods _must_ be
-        overriden by derived classes.
+        overridden by derived classes.
 
     .. note::
 
-        The ``optional_needs`` method can be overriden by derived classes.
-
+        The ``optional_needs`` and ``supported_langs`` methods can be
+        overridden by derived classes.
     """
 
     def __init__(self):
         """Initialize the :class:`PipelineStep` with a given configuration."""
         pass
 
-    def _pipeline_init(self, lang: str, progress_reporter: ProgressReporter):
+    def _pipeline_init_(self, lang: str, progress_reporter: ProgressReporter):
         """Set the step configuration that is common to the whole pipeline.
 
         :param lang: ISO 639-3 language string
@@ -399,13 +399,18 @@ class Pipeline:
         """
         self.steps = steps
 
-        steps_progress_reporter = get_progress_reporter(progress_report)
-        for step in steps:
-            step._pipeline_init(lang, steps_progress_reporter)
+        self.progress_report: Optional[Literal["tqdm"]] = progress_report
         self.progress_reporter = get_progress_reporter(progress_report)
 
         self.lang = lang
         self.warn = warn
+
+        self._pipeline_init_steps()
+
+    def _pipeline_init_steps(self):
+        steps_progress_reporter = get_progress_reporter(self.progress_report)
+        for step in self.steps:
+            step._pipeline_init_(self.lang, steps_progress_reporter)
 
     def check_valid(self, *args) -> Tuple[bool, List[str]]:
         """Check that the current pipeline can be run, which is
@@ -451,6 +456,8 @@ class Pipeline:
         if self.warn:
             for warning in warnings_or_errors:
                 print(f"[warning] : {warning}")
+
+        self._pipeline_init_steps()
 
         state = PipelineState(text, **kwargs)
 
