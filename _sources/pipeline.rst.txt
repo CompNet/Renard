@@ -72,6 +72,20 @@ to compute them yourself :
    out.export_graph_to_gexf("./network.gexf")	
 
 
+For simplicity, one can use one of the preconfigured pipelines:
+
+.. code-block:: python
+
+   from renard.pipeline.preconfigured import bert_pipeline
+
+   with open("./my_doc.txt") as f:
+       text = f.read()
+
+   pipeline = bert_pipeline()
+   out = pipeline(text)
+   out.export_graph_to_gexf("./network.gexf")	
+
+
 .. autoclass:: renard.pipeline.core.Pipeline
    :members:
 
@@ -171,9 +185,6 @@ Named Entity Recognition
 
 Coreference Resolution
 ======================
-
-.. automodule:: renard.pipeline.corefs.mentions
-   :members:
 
 .. automodule:: renard.pipeline.corefs.corefs
    :members:
