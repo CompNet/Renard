@@ -12,8 +12,8 @@ If you need local documentation, it can be generated using `Sphinx`. From the `d
 
 # Running tests 
 
-`Renard` uses `unittest` for testing. To launch tests, use the following command : 
+`Renard` uses `pytest` for testing. To launch tests, use the following command : 
 
-> poetry run python -m unittest discover ./tests
+> poetry run python -m pytest tests
 
 Expensive tests are disabled by default. These can be run by setting the environment variable `RENARD_TEST_ALL` to `1`.
