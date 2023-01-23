@@ -95,10 +95,9 @@
 <h2>Core<a class="headerlink" href="#core" title="Permalink to this headline"></a></h2>
 <section id="the-pipeline-object">
 <h3>The Pipeline Object<a class="headerlink" href="#the-pipeline-object" title="Permalink to this headline"></a></h3>
-<p>A <a class="reference internal" href="#renard.pipeline.core.Pipeline" title="renard.pipeline.core.Pipeline"><code class="xref py py-class docutils literal notranslate"><span class="pre">renard.pipeline.core.Pipeline</span></code></a> is a list of
-<a class="reference internal" href="#renard.pipeline.core.PipelineStep" title="renard.pipeline.core.PipelineStep"><code class="xref py py-class docutils literal notranslate"><span class="pre">renard.pipeline.core.PipelineStep</span></code></a> that are run sequentially
-in order to extract a characters graph from a document. Here is a
-simple example :</p>
+<p>A <a class="reference internal" href="#renard.pipeline.core.Pipeline" title="renard.pipeline.core.Pipeline"><code class="xref py py-class docutils literal notranslate"><span class="pre">Pipeline</span></code></a> is a list of <a class="reference internal" href="#renard.pipeline.core.PipelineStep" title="renard.pipeline.core.PipelineStep"><code class="xref py py-class docutils literal notranslate"><span class="pre">PipelineStep</span></code></a> that are run
+sequentially in order to extract a characters graph from a
+document. Here is a simple example :</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">renard.pipeline</span> <span class="kn">import</span> <span class="n">Pipeline</span>
 <span class="kn">from</span> <span class="nn">renard.pipeline.tokenization</span> <span class="kn">import</span> <span class="n">NLTKTokenizer</span>
 <span class="kn">from</span> <span class="nn">renard.pipeline.ner</span> <span class="kn">import</span> <span class="n">NLTKNamedEntityRecognizer</span>
@@ -124,10 +123,9 @@ simple example :</p>
 <p>Each step of a pipeline may require informations from previous steps
 before running : therefore, it is possible to create intractable
 pipelines when a step’s requirements are not satisfied. To
-troubleshoot those issues more easily, a
-<a class="reference internal" href="#renard.pipeline.core.Pipeline" title="renard.pipeline.core.Pipeline"><code class="xref py py-class docutils literal notranslate"><span class="pre">renard.pipeline.core.Pipeline</span></code></a> checks its validity at
-instantiation time, and throws an exception with an helpful message in
-case it is intractable.</p>
+troubleshoot those issues more easily, a <a class="reference internal" href="#renard.pipeline.core.Pipeline" title="renard.pipeline.core.Pipeline"><code class="xref py py-class docutils literal notranslate"><span class="pre">Pipeline</span></code></a> checks its
+validity at instantiation time, and throws an exception with an
+helpful message in case it is intractable.</p>
 <p>You can also specify the result of certains steps manually when
 calling the pipeline if you already have those results or if you wan’t
 to compute them yourself :</p>
@@ -215,9 +213,9 @@ valid, <code class="docutils literal notranslate"><span class="pre">(False,</spa
 <section id="pipeline-state">
 <h3>Pipeline State<a class="headerlink" href="#pipeline-state" title="Permalink to this headline"></a></h3>
 <p>A state is propagated and annotated during the execution of a
-<a class="reference internal" href="#renard.pipeline.core.Pipeline" title="renard.pipeline.core.Pipeline"><code class="xref py py-class docutils literal notranslate"><span class="pre">renard.pipeline.core.Pipeline</span></code></a>.</p>
+<a class="reference internal" href="#renard.pipeline.core.Pipeline" title="renard.pipeline.core.Pipeline"><code class="xref py py-class docutils literal notranslate"><span class="pre">Pipeline</span></code></a>.</p>
 <p>It is the final value returned when running a pipeline with
-<a class="reference internal" href="#renard.pipeline.core.Pipeline.__call__" title="renard.pipeline.core.Pipeline.__call__"><code class="xref py py-func docutils literal notranslate"><span class="pre">renard.pipeline.core.Pipeline.__call__()</span></code></a>.</p>
+<a class="reference internal" href="#renard.pipeline.core.Pipeline.__call__" title="renard.pipeline.core.Pipeline.__call__"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Pipeline.__call__()</span></code></a>.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="renard.pipeline.core.PipelineState">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">renard.pipeline.core.</span></span><span class="sig-name descname"><span class="pre">PipelineState</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chapters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tokens</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chapter_tokens</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wp_tokens</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sentences</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sentences_polarities</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bio_tags</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wp_bio_tags</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bert_batch_encoding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">corefs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">characters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">characters_graph</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.core.PipelineState" title="Permalink to this definition"></a></dt>
@@ -429,7 +427,7 @@ tokens</p>
 <section id="pipeline-steps">
 <h3>Pipeline Steps<a class="headerlink" href="#pipeline-steps" title="Permalink to this headline"></a></h3>
 <p>A pipeline is a sequential series of
-<a class="reference internal" href="#renard.pipeline.core.PipelineStep" title="renard.pipeline.core.PipelineStep"><code class="xref py py-class docutils literal notranslate"><span class="pre">renard.pipeline.core.PipelineStep</span></code></a>, that are applied in order.</p>
+<a class="reference internal" href="#renard.pipeline.core.PipelineStep" title="renard.pipeline.core.PipelineStep"><code class="xref py py-class docutils literal notranslate"><span class="pre">PipelineStep</span></code></a>, that are applied in order.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="renard.pipeline.core.PipelineStep">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">renard.pipeline.core.</span></span><span class="sig-name descname"><span class="pre">PipelineStep</span></span><a class="headerlink" href="#renard.pipeline.core.PipelineStep" title="Permalink to this definition"></a></dt>
@@ -437,11 +435,12 @@ tokens</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>The <code class="docutils literal notranslate"><span class="pre">__call__</span></code>, <code class="docutils literal notranslate"><span class="pre">needs</span></code> and <code class="docutils literal notranslate"><span class="pre">production</span></code> methods _must_ be
-overriden by derived classes.</p>
+overridden by derived classes.</p>
 </div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>The <code class="docutils literal notranslate"><span class="pre">optional_needs</span></code> method can be overriden by derived classes.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">optional_needs</span></code> and <code class="docutils literal notranslate"><span class="pre">supported_langs</span></code> methods can be
+overridden by derived classes.</p>
 </div>
 <dl class="py method">
 <dt class="sig sig-object py" id="renard.pipeline.core.PipelineStep.__call__">
@@ -461,8 +460,8 @@ overriden by derived classes.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="renard.pipeline.core.PipelineStep._pipeline_init">
-<span class="sig-name descname"><span class="pre">_pipeline_init</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lang</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress_reporter</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.core.PipelineStep._pipeline_init" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="renard.pipeline.core.PipelineStep._pipeline_init_">
+<span class="sig-name descname"><span class="pre">_pipeline_init_</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lang</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress_reporter</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.core.PipelineStep._pipeline_init_" title="Permalink to this definition"></a></dt>
 <dd><p>Set the step configuration that is common to the whole pipeline.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -539,12 +538,14 @@ the string <code class="docutils literal notranslate"><span class="pre">'any'</s
 <h4>Creating new steps<a class="headerlink" href="#creating-new-steps" title="Permalink to this headline"></a></h4>
 <p>Usually, steps must implement at least four functions :</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">__init__</span></code> : is used to pass options at step init time</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">__call__</span></code> : is called at pipeline run time</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">needs</span></code> : declares the set of informations needed from the pipeline
-state by this step</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">production</span></code> : declares the set of informations produced by this
-step</p></li>
+<li><p><a class="reference internal" href="#renard.pipeline.core.PipelineStep.__init__" title="renard.pipeline.core.PipelineStep.__init__"><code class="xref py py-meth docutils literal notranslate"><span class="pre">PipelineStep.__init__()</span></code></a>: is used to pass options at step init time</p></li>
+<li><p><a class="reference internal" href="#renard.pipeline.core.PipelineStep.__call__" title="renard.pipeline.core.PipelineStep.__call__"><code class="xref py py-meth docutils literal notranslate"><span class="pre">PipelineStep.__call__()</span></code></a>: is called at pipeline run time</p></li>
+<li><p><a class="reference internal" href="#renard.pipeline.core.PipelineStep.needs" title="renard.pipeline.core.PipelineStep.needs"><code class="xref py py-meth docutils literal notranslate"><span class="pre">PipelineStep.needs()</span></code></a>: declares the set of informations needed
+from the pipeline state by this step. Each returned string should be
+an attribute of <a class="reference internal" href="#renard.pipeline.core.PipelineState" title="renard.pipeline.core.PipelineState"><code class="xref py py-class docutils literal notranslate"><span class="pre">PipelineState</span></code></a>.</p></li>
+<li><p><a class="reference internal" href="#renard.pipeline.core.PipelineStep.production" title="renard.pipeline.core.PipelineStep.production"><code class="xref py py-meth docutils literal notranslate"><span class="pre">PipelineStep.production()</span></code></a>: declares the set of informations
+produced by this step. As in <a class="reference internal" href="#renard.pipeline.core.PipelineStep.needs" title="renard.pipeline.core.PipelineStep.needs"><code class="xref py py-meth docutils literal notranslate"><span class="pre">PipelineStep.needs()</span></code></a>, each
+returned string should be an attribute of <a class="reference internal" href="#renard.pipeline.core.PipelineState" title="renard.pipeline.core.PipelineState"><code class="xref py py-class docutils literal notranslate"><span class="pre">PipelineState</span></code></a>.</p></li>
 </ul>
 <p>Here is an example of creating a basic tokenization step :</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Set</span>
@@ -565,6 +566,17 @@ step</p></li>
         <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;tokens&quot;</span><span class="p">}</span>
 </pre></div>
 </div>
+<p>Additionally, the following methods can be overridden:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#renard.pipeline.core.PipelineStep.optional_needs" title="renard.pipeline.core.PipelineStep.optional_needs"><code class="xref py py-meth docutils literal notranslate"><span class="pre">PipelineStep.optional_needs()</span></code></a>: specifies optional
+dependencies the same way as <a class="reference internal" href="#renard.pipeline.core.PipelineStep.needs" title="renard.pipeline.core.PipelineStep.needs"><code class="xref py py-meth docutils literal notranslate"><span class="pre">PipelineStep.needs()</span></code></a>.</p></li>
+<li><p><a class="reference internal" href="#renard.pipeline.core.PipelineStep._pipeline_init_" title="renard.pipeline.core.PipelineStep._pipeline_init_"><code class="xref py py-meth docutils literal notranslate"><span class="pre">PipelineStep._pipeline_init_()</span></code></a>: is used for pipeline-wide
+arguments, such as language settings. This method is called at
+by the pipeline at pipeline run time.</p></li>
+<li><p><a class="reference internal" href="#renard.pipeline.core.PipelineStep.supported_langs" title="renard.pipeline.core.PipelineStep.supported_langs"><code class="xref py py-meth docutils literal notranslate"><span class="pre">PipelineStep.supported_langs()</span></code></a>: declares the set of supported
+languages as a set of ISO 639-3 codes (or the special value
+<code class="docutils literal notranslate"><span class="pre">&quot;any&quot;</span></code>). By default, will be <code class="docutils literal notranslate"><span class="pre">{&quot;eng&quot;}</span></code>.</p></li>
+</ul>
 </section>
 </section>
 </section>
@@ -669,8 +681,8 @@ which normally choose a huggingface model automatically.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="renard.pipeline.tokenization.BertTokenizer._pipeline_init">
-<span class="sig-name descname"><span class="pre">_pipeline_init</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lang</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress_reporter</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.tokenization.BertTokenizer._pipeline_init" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="renard.pipeline.tokenization.BertTokenizer._pipeline_init_">
+<span class="sig-name descname"><span class="pre">_pipeline_init_</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lang</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress_reporter</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.tokenization.BertTokenizer._pipeline_init_" title="Permalink to this definition"></a></dt>
 <dd><p>Set the step configuration that is common to the whole pipeline.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -851,8 +863,8 @@ which normally choose a huggingface model automatically.</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="renard.pipeline.ner.BertNamedEntityRecognizer._pipeline_init">
-<span class="sig-name descname"><span class="pre">_pipeline_init</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lang</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress_reporter</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.ner.BertNamedEntityRecognizer._pipeline_init" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="renard.pipeline.ner.BertNamedEntityRecognizer._pipeline_init_">
+<span class="sig-name descname"><span class="pre">_pipeline_init_</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lang</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress_reporter</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.ner.BertNamedEntityRecognizer._pipeline_init_" title="Permalink to this definition"></a></dt>
 <dd><p>Set the step configuration that is common to the whole pipeline.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>

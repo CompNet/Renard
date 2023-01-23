@@ -9,10 +9,9 @@ Core
 The Pipeline Object
 -------------------
 
-A :class:`renard.pipeline.core.Pipeline` is a list of
-:class:`renard.pipeline.core.PipelineStep` that are run sequentially
-in order to extract a characters graph from a document. Here is a
-simple example :
+A :class:`.Pipeline` is a list of :class:`.PipelineStep` that are run
+sequentially in order to extract a characters graph from a
+document. Here is a simple example :
 
 .. code-block:: python
 
@@ -41,10 +40,9 @@ simple example :
 Each step of a pipeline may require informations from previous steps
 before running : therefore, it is possible to create intractable
 pipelines when a step's requirements are not satisfied. To
-troubleshoot those issues more easily, a
-:class:`renard.pipeline.core.Pipeline` checks its validity at
-instantiation time, and throws an exception with an helpful message in
-case it is intractable.
+troubleshoot those issues more easily, a :class:`.Pipeline` checks its
+validity at instantiation time, and throws an exception with an
+helpful message in case it is intractable.
 
 You can also specify the result of certains steps manually when
 calling the pipeline if you already have those results or if you wan't
@@ -82,10 +80,10 @@ Pipeline State
 --------------
 
 A state is propagated and annotated during the execution of a
-:class:`renard.pipeline.core.Pipeline`.
+:class:`.Pipeline`.
 
 It is the final value returned when running a pipeline with
-:func:`renard.pipeline.core.Pipeline.__call__`.
+:meth:`.Pipeline.__call__`.
 
 
 .. autoclass:: renard.pipeline.core.PipelineState
@@ -96,7 +94,7 @@ Pipeline Steps
 --------------
 
 A pipeline is a sequential series of
-:class:`renard.pipeline.core.PipelineStep`, that are applied in order.
+:class:`.PipelineStep`, that are applied in order.
 
 .. autoclass:: renard.pipeline.core.PipelineStep
    :members:
@@ -107,12 +105,14 @@ Creating new steps
 
 Usually, steps must implement at least four functions :
 
-- ``__init__`` : is used to pass options at step init time
-- ``__call__`` : is called at pipeline run time
-- ``needs`` : declares the set of informations needed from the pipeline
-  state by this step
-- ``production`` : declares the set of informations produced by this
-  step
+- :meth:`.PipelineStep.__init__`: is used to pass options at step init time
+- :meth:`.PipelineStep.__call__`: is called at pipeline run time
+- :meth:`.PipelineStep.needs`: declares the set of informations needed
+  from the pipeline state by this step. Each returned string should be
+  an attribute of :class:`.PipelineState`.
+- :meth:`.PipelineStep.production`: declares the set of informations
+  produced by this step. As in :meth:`.PipelineStep.needs`, each
+  returned string should be an attribute of :class:`.PipelineState`.
 
 
 Here is an example of creating a basic tokenization step :
@@ -136,6 +136,16 @@ Here is an example of creating a basic tokenization step :
        def production(self) -> Set[str]: 
            return {"tokens"}
 
+Additionally, the following methods can be overridden:
+
+- :meth:`.PipelineStep.optional_needs`: specifies optional
+  dependencies the same way as :meth:`.PipelineStep.needs`.
+- :meth:`.PipelineStep._pipeline_init_`: is used for pipeline-wide
+  arguments, such as language settings. This method is called at
+  by the pipeline at pipeline run time.
+- :meth:`.PipelineStep.supported_langs`: declares the set of supported
+  languages as a set of ISO 639-3 codes (or the special value
+  ``"any"``). By default, will be ``{"eng"}``.
 
 
 Preprocessing
