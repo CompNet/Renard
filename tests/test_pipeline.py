@@ -4,11 +4,10 @@ import pytest
 from hypothesis import given, settings
 import hypothesis.strategies as st
 from renard.pipeline.core import Pipeline, PipelineStep
-from renard.pipeline.tokenization import NLTKTokenizer
-from renard.pipeline.ner import NLTKNamedEntityRecognizer
-from renard.pipeline.sentiment_analysis import NLTKSentimentAnalyzer
-from renard.pipeline.characters_extraction import NaiveCharactersExtractor
-from renard.pipeline.graph_extraction import CoOccurencesGraphExtractor
+from renard.pipeline.preconfigured import bert_pipeline, nltk_pipeline
+
+
+script_dir = os.path.abspath(os.path.dirname(__file__))
 
 
 def test_pipeline_is_valid():
@@ -52,18 +51,16 @@ def test_pipeline_is_invalid():
 
 
 @pytest.mark.skipif(os.getenv("RENARD_TEST_ALL") != "1", reason="performance")
-@settings(max_examples=25, deadline=None)
-@given(text=st.text())
-def test_nltk_pipeline(text: str):
-    pipeline = Pipeline(
-        [
-            NLTKTokenizer(),
-            NLTKNamedEntityRecognizer(),
-            NLTKSentimentAnalyzer(),
-            NaiveCharactersExtractor(),
-            CoOccurencesGraphExtractor(co_occurences_dist=10),
-        ],
-        warn=False,
-        progress_report=None,
-    )
+def test_nltk_pipeline_runs():
+    with open(f"{script_dir}/pp_chapter1.txt") as f:
+        text = f.read()
+    pipeline = nltk_pipeline(warn=False, progress_report=None)
+    pipeline(text)
+
+
+@pytest.mark.skipif(os.getenv("RENARD_TEST_ALL") != "1", reason="performance")
+def test_bert_pipeline_runs():
+    with open(f"{script_dir}/pp_chapter1.txt") as f:
+        text = f.read()
+    pipeline = bert_pipeline(warn=False, progress_report=None)
     pipeline(text)

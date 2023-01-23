@@ -201,7 +201,7 @@ class PipelineState:
         """Export characters graph to Gephi's gexf format
 
         :param path: export file path
-        :param name_style: see :func:`PipelineState.graph_with_names`
+        :param name_style: see :meth:`.PipelineState.graph_with_names`
             for more details
         """
         if not isinstance(self.characters_graph, nx.Graph):
@@ -224,7 +224,7 @@ class PipelineState:
         parameters, and save the produced figures in the specified
         directory.
 
-        :param name_style: see :func:`PipelineState.graph_with_names`
+        :param name_style: see :meth:`.PipelineState.graph_with_names`
             for more details
         :param cumulative: if ``True`` draw a cumulative graph instead
             of a sequential one
@@ -271,7 +271,7 @@ class PipelineState:
         """Draw ``self.character_graph`` using reasonable parameters,
         and save the produced figure to a file
 
-        :param name_style: see :func:`PipelineState.graph_with_names`
+        :param name_style: see :meth:`.PipelineState.graph_with_names`
             for more details
         """
         import matplotlib.pyplot as plt
@@ -303,7 +303,7 @@ class PipelineState:
             added to ``fig`` when it is given, in order to keep a
             reference to the slider.
 
-        :param name_style: see :func:`PipelineState.graph_with_names`
+        :param name_style: see :meth:`.PipelineState.graph_with_names`
             for more details
         :param fig: if specified, this matplotlib figure will be used
             for drawing

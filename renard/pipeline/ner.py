@@ -19,9 +19,9 @@ class NEREntity(Mention):
         .. note::
 
             This method is implemtented here to avoid type issues.  Since
-            :func:`Mention.shifted` cannot be annotated as returning
+            :meth:`.Mention.shifted` cannot be annotated as returning
             ``Self``, this method annotate the correct return type when
-            using :func:`NEREntity.shifted`.
+            using :meth:`.NEREntity.shifted`.
         """
         return super().shifted(shift)  # type: ignore
 
