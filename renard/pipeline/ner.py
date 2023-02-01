@@ -173,7 +173,7 @@ class BertNamedEntityRecognizer(PipelineStep):
         else:
             if lang == "eng":
                 self.model = AutoModelForTokenClassification.from_pretrained(
-                    "dslim/bert-base-NER"
+                    "compnet-renard/bert-base-cased-literary-NER"
                 )
             elif lang == "fra":
                 self.model = AutoModelForTokenClassification.from_pretrained(
