@@ -59,8 +59,8 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>Resources</li>
+      <li><a href="index.html" class="icon icon-home"></a></li>
+      <li class="breadcrumb-item active">Resources</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/resources.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -109,8 +109,14 @@ and are licensed under the Apache 2.0 License</p>
 <dd><p>Check if one name is an hypocorism of the other
 (or if both names are equals)</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name1</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – </p></li>
+<li><p><strong>name2</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
 </dd>
 </dl>
 </dd></dl>
@@ -120,8 +126,11 @@ and are licensed under the Apache 2.0 License</p>
 <span class="sig-name descname"><span class="pre">get_nicknames</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.resources.hypocorisms.HypocorismGazetteer.get_nicknames" title="Permalink to this definition"></a></dt>
 <dd><p>Return all possible nickname for the given name</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Set</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</p>
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>name</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – </p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Set</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -131,8 +140,11 @@ and are licensed under the Apache 2.0 License</p>
 <span class="sig-name descname"><span class="pre">get_possible_names</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nickname</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.resources.hypocorisms.HypocorismGazetteer.get_possible_names" title="Permalink to this definition"></a></dt>
 <dd><p>Return all names that can correspond to the given nickname</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Set</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</p>
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>nickname</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – </p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Set</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</p>
 </dd>
 </dl>
 </dd></dl>
