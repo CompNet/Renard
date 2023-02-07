@@ -1,7 +1,10 @@
+from __future__ import annotations
 from typing import List, Literal, Set, Dict, Any, cast
+from importlib import import_module
 import torch
 from transformers import BertTokenizerFast  # type: ignore
-from renard.pipeline import PipelineStep, Mention
+from more_itertools import windowed
+from renard.pipeline import PipelineStep, Mention, ProgressReporter
 from renard.pipeline.corefs.bert_corefs import BertForCoreferenceResolution
 
 
@@ -10,6 +13,11 @@ class BertCoreferenceResolver(PipelineStep):
     A coreference resolver using BERT.  Loosely based on 'End-to-end
     Neural Coreference Resolution' (Lee et at.  2017) and 'BERT for
     coreference resolution' (Joshi et al.  2019).
+
+    .. warning::
+
+        this is a work in progress and should not be used.
+
     """
 
     def __init__(
@@ -62,10 +70,6 @@ class BertCoreferenceResolver(PipelineStep):
         super().__init__()
 
     def __call__(self, text: str, tokens: List[str], **kwargs) -> Dict[str, Any]:
-        """
-        :param text:
-        :param tokens:
-        """
         blocks = [
             tokens[block_start : block_start + self.block_size]
             for block_start in range(0, len(tokens), self.block_size)
@@ -92,6 +96,150 @@ class BertCoreferenceResolver(PipelineStep):
             cur_doc_start += len(doc)
 
         return {"corefs": coref_chains}
+
+    def needs(self) -> Set[str]:
+        return {"tokens"}
+
+    def production(self) -> Set[str]:
+        return {"corefs"}
+
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    import spacy
+    from spacy.tokens import Doc
+    from spacy.tokens.token import Token
+    from coreferee.manager import CorefereeBroker
+    from coreferee.data_model import Mention as CorefereeMention
+
+
+class SpacyCorefereeCoreferenceResolver(PipelineStep):
+    """A coreference resolver using spacy's corefree.
+
+    .. note::
+
+        - This step requires to install Renard's extra 'spacy'
+        - While this step automatically install the needed spacy models, it still needs
+          a manual installation of the coreferee model: ``python -m coreferee install en``
+    """
+
+    def __init__(self):
+        pass
+
+    def _pipeline_init_(self, lang: str, progress_reporter: ProgressReporter):
+        # NOTE: spacy_transformers import is needed to load
+        # "en_core_web_trf"
+        import spacy_transformers
+
+        self.nlp = SpacyCorefereeCoreferenceResolver._spacy_try_load_model(
+            "en_core_web_trf"
+        )
+        super()._pipeline_init_(lang, progress_reporter)
+
+    @staticmethod
+    def _spacy_try_load_model(name: str) -> spacy.Language:  # type: ignore
+        from spacy.cli import download  # type: ignore
+
+        try:
+            mod = import_module(name)
+        except ModuleNotFoundError:
+            download(name)
+            mod = import_module(name)
+        return mod.load()
+
+    @staticmethod
+    def _spacy_try_infer_spaces(tokens: List[str]) -> List[bool]:
+        """
+        Try to infer, for each token, if there is a space between this
+        token and the next.
+        """
+        spaces = []
+        for _, t2 in windowed(tokens, 2):
+            spaces.append(not t2 in [".", "!", "?", ","])
+        spaces.append(False)  # last token has no subsequent space
+        return spaces
+
+    @staticmethod
+    def _coreferee_get_mention_tokens(
+        coref_model: CorefereeBroker, mention_heads: CorefereeMention, doc: Doc
+    ) -> List[Token]:
+        """Coreferee only return mention heads for mention, and not
+        the whole span.  This hack (defined in coreferee README at the
+        end of part 2
+        https://github.com/richardpaulhudson/coreferee#2-interacting-with-the-data-model)
+        gets the whole span as a list of spacy tokens.
+        """
+        rules_analyzer = coref_model.annotator.rules_analyzer
+        tokens = []
+        for head_i in mention_heads:
+            mention_tokens = rules_analyzer.get_propn_subtree(doc[head_i])
+            # in the case of non-noun mention, the previous function
+            # returns an empty list. In that case, we simply return
+            # the sole token at index head_i.
+            if len(mention_tokens) == 0:
+                tokens.append(doc[head_i])
+                continue
+            tokens += mention_tokens
+        return tokens
+
+    def __call__(self, text: str, tokens: List[str], **kwargs) -> Dict[str, Any]:
+        from spacy.tokens import Doc
+        from coreferee.manager import CorefereeBroker
+
+        # see https://spacy.io/api/doc for how to instantiate a spacy doc
+        spaces = SpacyCorefereeCoreferenceResolver._spacy_try_infer_spaces(tokens)
+        spacy_doc = Doc(self.nlp.vocab, words=tokens, spaces=spaces)
+
+        # current steps in the spacy pipeline:
+        # - transformer
+        # - tagger
+        # - parser
+        # - attribute_ruler
+        # - lemmatization
+        # - ner <-- TODO: we should strive to use our own NER here
+        for _, step in self.nlp.pipeline:
+            spacy_doc = step(spacy_doc)
+
+        coref_model = CorefereeBroker(self.nlp, "coref_chains")
+        spacy_doc = coref_model(spacy_doc)
+
+        # * parse coreferee chains
+        chains = []
+        for chain in spacy_doc._.coref_chains:
+
+            cur_chain = []
+
+            for mention in chain:
+
+                mention_tokens = (
+                    SpacyCorefereeCoreferenceResolver._coreferee_get_mention_tokens(
+                        coref_model, mention, spacy_doc
+                    )
+                )
+
+                # some spans produced by coreferee are not contigous:
+                # chains containing such spans are considered
+                # *invalid* for Renard, and are discarded
+                span_is_contiguous = len(mention_tokens) == 1 or all(
+                    [t1.i == t2.i - 1 for t1, t2 in windowed(mention_tokens, 2)]
+                )
+
+                if not span_is_contiguous:
+                    cur_chain = []
+                    break
+
+                mention = Mention(
+                    [str(t) for t in mention_tokens],
+                    mention_tokens[0].i,
+                    mention_tokens[-1].i,
+                )
+                cur_chain.append(mention)
+
+            if len(cur_chain) > 0:
+                chains.append(cur_chain)
+
+        return {"corefs": chains}
 
     def needs(self) -> Set[str]:
         return {"tokens"}

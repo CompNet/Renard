@@ -189,15 +189,6 @@ Coreference Resolution
 .. automodule:: renard.pipeline.corefs.corefs
    :members:
 
-BERT Coreference Resolution model
----------------------------------
-
-This module implements a Huggingface-like end-to-end neural
-coreference resolution model.
-
-.. automodule:: renard.pipeline.corefs.bert_corefs
-   :members:
-
       
 Characters Extraction
 =====================
