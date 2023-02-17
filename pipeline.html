@@ -1339,7 +1339,7 @@ by derived classes.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="renard.pipeline.corefs.corefs.SpacyCorefereeCoreferenceResolver">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">renard.pipeline.corefs.corefs.</span></span><span class="sig-name descname"><span class="pre">SpacyCorefereeCoreferenceResolver</span></span><a class="headerlink" href="#renard.pipeline.corefs.corefs.SpacyCorefereeCoreferenceResolver" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">renard.pipeline.corefs.corefs.</span></span><span class="sig-name descname"><span class="pre">SpacyCorefereeCoreferenceResolver</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chunk_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10000</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.corefs.corefs.SpacyCorefereeCoreferenceResolver" title="Permalink to this definition"></a></dt>
 <dd><p>A coreference resolver using spacy’s corefree.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -1349,6 +1349,11 @@ by derived classes.</p>
 a manual installation of the coreferee model: <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">coreferee</span> <span class="pre">install</span> <span class="pre">en</span></code></p></li>
 </ul>
 </div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>chunk_size</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]) – </p>
+</dd>
+</dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="renard.pipeline.corefs.corefs.SpacyCorefereeCoreferenceResolver.__call__">
 <span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tokens</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.corefs.corefs.SpacyCorefereeCoreferenceResolver.__call__" title="Permalink to this definition"></a></dt>
@@ -1368,8 +1373,12 @@ a manual installation of the coreferee model: <code class="docutils literal notr
 
 <dl class="py method">
 <dt class="sig sig-object py" id="renard.pipeline.corefs.corefs.SpacyCorefereeCoreferenceResolver.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.corefs.corefs.SpacyCorefereeCoreferenceResolver.__init__" title="Permalink to this definition"></a></dt>
-<dd><p>Initialize the <code class="xref py py-class docutils literal notranslate"><span class="pre">PipelineStep</span></code> with a given configuration.</p>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chunk_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10000</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.corefs.corefs.SpacyCorefereeCoreferenceResolver.__init__" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>chunk_size</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]) – coreference chunk size, in tokens</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
