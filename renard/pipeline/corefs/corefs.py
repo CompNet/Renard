@@ -132,6 +132,7 @@ class SpacyCorefereeCoreferenceResolver(PipelineStep):
         # "en_core_web_trf"
         import spacy_transformers
 
+        SpacyCorefereeCoreferenceResolver._spacy_try_load_model("en_core_web_lg")
         self.nlp = SpacyCorefereeCoreferenceResolver._spacy_try_load_model(
             "en_core_web_trf"
         )
