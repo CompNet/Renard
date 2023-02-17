@@ -172,36 +172,84 @@ Preprocessing
 Tokenization
 ============
 
-.. automodule:: renard.pipeline.tokenization
+NLTKTokenizer
+-------------
+
+.. autoclass:: renard.pipeline.tokenization.NLTKTokenizer
+   :members:
+
+BertTokenizer
+-------------
+
+.. autoclass:: renard.pipeline.tokenization.BertTokenizer
    :members:
 
 
 Named Entity Recognition
 ========================
 
-.. automodule:: renard.pipeline.ner
+.. autoclass:: renard.pipeline.ner.NEREntity
+   :members:
+
+BertNamedEntityRecognizer
+-------------------------
+
+.. autoclass:: renard.pipeline.ner.BertNamedEntityRecognizer
+   :members:
+
+NLTKNamedEntityRecognizer
+-------------------------
+
+.. autoclass:: renard.pipeline.ner.NLTKNamedEntityRecognizer
    :members:
 
 
 Coreference Resolution
 ======================
 
-.. automodule:: renard.pipeline.corefs.corefs
+A coreference resolver returns a list of coreference chains, each
+chain being :class:`.Mention`.
+
+.. autoclass:: renard.pipeline.core.Mention
+   :members:
+
+BertCoreferenceResolver
+-----------------------
+
+.. autoclass:: renard.pipeline.corefs.BertCoreferenceResolver
+   :members:
+
+
+SpacyCorefereeCoreferenceResolver
+---------------------------------
+
+.. autoclass:: renard.pipeline.corefs.SpacyCorefereeCoreferenceResolver
    :members:
 
       
 Characters Extraction
 =====================
 
-.. automodule:: renard.pipeline.characters_extraction
+.. autoclass:: renard.pipeline.characters_extraction.Character
    :members:
 
+NaiveCharactersExtractor
+------------------------
+
+.. autoclass:: renard.pipeline.characters_extraction.NaiveCharactersExtractor
+   :members:
+
+GraphRulesCharactersExtractor
+-----------------------------
+
+.. autoclass:: renard.pipeline.characters_extraction.GraphRulesCharactersExtractor
+   :members:
 
 
 Graph Extraction
 ================
 
-.. automodule:: renard.pipeline.graph_extraction
+.. autoclass:: renard.pipeline.graph_extraction.CoOccurencesGraphExtractor
    :members:
 
 
