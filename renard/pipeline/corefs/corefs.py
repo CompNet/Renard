@@ -139,6 +139,7 @@ class SpacyCorefereeCoreferenceResolver(PipelineStep):
         self.nlp = SpacyCorefereeCoreferenceResolver._spacy_try_load_model(
             "en_core_web_trf"
         )
+        self.nlp.remove_pipe("ner")
         super()._pipeline_init_(lang, progress_reporter)
 
     @staticmethod
@@ -212,7 +213,6 @@ class SpacyCorefereeCoreferenceResolver(PipelineStep):
             # - parser
             # - attribute_ruler
             # - lemmatization
-            # - ner <-- TODO: we should strive to use our own NER here
             for _, step in self.nlp.pipeline:
                 spacy_doc = step(spacy_doc)
 
