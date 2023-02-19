@@ -1,6 +1,8 @@
 from __future__ import annotations
 from typing import Dict, Iterator, List, Literal, Optional, Tuple, Union
 import re, glob
+from collections import defaultdict
+from pathlib import Path
 from dataclasses import dataclass
 from more_itertools.recipes import flatten
 import torch
@@ -411,6 +413,109 @@ def load_litbank_dataset(
             for fpath in glob.glob(f"{root_path}/coref/conll/*.conll")
         ]
     )
+
+
+def _ontonotes_split_line(line: str) -> List[str]:
+    """
+    >>> _ontonotes_split_line("in <COREF ...><COREF ...>Hong Kong</COREF> airport</COREF>")
+    ["in", "<COREF ...>", "<COREF ...>", "Hong", "Kong", "</COREF>", "airport", "</COREF>"]
+    """
+
+    # put a space after each <COREF ...> start tag
+    line = re.sub(r">([^ ])", r"> \1", line)
+    # put a space before each </COREF> end tag
+    line = re.sub(r"([^ ])</", r"\1 </", line)
+
+    tokens = []
+
+    chars_buffer = []
+    in_tag = False
+    for char in line:
+        if char == "<":
+            in_tag = True
+        elif char == ">":
+            in_tag = False
+        elif char == " " and not in_tag:
+            tokens.append("".join(chars_buffer))
+            chars_buffer = []
+            continue
+        chars_buffer.append(char)
+
+    tokens.append("".join(chars_buffer))
+
+    return tokens
+
+
+def load_ontonotes_document(document_path: Path) -> Optional[CoreferenceDocument]:
+    document_str = document_path.read_text()
+    lines = document_str.split("\n")[2:-2]
+
+    doc_chains = defaultdict(list)
+    doc_tokens = []
+
+    for line in lines:
+
+        # * Parsing line coreference chains and tokens
+        line_tokens = []
+        line_chains = defaultdict(list)
+        # (chain_id, [tokeni, token])
+        stack: List[Tuple[str, List[Tuple[int, str]]]] = []
+        for token_or_tag in _ontonotes_split_line(line):
+            # start tag
+            if m := re.match(r'<COREF ID="(.+?)" TYPE=".+?">', token_or_tag):
+                chain_id = m.group(1)
+                stack.append((chain_id, []))
+            # end tag
+            elif m := re.match(r"</COREF>", token_or_tag):
+                try:
+                    chain_id, tokeni_and_token = stack.pop()
+                except IndexError:
+                    print(
+                        f"[warning] could not load document {document_path}: unbalanced COREF tags"
+                    )
+                    return None
+                line_chains[chain_id].append(
+                    Mention(
+                        [it[1] for it in tokeni_and_token],  # tokens
+                        tokeni_and_token[0][0],  # index of the first token
+                        tokeni_and_token[-1][0],  # index of the last token
+                    )
+                )
+            # regular token
+            else:
+                token_i = len(line_tokens)
+                line_tokens.append(token_or_tag)
+                for chain_id, tokeni_and_token in stack:
+                    tokeni_and_token.append((token_i, token_or_tag))
+
+        # * Concatenating line chains to document chains
+        for chain_id, chain in line_chains.items():
+            for mention in chain:
+                mention.start_idx += len(doc_tokens)
+                mention.end_idx += len(doc_tokens)
+            doc_chains[chain_id] += chain
+        doc_tokens += line_tokens
+
+    return CoreferenceDocument(doc_tokens, list(doc_chains.values()))
+
+
+def load_ontonotes_dir(
+    root_dir: Path, progress: bool = True
+) -> List[CoreferenceDocument]:
+    documents = []
+    for path in tqdm(list(root_dir.iterdir()), disable=not progress):
+        if str(path).endswith(".coref"):
+            documents.append(load_ontonotes_document(path))
+        elif path.is_dir():
+            documents += load_ontonotes_dir(path, progress=False)
+    return [doc for doc in documents if not doc is None]
+
+
+def load_ontonotes_dataset(
+    root_path: str, tokenizer: PreTrainedTokenizerFast, max_span_size: int
+) -> CoreferenceDataset:
+    documents = load_ontonotes_dir(Path(root_path))
+    return CoreferenceDataset(documents, tokenizer, max_span_size)
 
 
 @dataclass
