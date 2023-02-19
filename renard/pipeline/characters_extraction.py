@@ -14,8 +14,10 @@ from renard.resources.pronouns.pronouns import is_a_female_pronoun, is_a_male_pr
 
 @dataclass(eq=True, frozen=True)
 class Character:
+
     names: FrozenSet[str]
     mentions: List[Mention]
+    gender: Gender = Gender.UNKNOWN
 
     def longest_name(self) -> str:
         return max(self.names, key=len)
@@ -27,7 +29,7 @@ class Character:
         return hash(tuple(sorted(self.names)))
 
     def __repr__(self) -> str:
-        return f"<{self.longest_name()}, {len(self.mentions)} mentions>"
+        return f"<{self.longest_name()}, {self.gender}, {len(self.mentions)} mentions>"
 
 
 def _assign_coreference_mentions(
@@ -75,7 +77,9 @@ def _assign_coreference_mentions(
             if not mention in char_mentions[best_character]:
                 char_mentions[best_character].append(mention)
 
-    return [Character(c.names, mentions) for c, mentions in char_mentions.items()]
+    return [
+        Character(c.names, mentions, c.gender) for c, mentions in char_mentions.items()
+    ]
 
 
 class NaiveCharactersExtractor(PipelineStep):
@@ -185,12 +189,12 @@ class GraphRulesCharactersExtractor(PipelineStep):
         mentions = ner_entities(tokens, bio_tags)
         mentions_str = [" ".join(m.tokens) for m in mentions]
 
-        # create a graph where each node is a mention detected by NER
+        # * create a graph where each node is a mention detected by NER
         G = nx.Graph()
         for mention_str in mentions_str:
             G.add_node(mention_str)
 
-        # link nodes based on several rules
+        # * link nodes based on several rules
         for (name1, name2) in combinations(G.nodes(), 2):
 
             # is one name a known hypocorism of the other ?
@@ -214,12 +218,9 @@ class GraphRulesCharactersExtractor(PipelineStep):
                 G.add_edge(name1, name2)
                 continue
 
-            # corefs are needed by the rules below
-            if corefs is None:
-                continue
-
-            if self.names_are_in_coref(name1, name2, corefs):
-                G.add_edge(name1, name2)
+            if not corefs is None:
+                if self.names_are_in_coref(name1, name2, corefs):
+                    G.add_edge(name1, name2)
 
         def try_remove_edges(edges):
             try:
@@ -227,8 +228,13 @@ class GraphRulesCharactersExtractor(PipelineStep):
             except nx.NetworkXNoPath:
                 pass
 
-        # delete the shortest path between two nodes if two names are found to be impossible to
-        # to be a mention of the same character
+        # * delete the shortest path between two nodes if two names
+        #   are found to be impossible to be a mention of the same
+        #   character
+        # we assign a gender to each name when corefs are available
+        if not corefs is None:
+            for name in G.nodes():
+                G.nodes[name]["gender"] = self.infer_name_gender(name, corefs)
         for (name1, name2) in combinations(G.nodes(), 2):
 
             # check if characters have the same last name but a
@@ -255,22 +261,26 @@ class GraphRulesCharactersExtractor(PipelineStep):
                 try_remove_edges(nx.all_shortest_paths(G, source=name1, target=name2))
                 continue
 
-            # corefs are needed by the rules below
-            if corefs is None:
-                continue
+            if not corefs is None:
 
-            # check if names dont have the same infered gender
-            gender1 = self.infer_name_gender(name1, corefs)
-            gender2 = self.infer_name_gender(name2, corefs)
-            if gender1 != gender2 and not any(
-                [g == Gender.UNKNOWN for g in (gender1, gender2)]
-            ):
-                try_remove_edges(nx.all_shortest_paths(G, source=name1, target=name2))
+                # check if names dont have the same infered gender
+                gender1 = G.nodes[name1]["gender"]
+                gender2 = G.nodes[name2]["gender"]
+                if gender1 != gender2 and not any(
+                    [g == Gender.UNKNOWN for g in (gender1, gender2)]
+                ):
+                    try_remove_edges(
+                        nx.all_shortest_paths(G, source=name1, target=name2)
+                    )
 
         # create characters from the computed graph
         characters = [
             Character(
-                frozenset(names), [m for m in mentions if " ".join(m.tokens) in names]
+                frozenset(names),
+                [m for m in mentions if " ".join(m.tokens) in names],
+                # per code above, if a gender is set all names have
+                # the same gender
+                gender=G.nodes[list(names)[0]].get("gender", Gender.UNKNOWN),
             )
             for names in nx.connected_components(G)
         ]
@@ -315,7 +325,7 @@ class GraphRulesCharactersExtractor(PipelineStep):
                 ]
             ):
                 return Gender.MALE
-            elif title in any(
+            elif any(
                 [
                     re.match(pattern, title)
                     for pattern in (r"[Mm]iss", r"[Mm]r?s\.?", r"[Ll]ady")
