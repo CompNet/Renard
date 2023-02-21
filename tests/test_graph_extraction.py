@@ -33,18 +33,20 @@ def test_basic_graph_extraction(tokens: List[str]):
     graph_extractor = CoOccurencesGraphExtractor(len(tokens))
     out = graph_extractor(" ".join(tokens), tokens, bio_tags, set(characters), [tokens])
 
-    G = nx.Graph()
-    for i, j in itertools.combinations(range(len(tokens)), 2):
-        A, B = (
-            Character(
-                frozenset((tokens[i],)),
-                [m for m in mentions if m.tokens[0] == tokens[i]],
-            ),
-            Character(
-                frozenset((tokens[j],)),
-                [m for m in mentions if m.tokens[0] == tokens[j]],
-            ),
+    characters = {
+        token: Character(
+            frozenset([token]), [m for m in mentions if m.tokens[0] == token]
         )
+        for token in set(tokens)
+    }
+
+    G = nx.Graph()
+    for character in characters.values():
+        G.add_node(character)
+
+    for i, j in itertools.combinations(range(len(tokens)), 2):
+        A = characters[tokens[i]]
+        B = characters[tokens[j]]
         if A == B:
             continue
         if not G.has_edge(A, B):
