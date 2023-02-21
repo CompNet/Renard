@@ -257,8 +257,10 @@ class CoOccurencesGraphExtractor(PipelineStep):
                 # record co_occurence
                 C[i][i + 1 + j] = 1
 
-        # construct graph from co-occurence matrix
+        # * Construct graph from co-occurence matrix
         G = nx.Graph()
+        for character, _ in mentions:
+            G.add_node(character)
 
         for i, (char1, mention1) in enumerate(mentions):
 
