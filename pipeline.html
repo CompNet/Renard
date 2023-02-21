@@ -191,17 +191,21 @@ to compute them yourself :</p>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="renard.pipeline.core.Pipeline.__call__">
-<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.core.Pipeline.__call__" title="Permalink to this definition"></a></dt>
-<dd><p>Run the pipeline sequentially</p>
+<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignored_steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.core.Pipeline.__call__" title="Permalink to this definition"></a></dt>
+<dd><p>Run the pipeline sequentially.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference internal" href="#renard.pipeline.core.PipelineState" title="renard.pipeline.core.PipelineState"><code class="xref py py-class docutils literal notranslate"><span class="pre">PipelineState</span></code></a></p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>the output of the last step of the pipeline</p>
-</dd>
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>text</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – </p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ignored_steps</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – a list of steps production.  All steps
+with a production in <code class="docutils literal notranslate"><span class="pre">ignored_steps</span></code> will be ignored.</p></li>
+<li><p><strong>text</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#renard.pipeline.core.PipelineState" title="renard.pipeline.core.PipelineState"><code class="xref py py-class docutils literal notranslate"><span class="pre">PipelineState</span></code></a></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>the output of the last step of the pipeline</p>
 </dd>
 </dl>
 </dd></dl>
@@ -225,14 +229,44 @@ progress.</p></li>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="renard.pipeline.core.Pipeline._non_ignored_steps">
+<span class="sig-name descname"><span class="pre">_non_ignored_steps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ignored_steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.core.Pipeline._non_ignored_steps" title="Permalink to this definition"></a></dt>
+<dd><p>Get steps that are not ignored.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>ignored_steps</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – a list of steps production.  All steps
+with a production in <code class="docutils literal notranslate"><span class="pre">ignored_steps</span></code> wont be returned.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<a class="reference internal" href="#renard.pipeline.core.PipelineStep" title="renard.pipeline.core.PipelineStep"><code class="xref py py-class docutils literal notranslate"><span class="pre">PipelineStep</span></code></a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="renard.pipeline.core.Pipeline._pipeline_init_steps">
+<span class="sig-name descname"><span class="pre">_pipeline_init_steps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ignored_steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.core.Pipeline._pipeline_init_steps" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>ignored_steps</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – a list of steps production.  All steps
+with a production in <code class="docutils literal notranslate"><span class="pre">ignored_steps</span></code> will be ignored.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="renard.pipeline.core.Pipeline.check_valid">
-<span class="sig-name descname"><span class="pre">check_valid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.core.Pipeline.check_valid" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">check_valid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignored_steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.core.Pipeline.check_valid" title="Permalink to this definition"></a></dt>
 <dd><p>Check that the current pipeline can be run, which is
 possible if all steps needs are satisfied</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>args</strong> – list of additional attributes to add to the
-starting pipeline state.</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>args</strong> – list of additional attributes to add to the
+starting pipeline state.</p></li>
+<li><p><strong>ignored_steps</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – a list of steps production.  All steps
+with a production in <code class="docutils literal notranslate"><span class="pre">ignored_steps</span></code> will be ignored.</p></li>
+</ul>
 </dd>
 <dt class="field-even">Return type</dt>
 <dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]</p>
@@ -240,6 +274,40 @@ starting pipeline state.</p>
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>a tuple : <code class="docutils literal notranslate"><span class="pre">(True,</span> <span class="pre">[warnings])</span></code> if the pipeline is
 valid, <code class="docutils literal notranslate"><span class="pre">(False,</span> <span class="pre">[errors])</span></code> otherwise</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="renard.pipeline.core.Pipeline.rerun_from">
+<span class="sig-name descname"><span class="pre">rerun_from</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">from_step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignored_steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.core.Pipeline.rerun_from" title="Permalink to this definition"></a></dt>
+<dd><p>Recompute steps, starting from <code class="docutils literal notranslate"><span class="pre">from_step</span></code> (included).
+Previous steps results are not recomputed.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>steps are not re-inited using <code class="xref py py-func docutils literal notranslate"><span class="pre">_pipeline_init_steps()</span></code>.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>state</strong> (<a class="reference internal" href="#renard.pipeline.core.PipelineState" title="renard.pipeline.core.PipelineState"><code class="xref py py-class docutils literal notranslate"><span class="pre">PipelineState</span></code></a>) – the previously computed state</p></li>
+<li><p><strong>from_step</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>[<a class="reference internal" href="#renard.pipeline.core.PipelineStep" title="renard.pipeline.core.PipelineStep"><code class="xref py py-class docutils literal notranslate"><span class="pre">PipelineStep</span></code></a>]]) – <p>first step to recompute from.  Either :</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">str</span></code> : in that case, the name of a step
+production (<code class="docutils literal notranslate"><span class="pre">'tokens'</span></code>, <code class="docutils literal notranslate"><span class="pre">'corefs'</span></code>…)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Type[PipelineStep]</span></code> : in that case, the class of
+a step</p></li>
+</ul>
+</p></li>
+<li><p><strong>ignored_steps</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – a list of steps production.  All steps
+with a production in <code class="docutils literal notranslate"><span class="pre">ignored_steps</span></code> will be ignored.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#renard.pipeline.core.PipelineState" title="renard.pipeline.core.PipelineState"><code class="xref py py-class docutils literal notranslate"><span class="pre">PipelineState</span></code></a></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>the output of the last step of the pipeline</p>
 </dd>
 </dl>
 </dd></dl>
