@@ -13,6 +13,7 @@ from typing import (
     Optional,
     Union,
     TypeVar,
+    Type,
     TYPE_CHECKING,
 )
 import os
@@ -432,7 +433,7 @@ class Pipeline:
         ]
 
     def check_valid(
-        self, *args, ignored_steps: Optional[List[str]]
+        self, *args, ignored_steps: Optional[List[str]] = None
     ) -> Tuple[bool, List[str]]:
         """Check that the current pipeline can be run, which is
         possible if all steps needs are satisfied
@@ -473,7 +474,7 @@ class Pipeline:
     def __call__(
         self, text: Optional[str], ignored_steps: Optional[List[str]] = None, **kwargs
     ) -> PipelineState:
-        """Run the pipeline sequentially
+        """Run the pipeline sequentially.
 
         :param ignored_steps: a list of steps production.  All steps
             with a production in ``ignored_steps`` will be ignored.
@@ -499,6 +500,51 @@ class Pipeline:
 
             self.progress_reporter.update_message_(f"{step.__class__.__name__}")
 
+            out = step(**state.__dict__)
+            for key, value in out.items():
+                setattr(state, key, value)
+
+        return state
+
+    def rerun_from(
+        self,
+        state: PipelineState,
+        from_step: Union[str, Type[PipelineStep]],
+        ignored_steps: Optional[List[str]] = None,
+    ) -> PipelineState:
+        """Recompute steps, starting from ``from_step`` (included).
+        Previous steps results are not recomputed.
+
+        .. note::
+
+            steps are not re-inited using :func:`._pipeline_init_steps`.
+
+        :param state: the previously computed state
+
+        :param from_step: first step to recompute from.  Either :
+
+                - ``str`` : in that case, the name of a step
+                  production (``'tokens'``, ``'corefs'``...)
+
+                - ``Type[PipelineStep]`` : in that case, the class of
+                  a step
+
+        :param ignored_steps: a list of steps production.  All steps
+            with a production in ``ignored_steps`` will be ignored.
+
+        :return: the output of the last step of the pipeline
+        """
+        steps = self._non_ignored_steps(ignored_steps)
+
+        from_step_i = None
+        for step_i, step in enumerate(steps):
+            if step.__class__ == from_step or from_step in step.production():
+                from_step_i = step_i
+                break
+        assert not from_step_i is None
+
+        for step in progress_(self.progress_reporter, steps[from_step_i:]):
+            self.progress_reporter.update_message_(f"{step.__class__.__name__}")
             out = step(**state.__dict__)
             for key, value in out.items():
                 setattr(state, key, value)
