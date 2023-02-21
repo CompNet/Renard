@@ -405,19 +405,42 @@ class Pipeline:
         self.lang = lang
         self.warn = warn
 
-        self._pipeline_init_steps()
-
-    def _pipeline_init_steps(self):
+    def _pipeline_init_steps(self, ignored_steps: Optional[List[str]] = None):
+        """
+        :param ignored_steps: a list of steps production.  All steps
+            with a production in ``ignored_steps`` will be ignored.
+        """
         steps_progress_reporter = get_progress_reporter(self.progress_report)
-        for step in self.steps:
+        steps = self._non_ignored_steps(ignored_steps)
+        for step in steps:
             step._pipeline_init_(self.lang, steps_progress_reporter)
 
-    def check_valid(self, *args) -> Tuple[bool, List[str]]:
+    def _non_ignored_steps(
+        self, ignored_steps: Optional[List[str]]
+    ) -> List[PipelineStep]:
+        """Get steps that are not ignored.
+
+        :param ignored_steps: a list of steps production.  All steps
+            with a production in ``ignored_steps`` wont be returned.
+        """
+        if ignored_steps is None:
+            return self.steps
+        return [
+            s
+            for s in self.steps
+            if not any([p in s.production() for p in ignored_steps])
+        ]
+
+    def check_valid(
+        self, *args, ignored_steps: Optional[List[str]]
+    ) -> Tuple[bool, List[str]]:
         """Check that the current pipeline can be run, which is
         possible if all steps needs are satisfied
 
         :param args: list of additional attributes to add to the
             starting pipeline state.
+        :param ignored_steps: a list of steps production.  All steps
+            with a production in ``ignored_steps`` will be ignored.
 
         :return: a tuple : ``(True, [warnings])`` if the pipeline is
                  valid, ``(False, [errors])`` otherwise
@@ -426,7 +449,9 @@ class Pipeline:
         pipeline_state = set(args).union({"text"})
         warnings = []
 
-        for i, step in enumerate(self.steps):
+        steps = self._non_ignored_steps(ignored_steps)
+
+        for i, step in enumerate(steps):
 
             if not step.needs().issubset(pipeline_state):
                 return (
@@ -445,23 +470,32 @@ class Pipeline:
 
         return (True, warnings)
 
-    def __call__(self, text: Optional[str], **kwargs) -> PipelineState:
+    def __call__(
+        self, text: Optional[str], ignored_steps: Optional[List[str]] = None, **kwargs
+    ) -> PipelineState:
         """Run the pipeline sequentially
+
+        :param ignored_steps: a list of steps production.  All steps
+            with a production in ``ignored_steps`` will be ignored.
 
         :return: the output of the last step of the pipeline
         """
-        is_valid, warnings_or_errors = self.check_valid(*kwargs.keys())
+        is_valid, warnings_or_errors = self.check_valid(
+            *kwargs.keys(), ignored_steps=ignored_steps
+        )
         if not is_valid:
             raise ValueError(warnings_or_errors)
         if self.warn:
             for warning in warnings_or_errors:
                 print(f"[warning] : {warning}")
 
-        self._pipeline_init_steps()
+        self._pipeline_init_steps(ignored_steps)
 
         state = PipelineState(text, **kwargs)
 
-        for step in progress_(self.progress_reporter, self.steps):
+        steps = self._non_ignored_steps(ignored_steps)
+
+        for step in progress_(self.progress_reporter, steps):
 
             self.progress_reporter.update_message_(f"{step.__class__.__name__}")
 
