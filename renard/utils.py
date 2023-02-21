@@ -1,4 +1,4 @@
-from typing import List, Tuple, TypeVar, Iterable, cast
+from typing import List, Tuple, TypeVar, Collection, Iterable, cast
 from more_itertools.more import windowed
 import torch
 
@@ -6,7 +6,7 @@ import torch
 T = TypeVar("T")
 
 
-def spans(seq: Iterable[T], max_len: int) -> List[Tuple[T]]:
+def spans(seq: Collection[T], max_len: int) -> List[Tuple[T]]:
     """Cut the input sequence into all possible spans up to a maximum length
 
     .. note::
@@ -20,7 +20,7 @@ def spans(seq: Iterable[T], max_len: int) -> List[Tuple[T]]:
     :return:
     """
     out_spans = []
-    for i in range(1, max_len + 1):
+    for i in range(1, min(len(seq), max_len + 1)):
         for span in windowed(seq, i):
             out_spans.append(span)
     return out_spans
@@ -29,7 +29,7 @@ def spans(seq: Iterable[T], max_len: int) -> List[Tuple[T]]:
 def spans_indexs(seq: List, max_len: int) -> List[Tuple[int, int]]:
     """"""
     indexs = []
-    for i in range(1, max_len + 1):
+    for i in range(1, min(len(seq), max_len + 1)):
         for span in windowed(range(len(seq)), i):
             span = cast(Tuple[int, ...], span)
             indexs.append((min(span), max(span)))
