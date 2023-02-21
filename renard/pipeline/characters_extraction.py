@@ -109,6 +109,7 @@ class NaiveCharactersExtractor(PipelineStep):
         assert len(tokens) == len(bio_tags)
 
         entities = ner_entities(tokens, bio_tags)
+        entities = [e for e in entities if e.tag == "PER"]
 
         characters = defaultdict(list)
         for entity in entities:
@@ -187,6 +188,7 @@ class GraphRulesCharactersExtractor(PipelineStep):
         import networkx as nx
 
         mentions = ner_entities(tokens, bio_tags)
+        mentions = [m for m in mentions if m.tag == "PER"]
         mentions_str = [" ".join(m.tokens) for m in mentions]
 
         # * create a graph where each node is a mention detected by NER
@@ -291,7 +293,12 @@ class GraphRulesCharactersExtractor(PipelineStep):
             characters = _assign_coreference_mentions(characters, corefs)
 
         # filter characters based on the number of time they appear
-        characters = [c for c in characters if len(c.mentions) >= self.min_appearances]
+        characters = [
+            c
+            for c in characters
+            if len([m for m in c.mentions if " ".join(m.tokens) in c.names])
+            >= self.min_appearances
+        ]
 
         return {"characters": characters}
 
