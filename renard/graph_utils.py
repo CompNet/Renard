@@ -1,6 +1,10 @@
-from typing import List, Set
+from __future__ import annotations
+from typing import List, Set, Union, Literal, Callable, TYPE_CHECKING
 from more_itertools.recipes import flatten
 import networkx as nx
+
+if TYPE_CHECKING:
+    from renard.pipeline.characters_extraction import Character
 
 
 def cumulative_graph(graphs: List[nx.Graph]) -> List[nx.Graph]:
@@ -38,3 +42,32 @@ def cumulative_graph(graphs: List[nx.Graph]) -> List[nx.Graph]:
 def graph_edges_attributes(G: nx.Graph) -> Set[str]:
     """Compute the set of all attributes of a graph"""
     return set(flatten(list(data.keys()) for *_, data in G.edges.data()))  # type: ignore
+
+
+def graph_with_names(
+    G: nx.Graph,
+    name_style: Union[
+        Literal["longest", "shortest", "most_frequent"], Callable[[Character], str]
+    ] = "longest",
+) -> nx.Graph:
+    """Relabel a characters graph, using a single name for each
+    node
+
+    :param name_style: characters name style in the resulting
+        graph.  Either a string (``'longest`` or ``shortest`` or
+        ``most_frequent``) or a custom function associating a
+        character to its name
+    """
+    if name_style == "longest":
+        name_style_fn = lambda character: character.longest_name()
+    elif name_style == "shortest":
+        name_style_fn = lambda character: character.shortest_name()
+    elif name_style == "most_frequent":
+        name_style_fn = lambda character: character.most_frequent_name()
+    else:
+        name_style_fn = name_style
+
+    return nx.relabel_nodes(
+        G,
+        {character: name_style_fn(character) for character in G.nodes()},  # type: ignore
+    )

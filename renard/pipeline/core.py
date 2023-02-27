@@ -25,7 +25,7 @@ import networkx as nx
 from renard.pipeline.progress import ProgressReporter, get_progress_reporter, progress_
 
 from renard.plot_utils import draw_nx_graph_reasonably, layout_nx_graph_reasonably
-from renard.graph_utils import cumulative_graph
+from renard.graph_utils import cumulative_graph, graph_with_names
 
 if TYPE_CHECKING:
     from renard.pipeline.characters_extraction import Character
@@ -166,57 +166,31 @@ class PipelineState:
     #: characters graph
     characters_graph: Optional[Union[List[nx.Graph], nx.Graph]] = None
 
-    @staticmethod
-    def graph_with_names(
-        G: nx.Graph,
-        name_style: Union[
-            Literal["longest", "shortest"], Callable[[Character], str]
-        ] = "longest",
-    ) -> nx.Graph:
-        """Relabel a characters graph, using a single name for each
-        node
-
-        :param name_style: characters name style in the resulting
-            graph.  Either a string (``'longest`` or ``shortest``) or
-            a custom function associating a character to its name
-        """
-        if name_style == "longest":
-            name_style_fn = lambda character: character.longest_name()
-        elif name_style == "shortest":
-            name_style_fn = lambda character: character.shortest_name()
-        else:
-            name_style_fn = name_style
-
-        return nx.relabel_nodes(
-            G,
-            {character: name_style_fn(character) for character in G.nodes()},  # type: ignore
-        )
-
     def export_graph_to_gexf(
         self,
         path: str,
         name_style: Union[
-            Literal["longest", "shortest"], Callable[[Character], str]
+            Literal["longest", "shortest", "most_frequent"], Callable[[Character], str]
         ] = "longest",
     ):
         """Export characters graph to Gephi's gexf format
 
         :param path: export file path
-        :param name_style: see :meth:`.PipelineState.graph_with_names`
+        :param name_style: see :func:`.graph_with_names`
             for more details
         """
         if not isinstance(self.characters_graph, nx.Graph):
             raise RuntimeError(
                 f"characters graph cant be exported : {self.characters_graph}"
             )
-        G = self.graph_with_names(self.characters_graph, name_style)
+        G = graph_with_names(self.characters_graph, name_style)
         nx.write_gexf(G, path)
 
     def draw_graphs_to_dir(
         self,
         directory: str,
         name_style: Union[
-            Literal["longest", "shortest"], Callable[[Character], str]
+            Literal["longest", "shortest", "most_frequent"], Callable[[Character], str]
         ] = "longest",
         cumulative: bool = False,
         stable_layout: bool = False,
@@ -225,7 +199,7 @@ class PipelineState:
         parameters, and save the produced figures in the specified
         directory.
 
-        :param name_style: see :meth:`.PipelineState.graph_with_names`
+        :param name_style: see :func:`.graph_with_names`
             for more details
         :param cumulative: if ``True`` draw a cumulative graph instead
             of a sequential one
@@ -254,11 +228,11 @@ class PipelineState:
                 if cumulative
                 else cumulative_graph(self.characters_graph)[-1]
             )
-            layout = layout_nx_graph_reasonably(self.graph_with_names(layout_graph))
+            layout = layout_nx_graph_reasonably(graph_with_names(layout_graph))
 
         for i, G in enumerate(self.characters_graph):
             fig, ax = plt.subplots()
-            G = self.graph_with_names(G, name_style=name_style)
+            G = graph_with_names(G, name_style=name_style)
             draw_nx_graph_reasonably(G, ax=ax, layout=layout)
             plt.savefig(f"{directory}/{i}.png")
 
@@ -266,13 +240,13 @@ class PipelineState:
         self,
         path: str,
         name_style: Union[
-            Literal["longest", "shortest"], Callable[[Character], str]
+            Literal["longest", "shortest", "most_frequent"], Callable[[Character], str]
         ] = "longest",
     ):
         """Draw ``self.character_graph`` using reasonable parameters,
         and save the produced figure to a file
 
-        :param name_style: see :meth:`.PipelineState.graph_with_names`
+        :param name_style: see :func:`.graph_with_names`
             for more details
         """
         import matplotlib.pyplot as plt
@@ -281,14 +255,14 @@ class PipelineState:
         if isinstance(self.characters_graph, list):
             raise ValueError("this function is supposed to be used on a static graph")
 
-        G = self.graph_with_names(self.characters_graph, name_style=name_style)
+        G = graph_with_names(self.characters_graph, name_style=name_style)
         draw_nx_graph_reasonably(G)
         plt.savefig(path)
 
     def draw_graph(
         self,
         name_style: Union[
-            Literal["longest", "shortest"], Callable[[Character], str]
+            Literal["longest", "shortest", "most_frequent"], Callable[[Character], str]
         ] = "longest",
         fig: Optional[plt.Figure] = None,
         cumulative: bool = False,
@@ -304,7 +278,7 @@ class PipelineState:
             added to ``fig`` when it is given, in order to keep a
             reference to the slider.
 
-        :param name_style: see :meth:`.PipelineState.graph_with_names`
+        :param name_style: see :func:`.graph_with_names`
             for more details
         :param fig: if specified, this matplotlib figure will be used
             for drawing
@@ -326,7 +300,7 @@ class PipelineState:
 
         # self.characters_graph is a static graph
         if isinstance(self.characters_graph, nx.Graph):
-            G = self.graph_with_names(self.characters_graph, name_style)
+            G = graph_with_names(self.characters_graph, name_style)
             ax = None
             if not fig is None:
                 ax = fig.add_subplot(111)
@@ -346,7 +320,7 @@ class PipelineState:
         cumulative_characters_graphs = cumulative_graph(self.characters_graph)
         if stable_layout:
             layout = layout_nx_graph_reasonably(
-                self.graph_with_names(cumulative_characters_graphs[-1], name_style)
+                graph_with_names(cumulative_characters_graphs[-1], name_style)
             )
 
         def update(slider_value):
@@ -356,9 +330,7 @@ class PipelineState:
             if cumulative:
                 characters_graphs = cumulative_characters_graphs
 
-            G = self.graph_with_names(
-                characters_graphs[int(slider_value) - 1], name_style
-            )
+            G = graph_with_names(characters_graphs[int(slider_value) - 1], name_style)
 
             ax.clear()
             draw_nx_graph_reasonably(G, ax=ax, layout=layout if stable_layout else None)

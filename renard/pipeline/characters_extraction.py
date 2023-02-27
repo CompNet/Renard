@@ -1,7 +1,7 @@
 from typing import Any, Dict, List, FrozenSet, Set, Optional, Tuple, Union, Literal
 import re
 from itertools import combinations
-from collections import defaultdict
+from collections import defaultdict, Counter
 from dataclasses import dataclass
 from nameparser import config
 from nameparser import HumanName
@@ -24,6 +24,11 @@ class Character:
 
     def shortest_name(self) -> str:
         return min(self.names, key=len)
+
+    def most_frequent_name(self) -> str:
+        c = Counter([" ".join(mention.tokens) for mention in self.mentions])
+        c = {c: count for c, count in c.items() if c in self.names}
+        return max(c, key=c.get)  # type: ignore
 
     def __hash__(self) -> int:
         return hash(tuple(sorted(self.names)))
