@@ -441,7 +441,7 @@ reference to the slider.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>name_style</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code>[‘longest’, ‘shortest’], <code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code>[[<a class="reference internal" href="#renard.pipeline.characters_extraction.Character" title="renard.pipeline.characters_extraction.Character"><code class="xref py py-class docutils literal notranslate"><span class="pre">Character</span></code></a>], <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – see <a class="reference internal" href="#renard.pipeline.core.PipelineState.graph_with_names" title="renard.pipeline.core.PipelineState.graph_with_names"><code class="xref py py-meth docutils literal notranslate"><span class="pre">PipelineState.graph_with_names()</span></code></a>
+<li><p><strong>name_style</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code>[‘longest’, ‘shortest’, ‘most_frequent’], <code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code>[[<a class="reference internal" href="#renard.pipeline.characters_extraction.Character" title="renard.pipeline.characters_extraction.Character"><code class="xref py py-class docutils literal notranslate"><span class="pre">Character</span></code></a>], <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – see <code class="xref py py-func docutils literal notranslate"><span class="pre">graph_with_names()</span></code>
 for more details</p></li>
 <li><p><strong>fig</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Figure</span></code>]) – if specified, this matplotlib figure will be used
 for drawing</p></li>
@@ -468,7 +468,7 @@ and save the produced figure to a file</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>name_style</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code>[‘longest’, ‘shortest’], <code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code>[[<a class="reference internal" href="#renard.pipeline.characters_extraction.Character" title="renard.pipeline.characters_extraction.Character"><code class="xref py py-class docutils literal notranslate"><span class="pre">Character</span></code></a>], <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – see <a class="reference internal" href="#renard.pipeline.core.PipelineState.graph_with_names" title="renard.pipeline.core.PipelineState.graph_with_names"><code class="xref py py-meth docutils literal notranslate"><span class="pre">PipelineState.graph_with_names()</span></code></a>
+<li><p><strong>name_style</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code>[‘longest’, ‘shortest’, ‘most_frequent’], <code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code>[[<a class="reference internal" href="#renard.pipeline.characters_extraction.Character" title="renard.pipeline.characters_extraction.Character"><code class="xref py py-class docutils literal notranslate"><span class="pre">Character</span></code></a>], <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – see <code class="xref py py-func docutils literal notranslate"><span class="pre">graph_with_names()</span></code>
 for more details</p></li>
 <li><p><strong>path</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – </p></li>
 </ul>
@@ -485,7 +485,7 @@ directory.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>name_style</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code>[‘longest’, ‘shortest’], <code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code>[[<a class="reference internal" href="#renard.pipeline.characters_extraction.Character" title="renard.pipeline.characters_extraction.Character"><code class="xref py py-class docutils literal notranslate"><span class="pre">Character</span></code></a>], <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – see <a class="reference internal" href="#renard.pipeline.core.PipelineState.graph_with_names" title="renard.pipeline.core.PipelineState.graph_with_names"><code class="xref py py-meth docutils literal notranslate"><span class="pre">PipelineState.graph_with_names()</span></code></a>
+<li><p><strong>name_style</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code>[‘longest’, ‘shortest’, ‘most_frequent’], <code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code>[[<a class="reference internal" href="#renard.pipeline.characters_extraction.Character" title="renard.pipeline.characters_extraction.Character"><code class="xref py py-class docutils literal notranslate"><span class="pre">Character</span></code></a>], <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – see <code class="xref py py-func docutils literal notranslate"><span class="pre">graph_with_names()</span></code>
 for more details</p></li>
 <li><p><strong>cumulative</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – if <code class="docutils literal notranslate"><span class="pre">True</span></code> draw a cumulative graph instead
 of a sequential one</p></li>
@@ -507,29 +507,9 @@ cumulative graph layout.</p></li>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>path</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – export file path</p></li>
-<li><p><strong>name_style</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code>[‘longest’, ‘shortest’], <code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code>[[<a class="reference internal" href="#renard.pipeline.characters_extraction.Character" title="renard.pipeline.characters_extraction.Character"><code class="xref py py-class docutils literal notranslate"><span class="pre">Character</span></code></a>], <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – see <a class="reference internal" href="#renard.pipeline.core.PipelineState.graph_with_names" title="renard.pipeline.core.PipelineState.graph_with_names"><code class="xref py py-meth docutils literal notranslate"><span class="pre">PipelineState.graph_with_names()</span></code></a>
+<li><p><strong>name_style</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code>[‘longest’, ‘shortest’, ‘most_frequent’], <code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code>[[<a class="reference internal" href="#renard.pipeline.characters_extraction.Character" title="renard.pipeline.characters_extraction.Character"><code class="xref py py-class docutils literal notranslate"><span class="pre">Character</span></code></a>], <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – see <code class="xref py py-func docutils literal notranslate"><span class="pre">graph_with_names()</span></code>
 for more details</p></li>
 </ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="renard.pipeline.core.PipelineState.graph_with_names">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">graph_with_names</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">G</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name_style</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'longest'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.core.PipelineState.graph_with_names" title="Permalink to this definition"></a></dt>
-<dd><p>Relabel a characters graph, using a single name for each
-node</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>name_style</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code>[‘longest’, ‘shortest’], <code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code>[[<a class="reference internal" href="#renard.pipeline.characters_extraction.Character" title="renard.pipeline.characters_extraction.Character"><code class="xref py py-class docutils literal notranslate"><span class="pre">Character</span></code></a>], <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – characters name style in the resulting
-graph.  Either a string (<code class="docutils literal notranslate"><span class="pre">'longest</span></code> or <code class="docutils literal notranslate"><span class="pre">shortest</span></code>) or
-a custom function associating a character to its name</p></li>
-<li><p><strong>G</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Graph</span></code>) – </p></li>
-</ul>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Graph</span></code></p>
 </dd>
 </dl>
 </dd></dl>
