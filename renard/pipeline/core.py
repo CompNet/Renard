@@ -166,6 +166,46 @@ class PipelineState:
     #: characters graph
     characters_graph: Optional[Union[List[nx.Graph], nx.Graph]] = None
 
+    def get_character(
+        self, name: str, partial_match: bool = True
+    ) -> Optional[Character]:
+        """Try to get a character by one of its name.
+
+        .. note::
+
+            Several characters may match the given name, but only the
+            first one is returned.
+
+
+        .. note::
+
+            Comparison is case-insensitive.
+
+
+        :param name: One of the name of the searched character.
+
+        :param partial_match: when ``True``, will also return a
+            character if the given ``name`` is only part of one of its
+            name.  Otherwise, only a character with the given ``name``
+            will be returned.
+
+        :return: a :class:`.Character`, or ``None`` if no character
+                 was found.
+        """
+        assert not self.characters is None
+        # exact match
+        for character in self.characters:
+            if name.lower() in [n.lower() for n in character.names]:
+                return character
+        # partial match
+        if partial_match:
+            for character in self.characters:
+                for cname in character.names:
+                    if name.lower() in cname.lower():
+                        return character
+        # no match
+        return None
+
     def export_graph_to_gexf(
         self,
         path: str,
