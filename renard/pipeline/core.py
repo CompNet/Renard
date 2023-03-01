@@ -24,7 +24,7 @@ from transformers.tokenization_utils_base import BatchEncoding
 import networkx as nx
 from renard.pipeline.progress import ProgressReporter, get_progress_reporter, progress_
 
-from renard.plot_utils import draw_nx_graph_reasonably, layout_nx_graph_reasonably
+from renard.plot_utils import plot_nx_graph_reasonably, layout_nx_graph_reasonably
 from renard.graph_utils import cumulative_graph, graph_with_names
 
 if TYPE_CHECKING:
@@ -226,7 +226,7 @@ class PipelineState:
         G = graph_with_names(self.characters_graph, name_style)
         nx.write_gexf(G, path)
 
-    def draw_graphs_to_dir(
+    def plot_graphs_to_dir(
         self,
         directory: str,
         name_style: Union[
@@ -235,13 +235,13 @@ class PipelineState:
         cumulative: bool = False,
         stable_layout: bool = False,
     ):
-        """Draw ``self.character_graph`` using reasonable default
+        """Plot ``self.character_graph`` using reasonable default
         parameters, and save the produced figures in the specified
         directory.
 
         :param name_style: see :func:`.graph_with_names`
             for more details
-        :param cumulative: if ``True`` draw a cumulative graph instead
+        :param cumulative: if ``True`` plot a cumulative graph instead
             of a sequential one
         :param stable_layout: If this parameter is ``True``,
             characters will keep the same position in space at each
@@ -273,17 +273,17 @@ class PipelineState:
         for i, G in enumerate(self.characters_graph):
             fig, ax = plt.subplots()
             G = graph_with_names(G, name_style=name_style)
-            draw_nx_graph_reasonably(G, ax=ax, layout=layout)
+            plot_nx_graph_reasonably(G, ax=ax, layout=layout)
             plt.savefig(f"{directory}/{i}.png")
 
-    def draw_graph_to_file(
+    def plot_graph_to_file(
         self,
         path: str,
         name_style: Union[
             Literal["longest", "shortest", "most_frequent"], Callable[[Character], str]
         ] = "longest",
     ):
-        """Draw ``self.character_graph`` using reasonable parameters,
+        """Plot ``self.character_graph`` using reasonable parameters,
         and save the produced figure to a file
 
         :param name_style: see :func:`.graph_with_names`
@@ -296,10 +296,10 @@ class PipelineState:
             raise ValueError("this function is supposed to be used on a static graph")
 
         G = graph_with_names(self.characters_graph, name_style=name_style)
-        draw_nx_graph_reasonably(G)
+        plot_nx_graph_reasonably(G)
         plt.savefig(path)
 
-    def draw_graph(
+    def plot_graph(
         self,
         name_style: Union[
             Literal["longest", "shortest", "most_frequent"], Callable[[Character], str]
@@ -309,24 +309,24 @@ class PipelineState:
         graph_start_idx: int = 1,
         stable_layout: bool = False,
     ):
-        """Draw ``self.characters_graph`` using reasonable default
+        """Plot ``self.characters_graph`` using reasonable default
         parameters
 
         .. note::
 
-            when drawing a dynamic graph, a ``slider`` attribute is
+            when plotting a dynamic graph, a ``slider`` attribute is
             added to ``fig`` when it is given, in order to keep a
             reference to the slider.
 
-        :param name_style: see :func:`.graph_with_names`
-            for more details
+        :param name_style: see :func:`.graph_with_names` for more
+            details
         :param fig: if specified, this matplotlib figure will be used
-            for drawing
+            for plotting
         :param cumulative: if ``True`` and ``self.characters_graph``
-            is dynamic, draw a cumulative graph instead of a
+            is dynamic, plot a cumulative graph instead of a
             sequential one
         :param graph_start_idx: When ``self.characters_graph`` is
-            dynamic, index of the first graph to draw, starting at 1
+            dynamic, index of the first graph to plot, starting at 1
             (not 0, since the graph slider starts at 1)
         :param stable_layout: if ``self.characters_graph`` is dynamic
             and this parameter is ``True``, characters will keep the
@@ -344,7 +344,7 @@ class PipelineState:
             ax = None
             if not fig is None:
                 ax = fig.add_subplot(111)
-            draw_nx_graph_reasonably(G, ax=ax)
+            plot_nx_graph_reasonably(G, ax=ax)
             return
 
         if not isinstance(self.characters_graph, list):
@@ -373,13 +373,13 @@ class PipelineState:
             G = graph_with_names(characters_graphs[int(slider_value) - 1], name_style)
 
             ax.clear()
-            draw_nx_graph_reasonably(G, ax=ax, layout=layout if stable_layout else None)
+            plot_nx_graph_reasonably(G, ax=ax, layout=layout if stable_layout else None)
             ax.set_xlim(-1.2, 1.2)
             ax.set_ylim(-1.2, 1.2)
 
         slider_ax = fig.add_axes([0.1, 0.05, 0.8, 0.04])
         # HACK: we save the slider to the figure. This ensure the
-        # slider is still alive at drawing time.
+        # slider is still alive at plotting time.
         fig.slider = Slider(  # type: ignore
             ax=slider_ax,
             label="Graph",

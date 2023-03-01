@@ -10,10 +10,10 @@ def layout_nx_graph_reasonably(G: nx.Graph) -> Dict[Any, np.ndarray]:
     return nx.spring_layout(G, k=0.75 * math.sqrt(len(G.nodes)))  # type: ignore
 
 
-def draw_nx_graph_reasonably(
+def plot_nx_graph_reasonably(
     G: nx.Graph, ax=None, layout: Optional[Dict[Any, np.ndarray]] = None
 ):
-    """Try to draw a :class:`nx.Graph` with 'reasonable' parameters
+    """Try to plot a :class:`nx.Graph` with 'reasonable' parameters
 
     :param G: the graph to draw
     :param ax: matplotlib axes
