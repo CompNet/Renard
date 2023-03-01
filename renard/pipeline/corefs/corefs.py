@@ -188,18 +188,32 @@ class SpacyCorefereeCoreferenceResolver(PipelineStep):
             tokens += mention_tokens
         return tokens
 
-    def __call__(self, text: str, tokens: List[str], **kwargs) -> Dict[str, Any]:
+    def __call__(
+        self,
+        text: str,
+        tokens: List[str],
+        chapter_tokens: Optional[List[List[str]]] = None,
+        **kwargs,
+    ) -> Dict[str, Any]:
         from spacy.tokens import Doc
         from coreferee.manager import CorefereeBroker
 
+        if chapter_tokens is None:
+            chapter_tokens = [tokens]
+
         chains = []
 
-        chunk_size = self.chunk_size if not self.chunk_size is None else len(tokens)
+        if len(chapter_tokens) > 1:
+            chunks = chapter_tokens
+        elif not self.chunk_size is None:
+            chunks = []
+            for chunk_start in range(0, len(tokens), self.chunk_size):
+                chunk_end = chunk_start + self.chunk_size
+                chunks.append(tokens[chunk_start:chunk_end])
+        else:
+            chunks = [tokens]
 
-        for chunk_start in range(0, len(tokens), chunk_size):
-
-            chunk_end = chunk_start + chunk_size
-            chunk_tokens = tokens[chunk_start:chunk_end]
+        for chunk_tokens in chunks:
 
             # see https://spacy.io/api/doc for how to instantiate a spacy doc
             spaces = SpacyCorefereeCoreferenceResolver._spacy_try_infer_spaces(
@@ -257,6 +271,9 @@ class SpacyCorefereeCoreferenceResolver(PipelineStep):
 
     def needs(self) -> Set[str]:
         return {"tokens"}
+
+    def optional_needs(self) -> Set[str]:
+        return {"chapter_tokens"}
 
     def production(self) -> Set[str]:
         return {"corefs"}
