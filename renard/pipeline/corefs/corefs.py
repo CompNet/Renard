@@ -124,11 +124,11 @@ class SpacyCorefereeCoreferenceResolver(PipelineStep):
           a manual installation of the coreferee model: ``python -m coreferee install en``
     """
 
-    def __init__(self, chunk_size: Optional[int] = 10000):
+    def __init__(self, max_chunk_size: Optional[int] = 10000):
         """
         :param chunk_size: coreference chunk size, in tokens
         """
-        self.chunk_size = chunk_size
+        self.max_chunk_size = max_chunk_size
 
     def _pipeline_init_(self, lang: str, progress_reporter: ProgressReporter):
         # NOTE: spacy_transformers import is needed to load
@@ -188,6 +188,15 @@ class SpacyCorefereeCoreferenceResolver(PipelineStep):
             tokens += mention_tokens
         return tokens
 
+    def _cut_into_chunks(self, tokens: List[str]) -> List[List[str]]:
+        if self.max_chunk_size is None:
+            return [tokens]
+        chunks = []
+        for chunk_start in range(0, len(tokens), self.max_chunk_size):
+            chunk_end = chunk_start + self.max_chunk_size
+            chunks.append(tokens[chunk_start:chunk_end])
+        return chunks
+
     def __call__(
         self,
         text: str,
@@ -201,18 +210,16 @@ class SpacyCorefereeCoreferenceResolver(PipelineStep):
         if chapter_tokens is None:
             chapter_tokens = [tokens]
 
+        if len(chapter_tokens) > 1:
+            chunks = []
+            for chapter in chapter_tokens:
+                chunks += self._cut_into_chunks(chapter)
+        else:
+            chunks = self._cut_into_chunks(tokens)
+
         chains = []
 
-        if len(chapter_tokens) > 1:
-            chunks = chapter_tokens
-        elif not self.chunk_size is None:
-            chunks = []
-            for chunk_start in range(0, len(tokens), self.chunk_size):
-                chunk_end = chunk_start + self.chunk_size
-                chunks.append(tokens[chunk_start:chunk_end])
-        else:
-            chunks = [tokens]
-
+        chunk_start = 0
         for chunk_tokens in chunks:
 
             # see https://spacy.io/api/doc for how to instantiate a spacy doc
@@ -259,13 +266,15 @@ class SpacyCorefereeCoreferenceResolver(PipelineStep):
 
                     mention = Mention(
                         [str(t) for t in mention_tokens],
-                        mention_tokens[0].i,
-                        mention_tokens[-1].i,
+                        mention_tokens[0].i + chunk_start,
+                        mention_tokens[-1].i + chunk_start,
                     )
                     cur_chain.append(mention)
 
                 if len(cur_chain) > 0:
                     chains.append(cur_chain)
+
+            chunk_start += len(chunk_tokens)
 
         return {"corefs": chains}
 
