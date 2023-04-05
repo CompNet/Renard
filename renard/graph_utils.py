@@ -32,6 +32,8 @@ def cumulative_graph(graphs: List[nx.Graph]) -> List[nx.Graph]:
                 H_attr = H.edges.get([n1, n2], default={attr: 0})[attr]
                 attrs[attr] = G_attr + H_attr
             K.add_edge(n1, n2, **attrs)
+        # We also re-add the graph and nodes attributes from G
+        K.graph = H.graph
         # finally, add the newly created graph to the sequence of
         # cumulative graphs
         cumulative_graph.append(K)
