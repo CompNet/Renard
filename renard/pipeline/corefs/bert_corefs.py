@@ -914,29 +914,17 @@ class BertForCoreferenceResolution(BertPreTrainedModel):
         # dimension (4) represents the number of tokens used in a pair
         # representation (first token of first span, last token of
         # first span, first token of second span and last token of
-        # second span). There are spans_nb ^ 2 such representations.
-        #
-        # /!\ below code could be optimised and has WIP status
-        #     see https://github.com/mandarjoshi90/coref/blob/master/overlap.py
-        #     for inspiration.
-        span_bounds_combination = torch.stack(
-            [
-                # each tensor has shape : (batch_size, 4, hidden_size)
-                torch.cat(
-                    [
-                        # (batch_size, 2, hidden_size)
-                        top_mentions_bounds[:, i, :, :],
-                        # (batch_size, 2, hidden_size)
-                        top_antecedents_bounds[:, i, j, :, :],
-                    ],
-                    1,
-                )
-                for i in range(top_mentions_nb)
-                for j in range(antecedents_nb)
-            ],
-            dim=1,
+        # second span). There are m * a such representations.
+        top_mentions_bounds_repeated = top_mentions_bounds.unsqueeze(2).repeat(
+            1, 1, a, 1, 1
         )
-        assert span_bounds_combination.shape == (b, m * a, 4, h)
+        assert top_mentions_bounds_repeated.shape == (b, m, a, 2, h)
+        span_bounds_combination = torch.cat(
+            [top_mentions_bounds_repeated, top_antecedents_bounds], dim=3
+        )
+        span_bounds_combination = torch.flatten(
+            span_bounds_combination, start_dim=1, end_dim=2
+        )
         span_bounds_combination = torch.flatten(span_bounds_combination, start_dim=2)
         assert span_bounds_combination.shape == (b, m * a, 4 * h)
 
