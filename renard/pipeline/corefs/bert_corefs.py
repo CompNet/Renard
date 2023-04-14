@@ -623,6 +623,7 @@ class BertForCoreferenceResolution(BertPreTrainedModel):
         mentions_per_tokens: float,
         antecedents_nb: int,
         max_span_size: int,
+        mention_scorer_hidden_size: int = 3000,
         **kwargs,
     ):
         super().__init__(config, **kwargs)
@@ -633,13 +634,17 @@ class BertForCoreferenceResolution(BertPreTrainedModel):
         self.antecedents_nb = antecedents_nb
         self.max_span_size = max_span_size
 
-        self.mention_scorer_hidden = torch.nn.Linear(2 * config.hidden_size, 150)
-        self.mention_scorer = torch.nn.Linear(150, 1)
+        self.mention_scorer_hidden = torch.nn.Linear(
+            2 * config.hidden_size, mention_scorer_hidden_size
+        )
+        self.mention_scorer = torch.nn.Linear(mention_scorer_hidden_size, 1)
 
         self.mention_compatibility_scorer_hidden = torch.nn.Linear(
-            4 * config.hidden_size, 150
+            4 * config.hidden_size, mention_scorer_hidden_size
         )
-        self.mention_compatibility_scorer = torch.nn.Linear(150, 1)
+        self.mention_compatibility_scorer = torch.nn.Linear(
+            mention_scorer_hidden_size, 1
+        )
 
         self.loss_fn = torch.nn.CrossEntropyLoss()
 
@@ -664,7 +669,7 @@ class BertForCoreferenceResolution(BertPreTrainedModel):
 
         :return: a tensor of shape ``(batch_size)``.
         """
-        # (batch, 150)
+        # (batch, mention_scorer_hidden_size)
         score = self.mention_scorer_hidden(torch.flatten(span_bounds, 1))
         score = torch.relu(score)
         # (batch)
@@ -676,7 +681,7 @@ class BertForCoreferenceResolution(BertPreTrainedModel):
 
         :return: a tensor of shape ``(batch_size)``
         """
-        # (batch_size, 150)
+        # (batch_size, mention_scorer_hidden_size)
         score = self.mention_compatibility_scorer_hidden(span_bounds)
         score = torch.relu(score)
         return self.mention_compatibility_scorer(score).squeeze(-1)
