@@ -624,6 +624,7 @@ class BertForCoreferenceResolution(BertPreTrainedModel):
         antecedents_nb: int,
         max_span_size: int,
         mention_scorer_hidden_size: int = 3000,
+        mention_scorer_dropout: float = 0.1,
         **kwargs,
     ):
         super().__init__(config, **kwargs)
@@ -633,6 +634,8 @@ class BertForCoreferenceResolution(BertPreTrainedModel):
         self.mentions_per_tokens = mentions_per_tokens
         self.antecedents_nb = antecedents_nb
         self.max_span_size = max_span_size
+
+        self.mention_scorer_dropout = torch.nn.Dropout(p=mention_scorer_dropout)
 
         self.mention_scorer_hidden = torch.nn.Linear(
             2 * config.hidden_size, mention_scorer_hidden_size
@@ -671,6 +674,7 @@ class BertForCoreferenceResolution(BertPreTrainedModel):
         """
         # (batch, mention_scorer_hidden_size)
         score = self.mention_scorer_hidden(torch.flatten(span_bounds, 1))
+        score = self.mention_scorer_dropout(score)
         score = torch.relu(score)
         # (batch)
         return self.mention_scorer(score).squeeze(-1)
@@ -683,9 +687,9 @@ class BertForCoreferenceResolution(BertPreTrainedModel):
         """
         # (batch_size, mention_scorer_hidden_size)
         score = self.mention_compatibility_scorer_hidden(span_bounds)
+        score = self.mention_scorer_dropout(score)
         score = torch.relu(score)
         return self.mention_compatibility_scorer(score).squeeze(-1)
-        # return self.mention_compatibility_scorer(span_bounds).squeeze(-1)
 
     def pruned_mentions_indexs(
         self, mention_scores: torch.Tensor, seq_size: int, top_mentions_nb: int
