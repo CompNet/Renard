@@ -623,6 +623,7 @@ class BertForCoreferenceResolution(BertPreTrainedModel):
         mentions_per_tokens: float,
         antecedents_nb: int,
         max_span_size: int,
+        segment_size: int = 128,
         mention_scorer_hidden_size: int = 3000,
         mention_scorer_dropout: float = 0.1,
         **kwargs,
@@ -634,6 +635,8 @@ class BertForCoreferenceResolution(BertPreTrainedModel):
         self.mentions_per_tokens = mentions_per_tokens
         self.antecedents_nb = antecedents_nb
         self.max_span_size = max_span_size
+
+        self.segment_size = segment_size
 
         self.mention_scorer_dropout = torch.nn.Dropout(p=mention_scorer_dropout)
 
@@ -803,6 +806,46 @@ class BertForCoreferenceResolution(BertPreTrainedModel):
 
         return close_indexs
 
+    def bert_encode(
+        self,
+        input_ids: torch.Tensor,
+        attention_mask: Optional[torch.Tensor] = None,
+        token_type_ids: Optional[torch.Tensor] = None,
+        position_ids: Optional[torch.Tensor] = None,
+        head_mask: Optional[torch.Tensor] = None,
+    ) -> torch.Tensor:
+        """
+        :param input_ids: a tensor of shape ``(batch_size, seq_size)``
+        :param attention_mask: a tensor of shape ``(batch_size, seq_size)``
+        :param token_type_ids: a tensor of shape ``(batch_size, seq_size)``
+
+        :return: hidden states of the last layer, of shape ``(batch_size, seq_size, hidden_size)``
+        """
+
+        # list[(batch_size, <= segment_size, hidden_size)]
+        last_hidden_states = []
+
+        def maybe_take_segment(
+            tensor: Optional[torch.Tensor], start: int, end: int
+        ) -> Optional[torch.Tensor]:
+            """
+            :param tensor: ``(batch_size, seq_size)``
+            """
+            return tensor[:, start:end] if not tensor is None else None
+
+        for s_start in range(0, input_ids.shape[1], self.segment_size):
+            s_end = s_start + self.segment_size
+            out = self.bert(
+                input_ids[:, s_start:s_end],
+                attention_mask=maybe_take_segment(attention_mask, s_start, s_end),
+                token_type_ids=maybe_take_segment(token_type_ids, s_start, s_end),
+                position_ids=maybe_take_segment(position_ids, s_start, s_end),
+                head_mask=head_mask,
+            )
+            last_hidden_states.append(out.last_hidden_states)
+
+        return torch.cat(last_hidden_states, dim=1)
+
     def loss(self, pred_scores: torch.Tensor, labels: torch.Tensor) -> torch.Tensor:
         """
         :param pred_scores: ``(batch_size, top_mentions_nb, antecedents_nb + 1)``
@@ -823,17 +866,13 @@ class BertForCoreferenceResolution(BertPreTrainedModel):
         token_type_ids: Optional[torch.Tensor] = None,
         position_ids: Optional[torch.Tensor] = None,
         head_mask: Optional[torch.Tensor] = None,
-        inputs_embeds: Optional[torch.Tensor] = None,
         labels: Optional[torch.LongTensor] = None,
-        output_attentions=None,
-        output_hidden_states=None,
-        return_dict=None,
-    ):
+    ) -> BertCoreferenceResolutionOutput:
         """
-        TODO: add return type
-
         :param input_ids: a tensor of shape ``(batch_size, seq_size)``
         :param attention_mask: a tensor of shape ``(batch_size, seq_size)``
+        :param token_type_ids: a tensor of shape ``(batch_size, seq_size)``
+        :param position_ids: a tensor of shape ``(batch_size, seq_size)``
         :param labels: a tensor of shape ``(batch_size, spans_nb, spans_nb)``
         """
 
@@ -843,23 +882,13 @@ class BertForCoreferenceResolution(BertPreTrainedModel):
 
         device = next(self.parameters()).device
 
-        return_dict = (
-            return_dict if return_dict is not None else self.config.use_return_dict
-        )
-
-        bert_output = self.bert(
+        encoded_input = self.bert_encode(
             input_ids,
             attention_mask=attention_mask,
             token_type_ids=token_type_ids,
             position_ids=position_ids,
             head_mask=head_mask,
-            inputs_embeds=inputs_embeds,
-            output_attentions=output_attentions,
-            output_hidden_states=output_hidden_states,
-            return_dict=return_dict,
         )
-
-        encoded_input = bert_output.last_hidden_state
         assert encoded_input.shape == (b, s, h)
 
         # -- span bounds computation --
@@ -999,8 +1028,8 @@ class BertForCoreferenceResolution(BertPreTrainedModel):
             top_antecedents_index,
             self.max_span_size,
             loss=loss,
-            hidden_states=bert_output.hidden_states,
-            attentions=bert_output.attentions,
+            hidden_states=None,  # TODO
+            attentions=None,  # TODO
         )
 
     def predict(
