@@ -842,7 +842,7 @@ class BertForCoreferenceResolution(BertPreTrainedModel):
                 position_ids=maybe_take_segment(position_ids, s_start, s_end),
                 head_mask=head_mask,
             )
-            last_hidden_states.append(out.last_hidden_states)
+            last_hidden_states.append(out.last_hidden_state)
 
         return torch.cat(last_hidden_states, dim=1)
 
