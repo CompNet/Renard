@@ -448,7 +448,15 @@ def _ontonotes_split_line(line: str) -> List[str]:
 
 def load_ontonotes_document(document_path: Path) -> Optional[CoreferenceDocument]:
     document_str = document_path.read_text()
-    lines = document_str.split("\n")[2:-2]
+    # let's not talk about these hacks
+    document_str = re.sub(r"\*[A-Z\?]+\*?(-[0-9]+)? ", "", document_str)
+    document_str = re.sub(r" \*[A-Z\?]+\*?(-[0-9]+)?", "", document_str)
+    document_str = re.sub(r"\*-[0-9]+ ", "", document_str)
+    document_str = re.sub(r" \*-[0-9]+", "", document_str)
+    document_str = re.sub(r"-LRB-", "(", document_str)
+    document_str = re.sub(r"-RRB-", ")", document_str)
+    document_str = re.sub(r" 0 ", " ", document_str)
+    lines = document_str.split("\n")[2:-3]
 
     doc_chains = defaultdict(list)
     doc_tokens = []
@@ -458,7 +466,7 @@ def load_ontonotes_document(document_path: Path) -> Optional[CoreferenceDocument
         # * Parsing line coreference chains and tokens
         line_tokens = []
         line_chains = defaultdict(list)
-        # (chain_id, [tokeni, token])
+        # (chain_id, [(tokeni, token)...])
         stack: List[Tuple[str, List[Tuple[int, str]]]] = []
         for token_or_tag in _ontonotes_split_line(line):
             # start tag
@@ -474,6 +482,9 @@ def load_ontonotes_document(document_path: Path) -> Optional[CoreferenceDocument
                         f"[warning] could not load document {document_path}: unbalanced COREF tags"
                     )
                     return None
+                if len(tokeni_and_token) == 0:
+                    print(f"[warning] empty mention in document {document_path}")
+                    continue
                 line_chains[chain_id].append(
                     Mention(
                         [it[1] for it in tokeni_and_token],  # tokens
@@ -541,7 +552,6 @@ class BertCoreferenceResolutionOutput:
         self, tokens: List[List[str]]
     ) -> List[CoreferenceDocument]:
         """"""
-
         batch_size = self.logits.shape[0]
         top_mentions_nb = self.logits.shape[1]
         antecedents_nb = self.logits.shape[2]
@@ -574,28 +584,49 @@ class BertCoreferenceResolutionOutput:
 
                 antecedent_coords = spans_idx[antecedent_idx]
 
-                # antecedent
+                # check if the current span or the current antecedent
+                # is in an existing chain
                 chain_id = None
+                antecedent_in_chain = False
+                span_in_chain = False
                 for chain_i, chain in enumerate(document.coref_chains):
                     for mention in chain:
                         if antecedent_coords == (mention.start_idx, mention.end_idx):
                             chain_id = chain_i
-                if chain_id is None:
-                    # new chain
-                    chain_id = len(document.coref_chains)
-                    # create a new chain in the document
-                    start_idx, end_idx = antecedent_coords[0], antecedent_coords[1]
-                    mention = Mention(
-                        tokens[i][start_idx : end_idx + 1], start_idx, end_idx
-                    )
-                    document.coref_chains.append([mention])
+                            antecedent_in_chain = True
+                        elif span_coords == (mention.start_idx, mention.end_idx):
+                            chain_id = chain_i
+                            span_in_chain = True
 
-                # current span
-                start_idx, end_idx = span_coords[0], span_coords[1]
-                mention = Mention(
-                    tokens[i][start_idx : end_idx + 1], start_idx, end_idx
-                )
-                document.coref_chains[chain_id].append(mention)
+                # new chain
+                if chain_id is None:
+                    # span
+                    start_i, end_i = span_coords[0], span_coords[1]
+                    span_mention = Mention(
+                        tokens[i][start_i : end_i + 1], start_i, end_i
+                    )
+                    # antecedent
+                    start_i, end_i = antecedent_coords[0], antecedent_coords[1]
+                    antecedent_mention = Mention(
+                        tokens[i][start_i : end_i + 1], start_i, end_i
+                    )
+                    # add new chain to document
+                    document.coref_chains.append([antecedent_mention, span_mention])
+                    continue
+
+                # append to existing chain
+                if not span_in_chain:
+                    start_i, end_i = span_coords[0], span_coords[1]
+                    span_mention = Mention(
+                        tokens[i][start_i : end_i + 1], start_i, end_i
+                    )
+                    document.coref_chains[chain_id].append(span_mention)
+                if not antecedent_in_chain:
+                    start_i, end_i = antecedent_coords[0], antecedent_coords[1]
+                    antecedent_mention = Mention(
+                        tokens[i][start_i : end_i + 1], start_i, end_i
+                    )
+                    document.coref_chains[chain_id].append(antecedent_mention)
 
             documents.append(document)
 
