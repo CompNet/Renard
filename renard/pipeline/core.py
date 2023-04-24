@@ -44,6 +44,9 @@ class Mention:
         self_dict["end_idx"] = self.end_idx + shift
         return self.__class__(**self_dict)
 
+    def __hash__(self) -> int:
+        return hash(tuple(self.tokens) + (self.start_idx, self.end_idx))
+
 
 class PipelineStep:
     """An abstract pipeline step

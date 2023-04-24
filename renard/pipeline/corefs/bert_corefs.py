@@ -565,7 +565,11 @@ class BertCoreferenceResolutionOutput:
 
             spans_idx = spans_indexs(tokens[i], self.max_span_size)
 
-            document = CoreferenceDocument(tokens[i], [])
+            # document = CoreferenceDocument(tokens[i], [])
+
+            import networkx as nx
+
+            G = nx.Graph()
 
             for j in range(top_mentions_nb):
 
@@ -584,51 +588,27 @@ class BertCoreferenceResolutionOutput:
 
                 antecedent_coords = spans_idx[antecedent_idx]
 
-                # check if the current span or the current antecedent
-                # is in an existing chain
-                chain_id = None
-                antecedent_in_chain = False
-                span_in_chain = False
-                for chain_i, chain in enumerate(document.coref_chains):
-                    for mention in chain:
-                        if antecedent_coords == (mention.start_idx, mention.end_idx):
-                            chain_id = chain_i
-                            antecedent_in_chain = True
-                        elif span_coords == (mention.start_idx, mention.end_idx):
-                            chain_id = chain_i
-                            span_in_chain = True
+                span_mention = Mention(
+                    tokens[i][span_coords[0] : span_coords[1] + 1],
+                    span_coords[0],
+                    span_coords[1],
+                )
 
-                # new chain
-                if chain_id is None:
-                    # span
-                    start_i, end_i = span_coords[0], span_coords[1]
-                    span_mention = Mention(
-                        tokens[i][start_i : end_i + 1], start_i, end_i
-                    )
-                    # antecedent
-                    start_i, end_i = antecedent_coords[0], antecedent_coords[1]
-                    antecedent_mention = Mention(
-                        tokens[i][start_i : end_i + 1], start_i, end_i
-                    )
-                    # add new chain to document
-                    document.coref_chains.append([antecedent_mention, span_mention])
-                    continue
+                antecedent_mention = Mention(
+                    tokens[i][antecedent_coords[0] : antecedent_coords[1] + 1],
+                    antecedent_coords[0],
+                    antecedent_coords[1],
+                )
 
-                # append to existing chain
-                if not span_in_chain:
-                    start_i, end_i = span_coords[0], span_coords[1]
-                    span_mention = Mention(
-                        tokens[i][start_i : end_i + 1], start_i, end_i
-                    )
-                    document.coref_chains[chain_id].append(span_mention)
-                if not antecedent_in_chain:
-                    start_i, end_i = antecedent_coords[0], antecedent_coords[1]
-                    antecedent_mention = Mention(
-                        tokens[i][start_i : end_i + 1], start_i, end_i
-                    )
-                    document.coref_chains[chain_id].append(antecedent_mention)
+                G.add_node(antecedent_mention)
+                G.add_node(span_mention)
+                G.add_edge(antecedent_mention, span_mention)
 
-            documents.append(document)
+            documents.append(
+                CoreferenceDocument(
+                    tokens[i], [list(C) for C in nx.connected_components(G)]
+                )
+            )
 
         return documents
 
