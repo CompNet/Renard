@@ -40,7 +40,11 @@
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Installation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#quick-start">Quick Start</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#quick-start">Quick Start</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#using-pip">Using Pip</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#manual-installation">Manual Installation</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="pipeline.html">Pipeline</a></li>
@@ -75,6 +79,18 @@
 <h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline"></a></h1>
 <section id="quick-start">
 <h2>Quick Start<a class="headerlink" href="#quick-start" title="Permalink to this headline"></a></h2>
+<section id="using-pip">
+<h3>Using Pip<a class="headerlink" href="#using-pip" title="Permalink to this headline"></a></h3>
+<p>Simply use <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">renard-pipeline</span></code>.</p>
+<p>You can also install the following extras:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">stanza</span></code> (<code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">renard-pipeline[stanza]</span></code>), for the Stanford CoreNLP pipeline</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">spacy</span></code> (<code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">renard-pipeline[spacy]</span></code>), for the Spacy
+coreference resolver Coreferee</p></li>
+</ul>
+</section>
+<section id="manual-installation">
+<h3>Manual Installation<a class="headerlink" href="#manual-installation" title="Permalink to this headline"></a></h3>
 <p>The project uses <a class="reference external" href="https://python-poetry.org/">Poetry</a> to manage dependencies. Use :</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">poetry</span> <span class="pre">install</span></code> to install dependencies</p></li>
@@ -84,6 +100,9 @@ environment with dependencies</p></li>
 </ul>
 <p>If you ever want to use the Stanford CoreNLP pipeline, you can install
 the <code class="docutils literal notranslate"><span class="pre">stanza</span></code> extra with <code class="docutils literal notranslate"><span class="pre">poetry</span> <span class="pre">install</span> <span class="pre">-E</span> <span class="pre">stanza</span></code>.</p>
+<p>If you want to use the Spacy Coreferee coreference solver, use
+<code class="docutils literal notranslate"><span class="pre">poetry</span> <span class="pre">install</span> <span class="pre">-E</span> <span class="pre">spacy</span></code>.</p>
+</section>
 </section>
 </section>
 
