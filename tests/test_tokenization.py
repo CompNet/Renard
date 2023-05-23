@@ -24,7 +24,6 @@ def test_nltk_tokens_and_sentences_are_aligned(
 ):
     out_dict = nltk_tokenizer(input_text)
     assert out_dict["tokens"] == list(flatten(out_dict["sentences"]))
-    assert out_dict["tokens"] == list(flatten(out_dict["chapter_tokens"]))
 
 
 @fixture
@@ -44,4 +43,3 @@ def test_bert_tokens_and_sentences_are_aligned(
 ):
     out_dict = bert_tokenizer.__call__(input_text)
     assert out_dict["tokens"] == list(flatten(out_dict["sentences"]))
-    assert out_dict["tokens"] == list(flatten(out_dict["chapter_tokens"]))

@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from torch._C import Value
 from transformers.tokenization_utils_base import BatchEncoding
 from seqeval.metrics import precision_score, recall_score, f1_score
-from renard.nltk_utils import NLTK_ISO_STRING_TO_LANG
+from renard.nltk_utils import NLTK_ISO_STRING_TO_LANG, nltk_fix_bio_tags
 from renard.pipeline.core import PipelineStep, Mention
 from renard.pipeline.progress import ProgressReporter
 
@@ -42,7 +42,6 @@ def ner_entities(
     current_tag_start_idx: Optional[int] = None
 
     for i, tag in enumerate(bio_tags):
-
         if not current_tag is None and not tag.startswith("I-"):
             assert not current_tag_start_idx is None
             entities.append(
@@ -129,7 +128,7 @@ class NLTKNamedEntityRecognizer(PipelineStep):
         word_tag_iobtags = tree2conlltags(
             nltk.ne_chunk(nltk.pos_tag(tokens, lang=self.lang))
         )
-        return {"bio_tags": [wti[2] for wti in word_tag_iobtags]}
+        return {"bio_tags": nltk_fix_bio_tags([wti[2] for wti in word_tag_iobtags])}
 
     def supported_langs(self) -> Union[Set[str], Literal["any"]]:
         # POS Tagging only supports english and russian
@@ -243,7 +242,7 @@ class BertNamedEntityRecognizer(PipelineStep):
         """
         assert len(wp_tokens) == len(wp_labels)
         labels = []
-        for (wp_token, wp_label) in zip(wp_tokens, wp_labels):
+        for wp_token, wp_label in zip(wp_tokens, wp_labels):
             if wp_token in {"[CLS]", "[SEP]", "[PAD]"}:
                 continue
             if not wp_token.startswith("##"):

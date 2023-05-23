@@ -263,9 +263,7 @@ class CoOccurencesGraphExtractor(PipelineStep):
             G.add_node(character)
 
         for i, (char1, mention1) in enumerate(mentions):
-
             for j, (char2, mention2) in enumerate(mentions):
-
                 # no co-occurences for these two mentions: we are out
                 if C[i][j] == 0:
                     continue
@@ -332,7 +330,6 @@ class CoOccurencesGraphExtractor(PipelineStep):
         graphs = []
 
         for chapter_i, chapter in enumerate(chapter_tokens):
-
             # TODO: optim
             chapter_mentions = mentions_for_chapter(chapter_tokens, chapter_i, mentions)
             chapter_start_idx = sum(

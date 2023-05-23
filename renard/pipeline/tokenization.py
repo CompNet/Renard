@@ -1,4 +1,5 @@
 from typing import Dict, Any, List, Optional, Set, Union, Literal
+import itertools
 import torch
 import nltk
 from more_itertools.recipes import flatten
@@ -20,32 +21,26 @@ class NLTKTokenizer(PipelineStep):
         """
         :param text:
         """
+        if not chapters is None:
+            out_dicts = [self.__call__(chapter, None) for chapter in chapters]
+            return {
+                "tokens": list(itertools.chain([d["tokens"] for d in out_dicts])),
+                "sentences": list(itertools.chain([d["sentences"] for d in out_dicts])),
+                "chapter_tokens": [d["tokens"] for d in out_dicts],
+            }
 
-        if chapters is None:
-            chapters = [text]
+        sentences = nltk.sent_tokenize(
+            text, language=NLTK_ISO_STRING_TO_LANG[self.lang]
+        )
 
-        chapters_sentences: List[List[str]] = [
-            nltk.sent_tokenize(c, language=NLTK_ISO_STRING_TO_LANG[self.lang])
-            for c in chapters
-        ]
-
-        sentences = []
         tokens = []
-        chapter_tokens = []
-        for chapter_sentences in self._progress_(chapters_sentences):
-            tokenized_chapter_sentences = [
-                nltk.word_tokenize(s) for s in chapter_sentences
-            ]
-            sentences += tokenized_chapter_sentences
-            flattened_tokens = list(flatten(tokenized_chapter_sentences))
-            tokens += flattened_tokens
-            chapter_tokens.append(flattened_tokens)
+        tokenized_sentences = []
+        for sent in sentences:
+            sent_tokens = nltk.word_tokenize(sent)
+            tokenized_sentences.append(sent_tokens)
+            tokens += sent_tokens
 
-        return {
-            "tokens": tokens,
-            "chapter_tokens": chapter_tokens,
-            "sentences": sentences,
-        }
+        return {"tokens": tokens, "sentences": tokenized_sentences}
 
     def supported_langs(self) -> Union[Set[str], Literal["any"]]:
         return set(NLTK_ISO_STRING_TO_LANG.keys())
@@ -99,47 +94,42 @@ class BertTokenizer(PipelineStep):
         """
         :param text:
         """
-        if chapters is None:
-            chapters = [text]
+        if not chapters is None:
+            out_dicts = [self.__call__(chapter, None) for chapter in chapters]
+            out_batchs = [d["bert_batch_encoding"] for d in out_dicts]
+            batchs = out_batchs[0]
+            for b in batchs[1:]:
+                batchs = {k: torch.cat([v, b[k]], dim=0) for k, v in batchs.items()}
+            return {
+                "tokens": list(itertools.chain([d["tokens"] for d in out_dicts])),
+                "sentences": list(itertools.chain([d["sentences"] for d in out_dicts])),
+                "chapter_tokens": [d["tokens"] for d in out_dicts],
+                "wp_tokens": list(itertools.chain([d["tokens"] for d in out_dicts])),
+                "bert_batch_encoding": batchs,
+            }
 
-        chapter_tokens: List[List[str]] = []
-        sentences: List[List[str]] = []
-        wp_tokens: List[str] = []
-        batchs = {}
+        # NOTE: it's possible that some input tokens are discarded
+        # here because of truncation.
+        batchs = self.tokenizer(
+            nltk.sent_tokenize(text, language=NLTK_ISO_STRING_TO_LANG[self.lang]),
+            return_tensors="pt",
+            padding=True,
+            truncation=True,
+        )
 
-        for chapter in chapters:
+        nested_wp_tokens: List[List[str]] = [
+            batchs.tokens(i) for i in range(len(batchs["input_ids"]))
+        ]
+        wp_tokens = [wp_t for s in nested_wp_tokens for wp_t in s]
 
-            # NOTE: it's possible that some input tokens are discarded
-            # here because of truncation.
-            batch = self.tokenizer(
-                nltk.sent_tokenize(
-                    chapter, language=NLTK_ISO_STRING_TO_LANG[self.lang]
-                ),
-                return_tensors="pt",
-                padding=True,
-                truncation=True,
-            )
-            if len(batchs) == 0:
-                batchs = batch
-            else:
-                batchs = {k: torch.cat([v, batch[k]], dim=0) for k, v in batch.items()}
-
-            nested_wp_tokens: List[List[str]] = [
-                batch.tokens(i) for i in range(len(batch["input_ids"]))
-            ]
-            chapter_wp_tokens = [wp_t for s in nested_wp_tokens for wp_t in s]
-            wp_tokens += chapter_wp_tokens
-
-            chapter_sentences = [
-                BertTokenizer.wp_tokens_to_tokens(wp_tokens)
-                for wp_tokens in nested_wp_tokens
-            ]
-            chapter_tokens.append(list(flatten(chapter_sentences)))
-            sentences += chapter_sentences
+        sentences = [
+            BertTokenizer.wp_tokens_to_tokens(wp_tokens)
+            for wp_tokens in nested_wp_tokens
+        ]
+        tokens = list(flatten(sentences))
 
         return {
-            "tokens": list(flatten(chapter_tokens)),
-            "chapter_tokens": chapter_tokens,
+            "tokens": tokens,
             "sentences": sentences,
             "bert_batch_encoding": batchs,
             "wp_tokens": wp_tokens,
