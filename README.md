@@ -3,6 +3,13 @@
 Relationships Extraction from NARrative Documents
 
 
+# Installation
+
+You can install the latest version using pip:
+
+> pip install renard-pipeline
+
+
 # Documentation
 
 Documentation, including installation instructions, can be found at https://compnet.github.io/Renard/
