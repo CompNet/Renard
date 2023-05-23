@@ -17,15 +17,18 @@ from typing import (
     TYPE_CHECKING,
 )
 import os
-from torch._C import Value
 
-from tqdm import tqdm
 from transformers.tokenization_utils_base import BatchEncoding
 import networkx as nx
-from renard.pipeline.progress import ProgressReporter, get_progress_reporter, progress_
+from networkx.readwrite.gexf import GEXFWriter
 
+from renard.pipeline.progress import ProgressReporter, get_progress_reporter, progress_
 from renard.plot_utils import plot_nx_graph_reasonably, layout_nx_graph_reasonably
-from renard.graph_utils import cumulative_graph, graph_with_names
+from renard.graph_utils import (
+    cumulative_graph,
+    graph_with_names,
+    dynamic_graph_to_gephi_graph,
+)
 
 if TYPE_CHECKING:
     from renard.pipeline.characters_extraction import Character
@@ -222,12 +225,31 @@ class PipelineState:
         :param name_style: see :func:`.graph_with_names`
             for more details
         """
-        if not isinstance(self.characters_graph, nx.Graph):
-            raise RuntimeError(
-                f"characters graph cant be exported : {self.characters_graph}"
+        if isinstance(self.characters_graph, list):
+            G = dynamic_graph_to_gephi_graph(self.characters_graph)
+            G = graph_with_names(G, name_style)
+            # HACK: networkx cannot set a dynamic "weight" attribute
+            # in gexf since "weight" has a specific meaning in
+            # networkx. the following code hacks the XML tree
+            # outputted by GEXFWriter to force the attribute name to
+            # be "weight" (instead of "dweight", as outputted by
+            # dynamic_graph_to_gephi_graph)
+            writer = GEXFWriter()
+            writer.add_graph(G)
+            attribute_dweight = writer.xml.find(
+                ".//graph/attributes/attribute[@title='dweight']"
             )
-        G = graph_with_names(self.characters_graph, name_style)
-        nx.write_gexf(G, path)
+            dweight_old_id = attribute_dweight.get("id")
+            attribute_dweight.set("id", "weight")
+            attribute_dweight.set("title", "Weight")
+            for attvalue in writer.xml.findall(
+                f".//graph/edges/edge/attvalues/attvalue[@for='{dweight_old_id}']"
+            ):
+                attvalue.set("for", "weight")
+            writer.write("./hp.gexf")
+        else:
+            G = graph_with_names(self.characters_graph, name_style)
+            nx.write_gexf(G, path)
 
     def plot_graphs_to_dir(
         self,
@@ -468,7 +490,6 @@ class Pipeline:
         steps = self._non_ignored_steps(ignored_steps)
 
         for i, step in enumerate(steps):
-
             if not step.needs().issubset(pipeline_state):
                 return (
                     False,
@@ -512,7 +533,6 @@ class Pipeline:
         steps = self._non_ignored_steps(ignored_steps)
 
         for step in progress_(self.progress_reporter, steps):
-
             self.progress_reporter.update_message_(f"{step.__class__.__name__}")
 
             out = step(**state.__dict__)

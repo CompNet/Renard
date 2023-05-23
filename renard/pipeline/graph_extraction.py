@@ -73,7 +73,7 @@ class CoOccurencesGraphExtractor(PipelineStep):
     def __init__(
         self,
         co_occurences_dist: Union[int, Tuple[int, Literal["tokens", "sentences"]]],
-        dynamic: Optional[Literal["nx", "gephi"]] = None,
+        dynamic: bool,
         dynamic_window: Optional[int] = None,
         dynamic_overlap: int = 0,
     ) -> None:
@@ -88,27 +88,19 @@ class CoOccurencesGraphExtractor(PipelineStep):
                   tuple is a distance while the second is an unit.
                   Examples : ``(1, "sentences")``, ``(3, "tokens")``.
 
-        :param dynamic: either ``None``, or one of ``{'nx', 'gephi'}``
+        :param dynamic:
 
-                - if ``None`` (the default), a ``nx.graph`` is
-                  extracted
+            - if ``False`` (the default), a static ``nx.graph`` is
+              extracted
 
-                - if ``'nx'``, several ``nx.graph`` are extracted.  In
-                  that case, ``dynamic_window`` and
-                  ``dynamic_overlap``*can* be specified.  If
-                  ``dynamic_window`` is not specified, this step is
-                  expecting the text to be cut into chapters', and a
-                  graph will be extracted for each 'chapter'.  In that
-                  case, ``chapters`` must be passed to the pipeline as
-                  a ``List[str]`` at runtime.
-
-                - if ``'gephi'``, a single ``nx.graph`` is extracted.
-                  This graph has the nice property that exporting it
-                  to `gexf` format using ``G.write_gexf()`` will
-                  produce a correct dynamic graph that can be read by
-                  Gephi.  Because of a limitation in networkx, the
-                  dynamic weight attribute is stored as ``dweight``
-                  instead of ``weight``.
+            - if ``True``, several ``nx.graph`` are extracted.  In
+              that case, ``dynamic_window`` and
+              ``dynamic_overlap``*can* be specified.  If
+              ``dynamic_window`` is not specified, this step is
+              expecting the text to be cut into chapters', and a graph
+              will be extracted for each 'chapter'.  In that case,
+              ``chapters`` must be passed to the pipeline as a
+              ``List[str]`` at runtime.
 
         :param dynamic_window: dynamic window, in number of
             interactions.  a dynamic window of `n` means that each
@@ -121,12 +113,10 @@ class CoOccurencesGraphExtractor(PipelineStep):
             co_occurences_dist = (co_occurences_dist, "tokens")
         self.co_occurences_dist = co_occurences_dist
 
-        if not dynamic is None:
-            assert dynamic in {"nx", "gephi"}
-            if dynamic == "nx":
-                if not dynamic_window is None:
-                    assert dynamic_window > 0
-                    assert dynamic_window > dynamic_overlap
+        if dynamic:
+            if not dynamic_window is None:
+                assert dynamic_window > 0
+                assert dynamic_window > dynamic_overlap
         self.dynamic = dynamic
         self.dynamic_window = dynamic_window
         self.dynamic_overlap = dynamic_overlap
@@ -162,16 +152,7 @@ class CoOccurencesGraphExtractor(PipelineStep):
                 mentions.append((character, mention))
         mentions = sorted(mentions, key=lambda cm: cm[1].start_idx)
 
-        if self.dynamic == "gephi":
-            if not sentences_polarities is None:
-                print("[warning] 'gephi' does not support sentence polarities")
-            return {
-                "characters_graph": self._extract_gephi_dynamic_graph(
-                    mentions, sentences
-                )
-            }
-
-        elif self.dynamic == "nx":
+        if self.dynamic:
             return {
                 "characters_graph": self._extract_dynamic_graph(
                     mentions,
@@ -182,8 +163,6 @@ class CoOccurencesGraphExtractor(PipelineStep):
                     sentences_polarities,
                 )
             }
-
-        # static extraction
         return {
             "characters_graph": self._extract_graph(
                 mentions, sentences, sentences_polarities
