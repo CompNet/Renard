@@ -19,7 +19,7 @@ document. Here is a simple example :
    from renard.pipeline.tokenization import NLTKTokenizer
    from renard.pipeline.ner import NLTKNamedEntityRecognizer
    from renard.pipeline.characters_extraction import NaiveCharactersExtractor
-   from renard.pipeline.graph_extraction import CoOccurencesGraphExtractor
+   from renard.pipeline.graph_extraction import CoOccurrencesGraphExtractor
 
    with open("./my_doc.txt") as f:
        text = f.read()
@@ -29,7 +29,7 @@ document. Here is a simple example :
            NLTKTokenizer(),
            NLTKNamedEntityRecognizer(),
            NaiveCharactersExtractor(min_appearance=10),
-           CoOccurencesGraphExtractor(co_occurences_dist=25)
+           CoOccurrencesGraphExtractor(co_occurences_dist=25)
        ]
    )
 
@@ -53,7 +53,7 @@ to compute them yourself :
    from renard.pipeline import Pipeline
    from renard.pipeline.ner import NLTKNamedEntityRecognizer
    from renard.pipeline.characters_extraction import NaiveCharactersExtractor
-   from renard.pipeline.graph_extraction import CoOccurencesGraphExtractor
+   from renard.pipeline.graph_extraction import CoOccurrencesGraphExtractor
 
    with open("./my_doc.txt") as f:
        text = f.read()
@@ -63,7 +63,7 @@ to compute them yourself :
        [
            NLTKNamedEntityRecognizer(),
            NaiveCharactersExtractor(min_appearance=10),
-           CoOccurencesGraphExtractor(co_occurences_dist=25)
+           CoOccurrencesGraphExtractor(co_occurences_dist=25)
        ]
    )
 
@@ -249,7 +249,7 @@ GraphRulesCharactersExtractor
 Graph Extraction
 ================
 
-.. autoclass:: renard.pipeline.graph_extraction.CoOccurencesGraphExtractor
+.. autoclass:: renard.pipeline.graph_extraction.CoOccurrencesGraphExtractor
    :members:
 
 

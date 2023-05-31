@@ -115,7 +115,7 @@ document. Here is a simple example :</p>
 <span class="kn">from</span> <span class="nn">renard.pipeline.tokenization</span> <span class="kn">import</span> <span class="n">NLTKTokenizer</span>
 <span class="kn">from</span> <span class="nn">renard.pipeline.ner</span> <span class="kn">import</span> <span class="n">NLTKNamedEntityRecognizer</span>
 <span class="kn">from</span> <span class="nn">renard.pipeline.characters_extraction</span> <span class="kn">import</span> <span class="n">NaiveCharactersExtractor</span>
-<span class="kn">from</span> <span class="nn">renard.pipeline.graph_extraction</span> <span class="kn">import</span> <span class="n">CoOccurencesGraphExtractor</span>
+<span class="kn">from</span> <span class="nn">renard.pipeline.graph_extraction</span> <span class="kn">import</span> <span class="n">CoOccurrencesGraphExtractor</span>
 
 <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;./my_doc.txt&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
     <span class="n">text</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
@@ -125,7 +125,7 @@ document. Here is a simple example :</p>
         <span class="n">NLTKTokenizer</span><span class="p">(),</span>
         <span class="n">NLTKNamedEntityRecognizer</span><span class="p">(),</span>
         <span class="n">NaiveCharactersExtractor</span><span class="p">(</span><span class="n">min_appearance</span><span class="o">=</span><span class="mi">10</span><span class="p">),</span>
-        <span class="n">CoOccurencesGraphExtractor</span><span class="p">(</span><span class="n">co_occurences_dist</span><span class="o">=</span><span class="mi">25</span><span class="p">)</span>
+        <span class="n">CoOccurrencesGraphExtractor</span><span class="p">(</span><span class="n">co_occurences_dist</span><span class="o">=</span><span class="mi">25</span><span class="p">)</span>
     <span class="p">]</span>
 <span class="p">)</span>
 
@@ -145,7 +145,7 @@ to compute them yourself :</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">renard.pipeline</span> <span class="kn">import</span> <span class="n">Pipeline</span>
 <span class="kn">from</span> <span class="nn">renard.pipeline.ner</span> <span class="kn">import</span> <span class="n">NLTKNamedEntityRecognizer</span>
 <span class="kn">from</span> <span class="nn">renard.pipeline.characters_extraction</span> <span class="kn">import</span> <span class="n">NaiveCharactersExtractor</span>
-<span class="kn">from</span> <span class="nn">renard.pipeline.graph_extraction</span> <span class="kn">import</span> <span class="n">CoOccurencesGraphExtractor</span>
+<span class="kn">from</span> <span class="nn">renard.pipeline.graph_extraction</span> <span class="kn">import</span> <span class="n">CoOccurrencesGraphExtractor</span>
 
 <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;./my_doc.txt&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
     <span class="n">text</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
@@ -155,7 +155,7 @@ to compute them yourself :</p>
     <span class="p">[</span>
         <span class="n">NLTKNamedEntityRecognizer</span><span class="p">(),</span>
         <span class="n">NaiveCharactersExtractor</span><span class="p">(</span><span class="n">min_appearance</span><span class="o">=</span><span class="mi">10</span><span class="p">),</span>
-        <span class="n">CoOccurencesGraphExtractor</span><span class="p">(</span><span class="n">co_occurences_dist</span><span class="o">=</span><span class="mi">25</span><span class="p">)</span>
+        <span class="n">CoOccurrencesGraphExtractor</span><span class="p">(</span><span class="n">co_occurences_dist</span><span class="o">=</span><span class="mi">25</span><span class="p">)</span>
     <span class="p">]</span>
 <span class="p">)</span>
 
@@ -1906,8 +1906,8 @@ by derived classes.</p>
 <section id="graph-extraction">
 <h2>Graph Extraction<a class="headerlink" href="#graph-extraction" title="Permalink to this headline"></a></h2>
 <dl class="py class">
-<dt class="sig sig-object py" id="renard.pipeline.graph_extraction.CoOccurencesGraphExtractor">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">renard.pipeline.graph_extraction.</span></span><span class="sig-name descname"><span class="pre">CoOccurencesGraphExtractor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">co_occurences_dist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dynamic</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dynamic_window</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dynamic_overlap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.graph_extraction.CoOccurencesGraphExtractor" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="renard.pipeline.graph_extraction.CoOccurrencesGraphExtractor">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">renard.pipeline.graph_extraction.</span></span><span class="sig-name descname"><span class="pre">CoOccurrencesGraphExtractor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">co_occurences_dist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dynamic</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dynamic_window</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dynamic_overlap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.graph_extraction.CoOccurrencesGraphExtractor" title="Permalink to this definition"></a></dt>
 <dd><p>A simple character graph extractor using co-occurences</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1920,8 +1920,8 @@ by derived classes.</p>
 </dd>
 </dl>
 <dl class="py method">
-<dt class="sig sig-object py" id="renard.pipeline.graph_extraction.CoOccurencesGraphExtractor.__call__">
-<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tokens</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bio_tags</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">characters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sentences</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chapter_tokens</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sentences_polarities</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.graph_extraction.CoOccurencesGraphExtractor.__call__" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="renard.pipeline.graph_extraction.CoOccurrencesGraphExtractor.__call__">
+<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tokens</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bio_tags</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">characters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sentences</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chapter_tokens</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sentences_polarities</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.graph_extraction.CoOccurrencesGraphExtractor.__call__" title="Permalink to this definition"></a></dt>
 <dd><p>Extract a characters graph</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1947,8 +1947,8 @@ value.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="renard.pipeline.graph_extraction.CoOccurencesGraphExtractor.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">co_occurences_dist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dynamic</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dynamic_window</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dynamic_overlap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.graph_extraction.CoOccurencesGraphExtractor.__init__" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="renard.pipeline.graph_extraction.CoOccurrencesGraphExtractor.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">co_occurences_dist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dynamic</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dynamic_window</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dynamic_overlap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.graph_extraction.CoOccurrencesGraphExtractor.__init__" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -1987,8 +1987,8 @@ returned graph will be formed by <cite>n</cite> interactions.</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="renard.pipeline.graph_extraction.CoOccurencesGraphExtractor._extract_dynamic_graph">
-<span class="sig-name descname"><span class="pre">_extract_dynamic_graph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mentions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">window</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overlap</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chapter_tokens</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sentences</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sentences_polarities</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.graph_extraction.CoOccurencesGraphExtractor._extract_dynamic_graph" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="renard.pipeline.graph_extraction.CoOccurrencesGraphExtractor._extract_dynamic_graph">
+<span class="sig-name descname"><span class="pre">_extract_dynamic_graph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mentions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">window</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overlap</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chapter_tokens</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sentences</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sentences_polarities</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.graph_extraction.CoOccurrencesGraphExtractor._extract_dynamic_graph" title="Permalink to this definition"></a></dt>
 <dd><div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>only one of <code class="docutils literal notranslate"><span class="pre">window</span></code> or <code class="docutils literal notranslate"><span class="pre">chapter_tokens</span></code> should be specified</p>
@@ -2012,8 +2012,8 @@ given, one graph will be extracted per chapter.</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="renard.pipeline.graph_extraction.CoOccurencesGraphExtractor._extract_gephi_dynamic_graph">
-<span class="sig-name descname"><span class="pre">_extract_gephi_dynamic_graph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mentions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sentences</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.graph_extraction.CoOccurencesGraphExtractor._extract_gephi_dynamic_graph" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="renard.pipeline.graph_extraction.CoOccurrencesGraphExtractor._extract_gephi_dynamic_graph">
+<span class="sig-name descname"><span class="pre">_extract_gephi_dynamic_graph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mentions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sentences</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.graph_extraction.CoOccurrencesGraphExtractor._extract_gephi_dynamic_graph" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -2028,8 +2028,8 @@ given, one graph will be extracted per chapter.</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="renard.pipeline.graph_extraction.CoOccurencesGraphExtractor._extract_graph">
-<span class="sig-name descname"><span class="pre">_extract_graph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mentions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sentences</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sentences_polarities</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.graph_extraction.CoOccurencesGraphExtractor._extract_graph" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="renard.pipeline.graph_extraction.CoOccurrencesGraphExtractor._extract_graph">
+<span class="sig-name descname"><span class="pre">_extract_graph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mentions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sentences</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sentences_polarities</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.graph_extraction.CoOccurrencesGraphExtractor._extract_graph" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -2049,8 +2049,8 @@ sentence polarity between those two mentions.</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="renard.pipeline.graph_extraction.CoOccurencesGraphExtractor._mentions_interact">
-<span class="sig-name descname"><span class="pre">_mentions_interact</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mention_1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mention_2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sentences</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.graph_extraction.CoOccurencesGraphExtractor._mentions_interact" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="renard.pipeline.graph_extraction.CoOccurrencesGraphExtractor._mentions_interact">
+<span class="sig-name descname"><span class="pre">_mentions_interact</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mention_1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mention_2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sentences</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.graph_extraction.CoOccurrencesGraphExtractor._mentions_interact" title="Permalink to this definition"></a></dt>
 <dd><p>Check if two mentions are close enough to be in interactions.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -2074,8 +2074,8 @@ sentence polarity between those two mentions.</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="renard.pipeline.graph_extraction.CoOccurencesGraphExtractor.needs">
-<span class="sig-name descname"><span class="pre">needs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.graph_extraction.CoOccurencesGraphExtractor.needs" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="renard.pipeline.graph_extraction.CoOccurrencesGraphExtractor.needs">
+<span class="sig-name descname"><span class="pre">needs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.graph_extraction.CoOccurrencesGraphExtractor.needs" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Set</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</p>
@@ -2089,8 +2089,8 @@ by derived classes.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="renard.pipeline.graph_extraction.CoOccurencesGraphExtractor.optional_needs">
-<span class="sig-name descname"><span class="pre">optional_needs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.graph_extraction.CoOccurencesGraphExtractor.optional_needs" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="renard.pipeline.graph_extraction.CoOccurrencesGraphExtractor.optional_needs">
+<span class="sig-name descname"><span class="pre">optional_needs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.graph_extraction.CoOccurrencesGraphExtractor.optional_needs" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Set</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</p>
@@ -2104,8 +2104,8 @@ classes.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="renard.pipeline.graph_extraction.CoOccurencesGraphExtractor.production">
-<span class="sig-name descname"><span class="pre">production</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.graph_extraction.CoOccurencesGraphExtractor.production" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="renard.pipeline.graph_extraction.CoOccurrencesGraphExtractor.production">
+<span class="sig-name descname"><span class="pre">production</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.graph_extraction.CoOccurrencesGraphExtractor.production" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Set</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</p>
@@ -2119,8 +2119,8 @@ by derived classes.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="renard.pipeline.graph_extraction.CoOccurencesGraphExtractor.supported_langs">
-<span class="sig-name descname"><span class="pre">supported_langs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.graph_extraction.CoOccurencesGraphExtractor.supported_langs" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="renard.pipeline.graph_extraction.CoOccurrencesGraphExtractor.supported_langs">
+<span class="sig-name descname"><span class="pre">supported_langs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.graph_extraction.CoOccurrencesGraphExtractor.supported_langs" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Set</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>], <code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code>[‘any’]]</p>
