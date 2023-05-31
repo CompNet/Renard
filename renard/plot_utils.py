@@ -7,7 +7,7 @@ from renard.graph_utils import graph_edges_attributes
 
 
 def layout_nx_graph_reasonably(G: nx.Graph) -> Dict[Any, np.ndarray]:
-    return nx.spring_layout(G, k=0.75 * math.sqrt(len(G.nodes)))  # type: ignore
+    return nx.spring_layout(G, k=2 / math.sqrt(len(G.nodes)))  # type: ignore
 
 
 def plot_nx_graph_reasonably(
@@ -56,4 +56,6 @@ def plot_nx_graph_reasonably(
         ax=ax,
     )
 
-    nx.draw_networkx_labels(G, pos=pos, ax=ax, verticalalignment="top")
+    nx.draw_networkx_labels(
+        G, pos=pos, ax=ax, verticalalignment="top", font_size=8, alpha=0.75
+    )
