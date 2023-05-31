@@ -247,7 +247,7 @@ class PipelineState:
                 f".//graph/edges/edge/attvalues/attvalue[@for='{dweight_old_id}']"
             ):
                 attvalue.set("for", "weight")
-            writer.write("./hp.gexf")
+            writer.write(path)
         else:
             G = graph_with_names(self.characters_graph, name_style)
             nx.write_gexf(G, path)
