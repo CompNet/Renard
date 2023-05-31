@@ -1,6 +1,6 @@
 from renard.pipeline.core import Pipeline
 from renard.pipeline.characters_extraction import GraphRulesCharactersExtractor
-from renard.pipeline.graph_extraction import CoOccurencesGraphExtractor
+from renard.pipeline.graph_extraction import CoOccurrencesGraphExtractor
 
 
 def nltk_pipeline(**kwargs) -> Pipeline:
@@ -14,7 +14,7 @@ def nltk_pipeline(**kwargs) -> Pipeline:
             NLTKNamedEntityRecognizer(),
             NLTKSentimentAnalyzer(),
             GraphRulesCharactersExtractor(),
-            CoOccurencesGraphExtractor(co_occurences_dist=(1, "sentences")),
+            CoOccurrencesGraphExtractor(co_occurences_dist=(1, "sentences")),
         ],
         **kwargs
     )
@@ -29,7 +29,7 @@ def bert_pipeline(**kwargs) -> Pipeline:
             BertTokenizer(),
             BertNamedEntityRecognizer(),
             GraphRulesCharactersExtractor(),
-            CoOccurencesGraphExtractor(co_occurences_dist=(1, "sentences")),
+            CoOccurrencesGraphExtractor(co_occurences_dist=(1, "sentences")),
         ],
         **kwargs
     )

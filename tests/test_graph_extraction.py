@@ -6,7 +6,7 @@ from hypothesis.strategies import lists, sampled_from
 from hypothesis.strategies._internal.numbers import integers
 import networkx as nx
 from networkx.algorithms import isomorphism
-from renard.pipeline.graph_extraction import CoOccurencesGraphExtractor
+from renard.pipeline.graph_extraction import CoOccurrencesGraphExtractor
 from renard.pipeline.characters_extraction import Character
 from renard.pipeline.ner import ner_entities, NEREntity
 
@@ -30,7 +30,7 @@ def test_basic_graph_extraction(tokens: List[str]):
     mentions = ner_entities(tokens, bio_tags)
     characters = _characters_from_mentions(mentions)
 
-    graph_extractor = CoOccurencesGraphExtractor(len(tokens))
+    graph_extractor = CoOccurrencesGraphExtractor(len(tokens))
     out = graph_extractor(" ".join(tokens), tokens, bio_tags, set(characters), [tokens])
 
     characters = {
@@ -72,7 +72,7 @@ def test_dynamic_graph_extraction(tokens: List[str], dynamic_window: int):
     mentions = ner_entities(tokens, bio_tags)
     characters = _characters_from_mentions(mentions)
 
-    graph_extractor = CoOccurencesGraphExtractor(
+    graph_extractor = CoOccurrencesGraphExtractor(
         len(tokens), dynamic="nx", dynamic_window=dynamic_window
     )
     out = graph_extractor(" ".join(tokens), tokens, bio_tags, set(characters), [tokens])
@@ -82,7 +82,7 @@ def test_dynamic_graph_extraction(tokens: List[str], dynamic_window: int):
 
 @given(lists(sampled_from(string.ascii_uppercase)))
 def test_polarity_extraction(tokens: List[str]):
-    graph_extractor = CoOccurencesGraphExtractor(10)
+    graph_extractor = CoOccurrencesGraphExtractor(10)
 
     bio_tags = ["B-PER"] * len(tokens)
 
@@ -109,7 +109,7 @@ def test_sent_co_occurence_dist(sent1: List[str]):
     # have 2 different characters
     sent2 = [chr(ord(token) + 1) for token in sent1]
 
-    graph_extractor = CoOccurencesGraphExtractor((1, "sentences"))
+    graph_extractor = CoOccurrencesGraphExtractor((1, "sentences"))
 
     sentences = [sent1, sent2]
     tokens = sent1 + sent2

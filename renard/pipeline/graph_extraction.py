@@ -67,7 +67,7 @@ def mentions_for_chapter(
     ]
 
 
-class CoOccurencesGraphExtractor(PipelineStep):
+class CoOccurrencesGraphExtractor(PipelineStep):
     """A simple character graph extractor using co-occurences"""
 
     def __init__(
