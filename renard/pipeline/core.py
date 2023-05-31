@@ -297,11 +297,12 @@ class PipelineState:
             )
             layout = layout_nx_graph_reasonably(graph_with_names(layout_graph))
 
-        for i, G in enumerate(self.characters_graph):
+        for i, G in enumerate(graphs):
             fig, ax = plt.subplots()
             G = graph_with_names(G, name_style=name_style)
             plot_nx_graph_reasonably(G, ax=ax, layout=layout)
             plt.savefig(f"{directory}/{i}.png")
+            plt.close()
 
     def plot_graph_to_file(
         self,
@@ -325,6 +326,7 @@ class PipelineState:
         G = graph_with_names(self.characters_graph, name_style=name_style)
         plot_nx_graph_reasonably(G)
         plt.savefig(path)
+        plt.close()
 
     def plot_graph(
         self,
