@@ -1,4 +1,6 @@
-from typing import List, Tuple, TypeVar, Collection, Iterable, cast
+from typing import List, Tuple, TypeVar, Collection, Iterable, Optional, Dict, cast
+import re, os
+from more_itertools import flatten
 from more_itertools.more import windowed
 import torch
 
@@ -77,3 +79,38 @@ def search_pattern(seq: Iterable[R], pattern: List[R]) -> List[int]:
         if list(subseq) == pattern:
             start_indices.append(subseq_i)
     return start_indices
+
+
+def load_conll2002_bio(
+    path: str, tag_conversion_map: Optional[Dict[str, str]] = None
+) -> Tuple[List[List[str]], List[str], List[str]]:
+    """Load a file under CoNLL2022 BIO format.  Sentences are expected
+    to be separated by end of lines.
+
+    :param path: path to the CoNLL-2002 formatted file
+    :param tag_conversion_map: conversion map for tags found in the
+        input file. Example : ``{'B': 'B-PER', 'I': 'I-PER'}``
+
+    :return: ``(sentences, tokens, tag)``
+    """
+
+    if tag_conversion_map is None:
+        tag_conversion_map = {}
+
+    with open(os.path.expanduser(path)) as f:
+        raw_data = f.read()
+
+    sents = []
+    sent_tokens = []
+    tags = []
+    for line in raw_data.split("\n"):
+        line = line.strip("\n")
+        if re.fullmatch(r"\s*", line):
+            sents.append(sent_tokens)
+            sent_tokens = []
+            continue
+        token, tag = line.split("\t")
+        sent_tokens.append(token)
+        tags.append(tag_conversion_map.get(tag, tag))
+
+    return sents, list(flatten(sents)), tags
