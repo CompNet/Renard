@@ -225,6 +225,7 @@ class PipelineState:
         :param name_style: see :func:`.graph_with_names`
             for more details
         """
+        path = os.path.expanduser(path)
         if isinstance(self.characters_graph, list):
             G = dynamic_graph_to_gephi_graph(self.characters_graph)
             G = graph_with_names(G, name_style)
@@ -280,6 +281,7 @@ class PipelineState:
             raise ValueError("this function is supposed to be used on a dynamic graph")
 
         directory = directory.rstrip("/")
+        directory = os.path.expanduser(directory)
         os.makedirs(directory, exist_ok=True)
 
         graphs = self.characters_graph
@@ -508,7 +510,10 @@ class Pipeline:
         return (True, warnings)
 
     def __call__(
-        self, text: Optional[str], ignored_steps: Optional[List[str]] = None, **kwargs
+        self,
+        text: Optional[str] = None,
+        ignored_steps: Optional[List[str]] = None,
+        **kwargs,
     ) -> PipelineState:
         """Run the pipeline sequentially.
 
