@@ -6,10 +6,12 @@ from dataclasses import dataclass
 from nameparser import config
 from nameparser import HumanName
 from renard.gender import Gender
-from renard.pipeline.ner import NEREntity, ner_entities
+from renard.pipeline.ner import ner_entities
 from renard.pipeline.core import Mention, PipelineStep
+from renard.pipeline.progress import ProgressReporter
 from renard.resources.hypocorisms import HypocorismGazetteer
-from renard.resources.pronouns.pronouns import is_a_female_pronoun, is_a_male_pronoun
+from renard.resources.pronouns import is_a_female_pronoun, is_a_male_pronoun
+from renard.resources.titles import is_a_male_title, is_a_female_title
 
 
 @dataclass(eq=True, frozen=True)
@@ -173,13 +175,21 @@ class GraphRulesCharactersExtractor(PipelineStep):
             nicknames associated with it
         """
         self.min_appearances = min_appearances
-
-        self.hypocorism_gazetteer = HypocorismGazetteer()
-        if not additional_hypocorisms is None:
-            for name, nicknames in additional_hypocorisms:
-                self.hypocorism_gazetteer._add_hypocorism_(name, nicknames)
+        self.additional_hypocorisms = additional_hypocorisms
 
         super().__init__()
+
+    def _pipeline_init_(self, lang: str, progress_reporter: ProgressReporter):
+
+        if lang in HypocorismGazetteer.supported_langs:
+            self.hypocorism_gazetteer = HypocorismGazetteer(lang=lang)
+            if not self.additional_hypocorisms is None:
+                for name, nicknames in self.additional_hypocorisms:
+                    self.hypocorism_gazetteer._add_hypocorism_(name, nicknames)
+        else:
+            self.hypocorism_gazetteer = None
+
+        return super()._pipeline_init_(lang, progress_reporter)
 
     def __call__(
         self,
@@ -205,9 +215,10 @@ class GraphRulesCharactersExtractor(PipelineStep):
         for (name1, name2) in combinations(G.nodes(), 2):
 
             # is one name a known hypocorism of the other ?
-            if self.hypocorism_gazetteer.are_related(name1, name2):
-                G.add_edge(name1, name2)
-                continue
+            if not self.hypocorism_gazetteer is None:
+                if self.hypocorism_gazetteer.are_related(name1, name2):
+                    G.add_edge(name1, name2)
+                    continue
 
             # if we remove the title, is one name related to the other
             # ?
@@ -312,6 +323,8 @@ class GraphRulesCharactersExtractor(PipelineStep):
         raw_name1 = HumanName(name1).full_name
         raw_name2 = HumanName(name2).full_name
 
+        if self.hypocorism_gazetteer is None:
+            return raw_name1 == raw_name2
         return raw_name1 == raw_name2 or self.hypocorism_gazetteer.are_related(
             raw_name1, raw_name2
         )
@@ -327,22 +340,11 @@ class GraphRulesCharactersExtractor(PipelineStep):
     def infer_name_gender(self, name: str, corefs: List[List[Mention]]) -> Gender:
         """Try to infer a name's gender"""
         # 1. try to infer gender based on honorifics
-        #    TODO: add more gendered honorifics to renard.resources
         title = HumanName(name).title
         if title != "":
-            if any(
-                [
-                    re.match(pattern, title)
-                    for pattern in (r"[Mm]r\.?", r"[Mm]\.?", r"[Ss]ir", r"[Ll]ord")
-                ]
-            ):
+            if is_a_male_title(title, lang=self.lang):
                 return Gender.MALE
-            elif any(
-                [
-                    re.match(pattern, title)
-                    for pattern in (r"[Mm]iss", r"[Mm]r?s\.?", r"[Ll]ady")
-                ]
-            ):
+            elif is_a_female_title(title, lang=self.lang):
                 return Gender.FEMALE
 
         # 2. if 1. didn't succeed, inspect coreferences chain
@@ -370,6 +372,9 @@ class GraphRulesCharactersExtractor(PipelineStep):
 
     def optional_needs(self) -> Set[str]:
         return {"corefs"}
+
+    def supported_langs(self) -> Union[Set[str], Literal["any"]]:
+        return {"eng", "fra"}
 
     def production(self) -> Set[str]:
         return {"characters"}

@@ -15,7 +15,17 @@ class HypocorismGazetteer:
         and are licensed under the Apache 2.0 License
     """
 
-    def __init__(self):
+    supported_langs = {"eng"}
+
+    def __init__(self, lang: str = "eng"):
+        """
+        :param lang: gazetteer language.  Must be in
+            ``HypocorismGazetteer.supported_langs``.
+        """
+        if not lang in HypocorismGazetteer.supported_langs:
+            raise ValueError(
+                f"{lang} not supported by {type(self)} (supported languages: {HypocorismGazetteer.supported_langs})"
+            )
 
         self.name_to_nicknames = defaultdict(set)
         self.nickname_to_names = defaultdict(set)
