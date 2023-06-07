@@ -1838,6 +1838,21 @@ nicknames associated with it</p></li>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="renard.pipeline.characters_extraction.GraphRulesCharactersExtractor._pipeline_init_">
+<span class="sig-name descname"><span class="pre">_pipeline_init_</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lang</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress_reporter</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.characters_extraction.GraphRulesCharactersExtractor._pipeline_init_" title="Permalink to this definition"></a></dt>
+<dd><p>Set the step configuration that is common to the whole pipeline.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lang</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – ISO 639-3 language string</p></li>
+<li><p><strong>progress_report</strong> – </p></li>
+<li><p><strong>progress_reporter</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ProgressReporter</span></code>) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="renard.pipeline.characters_extraction.GraphRulesCharactersExtractor.infer_name_gender">
 <span class="sig-name descname"><span class="pre">infer_name_gender</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">corefs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.characters_extraction.GraphRulesCharactersExtractor.infer_name_gender" title="Permalink to this definition"></a></dt>
 <dd><p>Try to infer a name’s gender</p>
@@ -1895,6 +1910,20 @@ classes.</p>
 <dd class="field-even"><p>a <cite>set</cite> of state attributes produced by this
 <code class="xref py py-class docutils literal notranslate"><span class="pre">PipelineStep</span></code>. This method must be overriden
 by derived classes.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="renard.pipeline.characters_extraction.GraphRulesCharactersExtractor.supported_langs">
+<span class="sig-name descname"><span class="pre">supported_langs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.characters_extraction.GraphRulesCharactersExtractor.supported_langs" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Set</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>], <code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code>[‘any’]]</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>a list of supported languages, as ISO 639-3 codes, or
+the string <code class="docutils literal notranslate"><span class="pre">'any'</span></code></p>
 </dd>
 </dl>
 </dd></dl>

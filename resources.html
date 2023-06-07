@@ -76,7 +76,7 @@
 <h2>Hypocorism<a class="headerlink" href="#hypocorism" title="Permalink to this headline"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="renard.resources.hypocorisms.HypocorismGazetteer">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">renard.resources.hypocorisms.</span></span><span class="sig-name descname"><span class="pre">HypocorismGazetteer</span></span><a class="headerlink" href="#renard.resources.hypocorisms.HypocorismGazetteer" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">renard.resources.hypocorisms.</span></span><span class="sig-name descname"><span class="pre">HypocorismGazetteer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lang</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'eng'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.resources.hypocorisms.HypocorismGazetteer" title="Permalink to this definition"></a></dt>
 <dd><p>An hypocorism (nicknames) gazetteer</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -84,10 +84,21 @@
 <a class="reference external" href="https://github.com/carltonnorthern/nickname-and-diminutive-names-lookup">https://github.com/carltonnorthern/nickname-and-diminutive-names-lookup</a>
 and are licensed under the Apache 2.0 License</p>
 </div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>lang</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – </p>
+</dd>
+</dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="renard.resources.hypocorisms.HypocorismGazetteer.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#renard.resources.hypocorisms.HypocorismGazetteer.__init__" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lang</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'eng'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.resources.hypocorisms.HypocorismGazetteer.__init__" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>lang</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – gazetteer language.  Must be in
+<code class="docutils literal notranslate"><span class="pre">HypocorismGazetteer.supported_langs</span></code>.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="renard.resources.hypocorisms.HypocorismGazetteer._add_hypocorism_">
