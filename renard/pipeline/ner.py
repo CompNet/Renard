@@ -185,7 +185,7 @@ class BertNamedEntityRecognizer(PipelineStep):
                 )
             elif lang == "fra":
                 self.model = AutoModelForTokenClassification.from_pretrained(
-                    "Jean-Baptiste/camembert-ner"
+                    "Davlan/bert-base-multilingual-cased-ner-hrl"
                 )
             else:
                 raise ValueError(
@@ -232,7 +232,7 @@ class BertNamedEntityRecognizer(PipelineStep):
                     for tens in classes_tens
                 ]
             labels = BertNamedEntityRecognizer.wp_labels_to_token_labels(
-                wp_tokens, wp_labels, self.lang
+                wp_tokens, wp_labels
             )
 
         return {
@@ -241,7 +241,7 @@ class BertNamedEntityRecognizer(PipelineStep):
         }
 
     @staticmethod
-    def eng_wp_labels_to_token_labels(
+    def wp_labels_to_token_labels(
         wp_tokens: List[str], wp_labels: List[str]
     ) -> List[str]:
         """Output a list of labels aligned with regular tokens instead
@@ -250,76 +250,21 @@ class BertNamedEntityRecognizer(PipelineStep):
         :param wp_tokens: word piece tokens
         :param wp_labels: word piece labels
         """
+        assert len(wp_tokens) == len(wp_labels)
+
         # TODO: there is a general way to do that
-        ENG_TOKENS_TO_IGNORE = ("[CLS]", "[SEP]", "[PAD]")
+        TOKENS_TO_IGNORE = ("[CLS]", "[SEP]", "[PAD]")
 
         labels = []
 
         for wp_token, wp_label in zip(wp_tokens, wp_labels):
-            if wp_token in ENG_TOKENS_TO_IGNORE:
+            if wp_token in TOKENS_TO_IGNORE:
                 continue
 
             if not wp_token.startswith("##"):
                 labels.append(wp_label)
 
         return labels
-
-    @staticmethod
-    def fra_wp_labels_to_token_labels(
-        wp_tokens: List[str], wp_labels: List[str]
-    ) -> List[str]:
-        """Output a list of labels aligned with regular tokens instead
-        of word piece tokens.
-
-        :param wp_tokens: word piece tokens
-        :param wp_labels: word piece labels
-        """
-        # TODO: there is a general way to do that
-        FRA_TOKENS_TO_IGNORE = ("<s>", "</s>", "<pad>")
-
-        labels = []
-        cur_label = []
-
-        for wp_token, wp_label in zip(wp_tokens, wp_labels):
-            if wp_token in FRA_TOKENS_TO_IGNORE:
-                continue
-
-            if wp_token.startswith("▁") and len(cur_label) > 0:
-                c = Counter(cur_label)
-                labels.append(max(c, key=c.get))  # type: ignore
-                cur_label = []
-
-            cur_label.append(wp_label)
-
-        if len(cur_label) > 0:
-            c = Counter(cur_label)
-            labels.append(max(c, key=c.get))  # type: ignore
-            cur_label = []
-
-        return labels
-
-    @staticmethod
-    def wp_labels_to_token_labels(
-        wp_tokens: List[str], wp_labels: List[str], lang: str
-    ) -> List[str]:
-        """Output a list of labels aligned with regular tokens instead
-        of word piece tokens.
-
-        :param wp_tokens: word piece tokens
-        :param wp_labels: word piece labels
-        :param lang:
-        """
-        assert len(wp_tokens) == len(wp_labels)
-        assert lang in ("fra", "eng")
-
-        if lang == "eng":
-            return BertNamedEntityRecognizer.eng_wp_labels_to_token_labels(
-                wp_tokens, wp_labels
-            )
-        elif lang == "fra":
-            return BertNamedEntityRecognizer.fra_wp_labels_to_token_labels(
-                wp_tokens, wp_labels
-            )
 
     def supported_langs(self) -> Union[Set[str], Literal["any"]]:
         return {"eng", "fra"}

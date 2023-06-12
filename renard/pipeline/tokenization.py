@@ -84,9 +84,9 @@ class BertTokenizer(PipelineStep):
             if lang == "eng":
                 self.tokenizer = AutoTokenizer.from_pretrained("bert-base-cased")
             elif lang == "fra":
-                self.tokenizer = AutoTokenizer.from_pretrained("camembert-base")
-            else:
-                raise ValueError(f"BertTokenizer does not support language {lang}")
+                self.tokenizer = AutoTokenizer.from_pretrained(
+                    "Davlan/bert-base-multilingual-cased-ner-hrl"
+                )
 
     def __call__(
         self, text: str, chapters: Optional[List[str]] = None, **kwargs
@@ -123,7 +123,7 @@ class BertTokenizer(PipelineStep):
         wp_tokens = [wp_t for s in nested_wp_tokens for wp_t in s]
 
         sentences = [
-            BertTokenizer.wp_tokens_to_tokens(wp_tokens, self.lang)
+            BertTokenizer.wp_tokens_to_tokens(wp_tokens)
             for wp_tokens in nested_wp_tokens
         ]
         tokens = list(flatten(sentences))
@@ -151,18 +151,19 @@ class BertTokenizer(PipelineStep):
         }
 
     @staticmethod
-    def eng_wp_tokens_to_tokens(wp_tokens: List[str]) -> List[str]:
+    def wp_tokens_to_tokens(wp_tokens: List[str]) -> List[str]:
         """Convert word piece tokens to 'regular' tokens
 
         :param wp_tokens: word piece tokens
         """
+
         # TODO: there is a general way to do that
-        ENG_TOKENS_TO_IGNORE = ("[CLS]", "[SEP]", "[PAD]")
+        TOKENS_TO_IGNORE = ("[CLS]", "[SEP]", "[PAD]")
 
         tokens = []
 
         for wp_token in wp_tokens:
-            if wp_token in ENG_TOKENS_TO_IGNORE:
+            if wp_token in TOKENS_TO_IGNORE:
                 continue
 
             if not wp_token.startswith("##"):
@@ -171,44 +172,3 @@ class BertTokenizer(PipelineStep):
                 tokens[-1] += wp_token[2:]
 
         return tokens
-
-    @staticmethod
-    def fra_wp_tokens_to_tokens(wp_tokens: List[str]) -> List[str]:
-        """Convert word piece tokens to 'regular' tokens
-
-        :param wp_tokens: word piece tokens
-        """
-        # TODO: there is a general way to do that
-        FRA_TOKENS_TO_IGNORE = ("<s>", "</s>", "<pad>")
-
-        tokens = []
-        cur_token = []
-
-        for wp_token in wp_tokens:
-            if wp_token in FRA_TOKENS_TO_IGNORE:
-                continue
-
-            if wp_token.startswith("▁") and len(cur_token) > 0:
-                tokens.append("".join(cur_token))
-                cur_token = []
-
-            cur_token.append(wp_token.strip("▁"))
-
-        if len(cur_token) > 0:
-            tokens.append("".join(cur_token))
-
-        return tokens
-
-    @staticmethod
-    def wp_tokens_to_tokens(wp_tokens: List[str], lang: str) -> List[str]:
-        """Convert word piece tokens to 'regular' tokens
-
-        :param wp_tokens: word piece tokens
-        :param lang:
-        """
-        assert lang in ("eng", "fra")
-
-        if lang == "eng":
-            return BertTokenizer.eng_wp_tokens_to_tokens(wp_tokens)
-        elif lang == "fra":
-            return BertTokenizer.fra_wp_tokens_to_tokens(wp_tokens)
