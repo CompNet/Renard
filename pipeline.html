@@ -812,6 +812,20 @@ by derived classes.</p>
 </dl>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="renard.pipeline.preprocessing.CustomSubstitutionPreprocessor.supported_langs">
+<span class="sig-name descname"><span class="pre">supported_langs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.preprocessing.CustomSubstitutionPreprocessor.supported_langs" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Set</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>], <code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code>[‘any’]]</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>a list of supported languages, as ISO 639-3 codes, or
+the string <code class="docutils literal notranslate"><span class="pre">'any'</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
 </dd></dl>
 
 </section>
@@ -953,34 +967,6 @@ which normally choose a huggingface model automatically.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="renard.pipeline.tokenization.BertTokenizer.eng_wp_tokens_to_tokens">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">eng_wp_tokens_to_tokens</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wp_tokens</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.tokenization.BertTokenizer.eng_wp_tokens_to_tokens" title="Permalink to this definition"></a></dt>
-<dd><p>Convert word piece tokens to ‘regular’ tokens</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>wp_tokens</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – word piece tokens</p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="renard.pipeline.tokenization.BertTokenizer.fra_wp_tokens_to_tokens">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">fra_wp_tokens_to_tokens</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wp_tokens</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.tokenization.BertTokenizer.fra_wp_tokens_to_tokens" title="Permalink to this definition"></a></dt>
-<dd><p>Convert word piece tokens to ‘regular’ tokens</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>wp_tokens</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – word piece tokens</p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="renard.pipeline.tokenization.BertTokenizer.needs">
 <span class="sig-name descname"><span class="pre">needs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.tokenization.BertTokenizer.needs" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
@@ -1026,14 +1012,11 @@ the string <code class="docutils literal notranslate"><span class="pre">'any'</s
 
 <dl class="py method">
 <dt class="sig sig-object py" id="renard.pipeline.tokenization.BertTokenizer.wp_tokens_to_tokens">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">wp_tokens_to_tokens</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wp_tokens</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lang</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.tokenization.BertTokenizer.wp_tokens_to_tokens" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">wp_tokens_to_tokens</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wp_tokens</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.tokenization.BertTokenizer.wp_tokens_to_tokens" title="Permalink to this definition"></a></dt>
 <dd><p>Convert word piece tokens to ‘regular’ tokens</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>wp_tokens</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – word piece tokens</p></li>
-<li><p><strong>lang</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – </p></li>
-</ul>
+<dd class="field-odd"><p><strong>wp_tokens</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – word piece tokens</p>
 </dd>
 <dt class="field-even">Return type</dt>
 <dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</p>
@@ -1184,42 +1167,6 @@ which normally choose a huggingface model automatically.</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="renard.pipeline.ner.BertNamedEntityRecognizer.eng_wp_labels_to_token_labels">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">eng_wp_labels_to_token_labels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wp_tokens</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wp_labels</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.ner.BertNamedEntityRecognizer.eng_wp_labels_to_token_labels" title="Permalink to this definition"></a></dt>
-<dd><p>Output a list of labels aligned with regular tokens instead
-of word piece tokens.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>wp_tokens</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – word piece tokens</p></li>
-<li><p><strong>wp_labels</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – word piece labels</p></li>
-</ul>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="renard.pipeline.ner.BertNamedEntityRecognizer.fra_wp_labels_to_token_labels">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">fra_wp_labels_to_token_labels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wp_tokens</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wp_labels</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.ner.BertNamedEntityRecognizer.fra_wp_labels_to_token_labels" title="Permalink to this definition"></a></dt>
-<dd><p>Output a list of labels aligned with regular tokens instead
-of word piece tokens.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>wp_tokens</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – word piece tokens</p></li>
-<li><p><strong>wp_labels</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – word piece labels</p></li>
-</ul>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="renard.pipeline.ner.BertNamedEntityRecognizer.needs">
 <span class="sig-name descname"><span class="pre">needs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.ner.BertNamedEntityRecognizer.needs" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
@@ -1265,7 +1212,7 @@ the string <code class="docutils literal notranslate"><span class="pre">'any'</s
 
 <dl class="py method">
 <dt class="sig sig-object py" id="renard.pipeline.ner.BertNamedEntityRecognizer.wp_labels_to_token_labels">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">wp_labels_to_token_labels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wp_tokens</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wp_labels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lang</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.ner.BertNamedEntityRecognizer.wp_labels_to_token_labels" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">wp_labels_to_token_labels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wp_tokens</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wp_labels</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.ner.BertNamedEntityRecognizer.wp_labels_to_token_labels" title="Permalink to this definition"></a></dt>
 <dd><p>Output a list of labels aligned with regular tokens instead
 of word piece tokens.</p>
 <dl class="field-list simple">
@@ -1273,7 +1220,6 @@ of word piece tokens.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>wp_tokens</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – word piece tokens</p></li>
 <li><p><strong>wp_labels</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – word piece labels</p></li>
-<li><p><strong>lang</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – </p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>
