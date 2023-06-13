@@ -84,9 +84,9 @@ class BertTokenizer(PipelineStep):
             if lang == "eng":
                 self.tokenizer = AutoTokenizer.from_pretrained("bert-base-cased")
             elif lang == "fra":
-                self.tokenizer = AutoTokenizer.from_pretrained("camembert-base")
-            else:
-                raise ValueError(f"BertTokenizer does not support language {lang}")
+                self.tokenizer = AutoTokenizer.from_pretrained(
+                    "Davlan/bert-base-multilingual-cased-ner-hrl"
+                )
 
     def __call__(
         self, text: str, chapters: Optional[List[str]] = None, **kwargs
@@ -154,14 +154,21 @@ class BertTokenizer(PipelineStep):
     def wp_tokens_to_tokens(wp_tokens: List[str]) -> List[str]:
         """Convert word piece tokens to 'regular' tokens
 
-        :wp_tokens: word piece tokens
+        :param wp_tokens: word piece tokens
         """
+
+        # TODO: there is a general way to do that
+        TOKENS_TO_IGNORE = ("[CLS]", "[SEP]", "[PAD]")
+
         tokens = []
+
         for wp_token in wp_tokens:
-            if wp_token in {"[CLS]", "[SEP]", "[PAD]"}:
+            if wp_token in TOKENS_TO_IGNORE:
                 continue
+
             if not wp_token.startswith("##"):
                 tokens.append(wp_token)
             else:
                 tokens[-1] += wp_token[2:]
+
         return tokens

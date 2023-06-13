@@ -1,4 +1,4 @@
-from typing import List, Tuple, Set, Dict, Any
+from typing import List, Tuple, Set, Dict, Any, Literal, Union
 import re
 from renard.pipeline.core import PipelineStep
 
@@ -27,3 +27,6 @@ class CustomSubstitutionPreprocessor(PipelineStep):
 
     def production(self) -> Set[str]:
         return set()
+
+    def supported_langs(self) -> Union[Set[str], Literal["any"]]:
+        return "any"

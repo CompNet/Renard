@@ -1,6 +1,8 @@
 from __future__ import annotations
 from typing import List, Dict, Any, Set, Tuple, Optional, Union, Literal
 from dataclasses import dataclass
+from collections import Counter
+import torch
 from torch._C import Value
 from transformers.tokenization_utils_base import BatchEncoding
 from seqeval.metrics import precision_score, recall_score, f1_score
@@ -148,6 +150,7 @@ class BertNamedEntityRecognizer(PipelineStep):
         self,
         huggingface_model_id: Optional[str] = None,
         batch_size: int = 4,
+        device: Literal["cpu", "cuda", "auto"] = "auto",
     ):
         """
         :param huggingface_model_id: a custom huggingface model id.
@@ -157,6 +160,12 @@ class BertNamedEntityRecognizer(PipelineStep):
         """
         self.huggingface_model_id = huggingface_model_id
         self.batch_size = batch_size
+
+        if device == "auto":
+            self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        else:
+            self.device = torch.device(device)
+
         super().__init__()
 
     def _pipeline_init_(self, lang: str, progress_reporter: ProgressReporter):
@@ -176,7 +185,7 @@ class BertNamedEntityRecognizer(PipelineStep):
                 )
             elif lang == "fra":
                 self.model = AutoModelForTokenClassification.from_pretrained(
-                    "Jean-Baptiste/camembert-ner"
+                    "Davlan/bert-base-multilingual-cased-ner-hrl"
                 )
             else:
                 raise ValueError(
@@ -197,8 +206,7 @@ class BertNamedEntityRecognizer(PipelineStep):
         """
         import torch
 
-        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        self.model = self.model.to(device)
+        self.model = self.model.to(self.device)
 
         batches_nb = len(bert_batch_encoding["input_ids"]) // self.batch_size + 1
 
@@ -209,10 +217,12 @@ class BertNamedEntityRecognizer(PipelineStep):
                 batch_start = batch_i * self.batch_size
                 batch_end = batch_start + self.batch_size
                 out = self.model(
-                    bert_batch_encoding["input_ids"][batch_start:batch_end].to(device),
+                    bert_batch_encoding["input_ids"][batch_start:batch_end].to(
+                        self.device
+                    ),
                     attention_mask=bert_batch_encoding["attention_mask"][
                         batch_start:batch_end
-                    ].to(device),
+                    ].to(self.device),
                 )
                 # (batch_size, sentence_size)
                 batch_classes_tens = torch.max(out.logits, dim=2).indices
@@ -241,12 +251,19 @@ class BertNamedEntityRecognizer(PipelineStep):
         :param wp_labels: word piece labels
         """
         assert len(wp_tokens) == len(wp_labels)
+
+        # TODO: there is a general way to do that
+        TOKENS_TO_IGNORE = ("[CLS]", "[SEP]", "[PAD]")
+
         labels = []
+
         for wp_token, wp_label in zip(wp_tokens, wp_labels):
-            if wp_token in {"[CLS]", "[SEP]", "[PAD]"}:
+            if wp_token in TOKENS_TO_IGNORE:
                 continue
+
             if not wp_token.startswith("##"):
                 labels.append(wp_label)
+
         return labels
 
     def supported_langs(self) -> Union[Set[str], Literal["any"]]:
