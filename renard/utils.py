@@ -82,12 +82,16 @@ def search_pattern(seq: Iterable[R], pattern: List[R]) -> List[int]:
 
 
 def load_conll2002_bio(
-    path: str, tag_conversion_map: Optional[Dict[str, str]] = None, **kwargs
+    path: str,
+    tag_conversion_map: Optional[Dict[str, str]] = None,
+    separator: str = "\t",
+    **kwargs
 ) -> Tuple[List[List[str]], List[str], List[str]]:
     """Load a file under CoNLL2022 BIO format.  Sentences are expected
     to be separated by end of lines.
 
     :param path: path to the CoNLL-2002 formatted file
+    :param separator: separator between token and BIO tags
     :param tag_conversion_map: conversion map for tags found in the
         input file.  Example : ``{'B': 'B-PER', 'I': 'I-PER'}``
     :param kwargs: additional kwargs for ``open`` (such as
@@ -111,7 +115,7 @@ def load_conll2002_bio(
             sents.append(sent_tokens)
             sent_tokens = []
             continue
-        token, tag = line.split("\t")
+        token, tag = line.split(separator)
         sent_tokens.append(token)
         tags.append(tag_conversion_map.get(tag, tag))
 
