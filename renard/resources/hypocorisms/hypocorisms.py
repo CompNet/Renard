@@ -23,26 +23,25 @@ class HypocorismGazetteer:
             ``HypocorismGazetteer.supported_langs``.
         """
         if not lang in HypocorismGazetteer.supported_langs:
-            raise ValueError(
-                f"{lang} not supported by {type(self)} (supported languages: {HypocorismGazetteer.supported_langs})"
+            print(
+                f"[warning] {lang} not supported by {type(self)} (supported languages: {HypocorismGazetteer.supported_langs})"
             )
 
         self.name_to_nicknames = defaultdict(set)
         self.nickname_to_names = defaultdict(set)
 
-        with open(f"{script_dir}/datas/hypocorisms.csv") as f:
+        if lang == "eng":
+            with open(f"{script_dir}/datas/hypocorisms.csv") as f:
+                for line in f:
+                    # it should be illegal to parse csv like that,
+                    # however in this specific case we know there
+                    # are no issues... right ?
+                    line = line.strip()
+                    splitted = line.split(",")
+                    name = splitted[0]
+                    nicknames = splitted[1:]
 
-            for line in f:
-
-                # it should be illegal to parse csv like that,
-                # however in this specific case we know there
-                # are no issues... right ?
-                line = line.strip()
-                splitted = line.split(",")
-                name = splitted[0]
-                nicknames = splitted[1:]
-
-                self._add_hypocorism_(name, nicknames)
+                    self._add_hypocorism_(name, nicknames)
 
     def _add_hypocorism_(self, name: str, nicknames: List[str]):
         """Add a name associated with several nicknames

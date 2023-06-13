@@ -178,13 +178,10 @@ class GraphRulesCharactersExtractor(PipelineStep):
         super().__init__()
 
     def _pipeline_init_(self, lang: str, progress_reporter: ProgressReporter):
-        if lang in HypocorismGazetteer.supported_langs:
-            self.hypocorism_gazetteer = HypocorismGazetteer(lang=lang)
-            if not self.additional_hypocorisms is None:
-                for name, nicknames in self.additional_hypocorisms:
-                    self.hypocorism_gazetteer._add_hypocorism_(name, nicknames)
-        else:
-            self.hypocorism_gazetteer = None
+        self.hypocorism_gazetteer = HypocorismGazetteer(lang=lang)
+        if not self.additional_hypocorisms is None:
+            for name, nicknames in self.additional_hypocorisms:
+                self.hypocorism_gazetteer._add_hypocorism_(name, nicknames)
 
         return super()._pipeline_init_(lang, progress_reporter)
 
@@ -211,10 +208,9 @@ class GraphRulesCharactersExtractor(PipelineStep):
         # * link nodes based on several rules
         for name1, name2 in combinations(G.nodes(), 2):
             # is one name a known hypocorism of the other ?
-            if not self.hypocorism_gazetteer is None:
-                if self.hypocorism_gazetteer.are_related(name1, name2):
-                    G.add_edge(name1, name2)
-                    continue
+            if self.hypocorism_gazetteer.are_related(name1, name2):
+                G.add_edge(name1, name2)
+                continue
 
             # if we remove the title, is one name related to the other
             # ?
@@ -323,8 +319,6 @@ class GraphRulesCharactersExtractor(PipelineStep):
         raw_name1 = HumanName(name1).full_name
         raw_name2 = HumanName(name2).full_name
 
-        if self.hypocorism_gazetteer is None:
-            return raw_name1.lower() == raw_name2.lower()
         return (
             raw_name1.lower() == raw_name2.lower()
             or self.hypocorism_gazetteer.are_related(raw_name1, raw_name2)
