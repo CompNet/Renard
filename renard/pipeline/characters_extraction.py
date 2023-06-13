@@ -16,7 +16,6 @@ from renard.resources.titles import is_a_male_title, is_a_female_title
 
 @dataclass(eq=True, frozen=True)
 class Character:
-
     names: FrozenSet[str]
     mentions: List[Mention]
     gender: Gender = Gender.UNKNOWN
@@ -60,7 +59,6 @@ def _assign_coreference_mentions(
     # we assign each chain to the character with highest name
     # occurence in it
     for chain in corefs:
-
         # determine the characters with the highest number of
         # occurences
         occ_counter = {}
@@ -180,7 +178,6 @@ class GraphRulesCharactersExtractor(PipelineStep):
         super().__init__()
 
     def _pipeline_init_(self, lang: str, progress_reporter: ProgressReporter):
-
         if lang in HypocorismGazetteer.supported_langs:
             self.hypocorism_gazetteer = HypocorismGazetteer(lang=lang)
             if not self.additional_hypocorisms is None:
@@ -212,8 +209,7 @@ class GraphRulesCharactersExtractor(PipelineStep):
             G.add_node(mention_str)
 
         # * link nodes based on several rules
-        for (name1, name2) in combinations(G.nodes(), 2):
-
+        for name1, name2 in combinations(G.nodes(), 2):
             # is one name a known hypocorism of the other ?
             if not self.hypocorism_gazetteer is None:
                 if self.hypocorism_gazetteer.are_related(name1, name2):
@@ -253,8 +249,7 @@ class GraphRulesCharactersExtractor(PipelineStep):
         if not corefs is None:
             for name in G.nodes():
                 G.nodes[name]["gender"] = self.infer_name_gender(name, corefs)
-        for (name1, name2) in combinations(G.nodes(), 2):
-
+        for name1, name2 in combinations(G.nodes(), 2):
             # check if characters have the same last name but a
             # different first name.
             human_name1 = HumanName(name1)
@@ -280,7 +275,6 @@ class GraphRulesCharactersExtractor(PipelineStep):
                 continue
 
             if not corefs is None:
-
                 # check if names dont have the same infered gender
                 gender1 = G.nodes[name1]["gender"]
                 gender2 = G.nodes[name2]["gender"]
@@ -324,9 +318,10 @@ class GraphRulesCharactersExtractor(PipelineStep):
         raw_name2 = HumanName(name2).full_name
 
         if self.hypocorism_gazetteer is None:
-            return raw_name1 == raw_name2
-        return raw_name1 == raw_name2 or self.hypocorism_gazetteer.are_related(
-            raw_name1, raw_name2
+            return raw_name1.lower() == raw_name2.lower()
+        return (
+            raw_name1.lower() == raw_name2.lower()
+            or self.hypocorism_gazetteer.are_related(raw_name1, raw_name2)
         )
 
     def names_are_in_coref(self, name1: str, name2: str, corefs: List[List[Mention]]):
