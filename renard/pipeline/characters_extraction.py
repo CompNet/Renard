@@ -225,10 +225,16 @@ class GraphRulesCharactersExtractor(PipelineStep):
             # add an edge if two characters have the same first name or family names
             human_name1 = HumanName(name1)
             human_name2 = HumanName(name2)
-            if len(human_name1.last) > 0 and human_name1.last == human_name2.last:
+            if (
+                len(human_name1.last) > 0
+                and human_name1.last.lower() == human_name2.last.lower()
+            ):
                 G.add_edge(name1, name2)
                 continue
-            if len(human_name1.first) > 0 and human_name1.first == human_name2.first:
+            if (
+                len(human_name1.first) > 0
+                and human_name1.first.lower() == human_name2.first.lower()
+            ):
                 G.add_edge(name1, name2)
                 continue
 
