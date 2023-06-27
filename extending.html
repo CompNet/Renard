@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Extending Renard &mdash; Renard  documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Reference" href="reference.html" />
+    <link rel="prev" title="The Pipeline" href="pipeline.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> Renard
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pipeline.html">The Pipeline</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Extending Renard</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#creating-new-steps">Creating new steps</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="reference.html">Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Renard</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a></li>
+      <li class="breadcrumb-item active">Extending Renard</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/extending.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="extending-renard">
+<h1>Extending Renard<a class="headerlink" href="#extending-renard" title="Permalink to this headline"></a></h1>
+<section id="creating-new-steps">
+<h2>Creating new steps<a class="headerlink" href="#creating-new-steps" title="Permalink to this headline"></a></h2>
+<p>Usually, steps must implement at least four functions :</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="reference.html#renard.pipeline.core.PipelineStep.__init__" title="renard.pipeline.core.PipelineStep.__init__"><code class="xref py py-meth docutils literal notranslate"><span class="pre">PipelineStep.__init__()</span></code></a>: is used to pass options at step init time</p></li>
+<li><p><a class="reference internal" href="reference.html#renard.pipeline.core.PipelineStep.__call__" title="renard.pipeline.core.PipelineStep.__call__"><code class="xref py py-meth docutils literal notranslate"><span class="pre">PipelineStep.__call__()</span></code></a>: is called at pipeline run time</p></li>
+<li><p><a class="reference internal" href="reference.html#renard.pipeline.core.PipelineStep.needs" title="renard.pipeline.core.PipelineStep.needs"><code class="xref py py-meth docutils literal notranslate"><span class="pre">PipelineStep.needs()</span></code></a>: declares the set of informations needed
+from the pipeline state by this step. Each returned string should be
+an attribute of <a class="reference internal" href="reference.html#renard.pipeline.core.PipelineState" title="renard.pipeline.core.PipelineState"><code class="xref py py-class docutils literal notranslate"><span class="pre">PipelineState</span></code></a>.</p></li>
+<li><p><a class="reference internal" href="reference.html#renard.pipeline.core.PipelineStep.production" title="renard.pipeline.core.PipelineStep.production"><code class="xref py py-meth docutils literal notranslate"><span class="pre">PipelineStep.production()</span></code></a>: declares the set of informations
+produced by this step. As in <a class="reference internal" href="reference.html#renard.pipeline.core.PipelineStep.needs" title="renard.pipeline.core.PipelineStep.needs"><code class="xref py py-meth docutils literal notranslate"><span class="pre">PipelineStep.needs()</span></code></a>, each
+returned string should be an attribute of <a class="reference internal" href="reference.html#renard.pipeline.core.PipelineState" title="renard.pipeline.core.PipelineState"><code class="xref py py-class docutils literal notranslate"><span class="pre">PipelineState</span></code></a>.</p></li>
+</ul>
+<p>Here is an example of creating a basic tokenization step :</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Set</span>
+<span class="kn">from</span> <span class="nn">renard.pipeline.core</span> <span class="kn">import</span> <span class="n">PipelineStep</span>
+
+<span class="k">class</span> <span class="nc">BasicTokenizerStep</span><span class="p">(</span><span class="n">PipelineStep</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;tokens&quot;</span><span class="p">:</span> <span class="n">text</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">)}</span>
+
+    <span class="k">def</span> <span class="nf">needs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;text&quot;</span><span class="p">}</span>
+
+    <span class="k">def</span> <span class="nf">production</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;tokens&quot;</span><span class="p">}</span>
+</pre></div>
+</div>
+<p>Additionally, the following methods can be overridden:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="reference.html#renard.pipeline.core.PipelineStep.optional_needs" title="renard.pipeline.core.PipelineStep.optional_needs"><code class="xref py py-meth docutils literal notranslate"><span class="pre">PipelineStep.optional_needs()</span></code></a>: specifies optional
+dependencies the same way as <a class="reference internal" href="reference.html#renard.pipeline.core.PipelineStep.needs" title="renard.pipeline.core.PipelineStep.needs"><code class="xref py py-meth docutils literal notranslate"><span class="pre">PipelineStep.needs()</span></code></a>.</p></li>
+<li><p><a class="reference internal" href="reference.html#renard.pipeline.core.PipelineStep._pipeline_init_" title="renard.pipeline.core.PipelineStep._pipeline_init_"><code class="xref py py-meth docutils literal notranslate"><span class="pre">PipelineStep._pipeline_init_()</span></code></a>: is used for pipeline-wide
+arguments, such as language settings. This method is called at
+by the pipeline at pipeline run time.</p></li>
+<li><p><a class="reference internal" href="reference.html#renard.pipeline.core.PipelineStep.supported_langs" title="renard.pipeline.core.PipelineStep.supported_langs"><code class="xref py py-meth docutils literal notranslate"><span class="pre">PipelineStep.supported_langs()</span></code></a>: declares the set of supported
+languages as a set of ISO 639-3 codes (or the special value
+<code class="docutils literal notranslate"><span class="pre">&quot;any&quot;</span></code>). By default, will be <code class="docutils literal notranslate"><span class="pre">{&quot;eng&quot;}</span></code>.</p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="pipeline.html" class="btn btn-neutral float-left" title="The Pipeline" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="reference.html" class="btn btn-neutral float-right" title="Reference" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Arthur Amalvy, Vincent Labatut, Richard Dufour.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

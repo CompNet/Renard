@@ -2,12 +2,8 @@
 Installation
 ============
 
-
-Quick Start
-===========
-
 Using Pip
----------
+=========
 
 Simply use ``pip install renard-pipeline``.
 
@@ -19,7 +15,7 @@ You can also install the following extras:
 
 
 Manual Installation
--------------------
+===================
 
 The project uses `Poetry <https://python-poetry.org/>`_ to manage dependencies. Use :
 

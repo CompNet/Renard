@@ -1,17 +1,11 @@
-========
-Pipeline
-========
+============
+The Pipeline
+============
 
-
-Core
-====
-
-The Pipeline Object
--------------------
-
-A :class:`.Pipeline` is a list of :class:`.PipelineStep` that are run
+Renard's central concept is the :class:`.Pipeline`. A
+:class:`.Pipeline` is a list of :class:`.PipelineStep` that are run
 sequentially in order to extract a characters graph from a
-document. Here is a simple example :
+document. Here is a simple example:
 
 .. code-block:: python
 
@@ -40,12 +34,12 @@ document. Here is a simple example :
 Each step of a pipeline may require informations from previous steps
 before running : therefore, it is possible to create intractable
 pipelines when a step's requirements are not satisfied. To
-troubleshoot those issues more easily, a :class:`.Pipeline` checks its
-validity at instantiation time, and throws an exception with an
-helpful message in case it is intractable.
+troubleshoot these issues more easily, a :class:`.Pipeline` checks its
+validity at run time, and throws an exception with an helpful message
+in case it is intractable.
 
 You can also specify the result of certains steps manually when
-calling the pipeline if you already have those results or if you wan't
+calling the pipeline if you already have those results or if you want
 to compute them yourself :
 
 .. code-block:: python
@@ -86,176 +80,35 @@ For simplicity, one can use one of the preconfigured pipelines:
    out.export_graph_to_gexf("./network.gexf")	
 
 
-.. autoclass:: renard.pipeline.core.Pipeline
-   :members:
+Pipeline Output: the Pipeline State
+===================================
+
+The :class:`.PipelineState` represents a state that is propagated and
+annotated during the execution of a :class:`.Pipeline`. It is the
+final value returned when running a pipeline with
+:meth:`.Pipeline.__call__`. As such, one can use it to do different
+things. For example, one can access the extracted character network:
+
+>>> out = pipeline(text)
+>>> out.characters_graph
+<networkx.classes.graph.Graph object at 0x7fd9e9115900>
+
+one can also access the output of each :class:`.PipelineStep`.
+
+A few plot functions are provided for convenience
+(:meth:`.PipelineState.plot_graph`,
+:meth:`.PipelineState.plot_graph_to_file`,
+:meth:`.PipelineState.plot_graphs_to_dir`). These functions should be
+seen more as exploration and debug tools rather than fully-fledged
+visualisation platforms. If you want a fully-featured visualisation
+tool, you can export your graph to Gephi's `gexf` format:
+
+>>> out.export_graph_to_gexf("./graph.gexf")
 
 
-Pipeline State
---------------
 
-A state is propagated and annotated during the execution of a
-:class:`.Pipeline`.
-
-It is the final value returned when running a pipeline with
-:meth:`.Pipeline.__call__`.
-
-
-.. autoclass:: renard.pipeline.core.PipelineState
-   :members:
-
-
-Pipeline Steps 
---------------
+Pipeline Steps
+==============
 
 A pipeline is a sequential series of
 :class:`.PipelineStep`, that are applied in order.
-
-.. autoclass:: renard.pipeline.core.PipelineStep
-   :members:
-
-
-Creating new steps
-~~~~~~~~~~~~~~~~~~
-
-Usually, steps must implement at least four functions :
-
-- :meth:`.PipelineStep.__init__`: is used to pass options at step init time
-- :meth:`.PipelineStep.__call__`: is called at pipeline run time
-- :meth:`.PipelineStep.needs`: declares the set of informations needed
-  from the pipeline state by this step. Each returned string should be
-  an attribute of :class:`.PipelineState`.
-- :meth:`.PipelineStep.production`: declares the set of informations
-  produced by this step. As in :meth:`.PipelineStep.needs`, each
-  returned string should be an attribute of :class:`.PipelineState`.
-
-
-Here is an example of creating a basic tokenization step :
-
-.. code-block:: python
-
-   from typing import Dict, Any, Set
-   from renard.pipeline.core import PipelineStep
-
-   class BasicTokenizerStep(PipelineStep):
-
-       def __init__(self):
-           pass
-
-       def __call__(self, text: str, **kwargs) -> Dict[str, Any]: 
-           return {"tokens": text.split(" ")}
-
-       def needs(self) -> Set[str]: 
-           return {"text"}
-
-       def production(self) -> Set[str]: 
-           return {"tokens"}
-
-Additionally, the following methods can be overridden:
-
-- :meth:`.PipelineStep.optional_needs`: specifies optional
-  dependencies the same way as :meth:`.PipelineStep.needs`.
-- :meth:`.PipelineStep._pipeline_init_`: is used for pipeline-wide
-  arguments, such as language settings. This method is called at
-  by the pipeline at pipeline run time.
-- :meth:`.PipelineStep.supported_langs`: declares the set of supported
-  languages as a set of ISO 639-3 codes (or the special value
-  ``"any"``). By default, will be ``{"eng"}``.
-
-
-Preprocessing
-=============
-
-.. automodule:: renard.pipeline.preprocessing
-   :members:
-
-
-Tokenization
-============
-
-NLTKTokenizer
--------------
-
-.. autoclass:: renard.pipeline.tokenization.NLTKTokenizer
-   :members:
-
-BertTokenizer
--------------
-
-.. autoclass:: renard.pipeline.tokenization.BertTokenizer
-   :members:
-
-
-Named Entity Recognition
-========================
-
-.. autoclass:: renard.pipeline.ner.NEREntity
-   :members:
-
-BertNamedEntityRecognizer
--------------------------
-
-.. autoclass:: renard.pipeline.ner.BertNamedEntityRecognizer
-   :members:
-
-NLTKNamedEntityRecognizer
--------------------------
-
-.. autoclass:: renard.pipeline.ner.NLTKNamedEntityRecognizer
-   :members:
-
-
-Coreference Resolution
-======================
-
-A coreference resolver returns a list of coreference chains, each
-chain being :class:`.Mention`.
-
-.. autoclass:: renard.pipeline.core.Mention
-   :members:
-
-BertCoreferenceResolver
------------------------
-
-.. autoclass:: renard.pipeline.corefs.BertCoreferenceResolver
-   :members:
-
-
-SpacyCorefereeCoreferenceResolver
----------------------------------
-
-.. autoclass:: renard.pipeline.corefs.SpacyCorefereeCoreferenceResolver
-   :members:
-
-      
-Characters Extraction
-=====================
-
-.. autoclass:: renard.pipeline.characters_extraction.Character
-   :members:
-
-NaiveCharactersExtractor
-------------------------
-
-.. autoclass:: renard.pipeline.characters_extraction.NaiveCharactersExtractor
-   :members:
-
-GraphRulesCharactersExtractor
------------------------------
-
-.. autoclass:: renard.pipeline.characters_extraction.GraphRulesCharactersExtractor
-   :members:
-
-
-Graph Extraction
-================
-
-.. autoclass:: renard.pipeline.graph_extraction.CoOccurrencesGraphExtractor
-   :members:
-
-
-
-Stanford CoreNLP Pipeline
-=========================
-
-.. automodule:: renard.pipeline.stanford_corenlp
-   :members:
