@@ -5,9 +5,11 @@ Welcome to Renard's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+   introduction
    installation
    pipeline
-   resources
+   extending
+   reference
 
 
 Indices and tables
