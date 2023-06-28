@@ -218,7 +218,7 @@ class PipelineState:
         path: str,
         name_style: Union[
             Literal["longest", "shortest", "most_frequent"], Callable[[Character], str]
-        ] = "longest",
+        ] = "most_frequent",
     ):
         """Export characters graph to Gephi's gexf format
 
@@ -258,7 +258,7 @@ class PipelineState:
         directory: str,
         name_style: Union[
             Literal["longest", "shortest", "most_frequent"], Callable[[Character], str]
-        ] = "longest",
+        ] = "most_frequent",
         cumulative: bool = False,
         stable_layout: bool = False,
     ):
@@ -310,7 +310,7 @@ class PipelineState:
         path: str,
         name_style: Union[
             Literal["longest", "shortest", "most_frequent"], Callable[[Character], str]
-        ] = "longest",
+        ] = "most_frequent",
     ):
         """Plot ``self.character_graph`` using reasonable parameters,
         and save the produced figure to a file
@@ -333,7 +333,7 @@ class PipelineState:
         self,
         name_style: Union[
             Literal["longest", "shortest", "most_frequent"], Callable[[Character], str]
-        ] = "longest",
+        ] = "most_frequent",
         fig: Optional[plt.Figure] = None,
         cumulative: bool = False,
         graph_start_idx: int = 1,
