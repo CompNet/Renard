@@ -1,5 +1,6 @@
 import os
 from typing import List, Optional, Set, Dict, Any
+from renard.pipeline.ner import ner_entities
 
 import stanza
 from stanza.protobuf import CoreNLP_pb2
@@ -208,7 +209,7 @@ class StanfordCoreNLPPipeline(PipelineStep):
 
                     coref_chains.append(chain)
 
-        out_dict = {"tokens": tokens, "bio_tags": bio_tags}
+        out_dict = {"tokens": tokens, "entities": ner_entities(tokens, bio_tags)}
         if self.annotate_corefs:
             out_dict["corefs"] = coref_chains  # type: ignore
         return out_dict
@@ -217,7 +218,7 @@ class StanfordCoreNLPPipeline(PipelineStep):
         return set()
 
     def production(self) -> Set[str]:
-        production = {"tokens", "bio_tags"}
+        production = {"tokens", "entities"}
         if self.annotate_corefs:
             production.add("corefs")
         return production
