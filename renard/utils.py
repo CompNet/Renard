@@ -90,7 +90,9 @@ def load_conll2002_bio(
     **kwargs
 ) -> Tuple[List[List[str]], List[str], List[NEREntity]]:
     """Load a file under CoNLL2022 BIO format.  Sentences are expected
-    to be separated by end of lines.
+    to be separated by end of lines.  Tags should be in the CoNLL-2002
+    format (such as 'B-PER I-PER') - If this is not the case, see the
+    ``tag_conversion_map`` argument.
 
     :param path: path to the CoNLL-2002 formatted file
     :param separator: separator between token and BIO tags

@@ -33,8 +33,10 @@ def ner_entities(
 ) -> List[NEREntity]:
     """Extract NER entities from a list of BIO tags
 
-    :param tokens:
-    :param bio_tags:
+    :param tokens: a list of tokens
+    :param bio_tags: a list of BIO tags.  In particular, BIO tags
+        should be in the CoNLL-2002 form (such as 'B-PER I-PER')
+
     :return: A list of ner entities, in apparition order
     """
     assert len(tokens) == len(bio_tags)
