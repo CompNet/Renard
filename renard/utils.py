@@ -101,7 +101,7 @@ def load_conll2002_bio(
     :param kwargs: additional kwargs for ``open`` (such as
         ``encoding`` or ``newline``).
 
-    :return: ``(sentences, tokens, tag)``
+    :return: ``(sentences, tokens, entities)``
     """
 
     if tag_conversion_map is None:
