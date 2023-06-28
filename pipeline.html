@@ -43,7 +43,7 @@
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">The Pipeline</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#pipeline-output-the-pipeline-state">Pipeline Output: the Pipeline State</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#pipeline-steps">Pipeline Steps</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#dynamic-graphs">Dynamic Graphs</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="extending.html">Extending Renard</a></li>
@@ -99,7 +99,6 @@ document. Here is a simple example:</p>
 <span class="p">)</span>
 
 <span class="n">out</span> <span class="o">=</span> <span class="n">pipeline</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
-<span class="n">out</span><span class="o">.</span><span class="n">export_graph_to_gexf</span><span class="p">(</span><span class="s2">&quot;./network.gexf&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Each step of a pipeline may require informations from previous steps
@@ -130,7 +129,6 @@ to compute them yourself :</p>
 
 <span class="c1"># tokens are passed at call time</span>
 <span class="n">out</span> <span class="o">=</span> <span class="n">pipeline</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">tokens</span><span class="o">=</span><span class="n">my_tokenization_function</span><span class="p">(</span><span class="n">text</span><span class="p">))</span>
-<span class="n">out</span><span class="o">.</span><span class="n">export_graph_to_gexf</span><span class="p">(</span><span class="s2">&quot;./network.gexf&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>For simplicity, one can use one of the preconfigured pipelines:</p>
@@ -141,7 +139,6 @@ to compute them yourself :</p>
 
 <span class="n">pipeline</span> <span class="o">=</span> <span class="n">bert_pipeline</span><span class="p">()</span>
 <span class="n">out</span> <span class="o">=</span> <span class="n">pipeline</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
-<span class="n">out</span><span class="o">.</span><span class="n">export_graph_to_gexf</span><span class="p">(</span><span class="s2">&quot;./network.gexf&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <section id="pipeline-output-the-pipeline-state">
@@ -150,28 +147,72 @@ to compute them yourself :</p>
 annotated during the execution of a <a class="reference internal" href="reference.html#renard.pipeline.core.Pipeline" title="renard.pipeline.core.Pipeline"><code class="xref py py-class docutils literal notranslate"><span class="pre">Pipeline</span></code></a>. It is the
 final value returned when running a pipeline with
 <a class="reference internal" href="reference.html#renard.pipeline.core.Pipeline.__call__" title="renard.pipeline.core.Pipeline.__call__"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Pipeline.__call__()</span></code></a>. As such, one can use it to do different
-things. For example, one can access the extracted character network:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">out</span> <span class="o">=</span> <span class="n">pipeline</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">out</span><span class="o">.</span><span class="n">characters_graph</span>
+things. For example, one can access the extracted character network as
+a networkx graph:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">out</span><span class="o">.</span><span class="n">characters_graph</span>
 <span class="go">&lt;networkx.classes.graph.Graph object at 0x7fd9e9115900&gt;</span>
 </pre></div>
 </div>
 <p>one can also access the output of each <a class="reference internal" href="reference.html#renard.pipeline.core.PipelineStep" title="renard.pipeline.core.PipelineStep"><code class="xref py py-class docutils literal notranslate"><span class="pre">PipelineStep</span></code></a>.</p>
-<p>A few plot functions are provided for convenience
+<p>A few matplotlib-based plot functions are provided for convenience
 (<a class="reference internal" href="reference.html#renard.pipeline.core.PipelineState.plot_graph" title="renard.pipeline.core.PipelineState.plot_graph"><code class="xref py py-meth docutils literal notranslate"><span class="pre">PipelineState.plot_graph()</span></code></a>,
-<a class="reference internal" href="reference.html#renard.pipeline.core.PipelineState.plot_graph_to_file" title="renard.pipeline.core.PipelineState.plot_graph_to_file"><code class="xref py py-meth docutils literal notranslate"><span class="pre">PipelineState.plot_graph_to_file()</span></code></a>,
-<a class="reference internal" href="reference.html#renard.pipeline.core.PipelineState.plot_graphs_to_dir" title="renard.pipeline.core.PipelineState.plot_graphs_to_dir"><code class="xref py py-meth docutils literal notranslate"><span class="pre">PipelineState.plot_graphs_to_dir()</span></code></a>). These functions should be
-seen more as exploration and debug tools rather than fully-fledged
-visualisation platforms. If you want a fully-featured visualisation
-tool, you can export your graph to Gephi’s <cite>gexf</cite> format:</p>
+<a class="reference internal" href="reference.html#renard.pipeline.core.PipelineState.plot_graph_to_file" title="renard.pipeline.core.PipelineState.plot_graph_to_file"><code class="xref py py-meth docutils literal notranslate"><span class="pre">PipelineState.plot_graph_to_file()</span></code></a>):</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">out</span><span class="o">.</span><span class="n">plot_graph</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>These functions should be seen more as exploration and debug tools
+rather than fully-fledged visualisation platforms. If you want a
+fully-featured visualisation tool, you can export your graph to
+Gephi’s <cite>gexf</cite> format:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">out</span><span class="o">.</span><span class="n">export_graph_to_gexf</span><span class="p">(</span><span class="s2">&quot;./graph.gexf&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
-<section id="pipeline-steps">
-<h2>Pipeline Steps<a class="headerlink" href="#pipeline-steps" title="Permalink to this headline"></a></h2>
-<p>A pipeline is a sequential series of
-<a class="reference internal" href="reference.html#renard.pipeline.core.PipelineStep" title="renard.pipeline.core.PipelineStep"><code class="xref py py-class docutils literal notranslate"><span class="pre">PipelineStep</span></code></a>, that are applied in order.</p>
+<section id="dynamic-graphs">
+<h2>Dynamic Graphs<a class="headerlink" href="#dynamic-graphs" title="Permalink to this headline"></a></h2>
+<p>Renard can also extract <em>dynamic graphs</em>: graphs that evolve through
+time. In Renard, such graphs are representend by a <code class="docutils literal notranslate"><span class="pre">List</span></code> of
+<code class="docutils literal notranslate"><span class="pre">networkx.Graph</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">renard.pipeline</span> <span class="kn">import</span> <span class="n">Pipeline</span>
+<span class="kn">from</span> <span class="nn">renard.pipeline.tokenization</span> <span class="kn">import</span> <span class="n">NLTKTokenizer</span>
+<span class="kn">from</span> <span class="nn">renard.pipeline.ner</span> <span class="kn">import</span> <span class="n">NLTKNamedEntityRecognizer</span>
+<span class="kn">from</span> <span class="nn">renard.pipeline.characters_extraction</span> <span class="kn">import</span> <span class="n">NaiveCharactersExtractor</span>
+<span class="kn">from</span> <span class="nn">renard.pipeline.graph_extraction</span> <span class="kn">import</span> <span class="n">CoOccurrencesGraphExtractor</span>
+
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;./my_doc.txt&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">text</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+
+<span class="n">pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span>
+    <span class="p">[</span>
+        <span class="n">NLTKTokenizer</span><span class="p">(),</span>
+        <span class="n">NLTKNamedEntityRecognizer</span><span class="p">(),</span>
+        <span class="n">NaiveCharactersExtractor</span><span class="p">(</span><span class="n">min_appearance</span><span class="o">=</span><span class="mi">10</span><span class="p">),</span>
+        <span class="n">CoOccurrencesGraphExtractor</span><span class="p">(</span>
+            <span class="n">co_occurences_dist</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span>
+            <span class="n">dynamic</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>     <span class="c1"># note the &#39;dynamic&#39;</span>
+            <span class="n">dynamic_window</span><span class="o">=</span><span class="mi">20</span> <span class="c1"># and the &#39;dynamic_window&#39; argument</span>
+        <span class="p">)</span>
+    <span class="p">]</span>
+<span class="p">)</span>
+
+<span class="n">out</span> <span class="o">=</span> <span class="n">pipeline</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>When executing the above block of code, the output attribute
+<code class="docutils literal notranslate"><span class="pre">characters_graph</span></code> will be a list of networkx graphs:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">out</span><span class="o">.</span><span class="n">characters_graph</span>
+<span class="go">[&lt;networkx.classes.graph.Graph object at 0x7fd9e9115900&gt;]</span>
+</pre></div>
+</div>
+<p>Plot and export functions work as one would expect
+intuitively. <a class="reference internal" href="reference.html#renard.pipeline.core.PipelineState.plot_graph" title="renard.pipeline.core.PipelineState.plot_graph"><code class="xref py py-meth docutils literal notranslate"><span class="pre">PipelineState.plot_graph()</span></code></a> allow to visualize the
+dynamic graph using a slider, and
+<a class="reference internal" href="reference.html#renard.pipeline.core.PipelineState.plot_graphs_to_dir" title="renard.pipeline.core.PipelineState.plot_graphs_to_dir"><code class="xref py py-meth docutils literal notranslate"><span class="pre">PipelineState.plot_graphs_to_dir()</span></code></a> saves plots of the dynamic
+graph to a directory. Meanwhile,
+<a class="reference internal" href="reference.html#renard.pipeline.core.PipelineState.export_graph_to_gexf" title="renard.pipeline.core.PipelineState.export_graph_to_gexf"><code class="xref py py-meth docutils literal notranslate"><span class="pre">PipelineState.export_graph_to_gexf()</span></code></a> correctly exports the
+dynamic graph to the Gephi format.</p>
 </section>
 </section>
 
