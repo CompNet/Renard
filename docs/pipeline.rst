@@ -28,7 +28,6 @@ document. Here is a simple example:
    )
 
    out = pipeline(text)
-   out.export_graph_to_gexf("./network.gexf")
 
 
 Each step of a pipeline may require informations from previous steps
@@ -63,7 +62,6 @@ to compute them yourself :
 
    # tokens are passed at call time
    out = pipeline(text, tokens=my_tokenization_function(text))
-   out.export_graph_to_gexf("./network.gexf")	
 
 
 For simplicity, one can use one of the preconfigured pipelines:
@@ -77,7 +75,6 @@ For simplicity, one can use one of the preconfigured pipelines:
 
    pipeline = bert_pipeline()
    out = pipeline(text)
-   out.export_graph_to_gexf("./network.gexf")	
 
 
 Pipeline Output: the Pipeline State
@@ -87,28 +84,74 @@ The :class:`.PipelineState` represents a state that is propagated and
 annotated during the execution of a :class:`.Pipeline`. It is the
 final value returned when running a pipeline with
 :meth:`.Pipeline.__call__`. As such, one can use it to do different
-things. For example, one can access the extracted character network:
+things. For example, one can access the extracted character network as
+a networkx graph:
 
->>> out = pipeline(text)
 >>> out.characters_graph
 <networkx.classes.graph.Graph object at 0x7fd9e9115900>
 
 one can also access the output of each :class:`.PipelineStep`.
 
-A few plot functions are provided for convenience
+A few matplotlib-based plot functions are provided for convenience
 (:meth:`.PipelineState.plot_graph`,
-:meth:`.PipelineState.plot_graph_to_file`,
-:meth:`.PipelineState.plot_graphs_to_dir`). These functions should be
-seen more as exploration and debug tools rather than fully-fledged
-visualisation platforms. If you want a fully-featured visualisation
-tool, you can export your graph to Gephi's `gexf` format:
+:meth:`.PipelineState.plot_graph_to_file`):
+
+>>> import matplotlib.pyplot as plt
+>>> out.plot_graph()
+>>> plt.show()
+
+These functions should be seen more as exploration and debug tools
+rather than fully-fledged visualisation platforms. If you want a
+fully-featured visualisation tool, you can export your graph to
+Gephi's `gexf` format:
 
 >>> out.export_graph_to_gexf("./graph.gexf")
 
 
-
-Pipeline Steps
+Dynamic Graphs
 ==============
 
-A pipeline is a sequential series of
-:class:`.PipelineStep`, that are applied in order.
+Renard can also extract *dynamic graphs*: graphs that evolve through
+time. In Renard, such graphs are representend by a ``List`` of
+``networkx.Graph``.
+
+.. code-block:: python
+
+   from renard.pipeline import Pipeline
+   from renard.pipeline.tokenization import NLTKTokenizer
+   from renard.pipeline.ner import NLTKNamedEntityRecognizer
+   from renard.pipeline.characters_extraction import NaiveCharactersExtractor
+   from renard.pipeline.graph_extraction import CoOccurrencesGraphExtractor
+
+   with open("./my_doc.txt") as f:
+       text = f.read()
+
+   pipeline = Pipeline(
+       [
+           NLTKTokenizer(),
+           NLTKNamedEntityRecognizer(),
+           NaiveCharactersExtractor(min_appearance=10),
+           CoOccurrencesGraphExtractor(
+	       co_occurences_dist=25,
+	       dynamic=True,     # note the 'dynamic'
+	       dynamic_window=20 # and the 'dynamic_window' argument
+	   )
+       ]
+   )
+
+   out = pipeline(text)
+
+
+When executing the above block of code, the output attribute
+``characters_graph`` will be a list of networkx graphs:
+
+>>> out.characters_graph
+[<networkx.classes.graph.Graph object at 0x7fd9e9115900>]
+
+Plot and export functions work as one would expect
+intuitively. :meth:`.PipelineState.plot_graph` allow to visualize the
+dynamic graph using a slider, and
+:meth:`.PipelineState.plot_graphs_to_dir` saves plots of the dynamic
+graph to a directory. Meanwhile,
+:meth:`.PipelineState.export_graph_to_gexf` correctly exports the
+dynamic graph to the Gephi format.
