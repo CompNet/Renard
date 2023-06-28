@@ -35,7 +35,7 @@ class Character:
         return hash(tuple(sorted(self.names)))
 
     def __repr__(self) -> str:
-        return f"<{self.longest_name()}, {self.gender}, {len(self.mentions)} mentions>"
+        return f"<{self.most_frequent_name()}, {self.gender}, {len(self.mentions)} mentions>"
 
 
 def _assign_coreference_mentions(
