@@ -126,8 +126,6 @@ class CoOccurrencesGraphExtractor(PipelineStep):
     def __call__(
         self,
         text: str,
-        tokens: List[str],
-        bio_tags: List[str],
         characters: Set[Character],
         sentences: List[List[str]],
         chapter_tokens: Optional[List[List[str]]] = None,
@@ -136,16 +134,12 @@ class CoOccurrencesGraphExtractor(PipelineStep):
     ) -> Dict[str, Any]:
         """Extract a characters graph
 
-        :param tokens:
-        :param bio_tags:
         :param characters:
 
         :return: a ``dict`` with key ``'characters_graph'`` and a
             :class:`nx.Graph` or a list of :class:`nx.Graph` as
             value.
         """
-        assert len(tokens) == len(bio_tags)
-
         mentions = []
         for character in characters:
             for mention in character.mentions:
@@ -394,7 +388,7 @@ class CoOccurrencesGraphExtractor(PipelineStep):
         return "any"
 
     def needs(self) -> Set[str]:
-        needs = {"tokens", "bio_tags", "characters", "sentences"}
+        needs = {"characters", "sentences"}
         if self.dynamic_needs_chapter:
             needs.add("chapter_tokens")
         return needs

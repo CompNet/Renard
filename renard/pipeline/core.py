@@ -32,6 +32,7 @@ from renard.graph_utils import (
 
 if TYPE_CHECKING:
     from renard.pipeline.characters_extraction import Character
+    from renard.pipeline.ner import NEREntity
     import matplotlib.pyplot as plt
 
 
@@ -156,8 +157,8 @@ class PipelineState:
     #: polarity of each sentence
     sentences_polarities: Optional[List[float]] = None
 
-    #: BIO NER tags, aligned with ``self.tokens``
-    bio_tags: Optional[List[str]] = None
+    #: NER entities
+    entities: Optional[List[NEREntity]] = None
     #: BIO NER tags, aligned with ``self.wp_tokens``
     wp_bio_tags: Optional[List[str]] = None
     #: BERT batch encodings

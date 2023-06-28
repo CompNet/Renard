@@ -6,8 +6,8 @@ from dataclasses import dataclass
 from nameparser import config
 from nameparser import HumanName
 from renard.gender import Gender
-from renard.pipeline.ner import ner_entities
 from renard.pipeline.core import Mention, PipelineStep
+from renard.pipeline.ner import NEREntity
 from renard.pipeline.progress import ProgressReporter
 from renard.resources.hypocorisms import HypocorismGazetteer
 from renard.resources.pronouns import is_a_female_pronoun, is_a_male_pronoun
@@ -101,23 +101,19 @@ class NaiveCharactersExtractor(PipelineStep):
     def __call__(
         self,
         text: str,
-        tokens: List[str],
-        bio_tags: List[str],
+        entities: List[NEREntity],
         corefs: Optional[List[List[Mention]]] = None,
         **kwargs,
     ) -> Dict[str, Any]:
         """
         :param text:
         :param tokens:
-        :param bio_tags:
+        :param entities:
         """
-        assert len(tokens) == len(bio_tags)
-
-        entities = ner_entities(tokens, bio_tags)
-        entities = [e for e in entities if e.tag == "PER"]
+        persons = [e for e in entities if e.tag == "PER"]
 
         characters = defaultdict(list)
-        for entity in entities:
+        for entity in persons:
             characters[" ".join(entity.tokens)].append(entity)
 
         characters = [
@@ -137,7 +133,7 @@ class NaiveCharactersExtractor(PipelineStep):
         return "any"
 
     def needs(self) -> Set[str]:
-        return {"tokens", "bio_tags"}
+        return {"entities"}
 
     def optional_needs(self) -> Set[str]:
         return {"corefs"}
@@ -187,17 +183,13 @@ class GraphRulesCharactersExtractor(PipelineStep):
 
     def __call__(
         self,
-        tokens: List[str],
-        bio_tags: List[str],
+        entities: List[NEREntity],
         corefs: Optional[List[List[Mention]]] = None,
         **kwargs: dict,
     ) -> Dict[str, Any]:
-        assert len(tokens) == len(bio_tags)
-
         import networkx as nx
 
-        mentions = ner_entities(tokens, bio_tags)
-        mentions = [m for m in mentions if m.tag == "PER"]
+        mentions = [m for m in entities if m.tag == "PER"]
         mentions_str = [" ".join(m.tokens) for m in mentions]
 
         # * create a graph where each node is a mention detected by NER
@@ -363,7 +355,7 @@ class GraphRulesCharactersExtractor(PipelineStep):
         return Gender.MALE if male_count > female_count else Gender.FEMALE
 
     def needs(self) -> Set[str]:
-        return {"tokens", "bio_tags"}
+        return {"entities"}
 
     def optional_needs(self) -> Set[str]:
         return {"corefs"}

@@ -130,7 +130,8 @@ class NLTKNamedEntityRecognizer(PipelineStep):
         word_tag_iobtags = tree2conlltags(
             nltk.ne_chunk(nltk.pos_tag(tokens, lang=self.lang))
         )
-        return {"bio_tags": nltk_fix_bio_tags([wti[2] for wti in word_tag_iobtags])}
+        bio_tags = nltk_fix_bio_tags([wti[2] for wti in word_tag_iobtags])
+        return {"entities": ner_entities(tokens, bio_tags)}
 
     def supported_langs(self) -> Union[Set[str], Literal["any"]]:
         # POS Tagging only supports english and russian
@@ -140,7 +141,7 @@ class NLTKNamedEntityRecognizer(PipelineStep):
         return {"tokens"}
 
     def production(self) -> Set[str]:
-        return {"bio_tags"}
+        return {"entities"}
 
 
 class BertNamedEntityRecognizer(PipelineStep):
@@ -195,6 +196,7 @@ class BertNamedEntityRecognizer(PipelineStep):
     def __call__(
         self,
         text: str,
+        tokens: List[str],
         bert_batch_encoding: BatchEncoding,
         wp_tokens: List[str],
         **kwargs,
@@ -235,10 +237,7 @@ class BertNamedEntityRecognizer(PipelineStep):
                 wp_tokens, wp_labels
             )
 
-        return {
-            "wp_bio_tags": wp_labels,
-            "bio_tags": labels,
-        }
+        return {"entities": ner_entities(tokens, labels)}
 
     @staticmethod
     def wp_labels_to_token_labels(
@@ -270,7 +269,7 @@ class BertNamedEntityRecognizer(PipelineStep):
         return {"eng", "fra"}
 
     def needs(self) -> Set[str]:
-        return {"bert_batch_encoding", "wp_tokens"}
+        return {"tokens", "bert_batch_encoding", "wp_tokens"}
 
     def production(self) -> Set[str]:
-        return {"wp_bio_tags", "bio_tags"}
+        return {"entities"}
