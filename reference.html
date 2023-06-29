@@ -43,7 +43,8 @@
 <li class="toctree-l1"><a class="reference internal" href="pipeline.html">The Pipeline</a></li>
 <li class="toctree-l1"><a class="reference internal" href="extending.html">Extending Renard</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Reference</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#pipeline">Pipeline</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#core">Core</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#pipeline">Pipeline</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#pipeline-state">Pipeline State</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#pipeline-steps">Pipeline Steps</a></li>
 </ul>
@@ -62,6 +63,10 @@
 <li class="toctree-l2"><a class="reference internal" href="#coreference-resolution">Coreference Resolution</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#bertcoreferenceresolver">BertCoreferenceResolver</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#spacycorefereecoreferenceresolver">SpacyCorefereeCoreferenceResolver</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#sentiment-analysis">Sentiment Analysis</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#nltksentimentanalyzer">NLTKSentimentAnalyzer</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#characters-extraction">Characters Extraction</a><ul>
@@ -105,8 +110,10 @@
              
   <section id="reference">
 <h1>Reference<a class="headerlink" href="#reference" title="Permalink to this headline"></a></h1>
+<section id="core">
+<h2>Core<a class="headerlink" href="#core" title="Permalink to this headline"></a></h2>
 <section id="pipeline">
-<h2>Pipeline<a class="headerlink" href="#pipeline" title="Permalink to this headline"></a></h2>
+<h3>Pipeline<a class="headerlink" href="#pipeline" title="Permalink to this headline"></a></h3>
 <dl class="py class">
 <dt class="sig sig-object py" id="renard.pipeline.core.Pipeline">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">renard.pipeline.core.</span></span><span class="sig-name descname"><span class="pre">Pipeline</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">steps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lang</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'eng'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress_report</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'tqdm'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">warn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.core.Pipeline" title="Permalink to this definition"></a></dt>
@@ -246,6 +253,7 @@ with a production in <code class="docutils literal notranslate"><span class="pre
 
 </dd></dl>
 
+</section>
 <section id="pipeline-state">
 <h3>Pipeline State<a class="headerlink" href="#pipeline-state" title="Permalink to this headline"></a></h3>
 <dl class="py class">
@@ -1503,6 +1511,75 @@ by derived classes.</p>
 
 </section>
 </section>
+<section id="sentiment-analysis">
+<h2>Sentiment Analysis<a class="headerlink" href="#sentiment-analysis" title="Permalink to this headline"></a></h2>
+<section id="nltksentimentanalyzer">
+<h3>NLTKSentimentAnalyzer<a class="headerlink" href="#nltksentimentanalyzer" title="Permalink to this headline"></a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="renard.pipeline.sentiment_analysis.NLTKSentimentAnalyzer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">renard.pipeline.sentiment_analysis.</span></span><span class="sig-name descname"><span class="pre">NLTKSentimentAnalyzer</span></span><a class="headerlink" href="#renard.pipeline.sentiment_analysis.NLTKSentimentAnalyzer" title="Permalink to this definition"></a></dt>
+<dd><p>A sentiment analyzer based on NLTK’s Vader.</p>
+<p>Hutto, C.J. &amp; Gilbert, E.E. (2014).  VADER: A Parsimonious
+Rule-based Model for Sentiment Analysis of Social Media Text.
+Eighth International Conference on Weblogs and Social Media
+(ICWSM-14).  Ann Arbor, MI, June 2014.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="renard.pipeline.sentiment_analysis.NLTKSentimentAnalyzer.__call__">
+<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sentences</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.sentiment_analysis.NLTKSentimentAnalyzer.__call__" title="Permalink to this definition"></a></dt>
+<dd><p>Call self as a function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>text</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – </p></li>
+<li><p><strong>sentences</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="renard.pipeline.sentiment_analysis.NLTKSentimentAnalyzer.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.sentiment_analysis.NLTKSentimentAnalyzer.__init__" title="Permalink to this definition"></a></dt>
+<dd><p>Initialize the <code class="xref py py-class docutils literal notranslate"><span class="pre">PipelineStep</span></code> with a given configuration.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="renard.pipeline.sentiment_analysis.NLTKSentimentAnalyzer.needs">
+<span class="sig-name descname"><span class="pre">needs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.sentiment_analysis.NLTKSentimentAnalyzer.needs" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Set</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>a <cite>set</cite> of state attributes needed by this
+<code class="xref py py-class docutils literal notranslate"><span class="pre">PipelineStep</span></code>. This method must be overriden
+by derived classes.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="renard.pipeline.sentiment_analysis.NLTKSentimentAnalyzer.production">
+<span class="sig-name descname"><span class="pre">production</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.sentiment_analysis.NLTKSentimentAnalyzer.production" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Set</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>a <cite>set</cite> of state attributes produced by this
+<code class="xref py py-class docutils literal notranslate"><span class="pre">PipelineStep</span></code>. This method must be overriden
+by derived classes.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
 <section id="characters-extraction">
 <h2>Characters Extraction<a class="headerlink" href="#characters-extraction" title="Permalink to this headline"></a></h2>
 <dl class="py class">
@@ -1683,10 +1760,9 @@ the string <code class="docutils literal notranslate"><span class="pre">'any'</s
 <dd><p>Extract characters by creating a graph where mentions are
 linked when they refer to the same character, and then
 merging this graph nodes.</p>
-<p>This algorithm is inspired from Vala et al., 2015</p>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>This is a work in progress.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This algorithm is inspired from Vala et al., 2015.</p>
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -2078,7 +2154,7 @@ using <code class="docutils literal notranslate"><span class="pre">server_kwargs
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>annotate_corefs</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – </p></li>
-<li><p><strong>corefs_algorithm</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – </p></li>
+<li><p><strong>corefs_algorithm</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code>[‘deterministic’, ‘statistical’, ‘neural’]) – </p></li>
 <li><p><strong>corenlp_custom_properties</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]]) – </p></li>
 <li><p><strong>server_timeout</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – </p></li>
 </ul>
@@ -2107,7 +2183,7 @@ using <code class="docutils literal notranslate"><span class="pre">server_kwargs
 <li><p><strong>annotate_corefs</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – <code class="docutils literal notranslate"><span class="pre">True</span></code> if coreferences must be
 annotated, <code class="docutils literal notranslate"><span class="pre">False</span></code> otherwise. This parameter is not
 yet implemented.</p></li>
-<li><p><strong>corefs_algorithm</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – one of <code class="docutils literal notranslate"><span class="pre">{&quot;deterministic&quot;,</span> <span class="pre">&quot;statistical&quot;,</span> <span class="pre">&quot;neural&quot;}</span></code></p></li>
+<li><p><strong>corefs_algorithm</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code>[‘deterministic’, ‘statistical’, ‘neural’]) – one of <code class="docutils literal notranslate"><span class="pre">{&quot;deterministic&quot;,</span> <span class="pre">&quot;statistical&quot;,</span> <span class="pre">&quot;neural&quot;}</span></code></p></li>
 <li><p><strong>corenlp_custom_properties</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]]) – custom properties dictionary to pass to the
 CoreNLP server. Note that some properties are already set when calling the
 server, so not all properties are supported : it is intended as a last

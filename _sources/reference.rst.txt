@@ -3,8 +3,11 @@ Reference
 =========
 
 
+Core
+====
+
 Pipeline
-========
+--------
 
 .. autoclass:: renard.pipeline.core.Pipeline
    :members:
@@ -86,6 +89,16 @@ SpacyCorefereeCoreferenceResolver
 ---------------------------------
 
 .. autoclass:: renard.pipeline.corefs.SpacyCorefereeCoreferenceResolver
+   :members:
+
+
+Sentiment Analysis
+==================
+
+NLTKSentimentAnalyzer
+---------------------
+
+.. autoclass:: renard.pipeline.sentiment_analysis.NLTKSentimentAnalyzer
    :members:
 
       
