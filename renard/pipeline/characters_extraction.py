@@ -147,12 +147,9 @@ class GraphRulesCharactersExtractor(PipelineStep):
     linked when they refer to the same character, and then
     merging this graph nodes.
 
-    This algorithm is inspired from Vala et al., 2015
+    .. note::
 
-    .. warning::
-
-        This is a work in progress.
-
+        This algorithm is inspired from Vala et al., 2015.
     """
 
     def __init__(
