@@ -1,5 +1,5 @@
 import os
-from typing import List, Optional, Set, Dict, Any
+from typing import List, Optional, Set, Dict, Any, Literal
 from renard.pipeline.ner import ner_entities
 
 import stanza
@@ -85,7 +85,9 @@ class StanfordCoreNLPPipeline(PipelineStep):
     def __init__(
         self,
         annotate_corefs: bool = False,
-        corefs_algorithm: str = "statistical",
+        corefs_algorithm: Literal[
+            "deterministic", "statistical", "neural"
+        ] = "statistical",
         corenlp_custom_properties: Optional[Dict[str, Any]] = None,
         server_timeout: int = 9999999,
         **server_kwargs,
