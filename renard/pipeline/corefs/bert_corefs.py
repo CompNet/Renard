@@ -118,7 +118,7 @@ class CoreferenceDocument:
                 new_chain.append(
                     Mention(tokens[start_idx : end_idx + 1], start_idx, end_idx)
                 )
-            if len(new_chain) > 1:
+            if len(new_chain) > 0:
                 new_chains.append(new_chain)
 
         document = CoreferenceDocument(tokens, new_chains)
