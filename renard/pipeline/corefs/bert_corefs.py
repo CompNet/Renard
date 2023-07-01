@@ -410,7 +410,7 @@ def load_litbank_dataset(
             CoreferenceDataset.from_conll2012_file(
                 fpath, tokenizer, max_span_size, 3, 12
             )
-            for fpath in glob.glob(f"{root_path}/coref/conll/*.conll")
+            for fpath in sorted(glob.glob(f"{root_path}/coref/conll/*.conll"))
         ]
     )
 
@@ -620,13 +620,16 @@ class BertForCoreferenceResolution(BertPreTrainedModel):
 
         We use the following short notation to annotate shapes :
 
-        - b : batch_size
-        - s : seq_size
-        - p : spans_nb
-        - m : top_mentions_nb
-        - a : antecedents_nb
-        - h : hidden_size
+        - b: batch_size
+        - s: seq_size
+        - p: spans_nb
+        - m: top_mentions_nb
+        - a: antecedents_nb
+        - h: hidden_size
+        - t: metadatas_features_size
     """
+
+    DIST_BUCKETS = [1, 2, 3, 4, 8, 16, 32, 64, 128]
 
     def __init__(
         self,
@@ -637,6 +640,7 @@ class BertForCoreferenceResolution(BertPreTrainedModel):
         segment_size: int = 128,
         mention_scorer_hidden_size: int = 3000,
         mention_scorer_dropout: float = 0.1,
+        metadatas_features_size: int = 20,
         **kwargs,
     ):
         super().__init__(config, **kwargs)
@@ -646,8 +650,8 @@ class BertForCoreferenceResolution(BertPreTrainedModel):
         self.mentions_per_tokens = mentions_per_tokens
         self.antecedents_nb = antecedents_nb
         self.max_span_size = max_span_size
-
         self.segment_size = segment_size
+        self.metadatas_features_size = metadatas_features_size
 
         self.mention_scorer_dropout = torch.nn.Dropout(p=mention_scorer_dropout)
 
@@ -656,8 +660,12 @@ class BertForCoreferenceResolution(BertPreTrainedModel):
         )
         self.mention_scorer = torch.nn.Linear(mention_scorer_hidden_size, 1)
 
+        self.dist_bucket_embedding = torch.nn.Embedding(
+            len(BertForCoreferenceResolution.DIST_BUCKETS) + 1, metadatas_features_size
+        )
+
         self.mention_compatibility_scorer_hidden = torch.nn.Linear(
-            4 * config.hidden_size, mention_scorer_hidden_size
+            4 * config.hidden_size + metadatas_features_size, mention_scorer_hidden_size
         )
         self.mention_compatibility_scorer = torch.nn.Linear(
             mention_scorer_hidden_size, 1
@@ -693,14 +701,16 @@ class BertForCoreferenceResolution(BertPreTrainedModel):
         # (batch)
         return self.mention_scorer(score).squeeze(-1)
 
-    def mention_compatibility_score(self, span_bounds: torch.Tensor) -> torch.Tensor:
+    def mention_compatibility_score(
+        self, span_pairs_repr: torch.Tensor
+    ) -> torch.Tensor:
         """
-        :param span_bounds: ``(batch_size, 4 * hidden_size)``
+        :param span_bounds: ``(batch_size, 4 * hidden_size + metadatas_features_size)``
 
         :return: a tensor of shape ``(batch_size)``
         """
         # (batch_size, mention_scorer_hidden_size)
-        score = self.mention_compatibility_scorer_hidden(span_bounds)
+        score = self.mention_compatibility_scorer_hidden(span_pairs_repr)
         score = self.mention_scorer_dropout(score)
         score = torch.relu(score)
         return self.mention_compatibility_scorer(score).squeeze(-1)
@@ -773,15 +783,12 @@ class BertForCoreferenceResolution(BertPreTrainedModel):
 
         return mention_indexs
 
-    def closest_antecedents_indexs(
-        self, spans_nb: int, seq_size: int, antecedents_nb: int
-    ):
+    def distance_between_spans(self, spans_nb: int, seq_size: int) -> torch.Tensor:
         """Compute the indexs of the k closest mentions
 
         :param spans_nb: number of spans in the sequence
         :param seq_size: size of the sequence
-        :param antecedents_nb: number of antecedents to consider
-        :return: a tensor of shape ``(spans_nb, antecedents_nb)``
+        :return: a tensor of shape ``(spans_nb, spans_nb)``
         """
         p = spans_nb
         device = next(self.parameters()).device
@@ -805,6 +812,21 @@ class BertForCoreferenceResolution(BertPreTrainedModel):
         assert dist.shape == (p * p,)
         dist = dist.reshape(spans_nb, spans_nb)
 
+        return dist
+
+    def closest_antecedents_indexs(
+        self, spans_nb: int, seq_size: int, antecedents_nb: int
+    ):
+        """Compute the indexs of the k closest mentions
+
+        :param spans_nb: number of spans in the sequence
+        :param seq_size: size of the sequence
+        :param antecedents_nb: number of antecedents to consider
+        :return: a tensor of shape ``(spans_nb, antecedents_nb)``
+        """
+        dist = self.distance_between_spans(spans_nb, seq_size)
+        assert dist.shape == (spans_nb, spans_nb)
+
         # when the distance between a span and a possible antecedent
         # is 0 or negative, it means the possible antecedents is after
         # the span. Therefore, it can't be an antecedents. We set
@@ -816,6 +838,44 @@ class BertForCoreferenceResolution(BertPreTrainedModel):
         assert close_indexs.shape == (spans_nb, antecedents_nb)
 
         return close_indexs
+
+    def distance_feature(
+        self, top_antecedents_index: torch.Tensor, spans_nb: int, seq_size: int
+    ) -> torch.Tensor:
+        """Compute the distance feature between two spans
+
+        :param top_antecedents_index: ``(batch_size, top_mentions_nb, antecedents_nb)``
+        :param spans_nb:
+        :param seq_size:
+
+        :return: ``(batch_size, top_mentions_nb, antecedents_nb, metadatas_features_size)``
+        """
+        b, m, a = top_antecedents_index.shape
+        t = self.metadatas_features_size
+        p = spans_nb
+        s = seq_size
+        device = next(self.parameters()).device
+
+        dist = self.distance_between_spans(p, s)
+        dist = dist.unsqueeze(0).repeat(b, 1, 1)
+        assert dist.shape == (b, p, p)
+
+        selected_dist = batch_index_select(
+            dist.flatten(start_dim=1), 1, top_antecedents_index.flatten(start_dim=1)
+        ).reshape(b, m, a)
+        selected_dist[selected_dist <= 0] = float("Inf")
+
+        # compute the bucket of each pair of span in feature_bucket
+        buckets = sorted(BertForCoreferenceResolution.DIST_BUCKETS, reverse=True)
+        feature_bucket = torch.full((b, m, a), len(buckets)).to(device)
+        for i, bucket_dist in enumerate(buckets):
+            feature_bucket[selected_dist <= bucket_dist] = len(buckets) - 1 - i
+
+        # embed feature
+        feature = self.dist_bucket_embedding(feature_bucket)
+        assert feature.shape == (b, m, a, t)
+
+        return feature
 
     def bert_encode(
         self,
@@ -890,6 +950,7 @@ class BertForCoreferenceResolution(BertPreTrainedModel):
         batch_size = b = input_ids.shape[0]
         seq_size = s = input_ids.shape[1]
         hidden_size = h = self.config.hidden_size
+        metadatas_features_size = t = self.metadatas_features_size
 
         device = next(self.parameters()).device
 
@@ -977,8 +1038,18 @@ class BertForCoreferenceResolution(BertPreTrainedModel):
         span_bounds_combination = torch.flatten(span_bounds_combination, start_dim=2)
         assert span_bounds_combination.shape == (b, m * a, 4 * h)
 
+        # distance feature computation
+        dist_ft = self.distance_feature(top_antecedents_index, spans_nb, seq_size)
+        dist_ft = torch.flatten(dist_ft, start_dim=1, end_dim=2)
+        assert dist_ft.shape == (b, m * a, t)
+
+        # mentions pairs representations
+        span_pairs_repr = torch.cat((span_bounds_combination, dist_ft), dim=2)
+        assert span_pairs_repr.shape == (b, m * a, 4 * h + t)
+
+        # mentions pair scoring
         mention_pair_scores = self.mention_compatibility_score(
-            torch.flatten(span_bounds_combination, start_dim=0, end_dim=1)
+            torch.flatten(span_pairs_repr, start_dim=0, end_dim=1)
         )
         assert mention_pair_scores.shape == (b * m * a,)
         mention_pair_scores = mention_pair_scores.reshape(b, m, a)
