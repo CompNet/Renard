@@ -29,7 +29,7 @@ class CoreferenceDocument:
     def __len__(self) -> int:
         return len(self.tokens)
 
-    def document_labels(self, max_span_size: int) -> List[List[int]]:
+    def coref_labels(self, max_span_size: int) -> List[List[int]]:
         """
         :return: a list of shape ``(spans_nb, spans_nb + 1)``.
             when ``out[i][j] == 1``, span j is the preceding
@@ -39,7 +39,6 @@ class CoreferenceDocument:
         spans_idx = spans_indexs(self.tokens, max_span_size)
         spans_nb = len(spans_idx)
 
-        # labels = torch.zeros(spans_nb, spans_nb + 1)
         labels = [[0] * (spans_nb + 1) for _ in range(spans_nb)]
 
         # spans in a coref chain : mark all antecedents
@@ -54,6 +53,9 @@ class CoreferenceDocument:
                             (other_mention.start_idx, other_mention.end_idx)
                         )
                         labels[mention_idx][other_mention_idx] = 1
+                # ValueError happens if the mention does not exist in
+                # spans_idx. This is possible since the mention can be
+                # larger than max_span_size
                 except ValueError:
                     continue
 
@@ -64,6 +66,31 @@ class CoreferenceDocument:
                 labels[i][spans_nb] = 1
 
         return labels
+
+    def mention_labels(self, max_span_size: int) -> List[int]:
+        """
+        :return: a list of shape ``(spans_nb)``
+        """
+        spans_idx = spans_indexs(self.tokens, max_span_size)
+        spans_nb = len(spans_idx)
+
+        labels = [0 for _ in range(spans_nb)]
+
+        for chain in self.coref_chains:
+            for mention in chain:
+                try:
+                    mention_idx = spans_idx.index((mention.start_idx, mention.end_idx))
+                    labels[mention_idx] = 1
+                # ValueError happens if the mention does not exist in
+                # spans_idx. This is possible since the mention can be
+                # larger than max_span_size
+                except ValueError:
+                    continue
+
+        return labels
+
+    def document_labels(self, max_span_size: int) -> Tuple[List[List[int]], List[int]]:
+        return (self.coref_labels(max_span_size), self.mention_labels(max_span_size))
 
     def prepared_document(
         self, tokenizer: PreTrainedTokenizerFast, max_span_size: int
@@ -122,7 +149,9 @@ class CoreferenceDocument:
                 new_chains.append(new_chain)
 
         document = CoreferenceDocument(tokens, new_chains)
-        batch["labels"] = document.document_labels(max_span_size)
+        coref_labels, mention_labels = document.document_labels(max_span_size)
+        batch["coref_labels"] = coref_labels
+        batch["mention_labels"] = mention_labels
 
         return document, batch
 
@@ -532,11 +561,14 @@ def load_ontonotes_dataset(
 @dataclass
 class BertCoreferenceResolutionOutput:
 
-    # (batch_size, top_mentions_nb, antecedents_nb + 1)
+    # (batch_size, top_mentions_nb, antecedents_nb)
     logits: torch.Tensor
 
     # (batch_size, top_mentions_nb)
     top_mentions_index: torch.Tensor
+
+    # (batch_size, top_mentions_nb)
+    top_mentions_scores: torch.Tensor
 
     # (batch_size, top_mentions_nb, antecedents_nb)
     top_antecedents_index: torch.Tensor
@@ -561,41 +593,42 @@ class BertCoreferenceResolutionOutput:
 
         documents = []
 
-        for i in range(batch_size):
+        for b_i in range(batch_size):
 
-            spans_idx = spans_indexs(tokens[i], self.max_span_size)
-
-            # document = CoreferenceDocument(tokens[i], [])
+            spans_idx = spans_indexs(tokens[b_i], self.max_span_size)
 
             import networkx as nx
 
             G = nx.Graph()
 
-            for j in range(top_mentions_nb):
+            for m_j in range(top_mentions_nb):
 
-                span_idx = int(self.top_mentions_index[i][j].item())
+                span_idx = int(self.top_mentions_index[b_i][m_j].item())
                 span_coords = spans_idx[span_idx]
 
-                top_antecedent_idx = int(antecedents_idx[i][j].item())
-
-                # the antecedent is the dummy mention : skip
-                if top_antecedent_idx == antecedents_nb - 1:
-                    continue
-
-                antecedent_idx = int(
-                    self.top_antecedents_index[i][j][top_antecedent_idx].item()
-                )
-
-                antecedent_coords = spans_idx[antecedent_idx]
+                top_antecedent_idx = int(antecedents_idx[b_i][m_j].item())
 
                 span_mention = Mention(
-                    tokens[i][span_coords[0] : span_coords[1] + 1],
+                    tokens[b_i][span_coords[0] : span_coords[1] + 1],
                     span_coords[0],
                     span_coords[1],
                 )
 
+                # the antecedent is the dummy mention : maybe we have
+                # a one-mention chain ?
+                if top_antecedent_idx == antecedents_nb - 1:
+                    if self.top_mentions_scores[b_i][m_j].item() > 0.0:
+                        G.add_node(span_mention)
+                    continue
+
+                antecedent_idx = int(
+                    self.top_antecedents_index[b_i][m_j][top_antecedent_idx].item()
+                )
+
+                antecedent_coords = spans_idx[antecedent_idx]
+
                 antecedent_mention = Mention(
-                    tokens[i][antecedent_coords[0] : antecedent_coords[1] + 1],
+                    tokens[b_i][antecedent_coords[0] : antecedent_coords[1] + 1],
                     antecedent_coords[0],
                     antecedent_coords[1],
                 )
@@ -606,7 +639,7 @@ class BertCoreferenceResolutionOutput:
 
             documents.append(
                 CoreferenceDocument(
-                    tokens[i], [list(C) for C in nx.connected_components(G)]
+                    tokens[b_i], [list(C) for C in nx.connected_components(G)]
                 )
             )
 
@@ -641,6 +674,7 @@ class BertForCoreferenceResolution(BertPreTrainedModel):
         mention_scorer_hidden_size: int = 3000,
         mention_scorer_dropout: float = 0.1,
         metadatas_features_size: int = 20,
+        mention_loss_coeff: float = 0.1,
         **kwargs,
     ):
         super().__init__(config, **kwargs)
@@ -671,7 +705,7 @@ class BertForCoreferenceResolution(BertPreTrainedModel):
             mention_scorer_hidden_size, 1
         )
 
-        self.loss_fn = torch.nn.CrossEntropyLoss()
+        self.mention_loss_coeff = mention_loss_coeff
 
     def bert_parameters(self) -> Iterator[Parameter]:
         """Get BERT encoder parameters"""
@@ -757,12 +791,14 @@ class BertForCoreferenceResolution(BertPreTrainedModel):
         # TODO: what if we can't have top_mentions_nb mentions ??
         mention_indexs = []
         # TODO: optim
-        for i in range(batch_size):
+        for b_i in range(batch_size):
             mention_indexs.append([])
-            for j in range(spans_nb):
+            for s_j in range(spans_nb):
+
                 if len(mention_indexs[-1]) >= top_mentions_nb:
                     break
-                span_index = int(sorted_indexs[i][j].item())
+
+                span_index = int(sorted_indexs[b_i][s_j].item())
                 if not any(
                     [
                         spans_are_overlapping(
@@ -771,7 +807,7 @@ class BertForCoreferenceResolution(BertPreTrainedModel):
                         for mention_idx in mention_indexs[-1]
                     ]
                 ):
-                    mention_indexs[-1].append(sorted_indexs[i][j])
+                    mention_indexs[-1].append(sorted_indexs[b_i][s_j])
 
         # To construct a tensor, we need all lists of mention to be
         # the same size : to do so, we cut them to have the length of
@@ -917,7 +953,31 @@ class BertForCoreferenceResolution(BertPreTrainedModel):
 
         return torch.cat(last_hidden_states, dim=1)
 
-    def loss(self, pred_scores: torch.Tensor, labels: torch.Tensor) -> torch.Tensor:
+    def mention_loss(
+        self, top_mention_scores: torch.Tensor, mention_labels: torch.Tensor
+    ) -> torch.Tensor:
+        """As in (Xu and Choi, 2021).
+
+        :param top_mention_scores: ``(batch_size, top_mentions_nb)``
+        :param mention_labels: ``(batch_size, top_mentions_nb)``
+        """
+        device = next(self.parameters()).device
+        b, m = top_mention_scores.shape
+
+        # Compared to (Xu and Choi, 2021), we apply weighting instead
+        # of sampling
+        pos_labels_nb = sum(torch.flatten(mention_labels))
+        neg_labels_nb = b * m - pos_labels_nb
+        weight = torch.ones((b, m)).to(device)
+        weight[mention_labels == 1] = neg_labels_nb / pos_labels_nb
+
+        return torch.nn.functional.binary_cross_entropy_with_logits(
+            top_mention_scores, mention_labels.float(), weight=weight
+        )
+
+    def coref_loss(
+        self, pred_scores: torch.Tensor, coref_labels: torch.Tensor
+    ) -> torch.Tensor:
         """
         :param pred_scores: ``(batch_size, top_mentions_nb, antecedents_nb + 1)``
         :param labels: ``(batch_size, top_mentions_nb, antecedents_nb + 1)``
@@ -926,7 +986,7 @@ class BertForCoreferenceResolution(BertPreTrainedModel):
         # (batch_size, top_mentions_nb, antecedents_nb + 1)
         coreference_log_probs = torch.log_softmax(pred_scores, dim=-1)
         # (batch_size, top_mentions_nb, antecedents_nb + 1)
-        correct_antecedent_log_probs = coreference_log_probs + labels.log()
+        correct_antecedent_log_probs = coreference_log_probs + coref_labels.log()
         # (1)
         return -torch.logsumexp(correct_antecedent_log_probs, dim=-1).sum(dim=1).mean()
 
@@ -937,20 +997,21 @@ class BertForCoreferenceResolution(BertPreTrainedModel):
         token_type_ids: Optional[torch.Tensor] = None,
         position_ids: Optional[torch.Tensor] = None,
         head_mask: Optional[torch.Tensor] = None,
-        labels: Optional[torch.LongTensor] = None,
+        coref_labels: Optional[torch.LongTensor] = None,
+        mention_labels: Optional[torch.LongTensor] = None,
     ) -> BertCoreferenceResolutionOutput:
         """
         :param input_ids: a tensor of shape ``(batch_size, seq_size)``
         :param attention_mask: a tensor of shape ``(batch_size, seq_size)``
         :param token_type_ids: a tensor of shape ``(batch_size, seq_size)``
         :param position_ids: a tensor of shape ``(batch_size, seq_size)``
-        :param labels: a tensor of shape ``(batch_size, spans_nb, spans_nb)``
+        :param coref_labels: a tensor of shape ``(batch_size, spans_nb, spans_nb)``
+        :param mention_labels: a tensor of shape ``(batch_size, spans_nb)``
         """
-
         batch_size = b = input_ids.shape[0]
         seq_size = s = input_ids.shape[1]
-        hidden_size = h = self.config.hidden_size
-        metadatas_features_size = t = self.metadatas_features_size
+        h = self.config.hidden_size
+        t = self.metadatas_features_size
 
         device = next(self.parameters()).device
 
@@ -1085,28 +1146,47 @@ class BertForCoreferenceResolution(BertPreTrainedModel):
 
         # -- loss computation --
         loss = None
-        if labels is not None:
+        if coref_labels is not None and mention_labels is not None:
 
-            selected_labels = batch_index_select(labels, 1, top_mentions_index)
-            assert selected_labels.shape == (b, m, p + 1)
+            # -- coref loss
+            selected_coref_labels = batch_index_select(
+                coref_labels, 1, top_mentions_index
+            )
+            assert selected_coref_labels.shape == (b, m, p + 1)
 
-            selected_labels = batch_index_select(
-                selected_labels.flatten(start_dim=0, end_dim=1),
+            selected_coref_labels = batch_index_select(
+                selected_coref_labels.flatten(start_dim=0, end_dim=1),
                 1,
                 top_antecedents_index,
             ).reshape(b, m, a)
 
             # mentions with no antecedents are assumed to have the dummy antecedent
-            dummy_labels = (1 - selected_labels).prod(-1, keepdim=True)
+            dummy_labels = (1 - selected_coref_labels).prod(-1, keepdim=True)
 
-            selected_labels = torch.cat((selected_labels, dummy_labels), dim=2)
-            assert selected_labels.shape == (b, m, a + 1)
+            selected_coref_labels = torch.cat(
+                (selected_coref_labels, dummy_labels), dim=2
+            )
+            assert selected_coref_labels.shape == (b, m, a + 1)
 
-            loss = self.loss(final_scores, selected_labels)
+            coref_loss = self.coref_loss(final_scores, selected_coref_labels)
+
+            # -- mention loss
+            selected_mention_labels = batch_index_select(
+                mention_labels, 1, top_mentions_index
+            )
+            assert selected_mention_labels.shape == (b, m)
+
+            mention_loss = self.mention_loss(
+                top_mention_scores, selected_mention_labels
+            )
+
+            # -- final loss
+            loss = coref_loss + self.mention_loss_coeff * mention_loss
 
         return BertCoreferenceResolutionOutput(
             final_scores,
             top_mentions_index,
+            top_mention_scores,
             top_antecedents_index,
             self.max_span_size,
             loss=loss,
