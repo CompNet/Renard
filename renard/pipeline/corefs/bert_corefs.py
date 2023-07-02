@@ -189,33 +189,52 @@ class CoreferenceDocument:
 
     @staticmethod
     def from_labels(
-        tokens: List[str], labels: List[List[int]], max_span_size: int
+        tokens: List[str],
+        coref_labels: List[List[int]],
+        mention_labels: List[int],
+        max_span_size: int,
     ) -> CoreferenceDocument:
         """Construct a CoreferenceDocument using labels
 
         :param tokens:
-        :param labels: ``(spans_nb, spans_nb + 1)``
+        :param coref_labels: ``(spans_nb, spans_nb + 1)``
+        :param mention_labels: ``(spans_nb)``
         :param max_span_size:
         """
         spans_idx = spans_indexs(tokens, max_span_size)
 
         chains = []
         already_visited_mentions = []
-        for i, mention_labels in enumerate(labels):
-            if mention_labels[-1] == 1:
+
+        for i, mlabels in enumerate(coref_labels):
+
+            if mlabels[-1] == 1:
+                # singleton cluster
+                if mention_labels[i] == 1:
+                    start_idx, end_idx = spans_idx[i]
+                    mention_tokens = tokens[start_idx : end_idx + 1]
+                    chains.append([Mention(mention_tokens, start_idx, end_idx)])
+                    already_visited_mentions.append(i)
+
                 continue
+
             if i in already_visited_mentions:
                 continue
+
             start_idx, end_idx = spans_idx[i]
             mention_tokens = tokens[start_idx : end_idx + 1]
             chain = [Mention(mention_tokens, start_idx, end_idx)]
-            for j, label in enumerate(mention_labels):
+
+            for j, label in enumerate(mlabels):
+
                 if label == 0:
                     continue
+
                 start_idx, end_idx = spans_idx[j]
                 mention_tokens = tokens[start_idx : end_idx + 1]
                 chain.append(Mention(mention_tokens, start_idx, end_idx))
                 already_visited_mentions.append(j)
+
             chains.append(chain)
 
         return CoreferenceDocument(tokens, chains)
@@ -237,39 +256,53 @@ class DataCollatorForSpanClassification(DataCollatorMixin):
     return_tensors: Literal["pt"] = "pt"
 
     def torch_call(self, features) -> Union[dict, BatchEncoding]:
-        labels = (
-            [feature["labels"] for feature in features]
-            if "labels" in features[0].keys()
+
+        coref_labels = (
+            [feature["coref_labels"] for feature in features]
+            if "coref_labels" in features[0].keys()
             else None
         )
+        mention_labels = (
+            [feature["mention_labels"] for feature in features]
+            if "mention_labels" in features[0].keys()
+            else None
+        )
+        assert (coref_labels is None and mention_labels is None) or (
+            coref_labels and mention_labels
+        )
+
         batch = self.tokenizer.pad(
             features,
             padding=self.padding,
             max_length=self.max_length,
-            # Conversion to tensors will fail if we have labels as they are not of the same length yet.
-            return_tensors="pt" if labels is None else None,
+            # Conversion to tensors will fail if we have labels as
+            # they are not of the same length yet.
+            return_tensors="pt" if coref_labels is None else None,
         )
 
         # keep encoding info
         batch._encodings = [f.encodings[0] for f in features]
 
-        if labels is None:
+        if coref_labels is None:
             return batch
 
         documents = [
             CoreferenceDocument.from_labels(
-                tokens, labels, max_span_size=self.max_span_size
+                tokens, coref_labels, mention_labels, max_span_size=self.max_span_size
             )
-            for tokens, labels in zip(
-                [f["input_ids"] for f in features], [f["labels"] for f in features]
+            for tokens, coref_labels, mention_labels in zip(
+                [f["input_ids"] for f in features],
+                [f["coref_labels"] for f in features],
+                [f["mention_labels"] for f in features],
             )
         ]
 
         for document, tokens in zip(documents, batch["input_ids"]):  # type: ignore
             document.tokens = tokens
-        batch["labels"] = [
-            document.document_labels(self.max_span_size) for document in documents
-        ]
+
+        labels = [doc.document_labels(self.max_span_size) for doc in documents]
+        batch["coref_labels"] = [coref_labels for coref_labels, _ in labels]
+        batch["mention_labels"] = [mention_labels for _, mention_labels in labels]
 
         return BatchEncoding(
             {k: torch.tensor(v, dtype=torch.int64) for k, v in batch.items()},
