@@ -633,7 +633,6 @@ class BertCoreferenceResolutionOutput:
             import networkx as nx
 
             G = nx.Graph()
-
             for m_j in range(top_mentions_nb):
 
                 span_idx = int(self.top_mentions_index[b_i][m_j].item())
@@ -1021,7 +1020,7 @@ class BertForCoreferenceResolution(BertPreTrainedModel):
         # (batch_size, top_mentions_nb, antecedents_nb + 1)
         correct_antecedent_log_probs = coreference_log_probs + coref_labels.log()
         # (1)
-        return -torch.logsumexp(correct_antecedent_log_probs, dim=-1).sum(dim=1).mean()
+        return -torch.logsumexp(correct_antecedent_log_probs, dim=-1).mean()
 
     def forward(
         self,
