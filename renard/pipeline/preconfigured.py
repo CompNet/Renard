@@ -50,13 +50,13 @@ def bert_pipeline(
 ) -> Pipeline:
     """A pre-configured BERT-based pipeline
 
-    :param tokenizer_kwargs: kwargs for :class:`.BertTokenizer`
+    :param tokenizer_kwargs: kwargs for :class:`.NLTKTokenizer`
     :param ner_kwargs: kwargs for :class:`.BertNamedEntityRecognizer`
     :param characters_extractor_kwargs: kwargs for :class:`.GraphRulesCharactersExtractor`
     :param graph_extractor_kwargs: kwargs for :class:`.CoOccurrencesGraphExtractor`
     :param pipeline_kwargs: kwargs for :class:`.Pipeline`
     """
-    from renard.pipeline.tokenization import BertTokenizer
+    from renard.pipeline.tokenization import NLTKTokenizer
     from renard.pipeline.ner import BertNamedEntityRecognizer
 
     tokenizer_kwargs = tokenizer_kwargs or {}
@@ -66,7 +66,7 @@ def bert_pipeline(
 
     return Pipeline(
         [
-            BertTokenizer(),
+            NLTKTokenizer(),
             BertNamedEntityRecognizer(),
             GraphRulesCharactersExtractor(),
             CoOccurrencesGraphExtractor(co_occurences_dist=(1, "sentences")),

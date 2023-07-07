@@ -43,11 +43,6 @@ NLTKTokenizer
 .. autoclass:: renard.pipeline.tokenization.NLTKTokenizer
    :members:
 
-BertTokenizer
--------------
-
-.. autoclass:: renard.pipeline.tokenization.BertTokenizer
-   :members:
 
 
 Named Entity Recognition

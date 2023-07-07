@@ -126,11 +126,9 @@ Tokenization
 ------------
 
 Tokenization is the task of cutting text in *tokens*. It is usually
-the first task to apply to a text. 3 tokenizer are available:
+the first task to apply to a text. 2 tokenizer are available:
 
 - :class:`.NLTKTokenizer`
-- :class:`.BertTokenizer`, that must be used when applying BERT-based
-  steps later (such as :class:`.BertNamedEntityRecognizer`).
 - :class:`.StanfordCoreNLPPipeline` does contain a tokenizer as part
   of its full NLP pipeline.
 
@@ -142,8 +140,7 @@ Named entity recognition (NER) detects entities occurences in the
 text. 3 modules are available:
 
 - :class:`.NLTKNamedEntityRecognizer`
-- :class:`.BertNamedEntityRecognizer` must be used in conjunction with
-  :class:`.BertTokenizer`.
+- :class:`.BertNamedEntityRecognizer`
 - :class:`.StanfordCoreNLPPipeline` contains a NER model as part of
   its full NLP pipeline.
 
