@@ -15,7 +15,7 @@ def _characters_from_mentions(mentions: List[NEREntity]) -> List[Character]:
     """Generate characters from a list of mentions"""
     name_to_mentions = defaultdict(list)
     for mention in mentions:
-        name_to_mentions[mention.tokens[0]].append(mention)
+        name_to_mentions[" ".join(mention.tokens)].append(mention)
     return [
         Character(frozenset((name,)), mentions)
         for name, mentions in name_to_mentions.items()

@@ -196,7 +196,9 @@ class CoOccurrencesGraphExtractor(PipelineStep):
         elif self.co_occurences_dist[1] == "sentences":
             assert not sentences is None
             mention_1_sent = sent_index_for_token_index(mention_1.start_idx, sentences)
-            mention_2_sent = sent_index_for_token_index(mention_2.end_idx, sentences)
+            mention_2_sent = sent_index_for_token_index(
+                mention_2.end_idx - 1, sentences
+            )
             return abs(mention_2_sent - mention_1_sent) <= self.co_occurences_dist[0]
         else:
             raise NotImplementedError
