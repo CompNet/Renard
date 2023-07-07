@@ -148,8 +148,6 @@ class PipelineState:
     tokens: Optional[List[str]] = None
     #: text splitted in tokens, by chapter
     chapter_tokens: Optional[List[List[str]]] = None
-    #: word piece tokens, for BERT-like models
-    wp_tokens: Optional[List[str]] = None
     #: text splitted into sentences, each sentence being a list of
     #: tokens
     sentences: Optional[List[List[str]]] = None
@@ -159,10 +157,6 @@ class PipelineState:
 
     #: NER entities
     entities: Optional[List[NEREntity]] = None
-    #: BIO NER tags, aligned with ``self.wp_tokens``
-    wp_bio_tags: Optional[List[str]] = None
-    #: BERT batch encodings
-    bert_batch_encoding: Optional[BatchEncoding] = None
 
     #: coreference chains
     corefs: Optional[List[List[Mention]]] = None
