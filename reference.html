@@ -891,8 +891,8 @@ using <a class="reference internal" href="#renard.pipeline.ner.NEREntity.shifted
 <li><p><strong>huggingface_model_id</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – a custom huggingface model id.
 This allows to bypass the <code class="docutils literal notranslate"><span class="pre">lang</span></code> pipeline parameter
 which normally choose a huggingface model automatically.</p></li>
-<li><p><strong>batch_size</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – </p></li>
-<li><p><strong>device</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code>[‘cpu’, ‘cuda’, ‘auto’]) – </p></li>
+<li><p><strong>batch_size</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – batch size at inference</p></li>
+<li><p><strong>device</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code>[‘cpu’, ‘cuda’, ‘auto’]) – computation device</p></li>
 </ul>
 </dd>
 </dl>
@@ -1118,7 +1118,7 @@ chain being <a class="reference internal" href="#renard.pipeline.core.Mention" t
 <h3>BertCoreferenceResolver<a class="headerlink" href="#bertcoreferenceresolver" title="Permalink to this headline"></a></h3>
 <dl class="py class">
 <dt class="sig sig-object py" id="renard.pipeline.corefs.BertCoreferenceResolver">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">renard.pipeline.corefs.</span></span><span class="sig-name descname"><span class="pre">BertCoreferenceResolver</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mentions_per_tokens</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">antecedents_nb</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_span_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tokenizer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'bert-base-cased'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">block_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">128</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'auto'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.corefs.BertCoreferenceResolver" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">renard.pipeline.corefs.</span></span><span class="sig-name descname"><span class="pre">BertCoreferenceResolver</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hugginface_model_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'auto'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.corefs.BertCoreferenceResolver" title="Permalink to this definition"></a></dt>
 <dd><p>A coreference resolver using BERT.  Loosely based on ‘End-to-end
 Neural Coreference Resolution’ (Lee et at.  2017) and ‘BERT for
 coreference resolution’ (Joshi et al.  2019).</p>
@@ -1129,13 +1129,8 @@ coreference resolution’ (Joshi et al.  2019).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>model</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – </p></li>
-<li><p><strong>mentions_per_tokens</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – </p></li>
-<li><p><strong>antecedents_nb</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – </p></li>
-<li><p><strong>max_span_size</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – </p></li>
-<li><p><strong>tokenizer</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – </p></li>
+<li><p><strong>hugginface_model_id</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – </p></li>
 <li><p><strong>batch_size</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – </p></li>
-<li><p><strong>block_size</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – </p></li>
 <li><p><strong>device</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code>[‘auto’, ‘cuda’, ‘cpu’]) – </p></li>
 </ul>
 </dd>
@@ -1159,7 +1154,7 @@ coreference resolution’ (Joshi et al.  2019).</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="renard.pipeline.corefs.BertCoreferenceResolver.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mentions_per_tokens</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">antecedents_nb</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_span_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tokenizer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'bert-base-cased'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">block_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">128</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'auto'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.corefs.BertCoreferenceResolver.__init__" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hugginface_model_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'auto'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.corefs.BertCoreferenceResolver.__init__" title="Permalink to this definition"></a></dt>
 <dd><div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>In the future, only <code class="docutils literal notranslate"><span class="pre">mentions_per_tokens</span></code>,
@@ -1169,17 +1164,27 @@ directly from the model’s config.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>model</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – key of the huggingface model</p></li>
-<li><p><strong>mentions_per_tokens</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – number of candidate mention per
-wordpiece token</p></li>
-<li><p><strong>antecedents_nb</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – max number of candidate antecedents for
-each candidate mention</p></li>
-<li><p><strong>max_span_size</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – maximum size of candidate spans, in
-wordpiece tokens</p></li>
-<li><p><strong>tokenizer</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – name of the hugginface tokenizer</p></li>
+<li><p><strong>huggingface_model_id</strong> – a custom huggingface model id.
+This allows to bypass the <code class="docutils literal notranslate"><span class="pre">lang</span></code> pipeline parameter
+which normally choose a huggingface model automatically.</p></li>
 <li><p><strong>batch_size</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – batch size at inference</p></li>
-<li><p><strong>block_size</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – size of text blocks to consider</p></li>
 <li><p><strong>device</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code>[‘auto’, ‘cuda’, ‘cpu’]) – computation device</p></li>
+<li><p><strong>hugginface_model_id</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="renard.pipeline.corefs.BertCoreferenceResolver._pipeline_init_">
+<span class="sig-name descname"><span class="pre">_pipeline_init_</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lang</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress_reporter</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.corefs.BertCoreferenceResolver._pipeline_init_" title="Permalink to this definition"></a></dt>
+<dd><p>Set the step configuration that is common to the whole pipeline.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lang</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – ISO 639-3 language string</p></li>
+<li><p><strong>progress_report</strong> – </p></li>
+<li><p><strong>progress_reporter</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ProgressReporter</span></code>) – </p></li>
 </ul>
 </dd>
 </dl>
@@ -1211,6 +1216,20 @@ by derived classes.</p>
 <dd class="field-even"><p>a <cite>set</cite> of state attributes produced by this
 <code class="xref py py-class docutils literal notranslate"><span class="pre">PipelineStep</span></code>. This method must be overriden
 by derived classes.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="renard.pipeline.corefs.BertCoreferenceResolver.supported_langs">
+<span class="sig-name descname"><span class="pre">supported_langs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.corefs.BertCoreferenceResolver.supported_langs" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Set</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>], <code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code>[‘any’]]</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>a list of supported languages, as ISO 639-3 codes, or
+the string <code class="docutils literal notranslate"><span class="pre">'any'</span></code></p>
 </dd>
 </dl>
 </dd></dl>
