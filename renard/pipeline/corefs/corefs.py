@@ -1,11 +1,9 @@
 from __future__ import annotations
-from typing import List, Literal, Optional, Set, Dict, Any, cast
+from typing import List, Literal, Optional, Set, Dict, Any, Union
 from importlib import import_module
 import torch
-from transformers import BertTokenizerFast  # type: ignore
 from more_itertools import windowed
 from renard.pipeline import PipelineStep, Mention, ProgressReporter
-from renard.pipeline.corefs.bert_corefs import BertForCoreferenceResolution
 
 
 class BertCoreferenceResolver(PipelineStep):
@@ -22,13 +20,8 @@ class BertCoreferenceResolver(PipelineStep):
 
     def __init__(
         self,
-        model: str,
-        mentions_per_tokens: float,
-        antecedents_nb: int,
-        max_span_size: int,
-        tokenizer: str = "bert-base-cased",
+        hugginface_model_id: Optional[str] = None,
         batch_size: int = 4,
-        block_size: int = 128,
         device: Literal["auto", "cuda", "cpu"] = "auto",
     ) -> None:
         """
@@ -38,48 +31,48 @@ class BertCoreferenceResolver(PipelineStep):
             ``antecedents_nb`` and ``max_span_size`` shall be read
             directly from the model's config.
 
-        :param model: key of the huggingface model
-        :param mentions_per_tokens: number of candidate mention per
-            wordpiece token
-        :param antecedents_nb: max number of candidate antecedents for
-            each candidate mention
-        :param max_span_size: maximum size of candidate spans, in
-            wordpiece tokens
-        :param tokenizer: name of the hugginface tokenizer
+        :param huggingface_model_id: a custom huggingface model id.
+            This allows to bypass the ``lang`` pipeline parameter
+            which normally choose a huggingface model automatically.
         :param batch_size: batch size at inference
-        :param block_size: size of text blocks to consider
         :param device: computation device
         """
-        if device == "auto":
-            torch_device = torch.device("cuda" if torch.cuda.is_available else "cpu")
-        else:
-            torch_device = torch.device(device)
-
-        self.bert_for_corefs = BertForCoreferenceResolution.from_pretrained(
-            model, mentions_per_tokens, antecedents_nb, max_span_size
-        )  # type: ignore
-        self.bert_for_corefs = cast(BertForCoreferenceResolution, self.bert_for_corefs)
-        self.bert_for_corefs = self.bert_for_corefs.to(torch_device)  # type: ignore
-
-        self.tokenizer = BertTokenizerFast.from_pretrained(tokenizer)  # type: ignore
-
+        self.hugginface_model_id = hugginface_model_id
         self.batch_size = batch_size
 
-        self.block_size = block_size
+        if device == "auto":
+            self.device = torch.device("cuda" if torch.cuda.is_available else "cpu")
+        else:
+            self.device = torch.device(device)
 
         super().__init__()
 
+    def _pipeline_init_(self, lang: str, progress_reporter: ProgressReporter):
+        from tibert import BertForCoreferenceResolution
+        from transformers import BertTokenizerFast
+
+        self.bert_for_corefs = BertForCoreferenceResolution.from_pretrained(
+            "compnet-renard/bert-base-cased-literary-coref"
+        )
+        self.tokenizer = BertTokenizerFast.from_pretrained("bert-base-cased")
+
+        super()._pipeline_init_(lang, progress_reporter)
+
     def __call__(self, text: str, tokens: List[str], **kwargs) -> Dict[str, Any]:
+        from tibert import predict_coref
+
+        # TODO: BertForCoreferenceResolution is limited to 512 tokens
+        # for now - we pass small block to avoid triggering that limit
+        # and having truncations issues
+        BLOCK_SIZE = 128
+
         blocks = [
-            tokens[block_start : block_start + self.block_size]
-            for block_start in range(0, len(tokens), self.block_size)
+            tokens[block_start : block_start + BLOCK_SIZE]
+            for block_start in range(0, len(tokens), BLOCK_SIZE)
         ]
 
-        coref_docs = self.bert_for_corefs.predict(
-            blocks,
-            self.tokenizer,
-            self.batch_size,
-        )
+        coref_docs = predict_coref(blocks, self.bert_for_corefs, self.tokenizer)
+
         # chains found in coref_docs are each local to their
         # blocks. The following code adjusts their start and end index
         # to match their global coordinate in the text.
@@ -102,6 +95,9 @@ class BertCoreferenceResolver(PipelineStep):
 
     def production(self) -> Set[str]:
         return {"corefs"}
+
+    def supported_langs(self) -> Union[Set[str], Literal["any"]]:
+        return {"eng"}
 
 
 from typing import TYPE_CHECKING
@@ -267,7 +263,7 @@ class SpacyCorefereeCoreferenceResolver(PipelineStep):
                     mention = Mention(
                         [str(t) for t in mention_tokens],
                         mention_tokens[0].i + chunk_start,
-                        mention_tokens[-1].i + chunk_start,
+                        mention_tokens[-1].i + chunk_start + 1,
                     )
                     cur_chain.append(mention)
 

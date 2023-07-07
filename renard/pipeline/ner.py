@@ -50,7 +50,7 @@ def ner_entities(
                 NEREntity(
                     tokens[current_tag_start_idx:i],
                     current_tag_start_idx,
-                    i - 1,
+                    i,
                     current_tag,
                 )
             )
@@ -73,7 +73,7 @@ def ner_entities(
             NEREntity(
                 tokens[current_tag_start_idx : len(tokens)],
                 current_tag_start_idx,
-                len(bio_tags) - 1,
+                len(bio_tags),
                 current_tag,
             )
         )
@@ -162,7 +162,8 @@ class BertNamedEntityRecognizer(PipelineStep):
         :param huggingface_model_id: a custom huggingface model id.
             This allows to bypass the ``lang`` pipeline parameter
             which normally choose a huggingface model automatically.
-        :param batch_size:
+        :param batch_size: batch size at inference
+        :param device: computation device
         """
         self.huggingface_model_id = huggingface_model_id
         self.batch_size = batch_size
