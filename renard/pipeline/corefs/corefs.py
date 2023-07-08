@@ -11,11 +11,6 @@ class BertCoreferenceResolver(PipelineStep):
     A coreference resolver using BERT.  Loosely based on 'End-to-end
     Neural Coreference Resolution' (Lee et at.  2017) and 'BERT for
     coreference resolution' (Joshi et al.  2019).
-
-    .. warning::
-
-        this is a work in progress and should not be used.
-
     """
 
     def __init__(
@@ -58,7 +53,7 @@ class BertCoreferenceResolver(PipelineStep):
 
         super()._pipeline_init_(lang, progress_reporter)
 
-    def __call__(self, text: str, tokens: List[str], **kwargs) -> Dict[str, Any]:
+    def __call__(self, tokens: List[str], **kwargs) -> Dict[str, Any]:
         from tibert import predict_coref
 
         # TODO: BertForCoreferenceResolution is limited to 512 tokens
@@ -217,7 +212,6 @@ class SpacyCorefereeCoreferenceResolver(PipelineStep):
 
         chunk_start = 0
         for chunk_tokens in chunks:
-
             # see https://spacy.io/api/doc for how to instantiate a spacy doc
             spaces = SpacyCorefereeCoreferenceResolver._spacy_try_infer_spaces(
                 chunk_tokens
@@ -238,11 +232,9 @@ class SpacyCorefereeCoreferenceResolver(PipelineStep):
 
             # * parse coreferee chains
             for chain in spacy_doc._.coref_chains:
-
                 cur_chain = []
 
                 for mention in chain:
-
                     mention_tokens = (
                         SpacyCorefereeCoreferenceResolver._coreferee_get_mention_tokens(
                             coref_model, mention, spacy_doc
