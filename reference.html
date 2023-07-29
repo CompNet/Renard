@@ -1122,10 +1122,6 @@ chain being <a class="reference internal" href="#renard.pipeline.core.Mention" t
 <dd><p>A coreference resolver using BERT.  Loosely based on ‘End-to-end
 Neural Coreference Resolution’ (Lee et at.  2017) and ‘BERT for
 coreference resolution’ (Joshi et al.  2019).</p>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>this is a work in progress and should not be used.</p>
-</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -1137,14 +1133,11 @@ coreference resolution’ (Joshi et al.  2019).</p>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="renard.pipeline.corefs.BertCoreferenceResolver.__call__">
-<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tokens</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.corefs.BertCoreferenceResolver.__call__" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tokens</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.corefs.BertCoreferenceResolver.__call__" title="Permalink to this definition"></a></dt>
 <dd><p>Call self as a function.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>text</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – </p></li>
-<li><p><strong>tokens</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – </p></li>
-</ul>
+<dd class="field-odd"><p><strong>tokens</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – </p>
 </dd>
 <dt class="field-even">Return type</dt>
 <dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]</p>
