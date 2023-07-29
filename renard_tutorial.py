@@ -95,7 +95,7 @@ from renard.utils import load_conll2002_bio
 
 # the utility function "load_conll2002_bio" allows loading BIO NER
 # annotations from disk.
-sentences, tokens, entities = load_conll2002_bio("./my_BIO_annotated_text.iob")
+sentences, tokens, entities = load_conll2002_bio("./tests/three_musketeers_fra.bio")
 
 # pipeline creation. Only the characters extraction and graph
 # extraction steps are specified, since tokenization and BIO tags are
@@ -106,7 +106,8 @@ pipeline = Pipeline(
         # an interaction will be a co-occurence in a range of 3
         # sentences or less
         CoOccurrencesGraphExtractor(co_occurences_dist=(3, "sentences")),
-    ]
+    ],
+    lang="fra",
 )
 
 # pipeline execution. The caller gives tokenization and NER entities
@@ -143,7 +144,8 @@ pipeline = Pipeline(
         # A co-occurence between two characters is counted if its
         # range is lower or equal to 10 sentences
         CoOccurrencesGraphExtractor(co_occurences_dist=(10, "sentences")),
-    ]
+    ],
+    lang="fra",
 )
 
 out = pipeline(tokens=tokens, sentences=sentences, entities=entities)
