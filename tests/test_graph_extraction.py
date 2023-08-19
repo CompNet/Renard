@@ -15,7 +15,7 @@ def _characters_from_mentions(mentions: List[NEREntity]) -> List[Character]:
     """Generate characters from a list of mentions"""
     name_to_mentions = defaultdict(list)
     for mention in mentions:
-        name_to_mentions[mention.tokens[0]].append(mention)
+        name_to_mentions[" ".join(mention.tokens)].append(mention)
     return [
         Character(frozenset((name,)), mentions)
         for name, mentions in name_to_mentions.items()
@@ -31,7 +31,7 @@ def test_basic_graph_extraction(tokens: List[str]):
     characters = _characters_from_mentions(mentions)
 
     graph_extractor = CoOccurrencesGraphExtractor(len(tokens))
-    out = graph_extractor(" ".join(tokens), tokens, bio_tags, set(characters), [tokens])
+    out = graph_extractor(" ".join(tokens), set(characters), [tokens])
 
     characters = {
         token: Character(
@@ -73,9 +73,9 @@ def test_dynamic_graph_extraction(tokens: List[str], dynamic_window: int):
     characters = _characters_from_mentions(mentions)
 
     graph_extractor = CoOccurrencesGraphExtractor(
-        len(tokens), dynamic="nx", dynamic_window=dynamic_window
+        len(tokens), dynamic=True, dynamic_window=dynamic_window
     )
-    out = graph_extractor(" ".join(tokens), tokens, bio_tags, set(characters), [tokens])
+    out = graph_extractor(" ".join(tokens), set(characters), [tokens])
 
     assert len(out["characters_graph"]) > 0
 
@@ -91,8 +91,6 @@ def test_polarity_extraction(tokens: List[str]):
 
     out = graph_extractor(
         " ".join(tokens),
-        tokens,
-        bio_tags,
         set(characters),
         sentences=[tokens],
         sentences_polarities=[1.0],
@@ -116,6 +114,6 @@ def test_sent_co_occurence_dist(sent1: List[str]):
     tags = ["B-PER"] * len(tokens)
     characters = _characters_from_mentions(ner_entities(tokens, tags))
 
-    out = graph_extractor(" ".join(tokens), tokens, tags, set(characters), sentences)
+    out = graph_extractor(" ".join(tokens), set(characters), sentences)
 
     assert len(out["characters_graph"]) > 0

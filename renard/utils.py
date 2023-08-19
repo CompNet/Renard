@@ -4,6 +4,8 @@ from more_itertools import flatten
 from more_itertools.more import windowed
 import torch
 
+from renard.pipeline.ner import NEREntity, ner_entities
+
 
 T = TypeVar("T")
 
@@ -86,9 +88,11 @@ def load_conll2002_bio(
     tag_conversion_map: Optional[Dict[str, str]] = None,
     separator: str = "\t",
     **kwargs
-) -> Tuple[List[List[str]], List[str], List[str]]:
+) -> Tuple[List[List[str]], List[str], List[NEREntity]]:
     """Load a file under CoNLL2022 BIO format.  Sentences are expected
-    to be separated by end of lines.
+    to be separated by end of lines.  Tags should be in the CoNLL-2002
+    format (such as 'B-PER I-PER') - If this is not the case, see the
+    ``tag_conversion_map`` argument.
 
     :param path: path to the CoNLL-2002 formatted file
     :param separator: separator between token and BIO tags
@@ -97,7 +101,7 @@ def load_conll2002_bio(
     :param kwargs: additional kwargs for ``open`` (such as
         ``encoding`` or ``newline``).
 
-    :return: ``(sentences, tokens, tag)``
+    :return: ``(sentences, tokens, entities)``
     """
 
     if tag_conversion_map is None:
@@ -119,4 +123,7 @@ def load_conll2002_bio(
         sent_tokens.append(token)
         tags.append(tag_conversion_map.get(tag, tag))
 
-    return sents, list(flatten(sents)), tags
+    tokens = list(flatten(sents))
+    entities = ner_entities(tokens, tags)
+
+    return sents, list(flatten(sents)), entities

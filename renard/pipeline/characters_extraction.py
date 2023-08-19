@@ -1,17 +1,17 @@
 from typing import Any, Dict, List, FrozenSet, Set, Optional, Tuple, Union, Literal
-import re
+import copy
 from itertools import combinations
 from collections import defaultdict, Counter
 from dataclasses import dataclass
-from nameparser import config
 from nameparser import HumanName
+from nameparser.config import Constants
 from renard.gender import Gender
-from renard.pipeline.ner import ner_entities
 from renard.pipeline.core import Mention, PipelineStep
+from renard.pipeline.ner import NEREntity
 from renard.pipeline.progress import ProgressReporter
 from renard.resources.hypocorisms import HypocorismGazetteer
 from renard.resources.pronouns import is_a_female_pronoun, is_a_male_pronoun
-from renard.resources.titles import is_a_male_title, is_a_female_title
+from renard.resources.titles import is_a_male_title, is_a_female_title, all_titles
 
 
 @dataclass(eq=True, frozen=True)
@@ -35,7 +35,7 @@ class Character:
         return hash(tuple(sorted(self.names)))
 
     def __repr__(self) -> str:
-        return f"<{self.longest_name()}, {self.gender}, {len(self.mentions)} mentions>"
+        return f"<{self.most_frequent_name()}, {self.gender}, {len(self.mentions)} mentions>"
 
 
 def _assign_coreference_mentions(
@@ -101,23 +101,19 @@ class NaiveCharactersExtractor(PipelineStep):
     def __call__(
         self,
         text: str,
-        tokens: List[str],
-        bio_tags: List[str],
+        entities: List[NEREntity],
         corefs: Optional[List[List[Mention]]] = None,
         **kwargs,
     ) -> Dict[str, Any]:
         """
         :param text:
         :param tokens:
-        :param bio_tags:
+        :param entities:
         """
-        assert len(tokens) == len(bio_tags)
-
-        entities = ner_entities(tokens, bio_tags)
-        entities = [e for e in entities if e.tag == "PER"]
+        persons = [e for e in entities if e.tag == "PER"]
 
         characters = defaultdict(list)
-        for entity in entities:
+        for entity in persons:
             characters[" ".join(entity.tokens)].append(entity)
 
         characters = [
@@ -137,7 +133,7 @@ class NaiveCharactersExtractor(PipelineStep):
         return "any"
 
     def needs(self) -> Set[str]:
-        return {"tokens", "bio_tags"}
+        return {"entities"}
 
     def optional_needs(self) -> Set[str]:
         return {"corefs"}
@@ -151,12 +147,9 @@ class GraphRulesCharactersExtractor(PipelineStep):
     linked when they refer to the same character, and then
     merging this graph nodes.
 
-    This algorithm is inspired from Vala et al., 2015
+    .. note::
 
-    .. warning::
-
-        This is a work in progress.
-
+        This algorithm is inspired from Vala et al., 2015.
     """
 
     def __init__(
@@ -187,40 +180,43 @@ class GraphRulesCharactersExtractor(PipelineStep):
 
     def __call__(
         self,
-        tokens: List[str],
-        bio_tags: List[str],
+        entities: List[NEREntity],
         corefs: Optional[List[List[Mention]]] = None,
         **kwargs: dict,
     ) -> Dict[str, Any]:
-        assert len(tokens) == len(bio_tags)
-
         import networkx as nx
 
-        mentions = ner_entities(tokens, bio_tags)
-        mentions = [m for m in mentions if m.tag == "PER"]
+        mentions = [m for m in entities if m.tag == "PER"]
         mentions_str = [" ".join(m.tokens) for m in mentions]
 
         # * create a graph where each node is a mention detected by NER
         G = nx.Graph()
-        for mention_str in mentions_str:
+        for mention_str in set(mentions_str):
             G.add_node(mention_str)
+
+        # * HumanName local configuration - dependant on language
+        hname_constants = self._make_hname_constants()
 
         # * link nodes based on several rules
         for name1, name2 in combinations(G.nodes(), 2):
-            # is one name a known hypocorism of the other ?
+
+            # is one name a known hypocorism of the other ? (also
+            # checks if both names are the same)
             if self.hypocorism_gazetteer.are_related(name1, name2):
                 G.add_edge(name1, name2)
                 continue
 
             # if we remove the title, is one name related to the other
             # ?
-            if self.names_are_related_after_title_removal(name1, name2):
+            if self.names_are_related_after_title_removal(
+                name1, name2, hname_constants
+            ):
                 G.add_edge(name1, name2)
                 continue
 
             # add an edge if two characters have the same first name or family names
-            human_name1 = HumanName(name1)
-            human_name2 = HumanName(name2)
+            human_name1 = HumanName(name1, constants=hname_constants)
+            human_name2 = HumanName(name2, constants=hname_constants)
             if (
                 len(human_name1.last) > 0
                 and human_name1.last.lower() == human_name2.last.lower()
@@ -234,6 +230,8 @@ class GraphRulesCharactersExtractor(PipelineStep):
                 G.add_edge(name1, name2)
                 continue
 
+            # if coreferences are available, check if both names are
+            # in a coref chain
             if not corefs is None:
                 if self.names_are_in_coref(name1, name2, corefs):
                     G.add_edge(name1, name2)
@@ -250,28 +248,21 @@ class GraphRulesCharactersExtractor(PipelineStep):
         # we assign a gender to each name when corefs are available
         if not corefs is None:
             for name in G.nodes():
-                G.nodes[name]["gender"] = self.infer_name_gender(name, corefs)
+                G.nodes[name]["gender"] = self.infer_name_gender(
+                    name, corefs, hname_constants
+                )
+
         for name1, name2 in combinations(G.nodes(), 2):
+
             # check if characters have the same last name but a
             # different first name.
-            human_name1 = HumanName(name1)
-            human_name2 = HumanName(name2)
+            human_name1 = HumanName(name1, constants=hname_constants)
+            human_name2 = HumanName(name2, constants=hname_constants)
             if (
                 len(human_name1.last) > 0
                 and len(human_name2.last) > 0
                 and human_name1.last == human_name2.last
                 and human_name1.first != human_name2.first
-            ):
-                try_remove_edges(nx.all_shortest_paths(G, source=name1, target=name2))
-                continue
-
-            # check if characters have the same first name but different
-            # last names
-            if (
-                human_name1.first == human_name2.first
-                and len(human_name1.last) > 0
-                and len(human_name2.last) > 0
-                and human_name1.last != human_name2.last
             ):
                 try_remove_edges(nx.all_shortest_paths(G, source=name1, target=name2))
                 continue
@@ -314,10 +305,24 @@ class GraphRulesCharactersExtractor(PipelineStep):
 
         return {"characters": characters}
 
-    def names_are_related_after_title_removal(self, name1: str, name2: str) -> bool:
-        config.CONSTANTS.string_format = "{first} {middle} {last}"
-        raw_name1 = HumanName(name1).full_name
-        raw_name2 = HumanName(name2).full_name
+    def _make_hname_constants(self) -> Constants:
+        if self.lang == "eng":
+            return Constants()
+        if self.lang == "fra":
+            hname_constants = Constants()
+            for title in all_titles["fra"]:
+                hname_constants.titles.add(title)
+            return hname_constants
+        raise ValueError(f"unsupported language: {self.lang}")
+
+    def names_are_related_after_title_removal(
+        self, name1: str, name2: str, hname_constants: Constants
+    ) -> bool:
+        """Check if two names are related after removing their titles"""
+        local_constants = copy.deepcopy(hname_constants)
+        local_constants.string_format = "{first} {middle} {last}"
+        raw_name1 = HumanName(name1, constants=local_constants).full_name
+        raw_name2 = HumanName(name2, constants=local_constants).full_name
 
         return (
             raw_name1.lower() == raw_name2.lower()
@@ -332,10 +337,17 @@ class GraphRulesCharactersExtractor(PipelineStep):
                 return True
         return False
 
-    def infer_name_gender(self, name: str, corefs: List[List[Mention]]) -> Gender:
-        """Try to infer a name's gender"""
+    def infer_name_gender(
+        self, name: str, corefs: List[List[Mention]], hname_constants: Constants
+    ) -> Gender:
+        """Try to infer a name's gender
+
+        :param name:
+        :param corefs:
+        :param hname_constants: HumanName constants
+        """
         # 1. try to infer gender based on honorifics
-        title = HumanName(name).title
+        title = HumanName(name, constants=hname_constants).title
         if title != "":
             if is_a_male_title(title, lang=self.lang):
                 return Gender.MALE
@@ -363,7 +375,7 @@ class GraphRulesCharactersExtractor(PipelineStep):
         return Gender.MALE if male_count > female_count else Gender.FEMALE
 
     def needs(self) -> Set[str]:
-        return {"tokens", "bio_tags"}
+        return {"entities"}
 
     def optional_needs(self) -> Set[str]:
         return {"corefs"}

@@ -32,6 +32,7 @@ from renard.graph_utils import (
 
 if TYPE_CHECKING:
     from renard.pipeline.characters_extraction import Character
+    from renard.pipeline.ner import NEREntity
     import matplotlib.pyplot as plt
 
 
@@ -147,8 +148,6 @@ class PipelineState:
     tokens: Optional[List[str]] = None
     #: text splitted in tokens, by chapter
     chapter_tokens: Optional[List[List[str]]] = None
-    #: word piece tokens, for BERT-like models
-    wp_tokens: Optional[List[str]] = None
     #: text splitted into sentences, each sentence being a list of
     #: tokens
     sentences: Optional[List[List[str]]] = None
@@ -156,12 +155,8 @@ class PipelineState:
     #: polarity of each sentence
     sentences_polarities: Optional[List[float]] = None
 
-    #: BIO NER tags, aligned with ``self.tokens``
-    bio_tags: Optional[List[str]] = None
-    #: BIO NER tags, aligned with ``self.wp_tokens``
-    wp_bio_tags: Optional[List[str]] = None
-    #: BERT batch encodings
-    bert_batch_encoding: Optional[BatchEncoding] = None
+    #: NER entities
+    entities: Optional[List[NEREntity]] = None
 
     #: coreference chains
     corefs: Optional[List[List[Mention]]] = None
@@ -217,7 +212,7 @@ class PipelineState:
         path: str,
         name_style: Union[
             Literal["longest", "shortest", "most_frequent"], Callable[[Character], str]
-        ] = "longest",
+        ] = "most_frequent",
     ):
         """Export characters graph to Gephi's gexf format
 
@@ -257,7 +252,7 @@ class PipelineState:
         directory: str,
         name_style: Union[
             Literal["longest", "shortest", "most_frequent"], Callable[[Character], str]
-        ] = "longest",
+        ] = "most_frequent",
         cumulative: bool = False,
         stable_layout: bool = False,
     ):
@@ -309,7 +304,7 @@ class PipelineState:
         path: str,
         name_style: Union[
             Literal["longest", "shortest", "most_frequent"], Callable[[Character], str]
-        ] = "longest",
+        ] = "most_frequent",
     ):
         """Plot ``self.character_graph`` using reasonable parameters,
         and save the produced figure to a file
@@ -332,7 +327,7 @@ class PipelineState:
         self,
         name_style: Union[
             Literal["longest", "shortest", "most_frequent"], Callable[[Character], str]
-        ] = "longest",
+        ] = "most_frequent",
         fig: Optional[plt.Figure] = None,
         cumulative: bool = False,
         graph_start_idx: int = 1,

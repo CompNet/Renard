@@ -50,7 +50,7 @@ def graph_with_names(
     G: nx.Graph,
     name_style: Union[
         Literal["longest", "shortest", "most_frequent"], Callable[[Character], str]
-    ] = "longest",
+    ] = "most_frequent",
 ) -> nx.Graph:
     """Relabel a characters graph, using a single name for each
     node

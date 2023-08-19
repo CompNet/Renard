@@ -1,12 +1,10 @@
 from __future__ import annotations
 from typing import List, Dict, Any, Set, Tuple, Optional, Union, Literal
 from dataclasses import dataclass
-from collections import Counter
 import torch
-from torch._C import Value
 from transformers.tokenization_utils_base import BatchEncoding
 from seqeval.metrics import precision_score, recall_score, f1_score
-from renard.nltk_utils import NLTK_ISO_STRING_TO_LANG, nltk_fix_bio_tags
+from renard.nltk_utils import nltk_fix_bio_tags
 from renard.pipeline.core import PipelineStep, Mention
 from renard.pipeline.progress import ProgressReporter
 
@@ -33,8 +31,10 @@ def ner_entities(
 ) -> List[NEREntity]:
     """Extract NER entities from a list of BIO tags
 
-    :param tokens:
-    :param bio_tags:
+    :param tokens: a list of tokens
+    :param bio_tags: a list of BIO tags.  In particular, BIO tags
+        should be in the CoNLL-2002 form (such as 'B-PER I-PER')
+
     :return: A list of ner entities, in apparition order
     """
     assert len(tokens) == len(bio_tags)
@@ -50,7 +50,7 @@ def ner_entities(
                 NEREntity(
                     tokens[current_tag_start_idx:i],
                     current_tag_start_idx,
-                    i - 1,
+                    i,
                     current_tag,
                 )
             )
@@ -73,7 +73,7 @@ def ner_entities(
             NEREntity(
                 tokens[current_tag_start_idx : len(tokens)],
                 current_tag_start_idx,
-                len(bio_tags) - 1,
+                len(bio_tags),
                 current_tag,
             )
         )
@@ -130,7 +130,8 @@ class NLTKNamedEntityRecognizer(PipelineStep):
         word_tag_iobtags = tree2conlltags(
             nltk.ne_chunk(nltk.pos_tag(tokens, lang=self.lang))
         )
-        return {"bio_tags": nltk_fix_bio_tags([wti[2] for wti in word_tag_iobtags])}
+        bio_tags = nltk_fix_bio_tags([wti[2] for wti in word_tag_iobtags])
+        return {"entities": ner_entities(tokens, bio_tags)}
 
     def supported_langs(self) -> Union[Set[str], Literal["any"]]:
         # POS Tagging only supports english and russian
@@ -140,11 +141,16 @@ class NLTKNamedEntityRecognizer(PipelineStep):
         return {"tokens"}
 
     def production(self) -> Set[str]:
-        return {"bio_tags"}
+        return {"entities"}
 
 
 class BertNamedEntityRecognizer(PipelineStep):
     """An entity recognizer based on BERT"""
+
+    LANG_TO_MODELS = {
+        "fra": "Davlan/bert-base-multilingual-cased-ner-hrl",
+        "eng": "compnet-renard/bert-base-cased-literary-NER",
+    }
 
     def __init__(
         self,
@@ -156,7 +162,8 @@ class BertNamedEntityRecognizer(PipelineStep):
         :param huggingface_model_id: a custom huggingface model id.
             This allows to bypass the ``lang`` pipeline parameter
             which normally choose a huggingface model automatically.
-        :param batch_size:
+        :param batch_size: batch size at inference
+        :param device: computation device
         """
         self.huggingface_model_id = huggingface_model_id
         self.batch_size = batch_size
@@ -169,7 +176,7 @@ class BertNamedEntityRecognizer(PipelineStep):
         super().__init__()
 
     def _pipeline_init_(self, lang: str, progress_reporter: ProgressReporter):
-        from transformers import AutoModelForTokenClassification  # type: ignore
+        from transformers import AutoModelForTokenClassification, AutoTokenizer  # type: ignore
 
         super()._pipeline_init_(lang, progress_reporter)
 
@@ -179,36 +186,35 @@ class BertNamedEntityRecognizer(PipelineStep):
             )
             self.lang = "unknown"
         else:
-            if lang == "eng":
-                self.model = AutoModelForTokenClassification.from_pretrained(
-                    "compnet-renard/bert-base-cased-literary-NER"
-                )
-            elif lang == "fra":
-                self.model = AutoModelForTokenClassification.from_pretrained(
-                    "Davlan/bert-base-multilingual-cased-ner-hrl"
-                )
-            else:
+            model_str = BertNamedEntityRecognizer.LANG_TO_MODELS.get(lang)
+            if model_str is None:
                 raise ValueError(
                     f"BertNamedEntityRecognizer does not support language {lang}"
                 )
+            self.model = AutoModelForTokenClassification.from_pretrained(model_str)
+            self.tokenizer = AutoTokenizer.from_pretrained(model_str)
 
     def __call__(
         self,
         text: str,
-        bert_batch_encoding: BatchEncoding,
-        wp_tokens: List[str],
+        tokens: List[str],
+        sentences: List[List[str]],
         **kwargs,
     ) -> Dict[str, Any]:
         """
         :param text:
-        :param bert_batch_encoding:
-        :param wp_tokens:
+        :param tokens:
+        :param sentences:
         """
         import torch
 
         self.model = self.model.to(self.device)
 
-        batches_nb = len(bert_batch_encoding["input_ids"]) // self.batch_size + 1
+        batchs = self.encode(sentences)
+
+        # TODO: iteration could be done using a torch dataloader
+        #       instead of doing it by hand
+        batches_nb = len(batchs["input_ids"]) // self.batch_size + 1
 
         with torch.no_grad():
             wp_labels = []
@@ -217,12 +223,10 @@ class BertNamedEntityRecognizer(PipelineStep):
                 batch_start = batch_i * self.batch_size
                 batch_end = batch_start + self.batch_size
                 out = self.model(
-                    bert_batch_encoding["input_ids"][batch_start:batch_end].to(
+                    batchs["input_ids"][batch_start:batch_end].to(self.device),
+                    attention_mask=batchs["attention_mask"][batch_start:batch_end].to(
                         self.device
                     ),
-                    attention_mask=bert_batch_encoding["attention_mask"][
-                        batch_start:batch_end
-                    ].to(self.device),
                 )
                 # (batch_size, sentence_size)
                 batch_classes_tens = torch.max(out.logits, dim=2).indices
@@ -231,46 +235,49 @@ class BertNamedEntityRecognizer(PipelineStep):
                     for classes_tens in batch_classes_tens
                     for tens in classes_tens
                 ]
-            labels = BertNamedEntityRecognizer.wp_labels_to_token_labels(
-                wp_tokens, wp_labels
-            )
 
-        return {
-            "wp_bio_tags": wp_labels,
-            "bio_tags": labels,
-        }
+            labels = self.batch_labels(batchs, 0, wp_labels, tokens)
 
-    @staticmethod
-    def wp_labels_to_token_labels(
-        wp_tokens: List[str], wp_labels: List[str]
+        return {"entities": ner_entities(tokens, labels)}
+
+    def encode(self, sentences: List[List[str]]) -> BatchEncoding:
+        return self.tokenizer(
+            sentences,
+            return_tensors="pt",
+            padding=True,
+            truncation=True,
+            is_split_into_words=True,
+        )
+
+    def batch_labels(
+        self,
+        batchs: BatchEncoding,
+        batch_i: int,
+        wp_labels: List[str],
+        tokens: List[str],
     ) -> List[str]:
-        """Output a list of labels aligned with regular tokens instead
-        of word piece tokens.
+        """Align labels to tokens rather than wordpiece tokens.
 
-        :param wp_tokens: word piece tokens
-        :param wp_labels: word piece labels
+        :param batchs: huggingface batch
+        :param batch_i: batch index
+        :param wp_labels: wordpiece aligned labels
+        :param tokens: original tokens
         """
-        assert len(wp_tokens) == len(wp_labels)
+        batch_labels = ["O"] * len(tokens)
 
-        # TODO: there is a general way to do that
-        TOKENS_TO_IGNORE = ("[CLS]", "[SEP]", "[PAD]")
-
-        labels = []
-
-        for wp_token, wp_label in zip(wp_tokens, wp_labels):
-            if wp_token in TOKENS_TO_IGNORE:
+        for wplabel_j, wp_label in enumerate(wp_labels):
+            token_i = batchs.token_to_word(batch_i, wplabel_j)
+            if token_i is None:
                 continue
+            batch_labels[token_i] = wp_label
 
-            if not wp_token.startswith("##"):
-                labels.append(wp_label)
-
-        return labels
+        return batch_labels
 
     def supported_langs(self) -> Union[Set[str], Literal["any"]]:
         return {"eng", "fra"}
 
     def needs(self) -> Set[str]:
-        return {"bert_batch_encoding", "wp_tokens"}
+        return {"tokens", "sentences"}
 
     def production(self) -> Set[str]:
-        return {"wp_bio_tags", "bio_tags"}
+        return {"entities"}

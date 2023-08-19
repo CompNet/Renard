@@ -3,8 +3,11 @@ Reference
 =========
 
 
+Core
+====
+
 Pipeline
-========
+--------
 
 .. autoclass:: renard.pipeline.core.Pipeline
    :members:
@@ -40,11 +43,6 @@ NLTKTokenizer
 .. autoclass:: renard.pipeline.tokenization.NLTKTokenizer
    :members:
 
-BertTokenizer
--------------
-
-.. autoclass:: renard.pipeline.tokenization.BertTokenizer
-   :members:
 
 
 Named Entity Recognition
@@ -86,6 +84,16 @@ SpacyCorefereeCoreferenceResolver
 ---------------------------------
 
 .. autoclass:: renard.pipeline.corefs.SpacyCorefereeCoreferenceResolver
+   :members:
+
+
+Sentiment Analysis
+==================
+
+NLTKSentimentAnalyzer
+---------------------
+
+.. autoclass:: renard.pipeline.sentiment_analysis.NLTKSentimentAnalyzer
    :members:
 
       

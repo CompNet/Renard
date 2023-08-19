@@ -1,3 +1,4 @@
+import itertools
 from typing import Dict, Any, List, Set, Optional, Tuple, Literal, Union
 import operator
 from itertools import accumulate
@@ -46,25 +47,32 @@ def sent_indices_for_chapter(
     return (sents_start_idx, sents_end_idx)
 
 
-def mentions_for_chapter(
+def mentions_for_chapters(
     chapters: List[List[str]],
-    chapter_idx: int,
     mentions: List[Tuple[Character, NEREntity]],
-) -> List[Tuple[Character, NEREntity]]:
-    """Return the mentions in the specified chapter
+) -> List[List[Tuple[Character, NEREntity]]]:
+    """Return each chapter mentions
 
     :param chapters:
-    :param chapter_idx: index of the specified chapter
     :param mentions:
+
+    :return: a list of mentions per chapters.  This list has len
+             ``len(chapters)``.
     """
-    chapter_start_idx = sum([len(c) for i, c in enumerate(chapters) if i < chapter_idx])
-    chapter_end_idx = chapter_start_idx + len(chapters[chapter_idx])
-    # TODO: optim
-    return [
-        m
-        for m in mentions
-        if m[1].start_idx >= chapter_start_idx and m[1].end_idx <= chapter_end_idx
-    ]
+    chapters_mentions = [[] for _ in range(len(chapters))]
+
+    start_indices = list(
+        itertools.accumulate([0] + [len(chapter) for chapter in chapters[:-1]])
+    )
+    end_indices = start_indices[1:] + [start_indices[-1] + len(chapters[-1])]
+
+    for mention in mentions:
+        for chapter_i, (start_i, end_i) in enumerate(zip(start_indices, end_indices)):
+            if mention[1].start_idx >= start_i and mention[1].end_idx < end_i:
+                chapters_mentions[chapter_i].append(mention)
+                break
+
+    return chapters_mentions
 
 
 class CoOccurrencesGraphExtractor(PipelineStep):
@@ -126,8 +134,6 @@ class CoOccurrencesGraphExtractor(PipelineStep):
     def __call__(
         self,
         text: str,
-        tokens: List[str],
-        bio_tags: List[str],
         characters: Set[Character],
         sentences: List[List[str]],
         chapter_tokens: Optional[List[List[str]]] = None,
@@ -136,16 +142,12 @@ class CoOccurrencesGraphExtractor(PipelineStep):
     ) -> Dict[str, Any]:
         """Extract a characters graph
 
-        :param tokens:
-        :param bio_tags:
         :param characters:
 
         :return: a ``dict`` with key ``'characters_graph'`` and a
             :class:`nx.Graph` or a list of :class:`nx.Graph` as
             value.
         """
-        assert len(tokens) == len(bio_tags)
-
         mentions = []
         for character in characters:
             for mention in character.mentions:
@@ -194,7 +196,9 @@ class CoOccurrencesGraphExtractor(PipelineStep):
         elif self.co_occurences_dist[1] == "sentences":
             assert not sentences is None
             mention_1_sent = sent_index_for_token_index(mention_1.start_idx, sentences)
-            mention_2_sent = sent_index_for_token_index(mention_2.end_idx, sentences)
+            mention_2_sent = sent_index_for_token_index(
+                mention_2.end_idx - 1, sentences
+            )
             return abs(mention_2_sent - mention_1_sent) <= self.co_occurences_dist[0]
         else:
             raise NotImplementedError
@@ -308,9 +312,10 @@ class CoOccurrencesGraphExtractor(PipelineStep):
 
         graphs = []
 
-        for chapter_i, chapter in enumerate(chapter_tokens):
-            # TODO: optim
-            chapter_mentions = mentions_for_chapter(chapter_tokens, chapter_i, mentions)
+        chapters_mentions = mentions_for_chapters(chapter_tokens, mentions)
+        for chapter_i, (_, chapter_mentions) in enumerate(
+            zip(chapter_tokens, chapters_mentions)
+        ):
             chapter_start_idx = sum(
                 [len(c) for i, c in enumerate(chapter_tokens) if i < chapter_i]
             )
@@ -394,7 +399,7 @@ class CoOccurrencesGraphExtractor(PipelineStep):
         return "any"
 
     def needs(self) -> Set[str]:
-        needs = {"tokens", "bio_tags", "characters", "sentences"}
+        needs = {"characters", "sentences"}
         if self.dynamic_needs_chapter:
             needs.add("chapter_tokens")
         return needs

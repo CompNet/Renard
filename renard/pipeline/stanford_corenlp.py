@@ -1,5 +1,6 @@
 import os
-from typing import List, Optional, Set, Dict, Any
+from typing import List, Optional, Set, Dict, Any, Literal
+from renard.pipeline.ner import ner_entities
 
 import stanza
 from stanza.protobuf import CoreNLP_pb2
@@ -84,7 +85,9 @@ class StanfordCoreNLPPipeline(PipelineStep):
     def __init__(
         self,
         annotate_corefs: bool = False,
-        corefs_algorithm: str = "statistical",
+        corefs_algorithm: Literal[
+            "deterministic", "statistical", "neural"
+        ] = "statistical",
         corenlp_custom_properties: Optional[Dict[str, Any]] = None,
         server_timeout: int = 9999999,
         **server_kwargs,
@@ -208,7 +211,7 @@ class StanfordCoreNLPPipeline(PipelineStep):
 
                     coref_chains.append(chain)
 
-        out_dict = {"tokens": tokens, "bio_tags": bio_tags}
+        out_dict = {"tokens": tokens, "entities": ner_entities(tokens, bio_tags)}
         if self.annotate_corefs:
             out_dict["corefs"] = coref_chains  # type: ignore
         return out_dict
@@ -217,7 +220,7 @@ class StanfordCoreNLPPipeline(PipelineStep):
         return set()
 
     def production(self) -> Set[str]:
-        production = {"tokens", "bio_tags"}
+        production = {"tokens", "entities"}
         if self.annotate_corefs:
             production.add("corefs")
         return production

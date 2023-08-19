@@ -17,6 +17,11 @@ Documentation, including installation instructions, can be found at https://comp
 If you need local documentation, it can be generated using `Sphinx`. From the `docs` directory, `make html` should create documentation under `docs/_build/html`. 
 
 
+# Tutorial
+
+`renard_tutorial.py` is a tutorial in the `jupytext` format. You can open it as a notebook in Jupyter Notebook (or export it as a notebook with `jupytext --to ipynb renard-tutorial.py`).
+
+
 # Running tests 
 
 `Renard` uses `pytest` for testing. To launch tests, use the following command : 
