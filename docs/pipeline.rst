@@ -149,8 +149,9 @@ Coreference Resolution
 ----------------------
 
 - :class:`.SpacyCorefereeCoreferenceResolver`
+- :class:`.BertCoreferenceResolver`, using the Tibert library.
 - :class:`.StanfordCoreNLPPipeline` can execute a coreference
-  resolution model as part of its pipeline
+  resolution model as part of its pipeline.
 
 
 Sentiment Analysis
