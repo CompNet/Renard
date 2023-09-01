@@ -154,6 +154,12 @@ Coreference Resolution
   resolution model as part of its pipeline.
 
 
+Quote Detection
+---------------
+
+- :class:`.QuoteDetector`
+
+
 Sentiment Analysis
 ------------------
 

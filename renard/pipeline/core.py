@@ -33,6 +33,7 @@ from renard.graph_utils import (
 if TYPE_CHECKING:
     from renard.pipeline.characters_extraction import Character
     from renard.pipeline.ner import NEREntity
+    from renard.pipeline.quote_detection import Quote
     import matplotlib.pyplot as plt
 
 
@@ -151,6 +152,9 @@ class PipelineState:
     #: text splitted into sentences, each sentence being a list of
     #: tokens
     sentences: Optional[List[List[str]]] = None
+
+    #: quotes
+    quotes: Optional[List[Quote]] = None
 
     #: polarity of each sentence
     sentences_polarities: Optional[List[float]] = None
