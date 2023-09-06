@@ -12,7 +12,7 @@ document. Here is a simple example:
    from renard.pipeline import Pipeline
    from renard.pipeline.tokenization import NLTKTokenizer
    from renard.pipeline.ner import NLTKNamedEntityRecognizer
-   from renard.pipeline.characters_extraction import NaiveCharactersExtractor
+   from renard.pipeline.characters_extraction import GraphRulesCharactersExtractor
    from renard.pipeline.graph_extraction import CoOccurrencesGraphExtractor
 
    with open("./my_doc.txt") as f:
@@ -22,7 +22,7 @@ document. Here is a simple example:
        [
            NLTKTokenizer(),
            NLTKNamedEntityRecognizer(),
-           NaiveCharactersExtractor(min_appearance=10),
+           GraphRulesCharactersExtractor(min_appearances=10),
            CoOccurrencesGraphExtractor(co_occurences_dist=25)
        ]
    )
@@ -45,7 +45,7 @@ to compute them yourself :
 
    from renard.pipeline import Pipeline
    from renard.pipeline.ner import NLTKNamedEntityRecognizer
-   from renard.pipeline.characters_extraction import NaiveCharactersExtractor
+   from renard.pipeline.characters_extraction import GraphRulesCharactersExtractor
    from renard.pipeline.graph_extraction import CoOccurrencesGraphExtractor
 
    with open("./my_doc.txt") as f:
@@ -55,7 +55,7 @@ to compute them yourself :
    pipeline = Pipeline(
        [
            NLTKNamedEntityRecognizer(),
-           NaiveCharactersExtractor(min_appearance=10),
+           GraphRulesCharactersExtractor(min_appearances=10),
            CoOccurrencesGraphExtractor(co_occurences_dist=25)
        ]
    )
@@ -196,7 +196,7 @@ time. In Renard, such graphs are representend by a ``List`` of
    from renard.pipeline import Pipeline
    from renard.pipeline.tokenization import NLTKTokenizer
    from renard.pipeline.ner import NLTKNamedEntityRecognizer
-   from renard.pipeline.characters_extraction import NaiveCharactersExtractor
+   from renard.pipeline.characters_extraction import GraphRulesCharactersExtractor
    from renard.pipeline.graph_extraction import CoOccurrencesGraphExtractor
 
    with open("./my_doc.txt") as f:
@@ -206,7 +206,7 @@ time. In Renard, such graphs are representend by a ``List`` of
        [
            NLTKTokenizer(),
            NLTKNamedEntityRecognizer(),
-           NaiveCharactersExtractor(min_appearance=10),
+           GraphRulesCharactersExtractor(min_appearances=10),
            CoOccurrencesGraphExtractor(
 	       co_occurences_dist=25,
 	       dynamic=True,     # note the 'dynamic'
