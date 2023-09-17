@@ -2,10 +2,18 @@ from __future__ import annotations
 from typing import List, Dict, Any, Set, Tuple, Optional, Union, Literal
 from dataclasses import dataclass
 import torch
+from torch.utils.data import DataLoader
 from transformers.tokenization_utils_base import BatchEncoding
-from transformers import PreTrainedModel, PreTrainedTokenizerFast
+from transformers import (
+    PreTrainedModel,
+    PreTrainedTokenizerFast,
+)
 from seqeval.metrics import precision_score, recall_score, f1_score
 from renard.nltk_utils import nltk_fix_bio_tags
+from renard.ner_utils import (
+    DataCollatorForTokenClassificationWithBatchEncoding,
+    NERDataset,
+)
 from renard.pipeline.core import PipelineStep, Mention
 from renard.pipeline.progress import ProgressReporter
 
@@ -236,48 +244,39 @@ class BertNamedEntityRecognizer(PipelineStep):
         """
         assert not self.model is None
 
-        import torch
-
         self.model = self.model.to(self.device)
 
-        batchs = self.encode(sentences)
+        dataset = NERDataset(sentences, self.tokenizer)
+        dataloader = DataLoader(
+            dataset,
+            batch_size=self.batch_size,
+            collate_fn=DataCollatorForTokenClassificationWithBatchEncoding(
+                self.tokenizer
+            ),
+        )
 
-        # TODO: iteration could be done using a torch dataloader
-        #       instead of doing it by hand
-        batches_nb = len(batchs["input_ids"]) // self.batch_size + 1
+        labels = []
 
         with torch.no_grad():
-            wp_labels = []
 
-            for batch_i in self._progress_(range(batches_nb)):
-                batch_start = batch_i * self.batch_size
-                batch_end = batch_start + self.batch_size
+            for batch_i, batch in enumerate(self._progress_(dataloader)):
                 out = self.model(
-                    batchs["input_ids"][batch_start:batch_end].to(self.device),
-                    attention_mask=batchs["attention_mask"][batch_start:batch_end].to(
-                        self.device
-                    ),
+                    batch["input_ids"].to(self.device),
+                    attention_mask=batch["attention_mask"].to(self.device),
                 )
                 # (batch_size, sentence_size)
                 batch_classes_tens = torch.max(out.logits, dim=2).indices
-                wp_labels += [
-                    self.model.config.id2label[tens.item()]
-                    for classes_tens in batch_classes_tens
-                    for tens in classes_tens
-                ]
 
-            labels = self.batch_labels(batchs, 0, wp_labels, tokens)
+                for i in range(batch["input_ids"].shape[0]):
+                    wp_labels = [
+                        self.model.config.id2label[tens.item()]
+                        for tens in batch_classes_tens[i]
+                    ]
+                    sent_tokens = sentences[self.batch_size * batch_i + i]
+                    sent_labels = self.batch_labels(batch, i, wp_labels, sent_tokens)
+                    labels += sent_labels
 
         return {"entities": ner_entities(tokens, labels)}
-
-    def encode(self, sentences: List[List[str]]) -> BatchEncoding:
-        return self.tokenizer(
-            sentences,
-            return_tensors="pt",
-            padding=True,
-            truncation=True,
-            is_split_into_words=True,
-        )
 
     def batch_labels(
         self,
