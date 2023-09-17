@@ -2,8 +2,8 @@ from __future__ import annotations
 from typing import List, Dict, Any, Set, Tuple, Optional, Union, Literal
 from dataclasses import dataclass
 import torch
-from transformers.tokenization_utils_base import BatchEncoding, PreTrainedTokenizerFast
-from transformers import PreTrainedModel
+from transformers.tokenization_utils_base import BatchEncoding
+from transformers import PreTrainedModel, PreTrainedTokenizerFast
 from seqeval.metrics import precision_score, recall_score, f1_score
 from renard.nltk_utils import nltk_fix_bio_tags
 from renard.pipeline.core import PipelineStep, Mention
