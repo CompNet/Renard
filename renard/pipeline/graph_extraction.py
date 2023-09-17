@@ -133,7 +133,6 @@ class CoOccurrencesGraphExtractor(PipelineStep):
 
     def __call__(
         self,
-        text: str,
         characters: Set[Character],
         sentences: List[List[str]],
         chapter_tokens: Optional[List[List[str]]] = None,

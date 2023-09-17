@@ -120,7 +120,7 @@ class NLTKNamedEntityRecognizer(PipelineStep):
 
         super().__init__()
 
-    def __call__(self, text: str, tokens: List[str], **kwargs) -> Dict[str, Any]:
+    def __call__(self, tokens: List[str], **kwargs) -> Dict[str, Any]:
         """
         :param text:
         :param tokens:
@@ -208,7 +208,6 @@ class BertNamedEntityRecognizer(PipelineStep):
 
     def __call__(
         self,
-        text: str,
         tokens: List[str],
         sentences: List[List[str]],
         **kwargs,

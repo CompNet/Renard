@@ -18,9 +18,7 @@ class NLTKSentimentAnalyzer(PipelineStep):
         self.sentiment_analyzer = SentimentIntensityAnalyzer()
         super().__init__()
 
-    def __call__(
-        self, text: str, sentences: List[List[str]], **kwargs
-    ) -> Dict[str, Any]:
+    def __call__(self, sentences: List[List[str]], **kwargs) -> Dict[str, Any]:
         return {
             # TODO: here, we 'detokenized' sentences using a very
             # naive method. This probably does not matter for Vader,
