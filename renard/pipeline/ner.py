@@ -3,6 +3,7 @@ from typing import List, Dict, Any, Set, Tuple, Optional, Union, Literal
 from dataclasses import dataclass
 import torch
 from transformers.tokenization_utils_base import BatchEncoding
+from transformers import PreTrainedModel
 from seqeval.metrics import precision_score, recall_score, f1_score
 from renard.nltk_utils import nltk_fix_bio_tags
 from renard.pipeline.core import PipelineStep, Mention
@@ -154,7 +155,7 @@ class BertNamedEntityRecognizer(PipelineStep):
 
     def __init__(
         self,
-        huggingface_model_id: Optional[str] = None,
+        model: Optional[Union[PreTrainedModel, str]] = None,
         batch_size: int = 4,
         device: Literal["cpu", "cuda", "auto"] = "auto",
     ):
@@ -165,7 +166,13 @@ class BertNamedEntityRecognizer(PipelineStep):
         :param batch_size: batch size at inference
         :param device: computation device
         """
-        self.huggingface_model_id = huggingface_model_id
+        if isinstance(model, str):
+            self.huggingface_model_id = model
+            self.model = None  # model will be init by _pipeline_init_
+        else:
+            self.huggingface_model_id = None
+            self.model = model
+
         self.batch_size = batch_size
 
         if device == "auto":
@@ -180,19 +187,24 @@ class BertNamedEntityRecognizer(PipelineStep):
 
         super()._pipeline_init_(lang, progress_reporter)
 
-        if not self.huggingface_model_id is None:
-            self.model = AutoModelForTokenClassification.from_pretrained(
-                self.huggingface_model_id
-            )
-            self.lang = "unknown"
-        else:
-            model_str = BertNamedEntityRecognizer.LANG_TO_MODELS.get(lang)
-            if model_str is None:
-                raise ValueError(
-                    f"BertNamedEntityRecognizer does not support language {lang}"
+        # init model if needed (this happens if the user did not pass
+        # the instance of a model)
+        if self.model is None:
+            # the user supplied a huggingface ID: load model from the HUB
+            if not self.huggingface_model_id is None:
+                self.model = AutoModelForTokenClassification.from_pretrained(
+                    self.huggingface_model_id
                 )
-            self.model = AutoModelForTokenClassification.from_pretrained(model_str)
-            self.tokenizer = AutoTokenizer.from_pretrained(model_str)
+                self.lang = "unknown"  # we don't know the lang of the custom model
+            # the user did not supply anything: load the default model
+            else:
+                model_str = BertNamedEntityRecognizer.LANG_TO_MODELS.get(lang)
+                if model_str is None:
+                    raise ValueError(
+                        f"BertNamedEntityRecognizer does not support language {lang}"
+                    )
+                self.model = AutoModelForTokenClassification.from_pretrained(model_str)
+                self.tokenizer = AutoTokenizer.from_pretrained(model_str)
 
     def __call__(
         self,
@@ -206,6 +218,8 @@ class BertNamedEntityRecognizer(PipelineStep):
         :param tokens:
         :param sentences:
         """
+        assert not self.model is None
+
         import torch
 
         self.model = self.model.to(self.device)
