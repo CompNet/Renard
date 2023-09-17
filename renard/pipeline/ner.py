@@ -195,6 +195,9 @@ class BertNamedEntityRecognizer(PipelineStep):
                 self.model = AutoModelForTokenClassification.from_pretrained(
                     self.huggingface_model_id
                 )
+                self.tokenizer = AutoTokenizer.from_pretrained(
+                    self.huggingface_model_id
+                )
                 self.lang = "unknown"  # we don't know the lang of the custom model
             # the user did not supply anything: load the default model
             else:
