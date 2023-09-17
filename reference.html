@@ -866,7 +866,7 @@ using <a class="reference internal" href="#renard.pipeline.ner.NEREntity.shifted
 <h3>BertNamedEntityRecognizer<a class="headerlink" href="#bertnamedentityrecognizer" title="Permalink to this headline"></a></h3>
 <dl class="py class">
 <dt class="sig sig-object py" id="renard.pipeline.ner.BertNamedEntityRecognizer">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">renard.pipeline.ner.</span></span><span class="sig-name descname"><span class="pre">BertNamedEntityRecognizer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'auto'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.ner.BertNamedEntityRecognizer" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">renard.pipeline.ner.</span></span><span class="sig-name descname"><span class="pre">BertNamedEntityRecognizer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'auto'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tokenizer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.ner.BertNamedEntityRecognizer" title="Permalink to this definition"></a></dt>
 <dd><p>An entity recognizer based on BERT</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -874,6 +874,7 @@ using <a class="reference internal" href="#renard.pipeline.ner.NEREntity.shifted
 <li><p><strong>model</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">PreTrainedModel</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>]) – </p></li>
 <li><p><strong>batch_size</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – </p></li>
 <li><p><strong>device</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code>[‘cpu’, ‘cuda’, ‘auto’]) – </p></li>
+<li><p><strong>tokenizer</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">PreTrainedTokenizerFast</span></code>]) – </p></li>
 </ul>
 </dd>
 </dl>
@@ -896,16 +897,23 @@ using <a class="reference internal" href="#renard.pipeline.ner.NEREntity.shifted
 
 <dl class="py method">
 <dt class="sig sig-object py" id="renard.pipeline.ner.BertNamedEntityRecognizer.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'auto'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.ner.BertNamedEntityRecognizer.__init__" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'auto'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tokenizer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.ner.BertNamedEntityRecognizer.__init__" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>huggingface_model_id</strong> – a custom huggingface model id.
-This allows to bypass the <code class="docutils literal notranslate"><span class="pre">lang</span></code> pipeline parameter
-which normally choose a huggingface model automatically.</p></li>
+<li><p><strong>model</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">PreTrainedModel</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>]) – <p>Either:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">None</span></code>: the model will be chosen accordingly
+knowing the <code class="docutils literal notranslate"><span class="pre">lang</span></code> of the pipeline</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">str</span></code>: a hugginface model ID</p></li>
+<li><p>a <code class="docutils literal notranslate"><span class="pre">PreTrainedModel</span></code>: a custom pre-trained BERT
+model.  If specified, a tokenizer must be passed as
+well.</p></li>
+</ul>
+</p></li>
 <li><p><strong>batch_size</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – batch size at inference</p></li>
 <li><p><strong>device</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code>[‘cpu’, ‘cuda’, ‘auto’]) – computation device</p></li>
-<li><p><strong>model</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">PreTrainedModel</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>]) – </p></li>
+<li><p><strong>tokenizer</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">PreTrainedTokenizerFast</span></code>]) – a custom tokenizer</p></li>
 </ul>
 </dd>
 </dl>
