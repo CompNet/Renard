@@ -1,13 +1,7 @@
 from __future__ import annotations
-from typing import List, Dict, Any, Set, Tuple, Optional, Union, Literal
+from typing import TYPE_CHECKING, List, Dict, Any, Set, Tuple, Optional, Union, Literal
 from dataclasses import dataclass
 import torch
-from torch.utils.data import DataLoader
-from transformers.tokenization_utils_base import BatchEncoding
-from transformers import (
-    PreTrainedModel,
-    PreTrainedTokenizerFast,
-)
 from seqeval.metrics import precision_score, recall_score, f1_score
 from renard.nltk_utils import nltk_fix_bio_tags
 from renard.ner_utils import (
@@ -16,6 +10,13 @@ from renard.ner_utils import (
 )
 from renard.pipeline.core import PipelineStep, Mention
 from renard.pipeline.progress import ProgressReporter
+
+if TYPE_CHECKING:
+    from transformers.tokenization_utils_base import BatchEncoding
+    from transformers import (
+        PreTrainedModel,
+        PreTrainedTokenizerFast,
+    )
 
 
 @dataclass
@@ -210,6 +211,7 @@ class BertNamedEntityRecognizer(PipelineStep):
         # init model if needed (this happens if the user did not pass
         # the instance of a model)
         if self.model is None:
+
             # the user supplied a huggingface ID: load model from the HUB
             if not self.huggingface_model_id is None:
                 self.model = AutoModelForTokenClassification.from_pretrained(
@@ -220,6 +222,7 @@ class BertNamedEntityRecognizer(PipelineStep):
                         self.huggingface_model_id
                     )
                 self.lang = "unknown"  # we don't know the lang of the custom model
+
             # the user did not supply anything: load the default model
             else:
                 model_str = BertNamedEntityRecognizer.LANG_TO_MODELS.get(lang)
@@ -230,6 +233,8 @@ class BertNamedEntityRecognizer(PipelineStep):
                 self.model = AutoModelForTokenClassification.from_pretrained(model_str)
                 if self.tokenizer is None:
                     self.tokenizer = AutoTokenizer.from_pretrained(model_str)
+
+        assert not self.tokenizer is None
 
     def __call__(
         self,
@@ -242,6 +247,8 @@ class BertNamedEntityRecognizer(PipelineStep):
         :param tokens:
         :param sentences:
         """
+        from torch.utils.data import DataLoader
+
         assert not self.model is None
 
         self.model = self.model.to(self.device)
