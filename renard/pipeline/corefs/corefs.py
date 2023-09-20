@@ -1,9 +1,13 @@
 from __future__ import annotations
-from typing import List, Literal, Optional, Set, Dict, Any, Union
+from typing import List, Literal, Optional, Set, Dict, Any, Union, TYPE_CHECKING
 from importlib import import_module
 import torch
 from more_itertools import windowed
 from renard.pipeline import PipelineStep, Mention, ProgressReporter
+
+if TYPE_CHECKING:
+    from tibert import BertForCoreferenceResolution
+    from transformers import PreTrainedTokenizerFast
 
 
 class BertCoreferenceResolver(PipelineStep):
@@ -15,9 +19,11 @@ class BertCoreferenceResolver(PipelineStep):
 
     def __init__(
         self,
+        model: Optional[Union[BertForCoreferenceResolution]] = None,
         hugginface_model_id: Optional[str] = None,
         batch_size: int = 4,
         device: Literal["auto", "cuda", "cpu"] = "auto",
+        tokenizer: Optional[PreTrainedTokenizerFast] = None,
     ) -> None:
         """
         .. note::
@@ -32,7 +38,15 @@ class BertCoreferenceResolver(PipelineStep):
         :param batch_size: batch size at inference
         :param device: computation device
         """
-        self.hugginface_model_id = hugginface_model_id
+        if isinstance(model, str):
+            self.hugginface_model_id = hugginface_model_id
+            self.model = None  # model will be init by _pipeline_init_
+        else:
+            self.hugginface_model_id = None
+            self.model = model
+
+        self.tokenizer = tokenizer
+
         self.batch_size = batch_size
 
         if device == "auto":
@@ -44,12 +58,29 @@ class BertCoreferenceResolver(PipelineStep):
 
     def _pipeline_init_(self, lang: str, progress_reporter: ProgressReporter):
         from tibert import BertForCoreferenceResolution
-        from transformers import BertTokenizerFast
+        from transformers import BertTokenizerFast, AutoTokenizer
 
-        self.bert_for_corefs = BertForCoreferenceResolution.from_pretrained(
-            "compnet-renard/bert-base-cased-literary-coref"
-        )
-        self.tokenizer = BertTokenizerFast.from_pretrained("bert-base-cased")
+        if self.model is None:
+
+            # the user supplied a huggingface ID: load model from the HUB
+            if not self.hugginface_model_id is None:
+                self.model = BertForCoreferenceResolution.from_pretrained(
+                    self.hugginface_model_id
+                )
+                if self.tokenizer is None:
+                    self.tokenizer = AutoTokenizer.from_pretrained(
+                        self.hugginface_model_id
+                    )
+                self.lang = "unknown"
+
+            # the user did not supply anything: load the default model
+            else:
+                self.bert_for_corefs = BertForCoreferenceResolution.from_pretrained(
+                    "compnet-renard/bert-base-cased-literary-coref"
+                )
+                self.tokenizer = BertTokenizerFast.from_pretrained("bert-base-cased")
+
+        assert not self.tokenizer is None
 
         super()._pipeline_init_(lang, progress_reporter)
 
