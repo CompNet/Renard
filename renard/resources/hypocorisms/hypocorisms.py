@@ -73,6 +73,9 @@ class HypocorismGazetteer:
         """Check if one name is an hypocorism of the other
         (or if both names are equals)
         """
+        if name1 == "" or name2 == "":
+            return False
+
         return (
             name1.lower() == name2.lower()
             or name2.lower() in self.get_nicknames(name1)
