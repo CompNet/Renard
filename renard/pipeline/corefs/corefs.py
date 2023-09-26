@@ -75,7 +75,7 @@ class BertCoreferenceResolver(PipelineStep):
 
             # the user did not supply anything: load the default model
             else:
-                self.bert_for_corefs = BertForCoreferenceResolution.from_pretrained(
+                self.model = BertForCoreferenceResolution.from_pretrained(
                     "compnet-renard/bert-base-cased-literary-coref"
                 )
                 self.tokenizer = BertTokenizerFast.from_pretrained("bert-base-cased")
@@ -97,7 +97,7 @@ class BertCoreferenceResolver(PipelineStep):
             for block_start in range(0, len(tokens), BLOCK_SIZE)
         ]
 
-        coref_docs = predict_coref(blocks, self.bert_for_corefs, self.tokenizer)
+        coref_docs = predict_coref(blocks, self.model, self.tokenizer)
 
         # chains found in coref_docs are each local to their
         # blocks. The following code adjusts their start and end index
