@@ -156,6 +156,7 @@ class GraphRulesCharactersExtractor(PipelineStep):
         self,
         min_appearances: int = 0,
         additional_hypocorisms: Optional[List[Tuple[str, List[str]]]] = None,
+        link_corefs_mentions: bool = False,
     ) -> None:
         """
         :param min_appearances: minimum number of appearances of a
@@ -164,9 +165,16 @@ class GraphRulesCharactersExtractor(PipelineStep):
             hypocorisms.  Each hypocorism is a tuple where the first
             element is a name, and the second element is a set of
             nicknames associated with it
+        :param link_corefs_mentions: if ``True``, will also use
+            coreference resolution to link names between them.  This
+            is disabled by default since a coreference model can
+            extract a lot of spurious links.  However, linking by
+            coref is sometimes the only way to resolve a character
+            alias.
         """
         self.min_appearances = min_appearances
         self.additional_hypocorisms = additional_hypocorisms
+        self.link_corefs_mentions = link_corefs_mentions
 
         super().__init__()
 
@@ -214,7 +222,7 @@ class GraphRulesCharactersExtractor(PipelineStep):
                 G.add_edge(name1, name2)
                 continue
 
-            # add an edge if two characters have the same first name or family names
+            # add an edge if two characters have the same family names
             human_name1 = HumanName(name1, constants=hname_constants)
             human_name2 = HumanName(name2, constants=hname_constants)
             if (
@@ -223,6 +231,7 @@ class GraphRulesCharactersExtractor(PipelineStep):
             ):
                 G.add_edge(name1, name2)
                 continue
+            # add an edge if two characters have the same first names
             if (
                 len(human_name1.first) > 0
                 and human_name1.first.lower() == human_name2.first.lower()
@@ -232,25 +241,24 @@ class GraphRulesCharactersExtractor(PipelineStep):
 
             # if coreferences are available, check if both names are
             # in a coref chain
-            if not corefs is None:
+            if not corefs is None and self.link_corefs_mentions:
                 if self.names_are_in_coref(name1, name2, corefs):
                     G.add_edge(name1, name2)
 
+        # we assign a gender to each name when corefs are available
+        for name in G.nodes():
+            G.nodes[name]["gender"] = self.infer_name_gender(
+                name, corefs, hname_constants
+            )
+
+        # * delete the shortest path between two nodes if two names
+        #   are found to be impossible to be a mention of the same
+        #   character
         def try_remove_edges(edges):
             try:
                 G.remove_edges_from(edges)
             except nx.NetworkXNoPath:
                 pass
-
-        # * delete the shortest path between two nodes if two names
-        #   are found to be impossible to be a mention of the same
-        #   character
-        # we assign a gender to each name when corefs are available
-        if not corefs is None:
-            for name in G.nodes():
-                G.nodes[name]["gender"] = self.infer_name_gender(
-                    name, corefs, hname_constants
-                )
 
         for name1, name2 in combinations(G.nodes(), 2):
 
@@ -261,34 +269,38 @@ class GraphRulesCharactersExtractor(PipelineStep):
             if (
                 len(human_name1.last) > 0
                 and len(human_name2.last) > 0
+                and len(human_name1.first) > 0
+                and len(human_name2.first) > 0
                 and human_name1.last == human_name2.last
                 and human_name1.first != human_name2.first
             ):
                 try_remove_edges(nx.all_shortest_paths(G, source=name1, target=name2))
                 continue
 
-            if not corefs is None:
-                # check if names dont have the same infered gender
-                gender1 = G.nodes[name1]["gender"]
-                gender2 = G.nodes[name2]["gender"]
-                if gender1 != gender2 and not any(
-                    [g == Gender.UNKNOWN for g in (gender1, gender2)]
-                ):
-                    try_remove_edges(
-                        nx.all_shortest_paths(G, source=name1, target=name2)
-                    )
+            # check if names dont have the same infered gender
+            gender1 = G.nodes[name1]["gender"]
+            gender2 = G.nodes[name2]["gender"]
+            if (
+                gender1 != gender2
+                and not gender1 == Gender.UNKNOWN
+                and not gender2 == Gender.UNKNOWN
+            ):
+                try_remove_edges(nx.all_shortest_paths(G, source=name1, target=name2))
 
         # create characters from the computed graph
-        characters = [
-            Character(
-                frozenset(names),
-                [m for m in mentions if " ".join(m.tokens) in names],
-                # per code above, if a gender is set all names have
-                # the same gender
-                gender=G.nodes[list(names)[0]].get("gender", Gender.UNKNOWN),
+        characters = []
+        for names in nx.connected_components(G):
+            # choose gender using a majority vote
+            genders = [G.nodes[name].get("gender", Gender.UNKNOWN) for name in names]
+            counter = Counter(genders)
+            gender = max(counter, key=counter.get)  # type: ignore
+            characters.append(
+                Character(
+                    frozenset(names),
+                    [m for m in mentions if " ".join(m.tokens) in names],
+                    gender,
+                )
             )
-            for names in nx.connected_components(G)
-        ]
 
         # link characters to all of to their coreferential mentions
         # (pronouns...)
@@ -324,6 +336,9 @@ class GraphRulesCharactersExtractor(PipelineStep):
         raw_name1 = HumanName(name1, constants=local_constants).full_name
         raw_name2 = HumanName(name2, constants=local_constants).full_name
 
+        if raw_name1 == "" or raw_name2 == "":
+            return False
+
         return (
             raw_name1.lower() == raw_name2.lower()
             or self.hypocorism_gazetteer.are_related(raw_name1, raw_name2)
@@ -338,7 +353,10 @@ class GraphRulesCharactersExtractor(PipelineStep):
         return False
 
     def infer_name_gender(
-        self, name: str, corefs: List[List[Mention]], hname_constants: Constants
+        self,
+        name: str,
+        corefs: Optional[List[List[Mention]]],
+        hname_constants: Constants,
     ) -> Gender:
         """Try to infer a name's gender
 
@@ -357,6 +375,9 @@ class GraphRulesCharactersExtractor(PipelineStep):
         # 2. if 1. didn't succeed, inspect coreferences chain
         #    to see if if the name was coreferent with a
         #    gendered pronoun
+        if corefs is None:
+            return Gender.UNKNOWN
+
         female_count = 0
         male_count = 0
 
