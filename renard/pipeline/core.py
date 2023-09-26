@@ -534,7 +534,12 @@ class Pipeline:
 
         self._pipeline_init_steps(ignored_steps)
 
-        state = PipelineState(text, **kwargs)
+        state = PipelineState(text)
+        # sets attributes to PipelineState dynamically. This ensures
+        # that users can create steps returning custom attributes, and
+        # that these attributes can be passed at pipeline call time.
+        for key, value in kwargs.items():
+            setattr(state, key, value)
 
         steps = self._non_ignored_steps(ignored_steps)
 
