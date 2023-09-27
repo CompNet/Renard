@@ -21,7 +21,7 @@ class BertCoreferenceResolver(PipelineStep):
         self,
         model: Optional[Union[BertForCoreferenceResolution]] = None,
         hugginface_model_id: Optional[str] = None,
-        batch_size: int = 4,
+        batch_size: int = 1,
         device: Literal["auto", "cuda", "cpu"] = "auto",
         tokenizer: Optional[PreTrainedTokenizerFast] = None,
     ) -> None:
@@ -97,7 +97,9 @@ class BertCoreferenceResolver(PipelineStep):
             for block_start in range(0, len(tokens), BLOCK_SIZE)
         ]
 
-        coref_docs = predict_coref(blocks, self.model, self.tokenizer)
+        coref_docs = predict_coref(
+            blocks, self.model, self.tokenizer, batch_size=self.batch_size
+        )
 
         # chains found in coref_docs are each local to their
         # blocks. The following code adjusts their start and end index
