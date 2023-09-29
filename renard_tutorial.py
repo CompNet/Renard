@@ -61,7 +61,7 @@
 #         NLTKTokenizer(),                                                 # tokenization
 #         NLTKNamedEntityRecognizer(),                                     # named entity recognition
 #         GraphRulesCharactersExtractor(),                                 # characters extraction
-#         CoOccurrencesGraphExtractor(co_occurences_dist=(1, "sentences")) # graph extraction
+#         CoOccurrencesGraphExtractor(co_occurrences_dist=(1, "sentences")) # graph extraction
 #     ]
 # )
 # ```
@@ -105,7 +105,7 @@ pipeline = Pipeline(
         GraphRulesCharactersExtractor(),
         # an interaction will be a co-occurence in a range of 3
         # sentences or less
-        CoOccurrencesGraphExtractor(co_occurences_dist=(3, "sentences")),
+        CoOccurrencesGraphExtractor(co_occurrences_dist=(3, "sentences")),
     ],
     lang="fra",
 )
@@ -143,7 +143,7 @@ pipeline = Pipeline(
         GraphRulesCharactersExtractor(min_appearances=3),
         # A co-occurence between two characters is counted if its
         # range is lower or equal to 10 sentences
-        CoOccurrencesGraphExtractor(co_occurences_dist=(10, "sentences")),
+        CoOccurrencesGraphExtractor(co_occurrences_dist=(10, "sentences")),
     ],
     lang="fra",
 )
@@ -180,7 +180,7 @@ pipeline = Pipeline(
     [
         GraphRulesCharactersExtractor(min_appearances=3),
         CoOccurrencesGraphExtractor(
-            co_occurences_dist=(20, "sentences"),
+            co_occurrences_dist=(20, "sentences"),
             dynamic=True,  # we want to extract a dynamic graph (i.e. a list of sequential graphs)
             dynamic_window=20,  # the size, in interaction, of each graph
             dynamic_overlap=0,  # overlap between windows

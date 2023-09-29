@@ -23,7 +23,7 @@ document. Here is a simple example:
            NLTKTokenizer(),
            NLTKNamedEntityRecognizer(),
            NaiveCharactersExtractor(min_appearance=10),
-           CoOccurrencesGraphExtractor(co_occurences_dist=25)
+           CoOccurrencesGraphExtractor(co_occurrences_dist=25)
        ]
    )
 
@@ -56,7 +56,7 @@ to compute them yourself :
        [
            NLTKNamedEntityRecognizer(),
            NaiveCharactersExtractor(min_appearance=10),
-           CoOccurrencesGraphExtractor(co_occurences_dist=25)
+           CoOccurrencesGraphExtractor(co_occurrences_dist=25)
        ]
    )
 
@@ -201,7 +201,7 @@ time. In Renard, such graphs are representend by a ``List`` of
            NLTKNamedEntityRecognizer(),
            NaiveCharactersExtractor(min_appearance=10),
            CoOccurrencesGraphExtractor(
-	       co_occurences_dist=25,
+	       co_occurrences_dist=25,
 	       dynamic=True,     # note the 'dynamic'
 	       dynamic_window=20 # and the 'dynamic_window' argument
 	   )

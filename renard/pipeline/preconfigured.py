@@ -27,8 +27,8 @@ def nltk_pipeline(
     characters_extractor_kwargs = characters_extractor_kwargs or {}
     graph_extractor_kwargs = graph_extractor_kwargs or {}
 
-    if not "co_occurences_dist" in graph_extractor_kwargs:
-        graph_extractor_kwargs["co_occurences_dist"] = (1, "sentences")
+    if not "co_occurrences_dist" in graph_extractor_kwargs:
+        graph_extractor_kwargs["co_occurrences_dist"] = (1, "sentences")
 
     return Pipeline(
         [
@@ -69,7 +69,7 @@ def bert_pipeline(
             NLTKTokenizer(),
             BertNamedEntityRecognizer(),
             GraphRulesCharactersExtractor(),
-            CoOccurrencesGraphExtractor(co_occurences_dist=(1, "sentences")),
+            CoOccurrencesGraphExtractor(co_occurrences_dist=(1, "sentences")),
         ],
         **pipeline_kwargs
     )
