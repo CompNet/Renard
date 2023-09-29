@@ -12,7 +12,7 @@ document. Here is a simple example:
    from renard.pipeline import Pipeline
    from renard.pipeline.tokenization import NLTKTokenizer
    from renard.pipeline.ner import NLTKNamedEntityRecognizer
-   from renard.pipeline.characters_extraction import GraphRulesCharactersExtractor
+   from renard.pipeline.characters_extraction import NaiveCharactersExtractor
    from renard.pipeline.graph_extraction import CoOccurrencesGraphExtractor
 
    with open("./my_doc.txt") as f:
@@ -22,8 +22,8 @@ document. Here is a simple example:
        [
            NLTKTokenizer(),
            NLTKNamedEntityRecognizer(),
-           GraphRulesCharactersExtractor(min_appearances=10),
-           CoOccurrencesGraphExtractor(co_occurences_dist=25)
+           NaiveCharactersExtractor(min_appearance=10),
+           CoOccurrencesGraphExtractor(co_occurrences_dist=25)
        ]
    )
 
@@ -45,7 +45,7 @@ to compute them yourself :
 
    from renard.pipeline import Pipeline
    from renard.pipeline.ner import NLTKNamedEntityRecognizer
-   from renard.pipeline.characters_extraction import GraphRulesCharactersExtractor
+   from renard.pipeline.characters_extraction import NaiveCharactersExtractor
    from renard.pipeline.graph_extraction import CoOccurrencesGraphExtractor
 
    with open("./my_doc.txt") as f:
@@ -55,8 +55,8 @@ to compute them yourself :
    pipeline = Pipeline(
        [
            NLTKNamedEntityRecognizer(),
-           GraphRulesCharactersExtractor(min_appearances=10),
-           CoOccurrencesGraphExtractor(co_occurences_dist=25)
+           NaiveCharactersExtractor(min_appearance=10),
+           CoOccurrencesGraphExtractor(co_occurrences_dist=25)
        ]
    )
 
@@ -149,15 +149,8 @@ Coreference Resolution
 ----------------------
 
 - :class:`.SpacyCorefereeCoreferenceResolver`
-- :class:`.BertCoreferenceResolver`, using the Tibert library.
 - :class:`.StanfordCoreNLPPipeline` can execute a coreference
-  resolution model as part of its pipeline.
-
-
-Quote Detection
----------------
-
-- :class:`.QuoteDetector`
+  resolution model as part of its pipeline
 
 
 Sentiment Analysis
@@ -196,7 +189,7 @@ time. In Renard, such graphs are representend by a ``List`` of
    from renard.pipeline import Pipeline
    from renard.pipeline.tokenization import NLTKTokenizer
    from renard.pipeline.ner import NLTKNamedEntityRecognizer
-   from renard.pipeline.characters_extraction import GraphRulesCharactersExtractor
+   from renard.pipeline.characters_extraction import NaiveCharactersExtractor
    from renard.pipeline.graph_extraction import CoOccurrencesGraphExtractor
 
    with open("./my_doc.txt") as f:
@@ -206,9 +199,9 @@ time. In Renard, such graphs are representend by a ``List`` of
        [
            NLTKTokenizer(),
            NLTKNamedEntityRecognizer(),
-           GraphRulesCharactersExtractor(min_appearances=10),
+           NaiveCharactersExtractor(min_appearance=10),
            CoOccurrencesGraphExtractor(
-	       co_occurences_dist=25,
+	       co_occurrences_dist=25,
 	       dynamic=True,     # note the 'dynamic'
 	       dynamic_window=20 # and the 'dynamic_window' argument
 	   )

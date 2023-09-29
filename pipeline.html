@@ -52,7 +52,6 @@
 <li class="toctree-l3"><a class="reference internal" href="#tokenization">Tokenization</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#named-entity-recognition">Named Entity Recognition</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#coreference-resolution">Coreference Resolution</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#quote-detection">Quote Detection</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#sentiment-analysis">Sentiment Analysis</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#characters-extraction">Characters Extraction</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#graph-extraction">Graph Extraction</a></li>
@@ -98,7 +97,7 @@ document. Here is a simple example:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">renard.pipeline</span> <span class="kn">import</span> <span class="n">Pipeline</span>
 <span class="kn">from</span> <span class="nn">renard.pipeline.tokenization</span> <span class="kn">import</span> <span class="n">NLTKTokenizer</span>
 <span class="kn">from</span> <span class="nn">renard.pipeline.ner</span> <span class="kn">import</span> <span class="n">NLTKNamedEntityRecognizer</span>
-<span class="kn">from</span> <span class="nn">renard.pipeline.characters_extraction</span> <span class="kn">import</span> <span class="n">GraphRulesCharactersExtractor</span>
+<span class="kn">from</span> <span class="nn">renard.pipeline.characters_extraction</span> <span class="kn">import</span> <span class="n">NaiveCharactersExtractor</span>
 <span class="kn">from</span> <span class="nn">renard.pipeline.graph_extraction</span> <span class="kn">import</span> <span class="n">CoOccurrencesGraphExtractor</span>
 
 <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;./my_doc.txt&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
@@ -108,8 +107,8 @@ document. Here is a simple example:</p>
     <span class="p">[</span>
         <span class="n">NLTKTokenizer</span><span class="p">(),</span>
         <span class="n">NLTKNamedEntityRecognizer</span><span class="p">(),</span>
-        <span class="n">GraphRulesCharactersExtractor</span><span class="p">(</span><span class="n">min_appearances</span><span class="o">=</span><span class="mi">10</span><span class="p">),</span>
-        <span class="n">CoOccurrencesGraphExtractor</span><span class="p">(</span><span class="n">co_occurences_dist</span><span class="o">=</span><span class="mi">25</span><span class="p">)</span>
+        <span class="n">NaiveCharactersExtractor</span><span class="p">(</span><span class="n">min_appearance</span><span class="o">=</span><span class="mi">10</span><span class="p">),</span>
+        <span class="n">CoOccurrencesGraphExtractor</span><span class="p">(</span><span class="n">co_occurrences_dist</span><span class="o">=</span><span class="mi">25</span><span class="p">)</span>
     <span class="p">]</span>
 <span class="p">)</span>
 
@@ -127,7 +126,7 @@ calling the pipeline if you already have those results or if you want
 to compute them yourself :</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">renard.pipeline</span> <span class="kn">import</span> <span class="n">Pipeline</span>
 <span class="kn">from</span> <span class="nn">renard.pipeline.ner</span> <span class="kn">import</span> <span class="n">NLTKNamedEntityRecognizer</span>
-<span class="kn">from</span> <span class="nn">renard.pipeline.characters_extraction</span> <span class="kn">import</span> <span class="n">GraphRulesCharactersExtractor</span>
+<span class="kn">from</span> <span class="nn">renard.pipeline.characters_extraction</span> <span class="kn">import</span> <span class="n">NaiveCharactersExtractor</span>
 <span class="kn">from</span> <span class="nn">renard.pipeline.graph_extraction</span> <span class="kn">import</span> <span class="n">CoOccurrencesGraphExtractor</span>
 
 <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;./my_doc.txt&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
@@ -137,8 +136,8 @@ to compute them yourself :</p>
 <span class="n">pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span>
     <span class="p">[</span>
         <span class="n">NLTKNamedEntityRecognizer</span><span class="p">(),</span>
-        <span class="n">GraphRulesCharactersExtractor</span><span class="p">(</span><span class="n">min_appearances</span><span class="o">=</span><span class="mi">10</span><span class="p">),</span>
-        <span class="n">CoOccurrencesGraphExtractor</span><span class="p">(</span><span class="n">co_occurences_dist</span><span class="o">=</span><span class="mi">25</span><span class="p">)</span>
+        <span class="n">NaiveCharactersExtractor</span><span class="p">(</span><span class="n">min_appearance</span><span class="o">=</span><span class="mi">10</span><span class="p">),</span>
+        <span class="n">CoOccurrencesGraphExtractor</span><span class="p">(</span><span class="n">co_occurrences_dist</span><span class="o">=</span><span class="mi">25</span><span class="p">)</span>
     <span class="p">]</span>
 <span class="p">)</span>
 
@@ -220,15 +219,8 @@ its full NLP pipeline.</p></li>
 <h3>Coreference Resolution<a class="headerlink" href="#coreference-resolution" title="Permalink to this headline"></a></h3>
 <ul class="simple">
 <li><p><a class="reference internal" href="reference.html#renard.pipeline.corefs.SpacyCorefereeCoreferenceResolver" title="renard.pipeline.corefs.SpacyCorefereeCoreferenceResolver"><code class="xref py py-class docutils literal notranslate"><span class="pre">SpacyCorefereeCoreferenceResolver</span></code></a></p></li>
-<li><p><a class="reference internal" href="reference.html#renard.pipeline.corefs.BertCoreferenceResolver" title="renard.pipeline.corefs.BertCoreferenceResolver"><code class="xref py py-class docutils literal notranslate"><span class="pre">BertCoreferenceResolver</span></code></a>, using the Tibert library.</p></li>
 <li><p><a class="reference internal" href="reference.html#renard.pipeline.stanford_corenlp.StanfordCoreNLPPipeline" title="renard.pipeline.stanford_corenlp.StanfordCoreNLPPipeline"><code class="xref py py-class docutils literal notranslate"><span class="pre">StanfordCoreNLPPipeline</span></code></a> can execute a coreference
-resolution model as part of its pipeline.</p></li>
-</ul>
-</section>
-<section id="quote-detection">
-<h3>Quote Detection<a class="headerlink" href="#quote-detection" title="Permalink to this headline"></a></h3>
-<ul class="simple">
-<li><p><a class="reference internal" href="reference.html#renard.pipeline.quote_detection.QuoteDetector" title="renard.pipeline.quote_detection.QuoteDetector"><code class="xref py py-class docutils literal notranslate"><span class="pre">QuoteDetector</span></code></a></p></li>
+resolution model as part of its pipeline</p></li>
 </ul>
 </section>
 <section id="sentiment-analysis">
@@ -261,7 +253,7 @@ time. In Renard, such graphs are representend by a <code class="docutils literal
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">renard.pipeline</span> <span class="kn">import</span> <span class="n">Pipeline</span>
 <span class="kn">from</span> <span class="nn">renard.pipeline.tokenization</span> <span class="kn">import</span> <span class="n">NLTKTokenizer</span>
 <span class="kn">from</span> <span class="nn">renard.pipeline.ner</span> <span class="kn">import</span> <span class="n">NLTKNamedEntityRecognizer</span>
-<span class="kn">from</span> <span class="nn">renard.pipeline.characters_extraction</span> <span class="kn">import</span> <span class="n">GraphRulesCharactersExtractor</span>
+<span class="kn">from</span> <span class="nn">renard.pipeline.characters_extraction</span> <span class="kn">import</span> <span class="n">NaiveCharactersExtractor</span>
 <span class="kn">from</span> <span class="nn">renard.pipeline.graph_extraction</span> <span class="kn">import</span> <span class="n">CoOccurrencesGraphExtractor</span>
 
 <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;./my_doc.txt&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
@@ -271,9 +263,9 @@ time. In Renard, such graphs are representend by a <code class="docutils literal
     <span class="p">[</span>
         <span class="n">NLTKTokenizer</span><span class="p">(),</span>
         <span class="n">NLTKNamedEntityRecognizer</span><span class="p">(),</span>
-        <span class="n">GraphRulesCharactersExtractor</span><span class="p">(</span><span class="n">min_appearances</span><span class="o">=</span><span class="mi">10</span><span class="p">),</span>
+        <span class="n">NaiveCharactersExtractor</span><span class="p">(</span><span class="n">min_appearance</span><span class="o">=</span><span class="mi">10</span><span class="p">),</span>
         <span class="n">CoOccurrencesGraphExtractor</span><span class="p">(</span>
-            <span class="n">co_occurences_dist</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span>
+            <span class="n">co_occurrences_dist</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span>
             <span class="n">dynamic</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>     <span class="c1"># note the &#39;dynamic&#39;</span>
             <span class="n">dynamic_window</span><span class="o">=</span><span class="mi">20</span> <span class="c1"># and the &#39;dynamic_window&#39; argument</span>
         <span class="p">)</span>
