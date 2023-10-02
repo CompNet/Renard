@@ -15,6 +15,7 @@ from typing import (
     TypeVar,
     Type,
     TYPE_CHECKING,
+    cast,
 )
 import os
 
@@ -326,9 +327,13 @@ class PipelineState:
             raise ValueError("this function is supposed to be used on a static graph")
 
         G = graph_with_names(self.characters_graph, name_style=name_style)
-        ax = None
-        if not fig is None:
-            ax = fig.add_subplot(111)
+        if fig is None:
+            # default values for a sufficiently sized graph
+            fig = plt.gcf()
+            assert not fig is None
+            fig.set_dpi(300)
+            fig.set_size_inches(24, 24)
+        ax = fig.add_subplot(111)
         plot_nx_graph_reasonably(G, ax=ax)
         plt.savefig(path)
         plt.close()
@@ -375,9 +380,13 @@ class PipelineState:
         # self.characters_graph is a static graph
         if isinstance(self.characters_graph, nx.Graph):
             G = graph_with_names(self.characters_graph, name_style)
-            ax = None
-            if not fig is None:
-                ax = fig.add_subplot(111)
+            if fig is None:
+                # default value for a sufficiently sized graph
+                fig = plt.gcf()
+                assert not fig is None
+                fig.set_dpi(300)
+                fig.set_size_inches(24, 24)
+            ax = fig.add_subplot(111)
             plot_nx_graph_reasonably(G, ax=ax)
             return
 
@@ -387,6 +396,9 @@ class PipelineState:
 
         if fig is None:
             fig, ax = plt.subplots()
+            assert not fig is None
+            fig.set_dpi(300)
+            fig.set_size_inches(24, 24)
         else:
             ax = fig.add_subplot(111)
         assert not fig is None
