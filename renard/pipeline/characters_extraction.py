@@ -26,9 +26,11 @@ class Character:
     def shortest_name(self) -> str:
         return min(self.names, key=len)
 
-    def most_frequent_name(self) -> str:
+    def most_frequent_name(self) -> Optional[str]:
         c = Counter([" ".join(mention.tokens) for mention in self.mentions])
         c = {c: count for c, count in c.items() if c in self.names}
+        if len(c) == 0:
+            return self.longest_name()
         return max(c, key=c.get)  # type: ignore
 
     def __hash__(self) -> int:
