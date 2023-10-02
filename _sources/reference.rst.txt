@@ -87,6 +87,16 @@ SpacyCorefereeCoreferenceResolver
    :members:
 
 
+Quote Detection
+===============
+
+QuoteDetector
+-------------
+
+.. autoclass:: renard.pipeline.quote_detection.QuoteDetector
+   :members:
+
+
 Sentiment Analysis
 ==================
 
