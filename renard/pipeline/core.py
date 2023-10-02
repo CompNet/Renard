@@ -309,12 +309,15 @@ class PipelineState:
         name_style: Union[
             Literal["longest", "shortest", "most_frequent"], Callable[[Character], str]
         ] = "most_frequent",
+        fig: Optional[plt.Figure] = None,
     ):
         """Plot ``self.character_graph`` using reasonable parameters,
         and save the produced figure to a file
 
         :param name_style: see :func:`.graph_with_names`
             for more details
+        :param fig: if specified, this matplotlib figure will be used
+            for plotting
         """
         import matplotlib.pyplot as plt
 
@@ -323,7 +326,10 @@ class PipelineState:
             raise ValueError("this function is supposed to be used on a static graph")
 
         G = graph_with_names(self.characters_graph, name_style=name_style)
-        plot_nx_graph_reasonably(G)
+        ax = None
+        if not fig is None:
+            ax = fig.add_subplot(111)
+        plot_nx_graph_reasonably(G, ax=ax)
         plt.savefig(path)
         plt.close()
 
