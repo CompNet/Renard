@@ -333,7 +333,7 @@ class PipelineState:
             raise ValueError("this function is supposed to be used on a static graph")
 
         if not layout is None:
-            layout = layout_with_names(G, layout, name_style)
+            layout = layout_with_names(self.characters_graph, layout, name_style)
         G = graph_with_names(self.characters_graph, name_style=name_style)
         if fig is None:
             # default values for a sufficiently sized graph
