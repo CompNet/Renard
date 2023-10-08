@@ -9,7 +9,7 @@ if TYPE_CHECKING:
     from renard.pipeline.characters_extraction import Character
 
 
-GraphLayout = Union[
+CharactersGraphLayout = Union[
     Dict["Character", Tuple[float, float]], Dict["Character", np.ndarray]
 ]
 
@@ -18,9 +18,7 @@ def layout_nx_graph_reasonably(G: nx.Graph) -> Dict[Any, np.ndarray]:
     return nx.spring_layout(G, k=2 / math.sqrt(len(G.nodes)))  # type: ignore
 
 
-def plot_nx_graph_reasonably(
-    G: nx.Graph, ax=None, layout: Optional[GraphLayout] = None
-):
+def plot_nx_graph_reasonably(G: nx.Graph, ax=None, layout: Optional[dict] = None):
     """Try to plot a :class:`nx.Graph` with 'reasonable' parameters
 
     :param G: the graph to draw

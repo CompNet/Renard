@@ -27,10 +27,11 @@ from renard.graph_utils import (
     cumulative_graph,
     graph_with_names,
     dynamic_graph_to_gephi_graph,
+    layout_with_names,
 )
 
 if TYPE_CHECKING:
-    from renard.plot_utils import GraphLayout
+    from renard.plot_utils import CharactersGraphLayout
     from renard.pipeline.characters_extraction import Character
     from renard.pipeline.ner import NEREntity
     from renard.pipeline.quote_detection import Quote
@@ -259,7 +260,7 @@ class PipelineState:
         ] = "most_frequent",
         cumulative: bool = False,
         stable_layout: bool = False,
-        layout: Optional[GraphLayout] = None,
+        layout: Optional[CharactersGraphLayout] = None,
     ):
         """Plot ``self.character_graph`` using reasonable default
         parameters, and save the produced figures in the specified
@@ -295,12 +296,15 @@ class PipelineState:
                 if cumulative
                 else cumulative_graph(self.characters_graph)[-1]
             )
-            layout = layout_nx_graph_reasonably(graph_with_names(layout_graph))
+            layout = layout_nx_graph_reasonably(layout_graph)
 
         for i, G in enumerate(graphs):
             _, ax = plt.subplots()
+            local_layout = layout
+            if not local_layout is None:
+                local_layout = layout_with_names(G, local_layout, name_style)
             G = graph_with_names(G, name_style=name_style)
-            plot_nx_graph_reasonably(G, ax=ax, layout=layout)
+            plot_nx_graph_reasonably(G, ax=ax, layout=local_layout)
             plt.savefig(f"{directory}/{i}.png")
             plt.close()
 
@@ -310,7 +314,7 @@ class PipelineState:
         name_style: Union[
             Literal["longest", "shortest", "most_frequent"], Callable[[Character], str]
         ] = "most_frequent",
-        layout: Optional[GraphLayout] = None,
+        layout: Optional[CharactersGraphLayout] = None,
         fig: Optional[plt.Figure] = None,
     ):
         """Plot ``self.character_graph`` using reasonable parameters,
@@ -328,6 +332,8 @@ class PipelineState:
         if isinstance(self.characters_graph, list):
             raise ValueError("this function is supposed to be used on a static graph")
 
+        if not layout is None:
+            layout = layout_with_names(G, layout, name_style)
         G = graph_with_names(self.characters_graph, name_style=name_style)
         if fig is None:
             # default values for a sufficiently sized graph
@@ -349,7 +355,7 @@ class PipelineState:
         cumulative: bool = False,
         graph_start_idx: int = 1,
         stable_layout: bool = False,
-        layout: Optional[GraphLayout] = None,
+        layout: Optional[CharactersGraphLayout] = None,
     ):
         """Plot ``self.characters_graph`` using reasonable default
         parameters
@@ -383,6 +389,8 @@ class PipelineState:
 
         # self.characters_graph is a static graph
         if isinstance(self.characters_graph, nx.Graph):
+            if not layout is None:
+                layout = layout_with_names(self.characters_graph, layout, name_style)
             G = graph_with_names(self.characters_graph, name_style)
             if fig is None:
                 # default value for a sufficiently sized graph
@@ -409,9 +417,7 @@ class PipelineState:
 
         cumulative_characters_graphs = cumulative_graph(self.characters_graph)
         if stable_layout:
-            layout = layout_nx_graph_reasonably(
-                graph_with_names(cumulative_characters_graphs[-1], name_style)
-            )
+            layout = layout_nx_graph_reasonably(cumulative_characters_graphs[-1])
 
         def update(slider_value):
             assert isinstance(self.characters_graph, list)
@@ -420,10 +426,15 @@ class PipelineState:
             if cumulative:
                 characters_graphs = cumulative_characters_graphs
 
-            G = graph_with_names(characters_graphs[int(slider_value) - 1], name_style)
+            G = characters_graphs[int(slider_value) - 1]
+
+            local_layout = layout
+            if not local_layout is None:
+                local_layout = layout_with_names(G, local_layout, name_style)
+            G = graph_with_names(G, name_style)
 
             ax.clear()
-            plot_nx_graph_reasonably(G, ax=ax, layout=layout)
+            plot_nx_graph_reasonably(G, ax=ax, layout=local_layout)
             ax.set_xlim(-1.2, 1.2)
             ax.set_ylim(-1.2, 1.2)
 

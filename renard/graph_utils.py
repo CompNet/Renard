@@ -1,10 +1,11 @@
 from __future__ import annotations
-from typing import List, Set, Union, Literal, Callable, TYPE_CHECKING
+from typing import Dict, List, Set, Union, Literal, Callable, TYPE_CHECKING
 from more_itertools.recipes import flatten
 import networkx as nx
 
 if TYPE_CHECKING:
     from renard.pipeline.characters_extraction import Character
+    from renard.plot_utils import CharactersGraphLayout
 
 
 def cumulative_graph(graphs: List[nx.Graph]) -> List[nx.Graph]:
@@ -73,6 +74,28 @@ def graph_with_names(
         G,
         {character: name_style_fn(character) for character in G.nodes()},  # type: ignore
     )
+
+
+def layout_with_names(
+    G: nx.Graph,
+    layout: CharactersGraphLayout,
+    name_style: Union[
+        Literal["longest", "shortest", "most_frequent"], Callable[[Character], str]
+    ] = "most_frequent",
+) -> dict:
+    """
+    :param G: a graph of ``Character``
+    """
+    if name_style == "longest":
+        name_style_fn = lambda character: character.longest_name()
+    elif name_style == "shortest":
+        name_style_fn = lambda character: character.shortest_name()
+    elif name_style == "most_frequent":
+        name_style_fn = lambda character: character.most_frequent_name()
+    else:
+        name_style_fn = name_style
+
+    return {name_style_fn(character): layout[character] for character in G.nodes()}
 
 
 def dynamic_graph_to_gephi_graph(graphs: List[nx.Graph]) -> nx.Graph:
