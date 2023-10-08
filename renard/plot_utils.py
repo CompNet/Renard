@@ -35,7 +35,7 @@ def plot_nx_graph_reasonably(G: nx.Graph, ax=None, layout: Optional[dict] = None
         pos,
         node_color=[degree for _, degree in G.degree],  # type: ignore
         cmap=plt.get_cmap("winter_r"),
-        node_size=[degree * 10 for _, degree in G.degree],  # type: ignore
+        node_size=[1 + degree * 10 for _, degree in G.degree],  # type: ignore
         ax=ax,
     )
 
