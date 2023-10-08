@@ -1,13 +1,17 @@
 import math
-from typing import Any, Dict, Optional, Union, Tuple
+from typing import TYPE_CHECKING, Any, Dict, Optional, Union, Tuple
 import networkx as nx
 import numpy as np
 import matplotlib.pyplot as plt
 from renard.graph_utils import graph_edges_attributes
-from renard.pipeline.characters_extraction import Character
+
+if TYPE_CHECKING:
+    from renard.pipeline.characters_extraction import Character
 
 
-GraphLayout = Union[Dict[Character, Tuple[float, float]], Dict[Character, np.ndarray]]
+GraphLayout = Union[
+    Dict["Character", Tuple[float, float]], Dict["Character", np.ndarray]
+]
 
 
 def layout_nx_graph_reasonably(G: nx.Graph) -> Dict[Any, np.ndarray]:
