@@ -1,9 +1,13 @@
 import math
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, Union, Tuple
 import networkx as nx
 import numpy as np
 import matplotlib.pyplot as plt
 from renard.graph_utils import graph_edges_attributes
+from renard.pipeline.characters_extraction import Character
+
+
+GraphLayout = Union[Dict[Character, Tuple[float, float]], Dict[Character, np.ndarray]]
 
 
 def layout_nx_graph_reasonably(G: nx.Graph) -> Dict[Any, np.ndarray]:
@@ -11,7 +15,7 @@ def layout_nx_graph_reasonably(G: nx.Graph) -> Dict[Any, np.ndarray]:
 
 
 def plot_nx_graph_reasonably(
-    G: nx.Graph, ax=None, layout: Optional[Dict[Any, np.ndarray]] = None
+    G: nx.Graph, ax=None, layout: Optional[GraphLayout] = None
 ):
     """Try to plot a :class:`nx.Graph` with 'reasonable' parameters
 

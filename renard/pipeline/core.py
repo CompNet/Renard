@@ -18,7 +18,6 @@ from typing import (
 )
 import os
 
-from transformers.tokenization_utils_base import BatchEncoding
 import networkx as nx
 from networkx.readwrite.gexf import GEXFWriter
 
@@ -31,6 +30,7 @@ from renard.graph_utils import (
 )
 
 if TYPE_CHECKING:
+    from renard.plot_utils import GraphLayout
     from renard.pipeline.characters_extraction import Character
     from renard.pipeline.ner import NEREntity
     from renard.pipeline.quote_detection import Quote
@@ -259,6 +259,7 @@ class PipelineState:
         ] = "most_frequent",
         cumulative: bool = False,
         stable_layout: bool = False,
+        layout: Optional[GraphLayout] = None,
     ):
         """Plot ``self.character_graph`` using reasonable default
         parameters, and save the produced figures in the specified
@@ -272,6 +273,7 @@ class PipelineState:
             characters will keep the same position in space at each
             timestep.  Characters' positions are based on the final
             cumulative graph layout.
+        :param layout: pre-computed graph layout
         """
         import matplotlib.pyplot as plt
 
@@ -287,7 +289,6 @@ class PipelineState:
         if cumulative:
             graphs = cumulative_graph(self.characters_graph)
 
-        layout = None
         if stable_layout:
             layout_graph = (
                 graphs[-1]
@@ -297,7 +298,7 @@ class PipelineState:
             layout = layout_nx_graph_reasonably(graph_with_names(layout_graph))
 
         for i, G in enumerate(graphs):
-            fig, ax = plt.subplots()
+            _, ax = plt.subplots()
             G = graph_with_names(G, name_style=name_style)
             plot_nx_graph_reasonably(G, ax=ax, layout=layout)
             plt.savefig(f"{directory}/{i}.png")
@@ -309,12 +310,14 @@ class PipelineState:
         name_style: Union[
             Literal["longest", "shortest", "most_frequent"], Callable[[Character], str]
         ] = "most_frequent",
+        layout: Optional[GraphLayout] = None,
     ):
         """Plot ``self.character_graph`` using reasonable parameters,
         and save the produced figure to a file
 
         :param name_style: see :func:`.graph_with_names`
             for more details
+        :param layout: pre-computed graph layout
         """
         import matplotlib.pyplot as plt
 
@@ -323,7 +326,7 @@ class PipelineState:
             raise ValueError("this function is supposed to be used on a static graph")
 
         G = graph_with_names(self.characters_graph, name_style=name_style)
-        plot_nx_graph_reasonably(G)
+        plot_nx_graph_reasonably(G, layout=layout)
         plt.savefig(path)
         plt.close()
 
@@ -336,6 +339,7 @@ class PipelineState:
         cumulative: bool = False,
         graph_start_idx: int = 1,
         stable_layout: bool = False,
+        layout: Optional[GraphLayout] = None,
     ):
         """Plot ``self.characters_graph`` using reasonable default
         parameters
@@ -360,6 +364,7 @@ class PipelineState:
             and this parameter is ``True``, characters will keep the
             same position in space at each timestep.  Characters'
             positions are based on the final cumulative graph layout.
+        :param layout: pre-computed graph layout
         """
         import matplotlib.pyplot as plt
         from matplotlib.widgets import Slider
@@ -372,7 +377,7 @@ class PipelineState:
             ax = None
             if not fig is None:
                 ax = fig.add_subplot(111)
-            plot_nx_graph_reasonably(G, ax=ax)
+            plot_nx_graph_reasonably(G, ax=ax, layout=layout)
             return
 
         if not isinstance(self.characters_graph, list):
@@ -401,7 +406,7 @@ class PipelineState:
             G = graph_with_names(characters_graphs[int(slider_value) - 1], name_style)
 
             ax.clear()
-            plot_nx_graph_reasonably(G, ax=ax, layout=layout if stable_layout else None)
+            plot_nx_graph_reasonably(G, ax=ax, layout=layout)
             ax.set_xlim(-1.2, 1.2)
             ax.set_ylim(-1.2, 1.2)
 
