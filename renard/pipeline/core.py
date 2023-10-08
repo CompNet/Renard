@@ -15,6 +15,7 @@ from typing import (
     TypeVar,
     Type,
     TYPE_CHECKING,
+    cast,
 )
 import os
 
@@ -311,6 +312,7 @@ class PipelineState:
             Literal["longest", "shortest", "most_frequent"], Callable[[Character], str]
         ] = "most_frequent",
         layout: Optional[GraphLayout] = None,
+        fig: Optional[plt.Figure] = None,
     ):
         """Plot ``self.character_graph`` using reasonable parameters,
         and save the produced figure to a file
@@ -318,6 +320,8 @@ class PipelineState:
         :param name_style: see :func:`.graph_with_names`
             for more details
         :param layout: pre-computed graph layout
+        :param fig: if specified, this matplotlib figure will be used
+            for plotting
         """
         import matplotlib.pyplot as plt
 
@@ -326,7 +330,14 @@ class PipelineState:
             raise ValueError("this function is supposed to be used on a static graph")
 
         G = graph_with_names(self.characters_graph, name_style=name_style)
-        plot_nx_graph_reasonably(G, layout=layout)
+        if fig is None:
+            # default values for a sufficiently sized graph
+            fig = plt.gcf()
+            assert not fig is None
+            fig.set_dpi(300)
+            fig.set_size_inches(24, 24)
+        ax = fig.add_subplot(111)
+        plot_nx_graph_reasonably(G, ax=ax, layout=layout)
         plt.savefig(path)
         plt.close()
 
@@ -374,9 +385,13 @@ class PipelineState:
         # self.characters_graph is a static graph
         if isinstance(self.characters_graph, nx.Graph):
             G = graph_with_names(self.characters_graph, name_style)
-            ax = None
-            if not fig is None:
-                ax = fig.add_subplot(111)
+            if fig is None:
+                # default value for a sufficiently sized graph
+                fig = plt.gcf()
+                assert not fig is None
+                fig.set_dpi(300)
+                fig.set_size_inches(24, 24)
+            ax = fig.add_subplot(111)
             plot_nx_graph_reasonably(G, ax=ax, layout=layout)
             return
 
@@ -386,6 +401,9 @@ class PipelineState:
 
         if fig is None:
             fig, ax = plt.subplots()
+            assert not fig is None
+            fig.set_dpi(300)
+            fig.set_size_inches(24, 24)
         else:
             ax = fig.add_subplot(111)
         assert not fig is None
