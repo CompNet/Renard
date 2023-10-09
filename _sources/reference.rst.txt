@@ -126,12 +126,27 @@ GraphRulesCharactersExtractor
    :members:
 
 
+Speaker Attribution
+===================
+
+.. autoclass:: renard.pipeline.speaker_attribution.BertSpeakerDetector
+   :members:
+
+
 Graph Extraction
 ================
+
+CoOccurrencesGraphExtractor
+---------------------------
 
 .. autoclass:: renard.pipeline.graph_extraction.CoOccurrencesGraphExtractor
    :members:
 
+ConversationalGraphExtractor
+----------------------------
+
+.. autoclass:: renard.pipeline.graph_extraction.ConversationalGraphExtractor
+   :members:
 
 
 Stanford CoreNLP Pipeline

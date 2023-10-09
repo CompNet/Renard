@@ -55,6 +55,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#quote-detection">Quote Detection</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#sentiment-analysis">Sentiment Analysis</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#characters-extraction">Characters Extraction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#speaker-attribution">Speaker Attribution</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#graph-extraction">Graph Extraction</a></li>
 </ul>
 </li>
@@ -152,7 +153,9 @@ to compute them yourself :</p>
 <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;./my_doc.txt&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
     <span class="n">text</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
 
-<span class="n">pipeline</span> <span class="o">=</span> <span class="n">bert_pipeline</span><span class="p">()</span>
+<span class="n">pipeline</span> <span class="o">=</span> <span class="n">bert_pipeline</span><span class="p">(</span>
+    <span class="n">graph_extractor_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;co_occurences_dist&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;sentences&quot;</span><span class="p">)}</span>
+<span class="p">)</span>
 <span class="n">out</span> <span class="o">=</span> <span class="n">pipeline</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -244,13 +247,22 @@ analysis</p></li>
 occurences detected using NER. This is done by assigning each mention
 to a unique character.</p>
 <ul class="simple">
-<li><p><code class="xref py py-class docutils literal notranslate"><span class="pre">NaiveCharactersExtractor</span></code></p></li>
-<li><p><code class="xref py py-class docutils literal notranslate"><span class="pre">GraphRulesCharactersExtractor</span></code></p></li>
+<li><p><a class="reference internal" href="reference.html#renard.pipeline.characters_extraction.NaiveCharactersExtractor" title="renard.pipeline.characters_extraction.NaiveCharactersExtractor"><code class="xref py py-class docutils literal notranslate"><span class="pre">NaiveCharactersExtractor</span></code></a></p></li>
+<li><p><a class="reference internal" href="reference.html#renard.pipeline.characters_extraction.GraphRulesCharactersExtractor" title="renard.pipeline.characters_extraction.GraphRulesCharactersExtractor"><code class="xref py py-class docutils literal notranslate"><span class="pre">GraphRulesCharactersExtractor</span></code></a></p></li>
+</ul>
+</section>
+<section id="speaker-attribution">
+<h3>Speaker Attribution<a class="headerlink" href="#speaker-attribution" title="Permalink to this headline"></a></h3>
+<ul class="simple">
+<li><p><a class="reference internal" href="reference.html#renard.pipeline.speaker_attribution.BertSpeakerDetector" title="renard.pipeline.speaker_attribution.BertSpeakerDetector"><code class="xref py py-class docutils literal notranslate"><span class="pre">BertSpeakerDetector</span></code></a></p></li>
 </ul>
 </section>
 <section id="graph-extraction">
 <h3>Graph Extraction<a class="headerlink" href="#graph-extraction" title="Permalink to this headline"></a></h3>
-<p>Only <a class="reference internal" href="reference.html#renard.pipeline.graph_extraction.CoOccurrencesGraphExtractor" title="renard.pipeline.graph_extraction.CoOccurrencesGraphExtractor"><code class="xref py py-class docutils literal notranslate"><span class="pre">CoOccurrencesGraphExtractor</span></code></a> is available.</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="reference.html#renard.pipeline.graph_extraction.CoOccurrencesGraphExtractor" title="renard.pipeline.graph_extraction.CoOccurrencesGraphExtractor"><code class="xref py py-class docutils literal notranslate"><span class="pre">CoOccurrencesGraphExtractor</span></code></a></p></li>
+<li><p><a class="reference internal" href="reference.html#renard.pipeline.graph_extraction.ConversationalGraphExtractor" title="renard.pipeline.graph_extraction.ConversationalGraphExtractor"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConversationalGraphExtractor</span></code></a></p></li>
+</ul>
 </section>
 </section>
 <section id="dynamic-graphs">
