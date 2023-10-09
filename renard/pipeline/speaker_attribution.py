@@ -104,8 +104,8 @@ class BertSpeakerDetector(PipelineStep):
         )
         dataset = SpeakerAttributionDataset(
             [doc],
-            SpeakerAttributionDataset.QUOTE_CTX_LEN,
-            SpeakerAttributionDataset.SPEAKER_REPR_NB,
+            BertSpeakerDetector.QUOTE_CTX_LEN,
+            BertSpeakerDetector.SPEAKER_REPR_NB,
             self.tokenizer,
         )
 
