@@ -114,7 +114,10 @@ class BertSpeakerDetector(PipelineStep):
         )[0]
         preds = []
         for pred in raw_preds:
-            preds.append(id_to_char.get(pred.predicted_speaker))
+            if pred.score > 0.5:
+                preds.append(id_to_char.get(pred.predicted_speaker))
+            else:
+                preds.append(None)
 
         assert len(preds) == len(quotes)
 
