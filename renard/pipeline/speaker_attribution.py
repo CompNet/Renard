@@ -21,6 +21,9 @@ if TYPE_CHECKING:
 class BertSpeakerDetector(PipelineStep):
     """Detect quote speaker in text"""
 
+    QUOTE_CTX_LEN = 512
+    SPEAKER_REPR_NB = 4
+
     def __init__(
         self,
         model: Optional[Union[PreTrainedModel, str]] = None,
@@ -99,7 +102,12 @@ class BertSpeakerDetector(PipelineStep):
                 for mention in character.mentions
             ],
         )
-        dataset = SpeakerAttributionDataset([doc])
+        dataset = SpeakerAttributionDataset(
+            [doc],
+            SpeakerAttributionDataset.QUOTE_CTX_LEN,
+            SpeakerAttributionDataset.SPEAKER_REPR_NB,
+            self.tokenizer,
+        )
 
         raw_preds = predict_speaker(
             dataset, self.model, self.tokenizer, self.batch_size, device=self.device
