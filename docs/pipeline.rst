@@ -73,7 +73,9 @@ For simplicity, one can use one of the preconfigured pipelines:
    with open("./my_doc.txt") as f:
        text = f.read()
 
-   pipeline = bert_pipeline()
+   pipeline = bert_pipeline(
+       graph_extractor_kwargs={"co_occurences_dist": (1, "sentences")}
+   )
    out = pipeline(text)
 
 
@@ -174,14 +176,21 @@ Characters extraction (or alias resolution) extract characters from
 occurences detected using NER. This is done by assigning each mention
 to a unique character.
 
-- :class:`NaiveCharactersExtractor`
-- :class:`GraphRulesCharactersExtractor`
+- :class:`.NaiveCharactersExtractor`
+- :class:`.GraphRulesCharactersExtractor`
+
+
+Speaker Attribution
+-------------------
+
+- :class:`.BertSpeakerDetector`
 
 
 Graph Extraction
 ----------------
 
-Only :class:`.CoOccurrencesGraphExtractor` is available.
+- :class:`.CoOccurrencesGraphExtractor`
+- :class:`.ConversationalGraphExtractor`
 
 
 Dynamic Graphs

@@ -25,6 +25,7 @@ class QuoteDetector(PipelineStep):
             ``QuoteDetector.DEFAULT_QUOTE_PAIRS``
         """
         self.quote_pairs = quote_pairs or QuoteDetector.DEFAULT_QUOTE_PAIRS
+        super().__init__()
 
     def _get_quote_pair(self, quote: str) -> Optional[Tuple[str, str]]:
         for qp in self.quote_pairs:

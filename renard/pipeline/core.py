@@ -156,6 +156,8 @@ class PipelineState:
 
     #: quotes
     quotes: Optional[List[Quote]] = None
+    #: quotes speakers
+    speakers: Optional[List[Character]] = None
 
     #: polarity of each sentence
     sentences_polarities: Optional[List[float]] = None

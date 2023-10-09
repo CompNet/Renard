@@ -10,6 +10,7 @@ from more_itertools import windowed
 from renard.pipeline.ner import NEREntity
 from renard.pipeline.core import PipelineStep
 from renard.pipeline.characters_extraction import Character
+from renard.pipeline.quote_detection import Quote
 
 
 def sent_index_for_token_index(token_index: int, sentences: List[List[str]]) -> int:
@@ -408,3 +409,84 @@ class CoOccurrencesGraphExtractor(PipelineStep):
 
     def optional_needs(self) -> Set[str]:
         return {"sentences_polarities"}
+
+
+class ConversationalGraphExtractor(PipelineStep):
+    """A graph extractor using conversation between characters
+
+    .. note::
+
+        This is an early version, that only supports static graphs
+        for now.
+    """
+
+    def __init__(
+        self, conversation_dist: Union[int, Tuple[int, Literal["tokens", "sentences"]]]
+    ):
+        if isinstance(conversation_dist, int):
+            conversation_dist = (conversation_dist, "tokens")
+        self.conversation_dist = conversation_dist
+
+        super().__init__()
+
+    def _quotes_interact(
+        self, quote_1: Quote, quote_2: Quote, sentences: List[List[str]]
+    ) -> bool:
+        ordered = quote_2.start >= quote_1.end
+        if self.conversation_dist[1] == "tokens":
+            return (
+                abs(
+                    quote_2.start - quote_1.end
+                    if ordered
+                    else quote_1.start - quote_2.end
+                )
+                <= self.conversation_dist[0]
+            )
+        elif self.conversation_dist[1] == "sentences":
+            if ordered:
+                quote_1_sent = sent_index_for_token_index(quote_1.end, sentences)
+                quote_2_sent = sent_index_for_token_index(quote_2.start, sentences)
+            else:
+                quote_1_sent = sent_index_for_token_index(quote_1.start, sentences)
+                quote_2_sent = sent_index_for_token_index(quote_2.end, sentences)
+            return abs(quote_1_sent - quote_2_sent) <= self.conversation_dist[0]
+        else:
+            raise NotImplementedError
+
+    def __call__(
+        self,
+        sentences: List[List[str]],
+        quotes: List[Quote],
+        speakers: List[Character],
+        characters: Set[Character],
+        **kwargs,
+    ) -> Dict[str, Any]:
+
+        G = nx.Graph()
+        for character in characters:
+            G.add_node(character)
+
+        for i, (quote_1, speaker_1) in enumerate(zip(quotes, speakers)):
+            # check ahead for co-occurences
+            for quote_2, speaker_2 in zip(quotes[i + 1 :], speakers):
+                if not self._quotes_interact(quote_1, quote_2, sentences):
+                    # dist between quote_1 and quote_2 is too great :
+                    # we finished co-occurences search for quote_1
+                    break
+                # ignore co-occurences with self
+                if quote_1 == quote_2:
+                    continue
+                # record co_occurence
+                if not G.has_edge(speaker_1, speaker_2):
+                    G.add_edge(speaker_1, speaker_2, weight=0)
+                G.edges[speaker_1, speaker_2]["weight"] += 1
+
+        return {"characters_graph": G}
+
+    def needs(self) -> Set[str]:
+        """sentences, quotes, speakers, characters"""
+        return {"sentences", "quotes", "speakers", "characters"}
+
+    def production(self) -> Set[str]:
+        """characters_graph"""
+        return {"characters_graph"}

@@ -13,10 +13,7 @@ from renard.pipeline.progress import ProgressReporter
 
 if TYPE_CHECKING:
     from transformers.tokenization_utils_base import BatchEncoding
-    from transformers import (
-        PreTrainedModel,
-        PreTrainedTokenizerFast,
-    )
+    from transformers import PreTrainedModel, PreTrainedTokenizerFast
 
 
 @dataclass
