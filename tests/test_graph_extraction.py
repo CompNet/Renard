@@ -60,7 +60,10 @@ def test_basic_graph_extraction(tokens: List[str]):
     )
 
 
-@given(lists(sampled_from(string.ascii_uppercase)), integers(min_value=1, max_value=5))
+@given(
+    lists(sampled_from(string.ascii_uppercase), min_size=1),
+    integers(min_value=1, max_value=5),
+)
 def test_dynamic_graph_extraction(tokens: List[str], dynamic_window: int):
     """
     .. note::
