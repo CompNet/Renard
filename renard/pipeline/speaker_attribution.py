@@ -70,7 +70,7 @@ class BertSpeakerDetector(PipelineStep):
             # the user did not supply anything: load the default model
             else:
                 self.model = SpeakerAttributionModel.from_pretrained(
-                    "compnet-renard/bert-base-cased-literary-speaker-attribution"
+                    "compnet-renard/spanbert-base-cased-literary-speaker-attribution"
                 )
                 self.tokenizer = AutoTokenizer.from_pretrained("bert-base-cased")
 
