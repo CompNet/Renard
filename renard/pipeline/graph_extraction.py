@@ -457,7 +457,7 @@ class ConversationalGraphExtractor(PipelineStep):
         self,
         sentences: List[List[str]],
         quotes: List[Quote],
-        speakers: List[Character],
+        speakers: List[Optional[Character]],
         characters: Set[Character],
         **kwargs,
     ) -> Dict[str, Any]:
@@ -467,15 +467,27 @@ class ConversationalGraphExtractor(PipelineStep):
             G.add_node(character)
 
         for i, (quote_1, speaker_1) in enumerate(zip(quotes, speakers)):
+
+            # no speaker prediction: ignore
+            if speaker_1 is None:
+                continue
+
             # check ahead for co-occurences
             for quote_2, speaker_2 in zip(quotes[i + 1 :], speakers):
+
+                # no speaker prediction: ignore
+                if speaker_2 is None:
+                    continue
+
                 if not self._quotes_interact(quote_1, quote_2, sentences):
                     # dist between quote_1 and quote_2 is too great :
                     # we finished co-occurences search for quote_1
                     break
+
                 # ignore co-occurences with self
                 if quote_1 == quote_2:
                     continue
+
                 # record co_occurence
                 if not G.has_edge(speaker_1, speaker_2):
                     G.add_edge(speaker_1, speaker_2, weight=0)

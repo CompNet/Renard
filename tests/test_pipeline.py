@@ -72,11 +72,14 @@ def test_bert_pipeline_runs():
     pipeline(text)
 
 
-# @pytest.mark.skipif(os.getenv("RENARD_TEST_ALL") != "1", reason="performance")
-@pytest.mark.skip(reason="no available model yet")
+@pytest.mark.skipif(os.getenv("RENARD_TEST_ALL") != "1", reason="performance")
 def test_conversational_pipeline_runs():
+
     with open(f"{script_dir}/pp_chapter1.txt") as f:
         text = f.read()
+    # if the text is too long, speaker attribution takes a long time
+    text = text[:500]
+
     pipeline = nltk_pipeline(
         warn=False,
         progress_report=None,
