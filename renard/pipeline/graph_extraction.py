@@ -485,7 +485,7 @@ class ConversationalGraphExtractor(PipelineStep):
                     break
 
                 # ignore co-occurences with self
-                if quote_1 == quote_2 or speaker1 == speaker2:
+                if quote_1 == quote_2 or speaker_1 == speaker_2:
                     continue
 
                 # record co_occurence
