@@ -473,7 +473,7 @@ class ConversationalGraphExtractor(PipelineStep):
                 continue
 
             # check ahead for co-occurences
-            for quote_2, speaker_2 in zip(quotes[i + 1 :], speakers):
+            for quote_2, speaker_2 in zip(quotes[i + 1 :], speakers[i + 1 :]):
 
                 # no speaker prediction: ignore
                 if speaker_2 is None:
