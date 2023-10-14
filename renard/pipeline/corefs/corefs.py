@@ -24,6 +24,7 @@ class BertCoreferenceResolver(PipelineStep):
         batch_size: int = 1,
         device: Literal["auto", "cuda", "cpu"] = "auto",
         tokenizer: Optional[PreTrainedTokenizerFast] = None,
+        block_size: int = 512,
     ) -> None:
         """
         .. note::
@@ -37,6 +38,8 @@ class BertCoreferenceResolver(PipelineStep):
             which normally choose a huggingface model automatically.
         :param batch_size: batch size at inference
         :param device: computation device
+        :param block_size: size of blocks to pass to the coreference
+            model
         """
         if isinstance(model, str):
             self.hugginface_model_id = hugginface_model_id
@@ -53,6 +56,8 @@ class BertCoreferenceResolver(PipelineStep):
             self.device = torch.device("cuda" if torch.cuda.is_available else "cpu")
         else:
             self.device = torch.device(device)
+
+        self.block_size = block_size
 
         super().__init__()
 
@@ -87,14 +92,9 @@ class BertCoreferenceResolver(PipelineStep):
     def __call__(self, tokens: List[str], **kwargs) -> Dict[str, Any]:
         from tibert import predict_coref
 
-        # TODO: BertForCoreferenceResolution is limited to 512 tokens
-        # for now - we pass small block to avoid triggering that limit
-        # and having truncations issues
-        BLOCK_SIZE = 128
-
         blocks = [
-            tokens[block_start : block_start + BLOCK_SIZE]
-            for block_start in range(0, len(tokens), BLOCK_SIZE)
+            tokens[block_start : block_start + self.block_size]
+            for block_start in range(0, len(tokens), self.block_size)
         ]
 
         coref_docs = predict_coref(
@@ -110,6 +110,10 @@ class BertCoreferenceResolver(PipelineStep):
             for chain in doc.coref_chains:
                 adjusted_chain = []
                 for mention in chain:
+                    # FIXME: It seems that a rare bug in Tibert can
+                    # -----  sometimes produce this unwanted state.
+                    if mention.start_idx is None:
+                        mention.start_idx = 0
                     start_idx = mention.start_idx + cur_doc_start
                     end_idx = mention.end_idx + cur_doc_start
                     adjusted_chain.append(Mention(mention.tokens, start_idx, end_idx))
