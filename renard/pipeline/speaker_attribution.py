@@ -110,7 +110,12 @@ class BertSpeakerDetector(PipelineStep):
         )
 
         raw_preds = predict_speaker(
-            dataset, self.model, self.tokenizer, self.batch_size, device=self.device
+            dataset,
+            self.model,
+            self.tokenizer,
+            self.batch_size,
+            device=self.device,
+            quiet=True,
         )[0]
         preds = []
         for pred in raw_preds:
