@@ -77,8 +77,8 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#characters-extraction">Characters Extraction</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#naivecharactersextractor">NaiveCharactersExtractor</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#graphrulescharactersextractor">GraphRulesCharactersExtractor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#naivecharacterunifier">NaiveCharacterUnifier</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#graphrulescharacterunifier">GraphRulesCharacterUnifier</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#speaker-attribution">Speaker Attribution</a></li>
@@ -281,11 +281,11 @@ with a production in <code class="docutils literal notranslate"><span class="pre
 <li><p><strong>chapter_tokens</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]]) – </p></li>
 <li><p><strong>sentences</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]]) – </p></li>
 <li><p><strong>quotes</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Quote</span></code>]]) – </p></li>
-<li><p><strong>speakers</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<a class="reference internal" href="#renard.pipeline.characters_extraction.Character" title="renard.pipeline.characters_extraction.Character"><code class="xref py py-class docutils literal notranslate"><span class="pre">Character</span></code></a>]]]) – </p></li>
+<li><p><strong>speakers</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<a class="reference internal" href="#renard.pipeline.character_unification.Character" title="renard.pipeline.character_unification.Character"><code class="xref py py-class docutils literal notranslate"><span class="pre">Character</span></code></a>]]]) – </p></li>
 <li><p><strong>sentences_polarities</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]]) – </p></li>
 <li><p><strong>entities</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<a class="reference internal" href="#renard.pipeline.ner.NEREntity" title="renard.pipeline.ner.NEREntity"><code class="xref py py-class docutils literal notranslate"><span class="pre">NEREntity</span></code></a>]]) – </p></li>
 <li><p><strong>corefs</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<a class="reference internal" href="#renard.pipeline.core.Mention" title="renard.pipeline.core.Mention"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mention</span></code></a>]]]) – </p></li>
-<li><p><strong>characters</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<a class="reference internal" href="#renard.pipeline.characters_extraction.Character" title="renard.pipeline.characters_extraction.Character"><code class="xref py py-class docutils literal notranslate"><span class="pre">Character</span></code></a>]]) – </p></li>
+<li><p><strong>characters</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<a class="reference internal" href="#renard.pipeline.character_unification.Character" title="renard.pipeline.character_unification.Character"><code class="xref py py-class docutils literal notranslate"><span class="pre">Character</span></code></a>]]) – </p></li>
 <li><p><strong>characters_graph</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Graph</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">Graph</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>]) – </p></li>
 </ul>
 </dd>
@@ -313,11 +313,11 @@ with a production in <code class="docutils literal notranslate"><span class="pre
 <li><p><strong>chapter_tokens</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]]) – </p></li>
 <li><p><strong>sentences</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]]) – </p></li>
 <li><p><strong>quotes</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Quote</span></code>]]) – </p></li>
-<li><p><strong>speakers</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<a class="reference internal" href="#renard.pipeline.characters_extraction.Character" title="renard.pipeline.characters_extraction.Character"><code class="xref py py-class docutils literal notranslate"><span class="pre">Character</span></code></a>]]]) – </p></li>
+<li><p><strong>speakers</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<a class="reference internal" href="#renard.pipeline.character_unification.Character" title="renard.pipeline.character_unification.Character"><code class="xref py py-class docutils literal notranslate"><span class="pre">Character</span></code></a>]]]) – </p></li>
 <li><p><strong>sentences_polarities</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]]) – </p></li>
 <li><p><strong>entities</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<a class="reference internal" href="#renard.pipeline.ner.NEREntity" title="renard.pipeline.ner.NEREntity"><code class="xref py py-class docutils literal notranslate"><span class="pre">NEREntity</span></code></a>]]) – </p></li>
 <li><p><strong>corefs</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<a class="reference internal" href="#renard.pipeline.core.Mention" title="renard.pipeline.core.Mention"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mention</span></code></a>]]]) – </p></li>
-<li><p><strong>characters</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<a class="reference internal" href="#renard.pipeline.characters_extraction.Character" title="renard.pipeline.characters_extraction.Character"><code class="xref py py-class docutils literal notranslate"><span class="pre">Character</span></code></a>]]) – </p></li>
+<li><p><strong>characters</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<a class="reference internal" href="#renard.pipeline.character_unification.Character" title="renard.pipeline.character_unification.Character"><code class="xref py py-class docutils literal notranslate"><span class="pre">Character</span></code></a>]]) – </p></li>
 <li><p><strong>characters_graph</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Graph</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">Graph</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>]) – </p></li>
 </ul>
 </dd>
@@ -344,7 +344,7 @@ with a production in <code class="docutils literal notranslate"><span class="pre
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="renard.pipeline.core.PipelineState.characters">
-<span class="sig-name descname"><span class="pre">characters</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#renard.pipeline.characters_extraction.Character" title="renard.pipeline.characters_extraction.Character"><span class="pre">renard.pipeline.characters_extraction.Character</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#renard.pipeline.core.PipelineState.characters" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">characters</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#renard.pipeline.character_unification.Character" title="renard.pipeline.character_unification.Character"><span class="pre">renard.pipeline.character_unification.Character</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#renard.pipeline.core.PipelineState.characters" title="Permalink to this definition"></a></dt>
 <dd><p>detected characters</p>
 </dd></dl>
 
@@ -374,7 +374,7 @@ with a production in <code class="docutils literal notranslate"><span class="pre
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>path</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – export file path</p></li>
-<li><p><strong>name_style</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code>[‘longest’, ‘shortest’, ‘most_frequent’], <code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code>[[<a class="reference internal" href="#renard.pipeline.characters_extraction.Character" title="renard.pipeline.characters_extraction.Character"><code class="xref py py-class docutils literal notranslate"><span class="pre">Character</span></code></a>], <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – see <code class="xref py py-func docutils literal notranslate"><span class="pre">graph_with_names()</span></code>
+<li><p><strong>name_style</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code>[‘longest’, ‘shortest’, ‘most_frequent’], <code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code>[[<a class="reference internal" href="#renard.pipeline.character_unification.Character" title="renard.pipeline.character_unification.Character"><code class="xref py py-class docutils literal notranslate"><span class="pre">Character</span></code></a>], <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – see <code class="xref py py-func docutils literal notranslate"><span class="pre">graph_with_names()</span></code>
 for more details</p></li>
 </ul>
 </dd>
@@ -405,10 +405,10 @@ will be returned.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<a class="reference internal" href="#renard.pipeline.characters_extraction.Character" title="renard.pipeline.characters_extraction.Character"><code class="xref py py-class docutils literal notranslate"><span class="pre">Character</span></code></a>]</p>
+<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<a class="reference internal" href="#renard.pipeline.character_unification.Character" title="renard.pipeline.character_unification.Character"><code class="xref py py-class docutils literal notranslate"><span class="pre">Character</span></code></a>]</p>
 </dd>
 <dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>a <a class="reference internal" href="#renard.pipeline.characters_extraction.Character" title="renard.pipeline.characters_extraction.Character"><code class="xref py py-class docutils literal notranslate"><span class="pre">Character</span></code></a>, or <code class="docutils literal notranslate"><span class="pre">None</span></code> if no character
+<dd class="field-odd"><p>a <a class="reference internal" href="#renard.pipeline.character_unification.Character" title="renard.pipeline.character_unification.Character"><code class="xref py py-class docutils literal notranslate"><span class="pre">Character</span></code></a>, or <code class="docutils literal notranslate"><span class="pre">None</span></code> if no character
 was found.</p>
 </dd>
 </dl>
@@ -428,7 +428,7 @@ reference to the slider.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>name_style</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code>[‘longest’, ‘shortest’, ‘most_frequent’], <code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code>[[<a class="reference internal" href="#renard.pipeline.characters_extraction.Character" title="renard.pipeline.characters_extraction.Character"><code class="xref py py-class docutils literal notranslate"><span class="pre">Character</span></code></a>], <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – see <code class="xref py py-func docutils literal notranslate"><span class="pre">graph_with_names()</span></code> for more
+<li><p><strong>name_style</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code>[‘longest’, ‘shortest’, ‘most_frequent’], <code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code>[[<a class="reference internal" href="#renard.pipeline.character_unification.Character" title="renard.pipeline.character_unification.Character"><code class="xref py py-class docutils literal notranslate"><span class="pre">Character</span></code></a>], <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – see <code class="xref py py-func docutils literal notranslate"><span class="pre">graph_with_names()</span></code> for more
 details</p></li>
 <li><p><strong>fig</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Figure</span></code>]) – if specified, this matplotlib figure will be used
 for plotting</p></li>
@@ -456,7 +456,7 @@ and save the produced figure to a file</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>name_style</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code>[‘longest’, ‘shortest’, ‘most_frequent’], <code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code>[[<a class="reference internal" href="#renard.pipeline.characters_extraction.Character" title="renard.pipeline.characters_extraction.Character"><code class="xref py py-class docutils literal notranslate"><span class="pre">Character</span></code></a>], <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – see <code class="xref py py-func docutils literal notranslate"><span class="pre">graph_with_names()</span></code>
+<li><p><strong>name_style</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code>[‘longest’, ‘shortest’, ‘most_frequent’], <code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code>[[<a class="reference internal" href="#renard.pipeline.character_unification.Character" title="renard.pipeline.character_unification.Character"><code class="xref py py-class docutils literal notranslate"><span class="pre">Character</span></code></a>], <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – see <code class="xref py py-func docutils literal notranslate"><span class="pre">graph_with_names()</span></code>
 for more details</p></li>
 <li><p><strong>layout</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[Character, <code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]], <code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[Character, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>], <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>]) – pre-computed graph layout</p></li>
 <li><p><strong>fig</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Figure</span></code>]) – if specified, this matplotlib figure will be used
@@ -476,7 +476,7 @@ directory.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>name_style</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code>[‘longest’, ‘shortest’, ‘most_frequent’], <code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code>[[<a class="reference internal" href="#renard.pipeline.characters_extraction.Character" title="renard.pipeline.characters_extraction.Character"><code class="xref py py-class docutils literal notranslate"><span class="pre">Character</span></code></a>], <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – see <code class="xref py py-func docutils literal notranslate"><span class="pre">graph_with_names()</span></code>
+<li><p><strong>name_style</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code>[‘longest’, ‘shortest’, ‘most_frequent’], <code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code>[[<a class="reference internal" href="#renard.pipeline.character_unification.Character" title="renard.pipeline.character_unification.Character"><code class="xref py py-class docutils literal notranslate"><span class="pre">Character</span></code></a>], <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – see <code class="xref py py-func docutils literal notranslate"><span class="pre">graph_with_names()</span></code>
 for more details</p></li>
 <li><p><strong>cumulative</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – if <code class="docutils literal notranslate"><span class="pre">True</span></code> plot a cumulative graph instead
 of a sequential one</p></li>
@@ -512,7 +512,7 @@ tokens</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="renard.pipeline.core.PipelineState.speakers">
-<span class="sig-name descname"><span class="pre">speakers</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#renard.pipeline.characters_extraction.Character" title="renard.pipeline.characters_extraction.Character"><span class="pre">renard.pipeline.characters_extraction.Character</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#renard.pipeline.core.PipelineState.speakers" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">speakers</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#renard.pipeline.character_unification.Character" title="renard.pipeline.character_unification.Character"><span class="pre">renard.pipeline.character_unification.Character</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#renard.pipeline.core.PipelineState.speakers" title="Permalink to this definition"></a></dt>
 <dd><p>quotes speakers</p>
 </dd></dl>
 
@@ -1571,8 +1571,8 @@ by derived classes.</p>
 <section id="characters-extraction">
 <h2>Characters Extraction<a class="headerlink" href="#characters-extraction" title="Permalink to this headline"></a></h2>
 <dl class="py class">
-<dt class="sig sig-object py" id="renard.pipeline.characters_extraction.Character">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">renard.pipeline.characters_extraction.</span></span><span class="sig-name descname"><span class="pre">Character</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">names</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mentions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gender</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Gender.UNKNOWN</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.characters_extraction.Character" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="renard.pipeline.character_unification.Character">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">renard.pipeline.character_unification.</span></span><span class="sig-name descname"><span class="pre">Character</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">names</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mentions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gender</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Gender.UNKNOWN</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.character_unification.Character" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -1583,20 +1583,20 @@ by derived classes.</p>
 </dd>
 </dl>
 <dl class="py method">
-<dt class="sig sig-object py" id="renard.pipeline.characters_extraction.Character.__delattr__">
-<span class="sig-name descname"><span class="pre">__delattr__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.characters_extraction.Character.__delattr__" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="renard.pipeline.character_unification.Character.__delattr__">
+<span class="sig-name descname"><span class="pre">__delattr__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.character_unification.Character.__delattr__" title="Permalink to this definition"></a></dt>
 <dd><p>Implement delattr(self, name).</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="renard.pipeline.characters_extraction.Character.__eq__">
-<span class="sig-name descname"><span class="pre">__eq__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.characters_extraction.Character.__eq__" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="renard.pipeline.character_unification.Character.__eq__">
+<span class="sig-name descname"><span class="pre">__eq__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.character_unification.Character.__eq__" title="Permalink to this definition"></a></dt>
 <dd><p>Return self==value.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="renard.pipeline.characters_extraction.Character.__hash__">
-<span class="sig-name descname"><span class="pre">__hash__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.characters_extraction.Character.__hash__" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="renard.pipeline.character_unification.Character.__hash__">
+<span class="sig-name descname"><span class="pre">__hash__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.character_unification.Character.__hash__" title="Permalink to this definition"></a></dt>
 <dd><p>Return hash(self).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -1606,8 +1606,8 @@ by derived classes.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="renard.pipeline.characters_extraction.Character.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">names</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mentions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gender</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Gender.UNKNOWN</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.characters_extraction.Character.__init__" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="renard.pipeline.character_unification.Character.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">names</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mentions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gender</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Gender.UNKNOWN</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.character_unification.Character.__init__" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -1620,8 +1620,8 @@ by derived classes.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="renard.pipeline.characters_extraction.Character.__repr__">
-<span class="sig-name descname"><span class="pre">__repr__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.characters_extraction.Character.__repr__" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="renard.pipeline.character_unification.Character.__repr__">
+<span class="sig-name descname"><span class="pre">__repr__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.character_unification.Character.__repr__" title="Permalink to this definition"></a></dt>
 <dd><p>Return repr(self).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -1631,121 +1631,22 @@ by derived classes.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="renard.pipeline.characters_extraction.Character.__setattr__">
-<span class="sig-name descname"><span class="pre">__setattr__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.characters_extraction.Character.__setattr__" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="renard.pipeline.character_unification.Character.__setattr__">
+<span class="sig-name descname"><span class="pre">__setattr__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.character_unification.Character.__setattr__" title="Permalink to this definition"></a></dt>
 <dd><p>Implement setattr(self, name, value).</p>
 </dd></dl>
 
 </dd></dl>
 
-<section id="naivecharactersextractor">
-<h3>NaiveCharactersExtractor<a class="headerlink" href="#naivecharactersextractor" title="Permalink to this headline"></a></h3>
-<dl class="py class">
-<dt class="sig sig-object py" id="renard.pipeline.characters_extraction.NaiveCharactersExtractor">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">renard.pipeline.characters_extraction.</span></span><span class="sig-name descname"><span class="pre">NaiveCharactersExtractor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">min_appearances</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.characters_extraction.NaiveCharactersExtractor" title="Permalink to this definition"></a></dt>
-<dd><p>A basic character extractor using NER</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>min_appearances</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – </p>
-</dd>
-</dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="renard.pipeline.characters_extraction.NaiveCharactersExtractor.__call__">
-<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">entities</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">corefs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.characters_extraction.NaiveCharactersExtractor.__call__" title="Permalink to this definition"></a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>text</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – </p></li>
-<li><p><strong>tokens</strong> – </p></li>
-<li><p><strong>entities</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<a class="reference internal" href="#renard.pipeline.ner.NEREntity" title="renard.pipeline.ner.NEREntity"><code class="xref py py-class docutils literal notranslate"><span class="pre">NEREntity</span></code></a>]) – </p></li>
-<li><p><strong>corefs</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<a class="reference internal" href="#renard.pipeline.core.Mention" title="renard.pipeline.core.Mention"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mention</span></code></a>]]]) – </p></li>
-</ul>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="renard.pipeline.characters_extraction.NaiveCharactersExtractor.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">min_appearances</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.characters_extraction.NaiveCharactersExtractor.__init__" title="Permalink to this definition"></a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>min_appearances</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – minimum number of appearances of a
-character for it to be extracted</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="renard.pipeline.characters_extraction.NaiveCharactersExtractor.needs">
-<span class="sig-name descname"><span class="pre">needs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.characters_extraction.NaiveCharactersExtractor.needs" title="Permalink to this definition"></a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Set</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>a <cite>set</cite> of state attributes needed by this
-<code class="xref py py-class docutils literal notranslate"><span class="pre">PipelineStep</span></code>. This method must be overriden
-by derived classes.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="renard.pipeline.characters_extraction.NaiveCharactersExtractor.optional_needs">
-<span class="sig-name descname"><span class="pre">optional_needs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.characters_extraction.NaiveCharactersExtractor.optional_needs" title="Permalink to this definition"></a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Set</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>a <cite>set</cite> of state attributes optionally neeeded by this
-<code class="xref py py-class docutils literal notranslate"><span class="pre">PipelineStep</span></code>. This method can be overriden by derived
-classes.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="renard.pipeline.characters_extraction.NaiveCharactersExtractor.production">
-<span class="sig-name descname"><span class="pre">production</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.characters_extraction.NaiveCharactersExtractor.production" title="Permalink to this definition"></a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Set</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>a <cite>set</cite> of state attributes produced by this
-<code class="xref py py-class docutils literal notranslate"><span class="pre">PipelineStep</span></code>. This method must be overriden
-by derived classes.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="renard.pipeline.characters_extraction.NaiveCharactersExtractor.supported_langs">
-<span class="sig-name descname"><span class="pre">supported_langs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.characters_extraction.NaiveCharactersExtractor.supported_langs" title="Permalink to this definition"></a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Set</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>], <code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code>[‘any’]]</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>a list of supported languages, as ISO 639-3 codes, or
-the string <code class="docutils literal notranslate"><span class="pre">'any'</span></code></p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
+<section id="naivecharacterunifier">
+<h3>NaiveCharacterUnifier<a class="headerlink" href="#naivecharacterunifier" title="Permalink to this headline"></a></h3>
 </section>
-<section id="graphrulescharactersextractor">
-<h3>GraphRulesCharactersExtractor<a class="headerlink" href="#graphrulescharactersextractor" title="Permalink to this headline"></a></h3>
+<section id="graphrulescharacterunifier">
+<h3>GraphRulesCharacterUnifier<a class="headerlink" href="#graphrulescharacterunifier" title="Permalink to this headline"></a></h3>
 <dl class="py class">
-<dt class="sig sig-object py" id="renard.pipeline.characters_extraction.GraphRulesCharactersExtractor">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">renard.pipeline.characters_extraction.</span></span><span class="sig-name descname"><span class="pre">GraphRulesCharactersExtractor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">min_appearances</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">additional_hypocorisms</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">link_corefs_mentions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.characters_extraction.GraphRulesCharactersExtractor" title="Permalink to this definition"></a></dt>
-<dd><p>Extract characters by creating a graph where mentions are
+<dt class="sig sig-object py" id="renard.pipeline.character_unification.GraphRulesCharacterUnifier">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">renard.pipeline.character_unification.</span></span><span class="sig-name descname"><span class="pre">GraphRulesCharacterUnifier</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">min_appearances</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">additional_hypocorisms</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">link_corefs_mentions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.character_unification.GraphRulesCharacterUnifier" title="Permalink to this definition"></a></dt>
+<dd><p>Unify characters by creating a graph where mentions are
 linked when they refer to the same character, and then
 merging this graph nodes.</p>
 <div class="admonition note">
@@ -1762,8 +1663,8 @@ merging this graph nodes.</p>
 </dd>
 </dl>
 <dl class="py method">
-<dt class="sig sig-object py" id="renard.pipeline.characters_extraction.GraphRulesCharactersExtractor.__call__">
-<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">entities</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">corefs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.characters_extraction.GraphRulesCharactersExtractor.__call__" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="renard.pipeline.character_unification.GraphRulesCharacterUnifier.__call__">
+<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">entities</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">corefs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.character_unification.GraphRulesCharacterUnifier.__call__" title="Permalink to this definition"></a></dt>
 <dd><p>Call self as a function.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1780,13 +1681,13 @@ merging this graph nodes.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="renard.pipeline.characters_extraction.GraphRulesCharactersExtractor.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">min_appearances</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">additional_hypocorisms</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">link_corefs_mentions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.characters_extraction.GraphRulesCharactersExtractor.__init__" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="renard.pipeline.character_unification.GraphRulesCharacterUnifier.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">min_appearances</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">additional_hypocorisms</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">link_corefs_mentions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.character_unification.GraphRulesCharacterUnifier.__init__" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>min_appearances</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – minimum number of appearances of a
-character for it to be extracted.</p></li>
+character for it to be considered valid.</p></li>
 <li><p><strong>additional_hypocorisms</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]]]) – a tuple of additional
 hypocorisms.  Each hypocorism is a tuple where the first
 element is a name, and the second element is a set of
@@ -1803,8 +1704,8 @@ alias.</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="renard.pipeline.characters_extraction.GraphRulesCharactersExtractor._pipeline_init_">
-<span class="sig-name descname"><span class="pre">_pipeline_init_</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lang</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress_reporter</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.characters_extraction.GraphRulesCharactersExtractor._pipeline_init_" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="renard.pipeline.character_unification.GraphRulesCharacterUnifier._pipeline_init_">
+<span class="sig-name descname"><span class="pre">_pipeline_init_</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lang</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress_reporter</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.character_unification.GraphRulesCharacterUnifier._pipeline_init_" title="Permalink to this definition"></a></dt>
 <dd><p>Set the step configuration that is common to the whole pipeline.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1818,8 +1719,8 @@ alias.</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="renard.pipeline.characters_extraction.GraphRulesCharactersExtractor.infer_name_gender">
-<span class="sig-name descname"><span class="pre">infer_name_gender</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">corefs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hname_constants</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.characters_extraction.GraphRulesCharactersExtractor.infer_name_gender" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="renard.pipeline.character_unification.GraphRulesCharacterUnifier.infer_name_gender">
+<span class="sig-name descname"><span class="pre">infer_name_gender</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">corefs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hname_constants</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.character_unification.GraphRulesCharacterUnifier.infer_name_gender" title="Permalink to this definition"></a></dt>
 <dd><p>Try to infer a name’s gender</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1836,8 +1737,8 @@ alias.</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="renard.pipeline.characters_extraction.GraphRulesCharactersExtractor.names_are_related_after_title_removal">
-<span class="sig-name descname"><span class="pre">names_are_related_after_title_removal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hname_constants</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.characters_extraction.GraphRulesCharactersExtractor.names_are_related_after_title_removal" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="renard.pipeline.character_unification.GraphRulesCharacterUnifier.names_are_related_after_title_removal">
+<span class="sig-name descname"><span class="pre">names_are_related_after_title_removal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hname_constants</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.character_unification.GraphRulesCharacterUnifier.names_are_related_after_title_removal" title="Permalink to this definition"></a></dt>
 <dd><p>Check if two names are related after removing their titles</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1854,8 +1755,8 @@ alias.</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="renard.pipeline.characters_extraction.GraphRulesCharactersExtractor.needs">
-<span class="sig-name descname"><span class="pre">needs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.characters_extraction.GraphRulesCharactersExtractor.needs" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="renard.pipeline.character_unification.GraphRulesCharacterUnifier.needs">
+<span class="sig-name descname"><span class="pre">needs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.character_unification.GraphRulesCharacterUnifier.needs" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Set</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</p>
@@ -1869,8 +1770,8 @@ by derived classes.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="renard.pipeline.characters_extraction.GraphRulesCharactersExtractor.optional_needs">
-<span class="sig-name descname"><span class="pre">optional_needs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.characters_extraction.GraphRulesCharactersExtractor.optional_needs" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="renard.pipeline.character_unification.GraphRulesCharacterUnifier.optional_needs">
+<span class="sig-name descname"><span class="pre">optional_needs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.character_unification.GraphRulesCharacterUnifier.optional_needs" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Set</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</p>
@@ -1884,8 +1785,8 @@ classes.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="renard.pipeline.characters_extraction.GraphRulesCharactersExtractor.production">
-<span class="sig-name descname"><span class="pre">production</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.characters_extraction.GraphRulesCharactersExtractor.production" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="renard.pipeline.character_unification.GraphRulesCharacterUnifier.production">
+<span class="sig-name descname"><span class="pre">production</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.character_unification.GraphRulesCharacterUnifier.production" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Set</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</p>
@@ -1899,8 +1800,8 @@ by derived classes.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="renard.pipeline.characters_extraction.GraphRulesCharactersExtractor.supported_langs">
-<span class="sig-name descname"><span class="pre">supported_langs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.characters_extraction.GraphRulesCharactersExtractor.supported_langs" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="renard.pipeline.character_unification.GraphRulesCharacterUnifier.supported_langs">
+<span class="sig-name descname"><span class="pre">supported_langs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.character_unification.GraphRulesCharacterUnifier.supported_langs" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Set</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>], <code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code>[‘any’]]</p>
@@ -1941,7 +1842,7 @@ the string <code class="docutils literal notranslate"><span class="pre">'any'</s
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>tokens</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – </p></li>
 <li><p><strong>quotes</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Quote</span></code>]) – </p></li>
-<li><p><strong>characters</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<a class="reference internal" href="#renard.pipeline.characters_extraction.Character" title="renard.pipeline.characters_extraction.Character"><code class="xref py py-class docutils literal notranslate"><span class="pre">Character</span></code></a>]) – </p></li>
+<li><p><strong>characters</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<a class="reference internal" href="#renard.pipeline.character_unification.Character" title="renard.pipeline.character_unification.Character"><code class="xref py py-class docutils literal notranslate"><span class="pre">Character</span></code></a>]) – </p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>
@@ -2031,7 +1932,7 @@ the string <code class="docutils literal notranslate"><span class="pre">'any'</s
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>characters</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Set</span></code>[<a class="reference internal" href="#renard.pipeline.characters_extraction.Character" title="renard.pipeline.characters_extraction.Character"><code class="xref py py-class docutils literal notranslate"><span class="pre">Character</span></code></a>]) – </p></li>
+<li><p><strong>characters</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Set</span></code>[<a class="reference internal" href="#renard.pipeline.character_unification.Character" title="renard.pipeline.character_unification.Character"><code class="xref py py-class docutils literal notranslate"><span class="pre">Character</span></code></a>]) – </p></li>
 <li><p><strong>sentences</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – </p></li>
 <li><p><strong>chapter_tokens</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]]) – </p></li>
 <li><p><strong>sentences_polarities</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]]) – </p></li>
@@ -2098,7 +1999,7 @@ returned graph will be formed by <cite>n</cite> interactions.</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>mentions</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<a class="reference internal" href="#renard.pipeline.characters_extraction.Character" title="renard.pipeline.characters_extraction.Character"><code class="xref py py-class docutils literal notranslate"><span class="pre">Character</span></code></a>, <a class="reference internal" href="#renard.pipeline.ner.NEREntity" title="renard.pipeline.ner.NEREntity"><code class="xref py py-class docutils literal notranslate"><span class="pre">NEREntity</span></code></a>]]) – A list of character mentions, ordered by appearance</p></li>
+<li><p><strong>mentions</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<a class="reference internal" href="#renard.pipeline.character_unification.Character" title="renard.pipeline.character_unification.Character"><code class="xref py py-class docutils literal notranslate"><span class="pre">Character</span></code></a>, <a class="reference internal" href="#renard.pipeline.ner.NEREntity" title="renard.pipeline.ner.NEREntity"><code class="xref py py-class docutils literal notranslate"><span class="pre">NEREntity</span></code></a>]]) – A list of character mentions, ordered by appearance</p></li>
 <li><p><strong>window</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]) – dynamic window, in tokens.</p></li>
 <li><p><strong>overlap</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – window overlap</p></li>
 <li><p><strong>chapter_tokens</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]]) – list of tokens for each chapter.  If
@@ -2119,7 +2020,7 @@ given, one graph will be extracted per chapter.</p></li>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>mentions</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<a class="reference internal" href="#renard.pipeline.characters_extraction.Character" title="renard.pipeline.characters_extraction.Character"><code class="xref py py-class docutils literal notranslate"><span class="pre">Character</span></code></a>, <a class="reference internal" href="#renard.pipeline.ner.NEREntity" title="renard.pipeline.ner.NEREntity"><code class="xref py py-class docutils literal notranslate"><span class="pre">NEREntity</span></code></a>]]) – A list of character mentions, ordered by appearance</p></li>
+<li><p><strong>mentions</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<a class="reference internal" href="#renard.pipeline.character_unification.Character" title="renard.pipeline.character_unification.Character"><code class="xref py py-class docutils literal notranslate"><span class="pre">Character</span></code></a>, <a class="reference internal" href="#renard.pipeline.ner.NEREntity" title="renard.pipeline.ner.NEREntity"><code class="xref py py-class docutils literal notranslate"><span class="pre">NEREntity</span></code></a>]]) – A list of character mentions, ordered by appearance</p></li>
 <li><p><strong>sentences</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – </p></li>
 </ul>
 </dd>
@@ -2135,7 +2036,7 @@ given, one graph will be extracted per chapter.</p></li>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>mentions</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<a class="reference internal" href="#renard.pipeline.characters_extraction.Character" title="renard.pipeline.characters_extraction.Character"><code class="xref py py-class docutils literal notranslate"><span class="pre">Character</span></code></a>, <a class="reference internal" href="#renard.pipeline.ner.NEREntity" title="renard.pipeline.ner.NEREntity"><code class="xref py py-class docutils literal notranslate"><span class="pre">NEREntity</span></code></a>]]) – A list of character mentions, ordered by
+<li><p><strong>mentions</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<a class="reference internal" href="#renard.pipeline.character_unification.Character" title="renard.pipeline.character_unification.Character"><code class="xref py py-class docutils literal notranslate"><span class="pre">Character</span></code></a>, <a class="reference internal" href="#renard.pipeline.ner.NEREntity" title="renard.pipeline.ner.NEREntity"><code class="xref py py-class docutils literal notranslate"><span class="pre">NEREntity</span></code></a>]]) – A list of character mentions, ordered by
 appearance</p></li>
 <li><p><strong>sentences</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – if specified, <code class="docutils literal notranslate"><span class="pre">sentences_polarities</span></code> must
 be specified as well.</p></li>
@@ -2262,8 +2163,8 @@ for now.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>sentences</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – </p></li>
 <li><p><strong>quotes</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Quote</span></code>]) – </p></li>
-<li><p><strong>speakers</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<a class="reference internal" href="#renard.pipeline.characters_extraction.Character" title="renard.pipeline.characters_extraction.Character"><code class="xref py py-class docutils literal notranslate"><span class="pre">Character</span></code></a>]]) – </p></li>
-<li><p><strong>characters</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Set</span></code>[<a class="reference internal" href="#renard.pipeline.characters_extraction.Character" title="renard.pipeline.characters_extraction.Character"><code class="xref py py-class docutils literal notranslate"><span class="pre">Character</span></code></a>]) – </p></li>
+<li><p><strong>speakers</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<a class="reference internal" href="#renard.pipeline.character_unification.Character" title="renard.pipeline.character_unification.Character"><code class="xref py py-class docutils literal notranslate"><span class="pre">Character</span></code></a>]]) – </p></li>
+<li><p><strong>characters</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Set</span></code>[<a class="reference internal" href="#renard.pipeline.character_unification.Character" title="renard.pipeline.character_unification.Character"><code class="xref py py-class docutils literal notranslate"><span class="pre">Character</span></code></a>]) – </p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>
