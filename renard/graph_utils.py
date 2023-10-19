@@ -4,7 +4,7 @@ from more_itertools.recipes import flatten
 import networkx as nx
 
 if TYPE_CHECKING:
-    from renard.pipeline.characters_extraction import Character
+    from renard.pipeline.character_unification import Character
     from renard.plot_utils import CharactersGraphLayout
 
 

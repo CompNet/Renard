@@ -12,7 +12,7 @@ document. Here is a simple example:
    from renard.pipeline import Pipeline
    from renard.pipeline.tokenization import NLTKTokenizer
    from renard.pipeline.ner import NLTKNamedEntityRecognizer
-   from renard.pipeline.characters_extraction import GraphRulesCharactersExtractor
+   from renard.pipeline.character_unification import GraphRulesCharacterUnifier
    from renard.pipeline.graph_extraction import CoOccurrencesGraphExtractor
 
    with open("./my_doc.txt") as f:
@@ -22,7 +22,7 @@ document. Here is a simple example:
        [
            NLTKTokenizer(),
            NLTKNamedEntityRecognizer(),
-           GraphRulesCharactersExtractor(min_appearances=10),
+           GraphRulesCharacterUnifier(min_appearances=10),
            CoOccurrencesGraphExtractor(co_occurences_dist=25)
        ]
    )
@@ -45,7 +45,7 @@ to compute them yourself :
 
    from renard.pipeline import Pipeline
    from renard.pipeline.ner import NLTKNamedEntityRecognizer
-   from renard.pipeline.characters_extraction import GraphRulesCharactersExtractor
+   from renard.pipeline.character_unification import GraphRulesCharacterUnifier
    from renard.pipeline.graph_extraction import CoOccurrencesGraphExtractor
 
    with open("./my_doc.txt") as f:
@@ -55,7 +55,7 @@ to compute them yourself :
    pipeline = Pipeline(
        [
            NLTKNamedEntityRecognizer(),
-           GraphRulesCharactersExtractor(min_appearances=10),
+           GraphRulesCharacterUnifier(min_appearances=10),
            CoOccurrencesGraphExtractor(co_occurences_dist=25)
        ]
    )
@@ -176,8 +176,8 @@ Characters extraction (or alias resolution) extract characters from
 occurences detected using NER. This is done by assigning each mention
 to a unique character.
 
-- :class:`.NaiveCharactersExtractor`
-- :class:`.GraphRulesCharactersExtractor`
+- :class:`.NaiveCharacterUnifier`
+- :class:`.GraphRulesCharacterUnifier`
 
 
 Speaker Attribution
@@ -205,7 +205,7 @@ time. In Renard, such graphs are representend by a ``List`` of
    from renard.pipeline import Pipeline
    from renard.pipeline.tokenization import NLTKTokenizer
    from renard.pipeline.ner import NLTKNamedEntityRecognizer
-   from renard.pipeline.characters_extraction import GraphRulesCharactersExtractor
+   from renard.pipeline.character_unification import GraphRulesCharacterUnifier
    from renard.pipeline.graph_extraction import CoOccurrencesGraphExtractor
 
    with open("./my_doc.txt") as f:
@@ -215,7 +215,7 @@ time. In Renard, such graphs are representend by a ``List`` of
        [
            NLTKTokenizer(),
            NLTKNamedEntityRecognizer(),
-           GraphRulesCharactersExtractor(min_appearances=10),
+           GraphRulesCharacterUnifier(min_appearances=10),
            CoOccurrencesGraphExtractor(
 	       co_occurences_dist=25,
 	       dynamic=True,     # note the 'dynamic'

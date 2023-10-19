@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 from renard.graph_utils import graph_edges_attributes
 
 if TYPE_CHECKING:
-    from renard.pipeline.characters_extraction import Character
+    from renard.pipeline.character_unification import Character
 
 
 CharactersGraphLayout = Union[

@@ -1,5 +1,5 @@
 from renard.pipeline import Mention
-from renard.pipeline.characters_extraction import (
+from renard.pipeline.character_unification import (
     Character,
     _assign_coreference_mentions,
 )

@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING, Optional, Set, List, Dict, Any, Union, Literal
 import torch
 from renard.pipeline.core import PipelineStep
 from renard.pipeline.progress import ProgressReporter
-from renard.pipeline.characters_extraction import Character
+from renard.pipeline.character_unification import Character
 from renard.pipeline.quote_detection import Quote
 from grimbert.model import SpeakerAttributionModel
 from grimbert.predict import predict_speaker

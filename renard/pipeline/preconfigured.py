@@ -1,7 +1,7 @@
 from typing import Optional
 from renard.pipeline.core import Pipeline
 from renard.pipeline.tokenization import NLTKTokenizer
-from renard.pipeline.characters_extraction import GraphRulesCharactersExtractor
+from renard.pipeline.character_unification import GraphRulesCharacterUnifier
 from renard.pipeline.graph_extraction import (
     CoOccurrencesGraphExtractor,
     ConversationalGraphExtractor,
@@ -26,7 +26,7 @@ def nltk_pipeline(
     :param quote_detector_kwargs: kwargs for :class:`.QuoteDetector`
     :param ner_kwargs: kwargs for :class:`.BertNamedEntityRecognizer`
     :param characters_extractor_kwargs: kwargs for
-        :class:`.GraphRulesCharactersExtractor`
+        :class:`.GraphRulesCharacterUnifier`
     :param speaker_detector_kwargs: kwargs for :class:`.BertSpeakerDetector`
     :param graph_extractor_kwargs: kwargs for
         :class:`.CoOccurrencesGraphExtractor` or
@@ -49,7 +49,7 @@ def nltk_pipeline(
                 NLTKTokenizer(**tokenizer_kwargs),
                 QuoteDetector(**quote_detector_kwargs),
                 NLTKNamedEntityRecognizer(**ner_kwargs),
-                GraphRulesCharactersExtractor(**characters_extractor_kwargs),
+                GraphRulesCharacterUnifier(**characters_extractor_kwargs),
                 BertSpeakerDetector(**speaker_detector_kwargs),
                 ConversationalGraphExtractor(**graph_extractor_kwargs),
             ],
@@ -60,7 +60,7 @@ def nltk_pipeline(
             [
                 NLTKTokenizer(**tokenizer_kwargs),
                 NLTKNamedEntityRecognizer(**ner_kwargs),
-                GraphRulesCharactersExtractor(**characters_extractor_kwargs),
+                GraphRulesCharacterUnifier(**characters_extractor_kwargs),
                 CoOccurrencesGraphExtractor(**graph_extractor_kwargs),
             ],
             **pipeline_kwargs
@@ -83,7 +83,7 @@ def bert_pipeline(
     :param quote_detector_kwargs: kwargs for :class:`.QuoteDetector`
     :param ner_kwargs: kwargs for :class:`.BertNamedEntityRecognizer`
     :param characters_extractor_kwargs: kwargs for
-        :class:`.GraphRulesCharactersExtractor`
+        :class:`.GraphRulesCharacterUnifier`
     :param speaker_detector_kwargs: kwargs for :class:`.BertSpeakerDetector`
     :param graph_extractor_kwargs: kwargs for
         :class:`.CoOccurrencesGraphExtractor` or
@@ -106,7 +106,7 @@ def bert_pipeline(
                 NLTKTokenizer(**tokenizer_kwargs),
                 QuoteDetector(**quote_detector_kwargs),
                 BertNamedEntityRecognizer(**ner_kwargs),
-                GraphRulesCharactersExtractor(**characters_extractor_kwargs),
+                GraphRulesCharacterUnifier(**characters_extractor_kwargs),
                 BertSpeakerDetector(**speaker_detector_kwargs),
                 ConversationalGraphExtractor(**graph_extractor_kwargs),
             ],
@@ -117,7 +117,7 @@ def bert_pipeline(
             [
                 NLTKTokenizer(**tokenizer_kwargs),
                 BertNamedEntityRecognizer(**ner_kwargs),
-                GraphRulesCharactersExtractor(**characters_extractor_kwargs),
+                GraphRulesCharacterUnifier(**characters_extractor_kwargs),
                 CoOccurrencesGraphExtractor(**graph_extractor_kwargs),
             ],
             **pipeline_kwargs

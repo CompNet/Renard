@@ -110,19 +110,19 @@ NLTKSentimentAnalyzer
 Characters Extraction
 =====================
 
-.. autoclass:: renard.pipeline.characters_extraction.Character
+.. autoclass:: renard.pipeline.character_unification.Character
    :members:
 
-NaiveCharactersExtractor
-------------------------
+NaiveCharacterUnifier
+---------------------
 
-.. autoclass:: renard.pipeline.characters_extraction.NaiveCharactersExtractor
+.. autoclass:: renard.pipeline.character_unificatrion.NaiveCharacterUnifier
    :members:
 
-GraphRulesCharactersExtractor
------------------------------
+GraphRulesCharacterUnifier
+--------------------------
 
-.. autoclass:: renard.pipeline.characters_extraction.GraphRulesCharactersExtractor
+.. autoclass:: renard.pipeline.character_unification.GraphRulesCharacterUnifier
    :members:
 
 

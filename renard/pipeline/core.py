@@ -32,7 +32,7 @@ from renard.graph_utils import (
 
 if TYPE_CHECKING:
     from renard.plot_utils import CharactersGraphLayout
-    from renard.pipeline.characters_extraction import Character
+    from renard.pipeline.character_unification import Character
     from renard.pipeline.ner import NEREntity
     from renard.pipeline.quote_detection import Quote
     import matplotlib.pyplot as plt

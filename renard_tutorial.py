@@ -37,7 +37,7 @@
 #    [named entity recognition (NER)]
 #                 |
 #                 v
-#       [characters extraction]
+#       [characters unification]
 #                 |
 #                 v
 #    [co-occurences graph extraction]
@@ -52,7 +52,7 @@
 # from renard.pipeline import Pipeline
 # from renard.pipeline.tokenization import NLTKTokenizer
 # from renard.pipeline.ner import NLTKNamedEntityRecognizer
-# from renard.pipeline.characters_extraction import GraphRulesCharactersExtractor
+# from renard.pipeline.character_unification import GraphRulesCharacterUnifier
 # from renard.pipeline.graph_extraction import CoOccurrencesGraphExtractor
 #
 # # Pipeline definition
@@ -60,7 +60,7 @@
 #     [
 #         NLTKTokenizer(),                                                 # tokenization
 #         NLTKNamedEntityRecognizer(),                                     # named entity recognition
-#         GraphRulesCharactersExtractor(),                                 # characters extraction
+#         GraphRulesCharacterUnifier(),                                    # characters extraction
 #         CoOccurrencesGraphExtractor(co_occurences_dist=(1, "sentences")) # graph extraction
 #     ]
 # )
@@ -89,7 +89,7 @@
 
 # %%
 from renard.pipeline import Pipeline
-from renard.pipeline.characters_extraction import GraphRulesCharactersExtractor
+from renard.pipeline.character_unification import GraphRulesCharacterUnifier
 from renard.pipeline.graph_extraction import CoOccurrencesGraphExtractor
 from renard.utils import load_conll2002_bio
 
@@ -102,7 +102,7 @@ sentences, tokens, entities = load_conll2002_bio("./tests/three_musketeers_fra.b
 # already given.
 pipeline = Pipeline(
     [
-        GraphRulesCharactersExtractor(),
+        GraphRulesCharacterUnifier(),
         # an interaction will be a co-occurence in a range of 3
         # sentences or less
         CoOccurrencesGraphExtractor(co_occurences_dist=(3, "sentences")),
@@ -140,7 +140,7 @@ pipeline = Pipeline(
     [
         # at least 3 occurences of a characters are needed for them to
         # be included in the graph (default is 1)
-        GraphRulesCharactersExtractor(min_appearances=3),
+        GraphRulesCharacterUnifier(min_appearances=3),
         # A co-occurence between two characters is counted if its
         # range is lower or equal to 10 sentences
         CoOccurrencesGraphExtractor(co_occurences_dist=(10, "sentences")),
@@ -178,7 +178,7 @@ out.export_graph_to_gexf("./my_graph.gexf")
 # %%
 pipeline = Pipeline(
     [
-        GraphRulesCharactersExtractor(min_appearances=3),
+        GraphRulesCharacterUnifier(min_appearances=3),
         CoOccurrencesGraphExtractor(
             co_occurences_dist=(20, "sentences"),
             dynamic=True,  # we want to extract a dynamic graph (i.e. a list of sequential graphs)
@@ -189,7 +189,7 @@ pipeline = Pipeline(
     lang="fra",
 )
 
-out = pipeline(tokens=tokens, sentences=sentences, bio_tags=bio_tags)
+out = pipeline(tokens=tokens, sentences=sentences, entities=entities)
 
 # display adapts to the fact that the extracted graph is dynamic, and
 # allow exploration of each graph of the list.

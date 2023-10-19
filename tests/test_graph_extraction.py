@@ -7,7 +7,7 @@ from hypothesis.strategies._internal.numbers import integers
 import networkx as nx
 from networkx.algorithms import isomorphism
 from renard.pipeline.graph_extraction import CoOccurrencesGraphExtractor
-from renard.pipeline.characters_extraction import Character
+from renard.pipeline.character_unification import Character
 from renard.pipeline.ner import ner_entities, NEREntity
 
 

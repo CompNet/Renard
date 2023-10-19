@@ -9,7 +9,7 @@ from more_itertools import windowed
 
 from renard.pipeline.ner import NEREntity
 from renard.pipeline.core import PipelineStep
-from renard.pipeline.characters_extraction import Character
+from renard.pipeline.character_unification import Character
 from renard.pipeline.quote_detection import Quote
 
 
