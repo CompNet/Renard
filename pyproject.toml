@@ -2,7 +2,7 @@
 name = "renard-pipeline"
 version = "0.2.2"
 description = "Relationships Extraction from NARrative Documents"
-authors = ["Arthur Amalvy <arthur.amalvy@univ-avignon.fr>"]
+authors = ["Arthur Amalvy <arthur.amalvy@XXXX.email>"]
 license = "GPL-3.0-only"
 readme = "README.md"
 packages = [
