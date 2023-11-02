@@ -164,3 +164,20 @@ Hypocorism
 
 .. autoclass:: renard.resources.hypocorisms.HypocorismGazetteer
    :members:
+
+
+Utils
+=====
+
+Graph utils
+-----------
+
+.. automodule:: renard.graph_utils
+   :members:
+
+
+Plot utils
+----------
+
+.. automodule:: renard.plot_utils
+   :members:
