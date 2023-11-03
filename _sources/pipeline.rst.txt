@@ -217,7 +217,7 @@ time. In Renard, such graphs are representend by a ``List`` of
            NLTKNamedEntityRecognizer(),
            GraphRulesCharacterUnifier(min_appearances=10),
            CoOccurrencesGraphExtractor(
-	       co_occurences_dist=25,
+	       co_occurrences_dist=25,
 	       dynamic=True,     # note the 'dynamic'
 	       dynamic_window=20 # and the 'dynamic_window' argument
 	   )
@@ -240,3 +240,50 @@ dynamic graph using a slider, and
 graph to a directory. Meanwhile,
 :meth:`.PipelineState.export_graph_to_gexf` correctly exports the
 dynamic graph to the Gephi format.
+
+
+Multilingual Support
+====================
+
+Renard supports multiple languages. By default, a :class:`.Pipeline`
+is configured for English, but can create a pipeline for any language
+*as long as all of its steps support it*. To configure a pipeline for
+another language, you can pass the ISO 639-3 code of the language you
+want:
+
+.. code-block:: python
+
+   from renard.pipeline import Pipeline
+   from renard.pipeline.tokenization import NLTKTokenizer
+   from renard.pipeline.ner import BertNamedEntityRecognizer
+   from renard.pipeline.character_unification import GraphRulesCharacterUnifier
+   from renard.pipeline.graph_extraction import CoOccurrencesGraphExtractor
+
+   with open("./my_doc_in_french.txt") as f:
+       text = f.read()
+
+   pipeline = Pipeline(
+       [
+           NLTKTokenizer(),
+           BertNamedEntityRecognizer(),
+           GraphRulesCharacterUnifier(min_appearances=10),
+           CoOccurrencesGraphExtractor(co_occurrences_dist=25)
+       ],
+       lang="fra" # ISO 639-3 language code for french
+   )
+
+   out = pipeline(text)
+
+
+This pipeline is valid because :class:`.NLTKTokenizer`,
+:class:`.BertNamedEntityRecognizer` and
+:class:`.GraphRulesCharacterUnifier` all support french, and that
+:class:`.CoOccurencesGraphExtractor` works for any language. If that
+pipeline was invalid, Renard would display an error message explaining
+why. Renard can perform this language check because each step
+explicitely indicates which languages it supports by overriding the
+:meth:`.PipelineStep.supported_langs` method. This method returns the
+sets of languages supported by a step as ISO 639-3 codes. The special
+string ``"any"`` is used to indicate that the step works regardless of
+language. If the method is not overrided, the default is english
+support only.

@@ -60,6 +60,7 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#dynamic-graphs">Dynamic Graphs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#multilingual-support">Multilingual Support</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="extending.html">Extending Renard</a></li>
@@ -247,7 +248,7 @@ analysis</p></li>
 occurences detected using NER. This is done by assigning each mention
 to a unique character.</p>
 <ul class="simple">
-<li><p><code class="xref py py-class docutils literal notranslate"><span class="pre">NaiveCharacterUnifier</span></code></p></li>
+<li><p><a class="reference internal" href="reference.html#renard.pipeline.character_unification.NaiveCharacterUnifier" title="renard.pipeline.character_unification.NaiveCharacterUnifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">NaiveCharacterUnifier</span></code></a></p></li>
 <li><p><a class="reference internal" href="reference.html#renard.pipeline.character_unification.GraphRulesCharacterUnifier" title="renard.pipeline.character_unification.GraphRulesCharacterUnifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">GraphRulesCharacterUnifier</span></code></a></p></li>
 </ul>
 </section>
@@ -285,7 +286,7 @@ time. In Renard, such graphs are representend by a <code class="docutils literal
         <span class="n">NLTKNamedEntityRecognizer</span><span class="p">(),</span>
         <span class="n">GraphRulesCharacterUnifier</span><span class="p">(</span><span class="n">min_appearances</span><span class="o">=</span><span class="mi">10</span><span class="p">),</span>
         <span class="n">CoOccurrencesGraphExtractor</span><span class="p">(</span>
-            <span class="n">co_occurences_dist</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span>
+            <span class="n">co_occurrences_dist</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span>
             <span class="n">dynamic</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>     <span class="c1"># note the &#39;dynamic&#39;</span>
             <span class="n">dynamic_window</span><span class="o">=</span><span class="mi">20</span> <span class="c1"># and the &#39;dynamic_window&#39; argument</span>
         <span class="p">)</span>
@@ -308,6 +309,48 @@ dynamic graph using a slider, and
 graph to a directory. Meanwhile,
 <a class="reference internal" href="reference.html#renard.pipeline.core.PipelineState.export_graph_to_gexf" title="renard.pipeline.core.PipelineState.export_graph_to_gexf"><code class="xref py py-meth docutils literal notranslate"><span class="pre">PipelineState.export_graph_to_gexf()</span></code></a> correctly exports the
 dynamic graph to the Gephi format.</p>
+</section>
+<section id="multilingual-support">
+<h2>Multilingual Support<a class="headerlink" href="#multilingual-support" title="Permalink to this headline"></a></h2>
+<p>Renard supports multiple languages. By default, a <a class="reference internal" href="reference.html#renard.pipeline.core.Pipeline" title="renard.pipeline.core.Pipeline"><code class="xref py py-class docutils literal notranslate"><span class="pre">Pipeline</span></code></a>
+is configured for English, but can create a pipeline for any language
+<em>as long as all of its steps support it</em>. To configure a pipeline for
+another language, you can pass the ISO 639-3 code of the language you
+want:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">renard.pipeline</span> <span class="kn">import</span> <span class="n">Pipeline</span>
+<span class="kn">from</span> <span class="nn">renard.pipeline.tokenization</span> <span class="kn">import</span> <span class="n">NLTKTokenizer</span>
+<span class="kn">from</span> <span class="nn">renard.pipeline.ner</span> <span class="kn">import</span> <span class="n">BertNamedEntityRecognizer</span>
+<span class="kn">from</span> <span class="nn">renard.pipeline.character_unification</span> <span class="kn">import</span> <span class="n">GraphRulesCharacterUnifier</span>
+<span class="kn">from</span> <span class="nn">renard.pipeline.graph_extraction</span> <span class="kn">import</span> <span class="n">CoOccurrencesGraphExtractor</span>
+
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;./my_doc_in_french.txt&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">text</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+
+<span class="n">pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span>
+    <span class="p">[</span>
+        <span class="n">NLTKTokenizer</span><span class="p">(),</span>
+        <span class="n">BertNamedEntityRecognizer</span><span class="p">(),</span>
+        <span class="n">GraphRulesCharacterUnifier</span><span class="p">(</span><span class="n">min_appearances</span><span class="o">=</span><span class="mi">10</span><span class="p">),</span>
+        <span class="n">CoOccurrencesGraphExtractor</span><span class="p">(</span><span class="n">co_occurrences_dist</span><span class="o">=</span><span class="mi">25</span><span class="p">)</span>
+    <span class="p">],</span>
+    <span class="n">lang</span><span class="o">=</span><span class="s2">&quot;fra&quot;</span> <span class="c1"># ISO 639-3 language code for french</span>
+<span class="p">)</span>
+
+<span class="n">out</span> <span class="o">=</span> <span class="n">pipeline</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This pipeline is valid because <a class="reference internal" href="reference.html#renard.pipeline.tokenization.NLTKTokenizer" title="renard.pipeline.tokenization.NLTKTokenizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">NLTKTokenizer</span></code></a>,
+<a class="reference internal" href="reference.html#renard.pipeline.ner.BertNamedEntityRecognizer" title="renard.pipeline.ner.BertNamedEntityRecognizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">BertNamedEntityRecognizer</span></code></a> and
+<a class="reference internal" href="reference.html#renard.pipeline.character_unification.GraphRulesCharacterUnifier" title="renard.pipeline.character_unification.GraphRulesCharacterUnifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">GraphRulesCharacterUnifier</span></code></a> all support french, and that
+<code class="xref py py-class docutils literal notranslate"><span class="pre">CoOccurencesGraphExtractor</span></code> works for any language. If that
+pipeline was invalid, Renard would display an error message explaining
+why. Renard can perform this language check because each step
+explicitely indicates which languages it supports by overriding the
+<a class="reference internal" href="reference.html#renard.pipeline.core.PipelineStep.supported_langs" title="renard.pipeline.core.PipelineStep.supported_langs"><code class="xref py py-meth docutils literal notranslate"><span class="pre">PipelineStep.supported_langs()</span></code></a> method. This method returns the
+sets of languages supported by a step as ISO 639-3 codes. The special
+string <code class="docutils literal notranslate"><span class="pre">&quot;any&quot;</span></code> is used to indicate that the step works regardless of
+language. If the method is not overrided, the default is english
+support only.</p>
 </section>
 </section>
 

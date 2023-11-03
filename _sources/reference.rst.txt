@@ -116,7 +116,7 @@ Characters Extraction
 NaiveCharacterUnifier
 ---------------------
 
-.. autoclass:: renard.pipeline.character_unificatrion.NaiveCharacterUnifier
+.. autoclass:: renard.pipeline.character_unification.NaiveCharacterUnifier
    :members:
 
 GraphRulesCharacterUnifier

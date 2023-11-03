@@ -1645,6 +1645,105 @@ by derived classes.</p>
 
 <section id="naivecharacterunifier">
 <h3>NaiveCharacterUnifier<a class="headerlink" href="#naivecharacterunifier" title="Permalink to this headline"></a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="renard.pipeline.character_unification.NaiveCharacterUnifier">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">renard.pipeline.character_unification.</span></span><span class="sig-name descname"><span class="pre">NaiveCharacterUnifier</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">min_appearances</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.character_unification.NaiveCharacterUnifier" title="Permalink to this definition"></a></dt>
+<dd><p>A basic character unifier using NER</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>min_appearances</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – </p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="renard.pipeline.character_unification.NaiveCharacterUnifier.__call__">
+<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">entities</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">corefs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.character_unification.NaiveCharacterUnifier.__call__" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>text</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – </p></li>
+<li><p><strong>tokens</strong> – </p></li>
+<li><p><strong>entities</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<a class="reference internal" href="#renard.pipeline.ner.NEREntity" title="renard.pipeline.ner.NEREntity"><code class="xref py py-class docutils literal notranslate"><span class="pre">NEREntity</span></code></a>]) – </p></li>
+<li><p><strong>corefs</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<a class="reference internal" href="#renard.pipeline.core.Mention" title="renard.pipeline.core.Mention"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mention</span></code></a>]]]) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="renard.pipeline.character_unification.NaiveCharacterUnifier.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">min_appearances</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.character_unification.NaiveCharacterUnifier.__init__" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>min_appearances</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – minimum number of appearances of a
+character for it to be valid</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="renard.pipeline.character_unification.NaiveCharacterUnifier.needs">
+<span class="sig-name descname"><span class="pre">needs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.character_unification.NaiveCharacterUnifier.needs" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Set</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>a <cite>set</cite> of state attributes needed by this
+<code class="xref py py-class docutils literal notranslate"><span class="pre">PipelineStep</span></code>. This method must be overriden
+by derived classes.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="renard.pipeline.character_unification.NaiveCharacterUnifier.optional_needs">
+<span class="sig-name descname"><span class="pre">optional_needs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.character_unification.NaiveCharacterUnifier.optional_needs" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Set</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>a <cite>set</cite> of state attributes optionally neeeded by this
+<code class="xref py py-class docutils literal notranslate"><span class="pre">PipelineStep</span></code>. This method can be overriden by derived
+classes.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="renard.pipeline.character_unification.NaiveCharacterUnifier.production">
+<span class="sig-name descname"><span class="pre">production</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.character_unification.NaiveCharacterUnifier.production" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Set</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>a <cite>set</cite> of state attributes produced by this
+<code class="xref py py-class docutils literal notranslate"><span class="pre">PipelineStep</span></code>. This method must be overriden
+by derived classes.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="renard.pipeline.character_unification.NaiveCharacterUnifier.supported_langs">
+<span class="sig-name descname"><span class="pre">supported_langs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.character_unification.NaiveCharacterUnifier.supported_langs" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Set</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>], <code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code>[‘any’]]</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>a list of supported languages, as ISO 639-3 codes, or
+the string <code class="docutils literal notranslate"><span class="pre">'any'</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </section>
 <section id="graphrulescharacterunifier">
 <h3>GraphRulesCharacterUnifier<a class="headerlink" href="#graphrulescharacterunifier" title="Permalink to this headline"></a></h3>
