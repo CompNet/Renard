@@ -55,13 +55,8 @@ to compute them yourself :
    pipeline = Pipeline(
        [
            NLTKNamedEntityRecognizer(),
-<<<<<<< HEAD
-           GraphRulesCharacterUnifier(min_appearances=10),
-           CoOccurrencesGraphExtractor(co_occurences_dist=25)
-=======
            NaiveCharactersExtractor(min_appearance=10),
            CoOccurrencesGraphExtractor(co_occurrences_dist=25)
->>>>>>> 66a46dc (fix a typo in CoOccurrencesGraphExtractor)
        ]
    )
 
