@@ -81,13 +81,18 @@ class CoOccurrencesGraphExtractor(PipelineStep):
 
     def __init__(
         self,
-        co_occurences_dist: Union[int, Tuple[int, Literal["tokens", "sentences"]]],
+        co_occurrences_dist: Optional[
+            Union[int, Tuple[int, Literal["tokens", "sentences"]]]
+        ],
         dynamic: bool = False,
         dynamic_window: Optional[int] = None,
         dynamic_overlap: int = 0,
+        co_occurences_dist: Optional[
+            Union[int, Tuple[int, Literal["tokens", "sentences"]]]
+        ] = None,
     ) -> None:
         """
-        :param co_occurences_dist: max accepted distance between two
+        :param co_occurrences_dist: max accepted distance between two
             character appearances to form a co-occurence interaction.
 
                 - if an ``int`` is given, the distance is in number of
@@ -99,28 +104,37 @@ class CoOccurrencesGraphExtractor(PipelineStep):
 
         :param dynamic:
 
-            - if ``False`` (the default), a static ``nx.graph`` is
-              extracted
+                - if ``False`` (the default), a static ``nx.graph`` is
+                  extracted
 
-            - if ``True``, several ``nx.graph`` are extracted.  In
-              that case, ``dynamic_window`` and
-              ``dynamic_overlap``*can* be specified.  If
-              ``dynamic_window`` is not specified, this step is
-              expecting the text to be cut into chapters', and a graph
-              will be extracted for each 'chapter'.  In that case,
-              ``chapters`` must be passed to the pipeline as a
-              ``List[str]`` at runtime.
+                - if ``True``, several ``nx.graph`` are extracted.  In
+                  that case, ``dynamic_window`` and
+                  ``dynamic_overlap``*can* be specified.  If
+                  ``dynamic_window`` is not specified, this step is
+                  expecting the text to be cut into chapters', and a
+                  graph will be extracted for each 'chapter'.  In that
+                  case, ``chapters`` must be passed to the pipeline as
+                  a ``List[str]`` at runtime.
 
         :param dynamic_window: dynamic window, in number of
             interactions.  a dynamic window of `n` means that each
             returned graph will be formed by `n` interactions.
 
         :param dynamic_overlap: overlap, in number of interactions.
-        """
 
-        if isinstance(co_occurences_dist, int):
-            co_occurences_dist = (co_occurences_dist, "tokens")
-        self.co_occurences_dist = co_occurences_dist
+        :param co_occurences_dist: same as ``co_occurrences_dist``.
+            Included because of retro-compatibility, as it was a
+            previously included typo.
+        """
+        # typo retrocompatibility
+        if not co_occurences_dist is None:
+            co_occurrences_dist = co_occurences_dist
+        if co_occurrences_dist is None and co_occurences_dist is None:
+            raise ValueError()
+
+        if isinstance(co_occurrences_dist, int):
+            co_occurrences_dist = (co_occurrences_dist, "tokens")
+        self.co_occurrences_dist = co_occurrences_dist
 
         if dynamic:
             if not dynamic_window is None:
@@ -181,25 +195,25 @@ class CoOccurrencesGraphExtractor(PipelineStep):
 
         .. note::
 
-            the attribute ``self.co_occurences_dist`` is used to know wether mentions are in co_occurences
+            the attribute ``self.co_occurrences_dist`` is used to know wether mentions are in co_occurences
 
         :param mention_1:
         :param mention_2:
         :param sentences:
         :return: a boolean indicating wether the two mentions are co-occuring
         """
-        if self.co_occurences_dist[1] == "tokens":
+        if self.co_occurrences_dist[1] == "tokens":
             return (
                 abs(mention_2.start_idx - mention_1.start_idx)
-                <= self.co_occurences_dist[0]
+                <= self.co_occurrences_dist[0]
             )
-        elif self.co_occurences_dist[1] == "sentences":
+        elif self.co_occurrences_dist[1] == "sentences":
             assert not sentences is None
             mention_1_sent = sent_index_for_token_index(mention_1.start_idx, sentences)
             mention_2_sent = sent_index_for_token_index(
                 mention_2.end_idx - 1, sentences
             )
-            return abs(mention_2_sent - mention_1_sent) <= self.co_occurences_dist[0]
+            return abs(mention_2_sent - mention_1_sent) <= self.co_occurrences_dist[0]
         else:
             raise NotImplementedError
 

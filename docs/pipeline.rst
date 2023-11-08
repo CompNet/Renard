@@ -22,8 +22,8 @@ document. Here is a simple example:
        [
            NLTKTokenizer(),
            NLTKNamedEntityRecognizer(),
-           GraphRulesCharacterUnifier(min_appearances=10),
-           CoOccurrencesGraphExtractor(co_occurences_dist=25)
+           NaiveCharactersExtractor(min_appearance=10),
+           CoOccurrencesGraphExtractor(co_occurrences_dist=25)
        ]
    )
 
@@ -55,8 +55,8 @@ to compute them yourself :
    pipeline = Pipeline(
        [
            NLTKNamedEntityRecognizer(),
-           GraphRulesCharacterUnifier(min_appearances=10),
-           CoOccurrencesGraphExtractor(co_occurences_dist=25)
+           NaiveCharactersExtractor(min_appearance=10),
+           CoOccurrencesGraphExtractor(co_occurrences_dist=25)
        ]
    )
 
