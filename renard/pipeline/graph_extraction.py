@@ -81,7 +81,9 @@ class CoOccurrencesGraphExtractor(PipelineStep):
 
     def __init__(
         self,
-        co_occurrences_dist: Union[int, Tuple[int, Literal["tokens", "sentences"]]],
+        co_occurrences_dist: Optional[
+            Union[int, Tuple[int, Literal["tokens", "sentences"]]]
+        ],
         dynamic: bool = False,
         dynamic_window: Optional[int] = None,
         dynamic_overlap: int = 0,
@@ -127,6 +129,8 @@ class CoOccurrencesGraphExtractor(PipelineStep):
         # typo retrocompatibility
         if not co_occurences_dist is None:
             co_occurrences_dist = co_occurences_dist
+        if co_occurrences_dist is None and co_occurences_dist is None:
+            raise ValueError()
 
         if isinstance(co_occurrences_dist, int):
             co_occurrences_dist = (co_occurrences_dist, "tokens")

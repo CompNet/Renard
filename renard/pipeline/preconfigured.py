@@ -56,6 +56,10 @@ def nltk_pipeline(
             **pipeline_kwargs
         )
     else:
+
+        if not "co_occurrences_dist" in graph_extractor_kwargs:
+            graph_extractor_kwargs["co_occurrences_dist"] = (1, "sentences")
+
         return Pipeline(
             [
                 NLTKTokenizer(**tokenizer_kwargs),
@@ -113,6 +117,10 @@ def bert_pipeline(
             **pipeline_kwargs
         )
     else:
+
+        if not "co_occurrences_dist" in graph_extractor_kwargs:
+            graph_extractor_kwargs["co_occurrences_dist"] = (1, "sentences")
+
         return Pipeline(
             [
                 NLTKTokenizer(**tokenizer_kwargs),
