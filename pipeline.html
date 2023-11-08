@@ -110,8 +110,8 @@ document. Here is a simple example:</p>
     <span class="p">[</span>
         <span class="n">NLTKTokenizer</span><span class="p">(),</span>
         <span class="n">NLTKNamedEntityRecognizer</span><span class="p">(),</span>
-        <span class="n">GraphRulesCharacterUnifier</span><span class="p">(</span><span class="n">min_appearances</span><span class="o">=</span><span class="mi">10</span><span class="p">),</span>
-        <span class="n">CoOccurrencesGraphExtractor</span><span class="p">(</span><span class="n">co_occurences_dist</span><span class="o">=</span><span class="mi">25</span><span class="p">)</span>
+        <span class="n">NaiveCharactersExtractor</span><span class="p">(</span><span class="n">min_appearance</span><span class="o">=</span><span class="mi">10</span><span class="p">),</span>
+        <span class="n">CoOccurrencesGraphExtractor</span><span class="p">(</span><span class="n">co_occurrences_dist</span><span class="o">=</span><span class="mi">25</span><span class="p">)</span>
     <span class="p">]</span>
 <span class="p">)</span>
 
@@ -139,8 +139,8 @@ to compute them yourself :</p>
 <span class="n">pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span>
     <span class="p">[</span>
         <span class="n">NLTKNamedEntityRecognizer</span><span class="p">(),</span>
-        <span class="n">GraphRulesCharacterUnifier</span><span class="p">(</span><span class="n">min_appearances</span><span class="o">=</span><span class="mi">10</span><span class="p">),</span>
-        <span class="n">CoOccurrencesGraphExtractor</span><span class="p">(</span><span class="n">co_occurences_dist</span><span class="o">=</span><span class="mi">25</span><span class="p">)</span>
+        <span class="n">NaiveCharactersExtractor</span><span class="p">(</span><span class="n">min_appearance</span><span class="o">=</span><span class="mi">10</span><span class="p">),</span>
+        <span class="n">CoOccurrencesGraphExtractor</span><span class="p">(</span><span class="n">co_occurrences_dist</span><span class="o">=</span><span class="mi">25</span><span class="p">)</span>
     <span class="p">]</span>
 <span class="p">)</span>
 
