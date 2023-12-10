@@ -1,4 +1,4 @@
-from typing import List, Optional, Union
+from typing import List, Literal, Optional, Union
 import torch
 from torch.utils.data import Dataset
 from transformers import PreTrainedTokenizerFast
@@ -20,61 +20,84 @@ class DataCollatorForTokenClassificationWithBatchEncoding:
     ) -> None:
         self.tokenizer = tokenizer
         self.pad_to_multiple_of = pad_to_multiple_of
-        self.label_pad_token_id = -100
+        self.pad_token_id = {"label": -100, "labels": -100}
 
-    def __call__(self, features) -> Union[dict, BatchEncoding]:
-        label_name = "label" if "label" in features[0].keys() else "labels"
-        labels = (
-            [feature[label_name] for feature in features]
-            if label_name in features[0].keys()
-            else None
-        )
-        batch = self.tokenizer.pad(
-            features,
-            padding="longest",
-            pad_to_multiple_of=self.pad_to_multiple_of,
-            return_tensors="pt" if labels is None else None,
-        )
-        # keep encodings info dammit
+    def __call__(self, features: List[dict]) -> Union[dict, BatchEncoding]:
+        keys = features[0].keys()
+        sequence_len = max([len(f["input_ids"]) for f in features])
+
+        # We do the padding and collating manually instead of calling
+        # self.tokenizer.pad, because pad does not work on arbitrary
+        # features.
+        batch = BatchEncoding({})
+        for key in keys:
+            if self.tokenizer.padding_side == "right":
+                batch[key] = [
+                    f[key]
+                    + [self.pad_token_id.get(key, 0)] * (sequence_len - len(f[key]))
+                    for f in features
+                ]
+            else:
+                batch[key] = [
+                    [
+                        self.pad_token_id.get(key, 0) * (sequence_len - len(f[key]))
+                        + f[key]
+                        for f in features
+                    ]
+                ]
+
         batch._encodings = [f.encodings[0] for f in features]
 
-        if labels is None:
-            return batch
-
-        sequence_length = torch.tensor(batch["input_ids"]).shape[1]
-        padding_side = self.tokenizer.padding_side
-        if padding_side == "right":
-            batch[label_name] = [
-                list(label) + [self.label_pad_token_id] * (sequence_length - len(label))
-                for label in labels
-            ]
-        else:
-            batch[label_name] = [
-                [self.label_pad_token_id] * (sequence_length - len(label)) + list(label)
-                for label in labels
-            ]
+        for k, v in batch.items():
+            batch[k] = torch.tensor(v)
 
         return batch
 
 
 class NERDataset(Dataset):
+    """
+    :ivar _context_mask: for each element, a mask indicating which
+        tokens are part of the context (1 for context, 0 for text on
+        which to perform inference).  The mask allows to discard
+        predictions made for context at inference time, even though
+        the context can still be passed as input to the model.
+    """
+
     def __init__(
-        self, sentences: List[List[str]], tokenizer: PreTrainedTokenizerFast
+        self,
+        elements: List[List[str]],
+        tokenizer: PreTrainedTokenizerFast,
+        context_mask: Optional[List[List[int]]] = None,
     ) -> None:
-        self.sentences = sentences
+        self.elements = elements
+
+        if context_mask:
+            assert all(
+                [len(cm) == len(elt) for elt, cm in zip(self.elements, context_mask)]
+            )
+        self._context_mask = context_mask or [[0] * len(elt) for elt in self.elements]
+
         self.tokenizer = tokenizer
 
     def __getitem__(self, index) -> BatchEncoding:
+        element = self.elements[index]
+
         batch = self.tokenizer(
-            self.sentences[index],
-            return_tensors="pt",
-            padding=True,
+            element,
             truncation=True,
+            max_length=512,  # TODO
             is_split_into_words=True,
         )
-        for k in batch.keys():
-            batch[k] = batch[k][0]
+
+        batch["context_mask"] = [0] * len(batch["input_ids"])
+        elt_context_mask = self._context_mask[index]
+        for i in range(len(element)):
+            w2t = batch.word_to_tokens(0, i)
+            mask_value = elt_context_mask[i]
+            tokens_mask = [mask_value] * (w2t.end - w2t.start)
+            batch["context_mask"][w2t.start : w2t.end] = tokens_mask
+
         return batch
 
     def __len__(self) -> int:
-        return len(self.sentences)
+        return len(self.elements)
