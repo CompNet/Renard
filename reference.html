@@ -92,7 +92,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#hypocorism">Hypocorism</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#utils">Utils</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#module-renard.utils">Utils</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#module-renard.graph_utils">Graph utils</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-renard.plot_utils">Plot utils</a></li>
 </ul>
@@ -2541,8 +2541,105 @@ and are licensed under the Apache 2.0 License</p>
 
 </section>
 </section>
-<section id="utils">
-<h2>Utils<a class="headerlink" href="#utils" title="Permalink to this headline"></a></h2>
+<section id="module-renard.utils">
+<span id="utils"></span><h2>Utils<a class="headerlink" href="#module-renard.utils" title="Permalink to this headline"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="renard.utils.batch_index_select">
+<span class="sig-prename descclassname"><span class="pre">renard.utils.</span></span><span class="sig-name descname"><span class="pre">batch_index_select</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.utils.batch_index_select" title="Permalink to this definition"></a></dt>
+<dd><p>Batched version of <code class="xref py py-func docutils literal notranslate"><span class="pre">torch.index_select()</span></code>.
+Inspired by <a class="reference external" href="https://discuss.pytorch.org/t/batched-index-select/9115/8">https://discuss.pytorch.org/t/batched-index-select/9115/8</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code>) – a torch tensor of shape <code class="docutils literal notranslate"><span class="pre">(B,</span> <span class="pre">*)</span></code> where <code class="docutils literal notranslate"><span class="pre">*</span></code>
+is any number of additional dimensions.</p></li>
+<li><p><strong>dim</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – the dimension in which to index</p></li>
+<li><p><strong>index</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code>) – index tensor of shape <code class="docutils literal notranslate"><span class="pre">(B,</span> <span class="pre">I)</span></code></p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>a tensor which indexes <code class="docutils literal notranslate"><span class="pre">input</span></code> along dimension <code class="docutils literal notranslate"><span class="pre">dim</span></code>
+using <code class="docutils literal notranslate"><span class="pre">index</span></code>. This tensor has the same shape as <code class="docutils literal notranslate"><span class="pre">input</span></code>,
+except in dimension <code class="docutils literal notranslate"><span class="pre">dim</span></code>, where it has dimension <code class="docutils literal notranslate"><span class="pre">I</span></code>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="renard.utils.load_conll2002_bio">
+<span class="sig-prename descclassname"><span class="pre">renard.utils.</span></span><span class="sig-name descname"><span class="pre">load_conll2002_bio</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tag_conversion_map</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">separator</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'\\t'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.utils.load_conll2002_bio" title="Permalink to this definition"></a></dt>
+<dd><p>Load a file under CoNLL2022 BIO format.  Sentences are expected
+to be separated by end of lines.  Tags should be in the CoNLL-2002
+format (such as ‘B-PER I-PER’) - If this is not the case, see the
+<code class="docutils literal notranslate"><span class="pre">tag_conversion_map</span></code> argument.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – path to the CoNLL-2002 formatted file</p></li>
+<li><p><strong>separator</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – separator between token and BIO tags</p></li>
+<li><p><strong>tag_conversion_map</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – conversion map for tags found in the
+input file.  Example : <code class="docutils literal notranslate"><span class="pre">{'B':</span> <span class="pre">'B-PER',</span> <span class="pre">'I':</span> <span class="pre">'I-PER'}</span></code></p></li>
+<li><p><strong>kwargs</strong> – additional kwargs for <code class="docutils literal notranslate"><span class="pre">open</span></code> (such as
+<code class="docutils literal notranslate"><span class="pre">encoding</span></code> or <code class="docutils literal notranslate"><span class="pre">newline</span></code>).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]], <code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<a class="reference internal" href="#renard.pipeline.ner.NEREntity" title="renard.pipeline.ner.NEREntity"><code class="xref py py-class docutils literal notranslate"><span class="pre">NEREntity</span></code></a>]]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">(sentences,</span> <span class="pre">tokens,</span> <span class="pre">entities)</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="renard.utils.search_pattern">
+<span class="sig-prename descclassname"><span class="pre">renard.utils.</span></span><span class="sig-name descname"><span class="pre">search_pattern</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seq</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pattern</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.utils.search_pattern" title="Permalink to this definition"></a></dt>
+<dd><p>Search a pattern in sequence</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>seq</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">TypeVar</span></code>(<code class="docutils literal notranslate"><span class="pre">R</span></code>)]) – sequence in which to search</p></li>
+<li><p><strong>pattern</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">TypeVar</span></code>(<code class="docutils literal notranslate"><span class="pre">R</span></code>)]) – searched pattern</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>a list of patterns start index</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="renard.utils.spans">
+<span class="sig-prename descclassname"><span class="pre">renard.utils.</span></span><span class="sig-name descname"><span class="pre">spans</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seq</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_len</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.utils.spans" title="Permalink to this definition"></a></dt>
+<dd><p>Cut the input sequence into all possible spans up to a maximum length</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>spans are ordered from the smallest to the biggest,
+from the beginning of seq to the end of seq.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>seq</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Collection</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">TypeVar</span></code>(<code class="docutils literal notranslate"><span class="pre">T</span></code>)]) – </p></li>
+<li><p><strong>max_len</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">TypeVar</span></code>(<code class="docutils literal notranslate"><span class="pre">T</span></code>)]]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
 <section id="module-renard.graph_utils">
 <span id="graph-utils"></span><h3>Graph utils<a class="headerlink" href="#module-renard.graph_utils" title="Permalink to this headline"></a></h3>
 <dl class="py function">

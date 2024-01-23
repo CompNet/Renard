@@ -169,6 +169,9 @@ Hypocorism
 Utils
 =====
 
+.. automodule:: renard.utils
+   :members:
+
 Graph utils
 -----------
 
