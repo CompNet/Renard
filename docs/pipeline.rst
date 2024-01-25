@@ -4,7 +4,7 @@ The Pipeline
 
 Renard's central concept is the :class:`.Pipeline`. A
 :class:`.Pipeline` is a list of :class:`.PipelineStep` that are run
-sequentially in order to extract a characters graph from a
+sequentially in order to extract a character graph from a
 document. Here is a simple example:
 
 .. code-block:: python
@@ -22,7 +22,7 @@ document. Here is a simple example:
        [
            NLTKTokenizer(),
            NLTKNamedEntityRecognizer(),
-           NaiveCharactersExtractor(min_appearance=10),
+           GraphRulesCharacterUnifier(min_appearance=10),
            CoOccurrencesGraphExtractor(co_occurrences_dist=25)
        ]
    )
@@ -30,7 +30,7 @@ document. Here is a simple example:
    out = pipeline(text)
 
 
-Each step of a pipeline may require informations from previous steps
+Each step of a pipeline may require information from previous steps
 before running : therefore, it is possible to create intractable
 pipelines when a step's requirements are not satisfied. To
 troubleshoot these issues more easily, a :class:`.Pipeline` checks its
@@ -39,7 +39,7 @@ in case it is intractable.
 
 You can also specify the result of certains steps manually when
 calling the pipeline if you already have those results or if you want
-to compute them yourself :
+to compute them yourself:
 
 .. code-block:: python
 

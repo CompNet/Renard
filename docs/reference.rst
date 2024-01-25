@@ -107,8 +107,8 @@ NLTKSentimentAnalyzer
    :members:
 
       
-Characters Extraction
-=====================
+Characters Unification
+======================
 
 .. autoclass:: renard.pipeline.character_unification.Character
    :members:
@@ -168,6 +168,9 @@ Hypocorism
 
 Utils
 =====
+
+.. automodule:: renard.utils
+   :members:
 
 Graph utils
 -----------

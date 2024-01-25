@@ -53,7 +53,7 @@ class BertCoreferenceResolver(PipelineStep):
         self.batch_size = batch_size
 
         if device == "auto":
-            self.device = torch.device("cuda" if torch.cuda.is_available else "cpu")
+            self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         else:
             self.device = torch.device(device)
 
@@ -90,16 +90,26 @@ class BertCoreferenceResolver(PipelineStep):
         super()._pipeline_init_(lang, progress_reporter)
 
     def __call__(self, tokens: List[str], **kwargs) -> Dict[str, Any]:
-        from tibert import predict_coref
+        from tibert import stream_predict_coref
 
         blocks = [
             tokens[block_start : block_start + self.block_size]
             for block_start in range(0, len(tokens), self.block_size)
         ]
 
-        coref_docs = predict_coref(
-            blocks, self.model, self.tokenizer, batch_size=self.batch_size
-        )
+        coref_docs = []
+        for doc in self._progress_(
+            stream_predict_coref(
+                blocks,
+                self.model,
+                self.tokenizer,
+                batch_size=self.batch_size,
+                quiet=True,
+                device_str=self.device,
+            ),
+            total=len(blocks),
+        ):
+            coref_docs.append(doc)
 
         # chains found in coref_docs are each local to their
         # blocks. The following code adjusts their start and end index
