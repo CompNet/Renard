@@ -25,8 +25,10 @@ class NLTKTokenizer(PipelineStep):
         if not chapters is None:
             out_dicts = [self.__call__(chapter, None) for chapter in chapters]
             return {
-                "tokens": list(itertools.chain([d["tokens"] for d in out_dicts])),
-                "sentences": list(itertools.chain([d["sentences"] for d in out_dicts])),
+                "tokens": list(itertools.chain(*[d["tokens"] for d in out_dicts])),
+                "sentences": list(
+                    itertools.chain(*[d["sentences"] for d in out_dicts])
+                ),
                 "chapter_tokens": [d["tokens"] for d in out_dicts],
             }
 
