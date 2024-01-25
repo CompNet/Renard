@@ -107,8 +107,8 @@ NLTKSentimentAnalyzer
    :members:
 
       
-Characters Extraction
-=====================
+Characters Unification
+======================
 
 .. autoclass:: renard.pipeline.character_unification.Character
    :members:

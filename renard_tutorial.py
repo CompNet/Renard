@@ -60,7 +60,7 @@
 #     [
 #         NLTKTokenizer(),                                                 # tokenization
 #         NLTKNamedEntityRecognizer(),                                     # named entity recognition
-#         GraphRulesCharactersExtractor(),                                 # characters extraction
+#         GraphRulesCharactersUnifier(),                                   # characters unification
 #         CoOccurrencesGraphExtractor(co_occurrences_dist=(1, "sentences")) # graph extraction
 #     ]
 # )
