@@ -54,8 +54,8 @@ def _assign_coreference_mentions(
     :param corefs:
     """
 
-    char_mentions: Dict[Character, List[Mention]] = {
-        character: character.mentions for character in characters
+    char_mentions: Dict[Character, Set[Mention]] = {
+        character: set(character.mentions) for character in characters
     }
 
     # we assign each chain to the character with highest name
@@ -80,12 +80,12 @@ def _assign_coreference_mentions(
 
         # assign the chain to the character with the most occurences
         for mention in chain:
-            # TODO: complexity
             if not mention in char_mentions[best_character]:
-                char_mentions[best_character].append(mention)
+                char_mentions[best_character].add(mention)
 
     return [
-        Character(c.names, mentions, c.gender) for c, mentions in char_mentions.items()
+        Character(c.names, sorted(mentions, key=lambda m: m.start_idx), c.gender)
+        for c, mentions in char_mentions.items()
     ]
 
 
