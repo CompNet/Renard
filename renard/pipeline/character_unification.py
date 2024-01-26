@@ -209,7 +209,6 @@ class GraphRulesCharacterUnifier(PipelineStep):
 
         # * link nodes based on several rules
         for name1, name2 in combinations(G.nodes(), 2):
-
             # is one name a known hypocorism of the other ? (also
             # checks if both names are the same)
             if self.hypocorism_gazetteer.are_related(name1, name2):
@@ -263,7 +262,6 @@ class GraphRulesCharacterUnifier(PipelineStep):
                 pass
 
         for name1, name2 in combinations(G.nodes(), 2):
-
             # check if characters have the same last name but a
             # different first name.
             human_name1 = HumanName(name1, constants=hname_constants)
@@ -333,10 +331,11 @@ class GraphRulesCharacterUnifier(PipelineStep):
         self, name1: str, name2: str, hname_constants: Constants
     ) -> bool:
         """Check if two names are related after removing their titles"""
-        local_constants = copy.deepcopy(hname_constants)
-        local_constants.string_format = "{first} {middle} {last}"
-        raw_name1 = HumanName(name1, constants=local_constants).full_name
-        raw_name2 = HumanName(name2, constants=local_constants).full_name
+        old_string_format = hname_constants.string_format
+        hname_constants.string_format = "{first} {middle} {last}"
+        raw_name1 = HumanName(name1, constants=hname_constants).full_name
+        raw_name2 = HumanName(name2, constants=hname_constants).full_name
+        hname_constants.string_format = old_string_format
 
         if raw_name1 == "" or raw_name2 == "":
             return False
