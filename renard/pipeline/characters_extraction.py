@@ -1,7 +1,7 @@
 import renard.pipeline.character_unification as cu
 
 print(
-    "[warning] the characters_extraction module is deprecated. Use character_unfication instead."
+    "[warning] the characters_extraction module is deprecated. Use character_unification instead."
 )
 
 Character = cu.Character
