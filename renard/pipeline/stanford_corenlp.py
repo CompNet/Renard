@@ -1,6 +1,6 @@
 import os
 from typing import List, Optional, Set, Dict, Any, Literal
-from renard.pipeline.ner import ner_entities
+from renard.ner_utils import ner_entities
 
 import stanza
 from stanza.protobuf import CoreNLP_pb2

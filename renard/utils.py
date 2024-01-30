@@ -1,11 +1,6 @@
-from typing import List, Tuple, TypeVar, Collection, Iterable, Optional, Dict, cast
-import re, os
-from more_itertools import flatten
+from typing import List, Tuple, TypeVar, Collection, Iterable, cast
 from more_itertools.more import windowed
 import torch
-
-from renard.pipeline.ner import NEREntity, ner_entities
-
 
 T = TypeVar("T")
 
@@ -81,49 +76,3 @@ def search_pattern(seq: Iterable[R], pattern: List[R]) -> List[int]:
         if list(subseq) == pattern:
             start_indices.append(subseq_i)
     return start_indices
-
-
-def load_conll2002_bio(
-    path: str,
-    tag_conversion_map: Optional[Dict[str, str]] = None,
-    separator: str = "\t",
-    **kwargs
-) -> Tuple[List[List[str]], List[str], List[NEREntity]]:
-    """Load a file under CoNLL2022 BIO format.  Sentences are expected
-    to be separated by end of lines.  Tags should be in the CoNLL-2002
-    format (such as 'B-PER I-PER') - If this is not the case, see the
-    ``tag_conversion_map`` argument.
-
-    :param path: path to the CoNLL-2002 formatted file
-    :param separator: separator between token and BIO tags
-    :param tag_conversion_map: conversion map for tags found in the
-        input file.  Example : ``{'B': 'B-PER', 'I': 'I-PER'}``
-    :param kwargs: additional kwargs for ``open`` (such as
-        ``encoding`` or ``newline``).
-
-    :return: ``(sentences, tokens, entities)``
-    """
-
-    if tag_conversion_map is None:
-        tag_conversion_map = {}
-
-    with open(os.path.expanduser(path), **kwargs) as f:
-        raw_data = f.read()
-
-    sents = []
-    sent_tokens = []
-    tags = []
-    for line in raw_data.split("\n"):
-        line = line.strip("\n")
-        if re.fullmatch(r"\s*", line):
-            sents.append(sent_tokens)
-            sent_tokens = []
-            continue
-        token, tag = line.split(separator)
-        sent_tokens.append(token)
-        tags.append(tag_conversion_map.get(tag, tag))
-
-    tokens = list(flatten(sents))
-    entities = ner_entities(tokens, tags)
-
-    return sents, list(flatten(sents)), entities
