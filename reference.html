@@ -2580,33 +2580,6 @@ except in dimension <code class="docutils literal notranslate"><span class="pre"
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="renard.utils.load_conll2002_bio">
-<span class="sig-prename descclassname"><span class="pre">renard.utils.</span></span><span class="sig-name descname"><span class="pre">load_conll2002_bio</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tag_conversion_map</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">separator</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'\\t'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.utils.load_conll2002_bio" title="Permalink to this definition"></a></dt>
-<dd><p>Load a file under CoNLL2022 BIO format.  Sentences are expected
-to be separated by end of lines.  Tags should be in the CoNLL-2002
-format (such as ‘B-PER I-PER’) - If this is not the case, see the
-<code class="docutils literal notranslate"><span class="pre">tag_conversion_map</span></code> argument.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>path</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – path to the CoNLL-2002 formatted file</p></li>
-<li><p><strong>separator</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – separator between token and BIO tags</p></li>
-<li><p><strong>tag_conversion_map</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – conversion map for tags found in the
-input file.  Example : <code class="docutils literal notranslate"><span class="pre">{'B':</span> <span class="pre">'B-PER',</span> <span class="pre">'I':</span> <span class="pre">'I-PER'}</span></code></p></li>
-<li><p><strong>kwargs</strong> – additional kwargs for <code class="docutils literal notranslate"><span class="pre">open</span></code> (such as
-<code class="docutils literal notranslate"><span class="pre">encoding</span></code> or <code class="docutils literal notranslate"><span class="pre">newline</span></code>).</p></li>
-</ul>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]], <code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<a class="reference internal" href="#renard.pipeline.ner.NEREntity" title="renard.pipeline.ner.NEREntity"><code class="xref py py-class docutils literal notranslate"><span class="pre">NEREntity</span></code></a>]]</p>
-</dd>
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">(sentences,</span> <span class="pre">tokens,</span> <span class="pre">entities)</span></code></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
 <dt class="sig sig-object py" id="renard.utils.search_pattern">
 <span class="sig-prename descclassname"><span class="pre">renard.utils.</span></span><span class="sig-name descname"><span class="pre">search_pattern</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seq</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pattern</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.utils.search_pattern" title="Permalink to this definition"></a></dt>
 <dd><p>Search a pattern in sequence</p>
