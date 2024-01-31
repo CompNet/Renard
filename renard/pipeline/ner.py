@@ -160,7 +160,7 @@ class BertNamedEntityRecognizer(PipelineStep):
     """An entity recognizer based on BERT"""
 
     LANG_TO_MODELS = {
-        "fra": "Davlan/bert-base-multilingual-cased-ner-hrl",
+        "fra": "compnet-renard/camembert-base-literary-NER",
         "eng": "compnet-renard/bert-base-cased-literary-NER",
     }
 
