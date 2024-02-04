@@ -75,7 +75,7 @@
 # out = pipeline(text)
 # ```
 #
-# The `out` object then contains the pipeline execution's result, which includes the character network (see the `characters_graph` attribute). We can for example export this network on the disk:
+# The `out` object then contains the pipeline execution's result, which includes the character network (see the `character_network` attribute). We can for example export this network on the disk:
 #
 # ```python
 # out.export_graph_to_gexf("./my_graph.gexf")
@@ -155,12 +155,12 @@ plt.show()
 # %% [markdown]
 # ## Advanced Graph Manipulation
 #
-# The `characters_graph` attribute contains the `networkx` graph extracted by `Renard`. It is possible to manipulate this graph directly using python for advanced usage.
+# The `character_network` attribute contains the `networkx` graph extracted by `Renard`. It is possible to manipulate this graph directly using python for advanced usage.
 
 # %%
 import networkx as nx
 
-print(nx.density(out.characters_graph))
+print(nx.density(out.character_network))
 
 # %% [markdown]
 # ## Graphi Export

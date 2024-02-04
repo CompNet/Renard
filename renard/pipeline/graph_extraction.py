@@ -158,7 +158,7 @@ class CoOccurrencesGraphExtractor(PipelineStep):
 
         :param characters:
 
-        :return: a ``dict`` with key ``'characters_graph'`` and a
+        :return: a ``dict`` with key ``'character_network'`` and a
             :class:`nx.Graph` or a list of :class:`nx.Graph` as
             value.
         """
@@ -170,7 +170,7 @@ class CoOccurrencesGraphExtractor(PipelineStep):
 
         if self.dynamic:
             return {
-                "characters_graph": self._extract_dynamic_graph(
+                "character_network": self._extract_dynamic_graph(
                     mentions,
                     self.dynamic_window,
                     self.dynamic_overlap,
@@ -180,7 +180,7 @@ class CoOccurrencesGraphExtractor(PipelineStep):
                 )
             }
         return {
-            "characters_graph": self._extract_graph(
+            "character_network": self._extract_graph(
                 mentions, sentences, sentences_polarities
             )
         }
@@ -419,7 +419,7 @@ class CoOccurrencesGraphExtractor(PipelineStep):
         return needs
 
     def production(self) -> Set[str]:
-        return {"characters_graph"}
+        return {"character_network"}
 
     def optional_needs(self) -> Set[str]:
         return {"sentences_polarities"}
@@ -475,20 +475,17 @@ class ConversationalGraphExtractor(PipelineStep):
         characters: Set[Character],
         **kwargs,
     ) -> Dict[str, Any]:
-
         G = nx.Graph()
         for character in characters:
             G.add_node(character)
 
         for i, (quote_1, speaker_1) in enumerate(zip(quotes, speakers)):
-
             # no speaker prediction: ignore
             if speaker_1 is None:
                 continue
 
             # check ahead for co-occurences
             for quote_2, speaker_2 in zip(quotes[i + 1 :], speakers[i + 1 :]):
-
                 # no speaker prediction: ignore
                 if speaker_2 is None:
                     continue
@@ -507,12 +504,12 @@ class ConversationalGraphExtractor(PipelineStep):
                     G.add_edge(speaker_1, speaker_2, weight=0)
                 G.edges[speaker_1, speaker_2]["weight"] += 1
 
-        return {"characters_graph": G}
+        return {"character_network": G}
 
     def needs(self) -> Set[str]:
         """sentences, quotes, speakers, characters"""
         return {"sentences", "quotes", "speakers", "characters"}
 
     def production(self) -> Set[str]:
-        """characters_graph"""
-        return {"characters_graph"}
+        """character_network"""
+        return {"character_network"}
