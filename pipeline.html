@@ -168,7 +168,7 @@ final value returned when running a pipeline with
 <a class="reference internal" href="reference.html#renard.pipeline.core.Pipeline.__call__" title="renard.pipeline.core.Pipeline.__call__"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Pipeline.__call__()</span></code></a>. As such, one can use it to do different
 things. For example, one can access the extracted character network as
 a networkx graph:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">out</span><span class="o">.</span><span class="n">characters_graph</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">out</span><span class="o">.</span><span class="n">character_network</span>
 <span class="go">&lt;networkx.classes.graph.Graph object at 0x7fd9e9115900&gt;</span>
 </pre></div>
 </div>
@@ -297,8 +297,8 @@ time. In Renard, such graphs are representend by a <code class="docutils literal
 </pre></div>
 </div>
 <p>When executing the above block of code, the output attribute
-<code class="docutils literal notranslate"><span class="pre">characters_graph</span></code> will be a list of networkx graphs:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">out</span><span class="o">.</span><span class="n">characters_graph</span>
+<code class="docutils literal notranslate"><span class="pre">character_network</span></code> will be a list of networkx graphs:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">out</span><span class="o">.</span><span class="n">character_network</span>
 <span class="go">[&lt;networkx.classes.graph.Graph object at 0x7fd9e9115900&gt;]</span>
 </pre></div>
 </div>
