@@ -89,7 +89,7 @@ final value returned when running a pipeline with
 things. For example, one can access the extracted character network as
 a networkx graph:
 
->>> out.characters_graph
+>>> out.character_network
 <networkx.classes.graph.Graph object at 0x7fd9e9115900>
 
 one can also access the output of each :class:`.PipelineStep`.
@@ -228,9 +228,9 @@ time. In Renard, such graphs are representend by a ``List`` of
 
 
 When executing the above block of code, the output attribute
-``characters_graph`` will be a list of networkx graphs:
+``character_network`` will be a list of networkx graphs:
 
->>> out.characters_graph
+>>> out.character_network
 [<networkx.classes.graph.Graph object at 0x7fd9e9115900>]
 
 Plot and export functions work as one would expect

@@ -16,7 +16,7 @@ from typing import (
     Type,
     TYPE_CHECKING,
 )
-import os
+import os, sys
 
 import networkx as nx
 from networkx.readwrite.gexf import GEXFWriter
@@ -171,8 +171,18 @@ class PipelineState:
     #: detected characters
     characters: Optional[List[Character]] = None
 
-    #: characters graph
-    characters_graph: Optional[Union[List[nx.Graph], nx.Graph]] = None
+    #: character network (or list of network in the case of a dynamic
+    #: network)
+    character_network: Optional[Union[List[nx.Graph], nx.Graph]] = None
+
+    def get_characters_graph(self) -> Optional[Union[List[nx.Graph], nx.Graph]]:
+        print(
+            "[warning] the characters_graph attribute is deprecated, use character_network instead",
+            file=sys.stderr,
+        )
+        return self.character_network
+
+    characters_graph = property(get_characters_graph)
 
     def get_character(
         self, name: str, partial_match: bool = True
@@ -228,8 +238,8 @@ class PipelineState:
             for more details
         """
         path = os.path.expanduser(path)
-        if isinstance(self.characters_graph, list):
-            G = dynamic_graph_to_gephi_graph(self.characters_graph)
+        if isinstance(self.character_network, list):
+            G = dynamic_graph_to_gephi_graph(self.character_network)
             G = graph_with_names(G, name_style)
             # HACK: networkx cannot set a dynamic "weight" attribute
             # in gexf since "weight" has a specific meaning in
@@ -251,7 +261,7 @@ class PipelineState:
                 attvalue.set("for", "weight")
             writer.write(path)
         else:
-            G = graph_with_names(self.characters_graph, name_style)
+            G = graph_with_names(self.character_network, name_style)
             nx.write_gexf(G, path)
 
     def plot_graphs_to_dir(
@@ -280,23 +290,23 @@ class PipelineState:
         """
         import matplotlib.pyplot as plt
 
-        assert not self.characters_graph is None
-        if isinstance(self.characters_graph, nx.Graph):
+        assert not self.character_network is None
+        if isinstance(self.character_network, nx.Graph):
             raise ValueError("this function is supposed to be used on a dynamic graph")
 
         directory = directory.rstrip("/")
         directory = os.path.expanduser(directory)
         os.makedirs(directory, exist_ok=True)
 
-        graphs = self.characters_graph
+        graphs = self.character_network
         if cumulative:
-            graphs = cumulative_graph(self.characters_graph)
+            graphs = cumulative_graph(self.character_network)
 
         if stable_layout:
             layout_graph = (
                 graphs[-1]
                 if cumulative
-                else cumulative_graph(self.characters_graph)[-1]
+                else cumulative_graph(self.character_network)[-1]
             )
             layout = layout_nx_graph_reasonably(layout_graph)
 
@@ -330,13 +340,13 @@ class PipelineState:
         """
         import matplotlib.pyplot as plt
 
-        assert not self.characters_graph is None
-        if isinstance(self.characters_graph, list):
+        assert not self.character_network is None
+        if isinstance(self.character_network, list):
             raise ValueError("this function is supposed to be used on a static graph")
 
         if not layout is None:
-            layout = layout_with_names(self.characters_graph, layout, name_style)
-        G = graph_with_names(self.characters_graph, name_style=name_style)
+            layout = layout_with_names(self.character_network, layout, name_style)
+        G = graph_with_names(self.character_network, name_style=name_style)
         if fig is None:
             # default values for a sufficiently sized graph
             fig = plt.gcf()
@@ -359,7 +369,7 @@ class PipelineState:
         stable_layout: bool = False,
         layout: Optional[CharactersGraphLayout] = None,
     ):
-        """Plot ``self.characters_graph`` using reasonable default
+        """Plot ``self.character_network`` using reasonable default
         parameters
 
         .. note::
@@ -372,13 +382,13 @@ class PipelineState:
             details
         :param fig: if specified, this matplotlib figure will be used
             for plotting
-        :param cumulative: if ``True`` and ``self.characters_graph``
+        :param cumulative: if ``True`` and ``self.character_network``
             is dynamic, plot a cumulative graph instead of a
             sequential one
-        :param graph_start_idx: When ``self.characters_graph`` is
+        :param graph_start_idx: When ``self.character_network`` is
             dynamic, index of the first graph to plot, starting at 1
             (not 0, since the graph slider starts at 1)
-        :param stable_layout: if ``self.characters_graph`` is dynamic
+        :param stable_layout: if ``self.character_network`` is dynamic
             and this parameter is ``True``, characters will keep the
             same position in space at each timestep.  Characters'
             positions are based on the final cumulative graph layout.
@@ -387,13 +397,13 @@ class PipelineState:
         import matplotlib.pyplot as plt
         from matplotlib.widgets import Slider
 
-        assert not self.characters_graph is None
+        assert not self.character_network is None
 
-        # self.characters_graph is a static graph
-        if isinstance(self.characters_graph, nx.Graph):
+        # self.character_network is a static graph
+        if isinstance(self.character_network, nx.Graph):
             if not layout is None:
-                layout = layout_with_names(self.characters_graph, layout, name_style)
-            G = graph_with_names(self.characters_graph, name_style)
+                layout = layout_with_names(self.character_network, layout, name_style)
+            G = graph_with_names(self.character_network, name_style)
             if fig is None:
                 # default value for a sufficiently sized graph
                 fig = plt.gcf()
@@ -404,9 +414,9 @@ class PipelineState:
             plot_nx_graph_reasonably(G, ax=ax, layout=layout)
             return
 
-        if not isinstance(self.characters_graph, list):
+        if not isinstance(self.character_network, list):
             raise TypeError
-        # self.characters_graph is a list: plot a dynamic graph
+        # self.character_network is a list: plot a dynamic graph
 
         if fig is None:
             fig, ax = plt.subplots()
@@ -417,18 +427,18 @@ class PipelineState:
             ax = fig.add_subplot(111)
         assert not fig is None
 
-        cumulative_characters_graphs = cumulative_graph(self.characters_graph)
+        cumulative_character_networks = cumulative_graph(self.character_network)
         if stable_layout:
-            layout = layout_nx_graph_reasonably(cumulative_characters_graphs[-1])
+            layout = layout_nx_graph_reasonably(cumulative_character_networks[-1])
 
         def update(slider_value):
-            assert isinstance(self.characters_graph, list)
+            assert isinstance(self.character_network, list)
 
-            characters_graphs = self.characters_graph
+            character_networks = self.character_network
             if cumulative:
-                characters_graphs = cumulative_characters_graphs
+                character_networks = cumulative_character_networks
 
-            G = characters_graphs[int(slider_value) - 1]
+            G = character_networks[int(slider_value) - 1]
 
             local_layout = layout
             if not local_layout is None:
@@ -447,8 +457,8 @@ class PipelineState:
             ax=slider_ax,
             label="Graph",
             valmin=1,
-            valmax=len(self.characters_graph),
-            valstep=[i + 1 for i in range(len(self.characters_graph))],
+            valmax=len(self.character_network),
+            valstep=[i + 1 for i in range(len(self.character_network))],
         )
         fig.slider.on_changed(update)  # type: ignore
         fig.slider.set_val(graph_start_idx)  # type: ignore

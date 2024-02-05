@@ -54,7 +54,7 @@ def test_basic_graph_extraction(tokens: List[str]):
         G.edges[A, B]["weight"] += 1
 
     assert nx.is_isomorphic(
-        out["characters_graph"],
+        out["character_network"],
         G,
         edge_match=isomorphism.numerical_edge_match("weight", 0),
     )
@@ -80,7 +80,7 @@ def test_dynamic_graph_extraction(tokens: List[str], dynamic_window: int):
     )
     out = graph_extractor(set(characters), [tokens])
 
-    assert len(out["characters_graph"]) > 0
+    assert len(out["character_network"]) > 0
 
 
 @given(lists(sampled_from(string.ascii_uppercase)))
@@ -99,8 +99,8 @@ def test_polarity_extraction(tokens: List[str]):
     )
 
     for character1, character2 in itertools.combinations(characters, 2):
-        if out["characters_graph"].has_edge(character1, character2):
-            assert "polarity" in out["characters_graph"].edges[character1, character2]
+        if out["character_network"].has_edge(character1, character2):
+            assert "polarity" in out["character_network"].edges[character1, character2]
 
 
 @given(lists(sampled_from(string.ascii_uppercase), min_size=1))
@@ -118,4 +118,4 @@ def test_sent_co_occurence_dist(sent1: List[str]):
 
     out = graph_extractor(set(characters), sentences)
 
-    assert len(out["characters_graph"]) > 0
+    assert len(out["character_network"]) > 0
