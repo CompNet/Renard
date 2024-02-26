@@ -113,6 +113,9 @@ class NERSamenounContextRetriever(NERContextRetriever):
     """
 
     def __init__(self, k: int) -> None:
+        """
+        :param k: the number of sentences to retrieve
+        """
         self.k = k
 
     def __call__(self, dataset: NERDataset) -> NERDataset:
