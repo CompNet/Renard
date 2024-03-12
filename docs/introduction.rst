@@ -17,5 +17,8 @@ characters. These networks have several possible applications:
 See LabatutAndBost2019_ for a more complete overview of character
 networks and their automated extraction.
 
+.. image:: pp.svg
+
 
 .. _LabatutAndBost2019: https://arxiv.org/abs/1907.02704
+

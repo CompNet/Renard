@@ -1,6 +1,8 @@
 # Renard
 
-Relationships Extraction from NARrative Documents
+Renard (Relationships Extraction from NARrative Documents) is a library for creating and using custom character networks extraction pipelines. Renard can extract dynamic as well as static character networks.
+
+![Character network extracted from "Pride and Prejudice"](./docs/pp.svg)
 
 
 # Installation
@@ -29,3 +31,8 @@ If you need local documentation, it can be generated using `Sphinx`. From the `d
 > poetry run python -m pytest tests
 
 Expensive tests are disabled by default. These can be run by setting the environment variable `RENARD_TEST_ALL` to `1`.
+
+
+# Contributing
+
+see [the "Contributing" section of the documentation](https://compnet.github.io/Renard/contributing.html).
