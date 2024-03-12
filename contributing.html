@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Introduction &mdash; Renard  documentation</title>
+  <title>Contributing &mdash; Renard  documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -18,8 +18,7 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Installation" href="installation.html" />
-    <link rel="prev" title="Welcome to Renard’s documentation!" href="index.html" /> 
+    <link rel="prev" title="Reference" href="reference.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -43,12 +42,15 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="pipeline.html">The Pipeline</a></li>
 <li class="toctree-l1"><a class="reference internal" href="extending.html">Extending Renard</a></li>
 <li class="toctree-l1"><a class="reference internal" href="reference.html">Reference</a></li>
-<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Contributing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#code-quality-guidelines">Code Quality Guidelines</a></li>
+</ul>
+</li>
 </ul>
 
         </div>
@@ -65,9 +67,9 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">Introduction</li>
+      <li class="breadcrumb-item active">Contributing</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="_sources/introduction.rst.txt" rel="nofollow"> View page source</a>
+            <a href="_sources/contributing.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -75,30 +77,46 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="introduction">
-<h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline"></a></h1>
-<p>Renard (Relationships Extraction from NARrative Documents) is a
-character networks extraction pipeline written in Python. Character
-networks are graphs where each node represent a character, and the
-edges between nodes represent the relationship between two
-characters. These networks have several possible applications:</p>
-<ul class="simple">
-<li><p>They allow intuitive visualisation of the relationships between
-characters in a story</p></li>
-<li><p>They can be used as an analysis tool</p></li>
-<li><p>They allow to encode the relationship between characters of a text
-in a single mathematical object</p></li>
-</ul>
-<p>See <a class="reference external" href="https://arxiv.org/abs/1907.02704">LabatutAndBost2019</a> for a more complete overview of character
-networks and their automated extraction.</p>
-<img alt="pp.svg" src="pp.svg" /></section>
+  <section id="contributing">
+<h1>Contributing<a class="headerlink" href="#contributing" title="Permalink to this headline"></a></h1>
+<p>Contributions to Renard are welcome! You are encouraged to open an
+issue if you encounter a problem or want to discuss a specific
+feature. If you want to contribute a patch:</p>
+<ol class="arabic simple">
+<li><p>Check that your code matches our code quality guidelines and that
+all existing tests are passing with <code class="docutils literal notranslate"><span class="pre">RENARD_TEST_ALL=1</span></code>.</p></li>
+<li><p>Create a Github pull request with your patch, explaining the
+rationale behind it and giving a high level overview of your
+code. Mention the relevant issue if applicable.</p></li>
+<li><p>We will discuss the contribution further and, hopefully, merge your
+contribution once the core maintainers are satisified.</p></li>
+</ol>
+<section id="code-quality-guidelines">
+<h2>Code Quality Guidelines<a class="headerlink" href="#code-quality-guidelines" title="Permalink to this headline"></a></h2>
+<p>The source code of Renard is entirely typed. If possible, all
+functions should be annotated with type information for arguments and
+return types.</p>
+<p>You should write docstrings for non-trivial functions and classes,
+using the Spinx docstring format. Do not forget to add your
+function/class/module to the <code class="docutils literal notranslate"><span class="pre">docs/reference.rst</span></code> file for it to
+show up in the online documentation. If necessary, you can add new
+documents to the documentation or complete existing ones.</p>
+<p>Format all of your code using <code class="docutils literal notranslate"><span class="pre">black</span></code>, so that the style stay
+consistent in the repository.</p>
+<p>When relevant, it’s better to write tests for your code. Tests live in
+the <code class="docutils literal notranslate"><span class="pre">tests</span></code> directory. We use <code class="docutils literal notranslate"><span class="pre">pytest</span></code> to test code, and also use
+<code class="docutils literal notranslate"><span class="pre">hypothesis</span></code> when applicable. If you open a patch, make sure that
+all tests are passing. In particular, do not rely on the CI, as it
+does not run time costly tests! Check for yourself locally, using
+<code class="docutils literal notranslate"><span class="pre">RENARD_TEST_ALL=1</span> <span class="pre">python</span> <span class="pre">-m</span> <span class="pre">pytest</span> <span class="pre">tests</span></code></p>
+</section>
+</section>
 
 
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="index.html" class="btn btn-neutral float-left" title="Welcome to Renard’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="installation.html" class="btn btn-neutral float-right" title="Installation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="reference.html" class="btn btn-neutral float-left" title="Reference" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 
   <hr/>

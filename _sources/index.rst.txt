@@ -10,6 +10,7 @@ Welcome to Renard's documentation!
    pipeline
    extending
    reference
+   contributing
 
 
 Indices and tables
