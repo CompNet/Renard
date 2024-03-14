@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "renard-pipeline"
-version = "0.3.1"
+version = "0.4.0"
 description = "Relationships Extraction from NARrative Documents"
 authors = ["Arthur Amalvy <arthur.amalvy@univ-avignon.fr>"]
 license = "GPL-3.0-only"
@@ -28,7 +28,7 @@ matplotlib = "^3.5.3"
 seqeval = "1.2.2"
 pandas = "^2.0.0"
 pytest = "^7.2.1"
-tibert = "^0.2.4"
+tibert = "^0.3.0"
 grimbert = "^0.1.0"
 datasets = "^2.16.1"
 
