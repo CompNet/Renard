@@ -50,6 +50,13 @@ class Mention:
         self_dict["end_idx"] = self.end_idx + shift
         return self.__class__(**self_dict)
 
+    def __eq__(self, other: Mention) -> bool:
+        return (
+            self.tokens == other.tokens
+            and self.start_idx == other.start_idx
+            and self.end_idx == other.end_idx
+        )
+
     def __hash__(self) -> int:
         return hash(tuple(self.tokens) + (self.start_idx, self.end_idx))
 
