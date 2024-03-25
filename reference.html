@@ -1267,14 +1267,14 @@ model</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="renard.pipeline.corefs.BertCoreferenceResolver._pipeline_init_">
-<span class="sig-name descname"><span class="pre">_pipeline_init_</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lang</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress_reporter</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.corefs.BertCoreferenceResolver._pipeline_init_" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">_pipeline_init_</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lang</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.corefs.BertCoreferenceResolver._pipeline_init_" title="Permalink to this definition"></a></dt>
 <dd><p>Set the step configuration that is common to the whole
 pipeline.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>lang</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – the lang of the whole pipeline</p></li>
-<li><p><strong>progress_reporter</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ProgressReporter</span></code>) – </p></li>
+<li><p><strong>progress_reporter</strong> – </p></li>
 <li><p><strong>kwargs</strong> – additional pipeline parameters.</p></li>
 </ul>
 </dd>
@@ -1740,6 +1740,27 @@ character for it to be valid</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="renard.pipeline.character_unification.NaiveCharacterUnifier._pipeline_init_">
+<span class="sig-name descname"><span class="pre">_pipeline_init_</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lang</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">character_ner_tag</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.character_unification.NaiveCharacterUnifier._pipeline_init_" title="Permalink to this definition"></a></dt>
+<dd><p>Set the step configuration that is common to the whole
+pipeline.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lang</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – the lang of the whole pipeline</p></li>
+<li><p><strong>progress_reporter</strong> – </p></li>
+<li><p><strong>kwargs</strong> – additional pipeline parameters.</p></li>
+<li><p><strong>character_ner_tag</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>a step can return a dictionary of pipeline params if
+it wish to modify some of these.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="renard.pipeline.character_unification.NaiveCharacterUnifier.needs">
 <span class="sig-name descname"><span class="pre">needs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.character_unification.NaiveCharacterUnifier.needs" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
@@ -1865,7 +1886,7 @@ alias.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="renard.pipeline.character_unification.GraphRulesCharacterUnifier._pipeline_init_">
-<span class="sig-name descname"><span class="pre">_pipeline_init_</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lang</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.character_unification.GraphRulesCharacterUnifier._pipeline_init_" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">_pipeline_init_</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lang</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">character_ner_tag</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.character_unification.GraphRulesCharacterUnifier._pipeline_init_" title="Permalink to this definition"></a></dt>
 <dd><p>Set the step configuration that is common to the whole
 pipeline.</p>
 <dl class="field-list simple">
@@ -1874,6 +1895,7 @@ pipeline.</p>
 <li><p><strong>lang</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – the lang of the whole pipeline</p></li>
 <li><p><strong>progress_reporter</strong> – </p></li>
 <li><p><strong>kwargs</strong> – additional pipeline parameters.</p></li>
+<li><p><strong>character_ner_tag</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
