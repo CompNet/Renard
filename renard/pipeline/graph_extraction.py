@@ -52,8 +52,8 @@ def sent_indices_for_blocks(
 
 def mentions_for_blocks(
     dynamic_blocks: List[List[str]],
-    mentions: List[Tuple[Character, NEREntity]],
-) -> List[List[Tuple[Character, NEREntity]]]:
+    mentions: List[Tuple[Any, NEREntity]],
+) -> List[List[Tuple[Any, NEREntity]]]:
     """Return each block mentions
 
     :param blocks:
@@ -92,6 +92,7 @@ class CoOccurrencesGraphExtractor(PipelineStep):
         co_occurences_dist: Optional[
             Union[int, Tuple[int, Literal["tokens", "sentences"]]]
         ] = None,
+        additional_ner_classes: Optional[List[str]] = None,
     ) -> None:
         """
         :param co_occurrences_dist: max accepted distance between two
@@ -113,10 +114,10 @@ class CoOccurrencesGraphExtractor(PipelineStep):
                   that case, ``dynamic_window`` and
                   ``dynamic_overlap``*can* be specified.  If
                   ``dynamic_window`` is not specified, this step is
-                  expecting the text to be cut into 'dynamic blocks', and a
-                  graph will be extracted for each block.  In that
-                  case, ``dynamic_blocks`` must be passed to the pipeline as
-                  a ``List[str]`` at runtime.
+                  expecting the text to be cut into 'dynamic blocks',
+                  and a graph will be extracted for each block.  In
+                  that case, ``dynamic_blocks`` must be passed to the
+                  pipeline as a ``List[str]`` at runtime.
 
         :param dynamic_window: dynamic window, in number of
             interactions.  a dynamic window of `n` means that each
@@ -127,6 +128,11 @@ class CoOccurrencesGraphExtractor(PipelineStep):
         :param co_occurences_dist: same as ``co_occurrences_dist``.
             Included because of retro-compatibility, as it was a
             previously included typo.
+
+        :param additional_ner_classes: if specified, will include
+            entities other than characters in the final graph.  No
+            attempt will be made at unfying the entities (for example,
+            "New York" will be distinct from "New York City").
         """
         # typo retrocompatibility
         if not co_occurences_dist is None:
@@ -146,6 +152,9 @@ class CoOccurrencesGraphExtractor(PipelineStep):
         self.dynamic_window = dynamic_window
         self.dynamic_overlap = dynamic_overlap
         self.need_dynamic_blocks = dynamic == "nx" and dynamic_window is None
+
+        self.additional_ner_classes = additional_ner_classes or []
+
         super().__init__()
 
     def __call__(
@@ -154,6 +163,7 @@ class CoOccurrencesGraphExtractor(PipelineStep):
         sentences: List[List[str]],
         dynamic_blocks_tokens: Optional[List[List[str]]] = None,
         sentences_polarities: Optional[List[float]] = None,
+        entities: Optional[List[NEREntity]] = None,
         **kwargs,
     ) -> Dict[str, Any]:
         """Extract a characters graph
@@ -168,6 +178,13 @@ class CoOccurrencesGraphExtractor(PipelineStep):
         for character in characters:
             for mention in character.mentions:
                 mentions.append((character, mention))
+
+        if len(self.additional_ner_classes) > 0:
+            assert not entities is None
+            for entity in entities:
+                if entity.tag in self.additional_ner_classes:
+                    mentions.append((" ".join(entity.tokens), entity))
+
         mentions = sorted(mentions, key=lambda cm: cm[1].start_idx)
 
         if self.dynamic:
@@ -204,6 +221,7 @@ class CoOccurrencesGraphExtractor(PipelineStep):
         :param sentences:
         :return: a boolean indicating wether the two mentions are co-occuring
         """
+        assert not self.co_occurrences_dist is None
         if self.co_occurrences_dist[1] == "tokens":
             return (
                 abs(mention_2.start_idx - mention_1.start_idx)
@@ -221,13 +239,14 @@ class CoOccurrencesGraphExtractor(PipelineStep):
 
     def _extract_graph(
         self,
-        mentions: List[Tuple[Character, NEREntity]],
+        mentions: List[Tuple[Any, NEREntity]],
         sentences: List[List[str]],
         sentences_polarities: Optional[List[float]],
     ):
         """
-        :param mentions: A list of character mentions, ordered by
-            appearance
+        :param mentions: A list of entity mentions, ordered by
+            appearance, each of the form (KEY MENTION).  KEY
+            determines the unicity of the entity.
         :param sentences: if specified, ``sentences_polarities`` must
             be specified as well.
         :param sentences_polarities: if specified, ``sentences`` must
@@ -293,7 +312,7 @@ class CoOccurrencesGraphExtractor(PipelineStep):
 
     def _extract_dynamic_graph(
         self,
-        mentions: List[Tuple[Character, NEREntity]],
+        mentions: List[Tuple[Any, NEREntity]],
         window: Optional[int],
         overlap: int,
         dynamic_blocks_tokens: Optional[List[List[str]]],
@@ -305,7 +324,9 @@ class CoOccurrencesGraphExtractor(PipelineStep):
 
             only one of ``window`` or ``dynamic_blocks_tokens`` should be specified
 
-        :param mentions: A list of character mentions, ordered by appearance
+        :param mentions: A list of entity mentions, ordered by
+            appearance, each of the form (KEY MENTION).  KEY
+            determines the unicity of the entity.
         :param window: dynamic window, in tokens.
         :param overlap: window overlap
         :param dynamic_blocks_tokens: list of tokens for each block.  If
@@ -418,6 +439,8 @@ class CoOccurrencesGraphExtractor(PipelineStep):
         needs = {"characters", "sentences"}
         if self.need_dynamic_blocks:
             needs.add("dynamic_blocks_tokens")
+        if len(self.additional_ner_classes) > 0:
+            needs.add("entities")
         return needs
 
     def production(self) -> Set[str]:
