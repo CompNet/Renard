@@ -70,10 +70,17 @@ def graph_with_names(
     else:
         name_style_fn = name_style
 
-    return nx.relabel_nodes(
-        G,
-        {character: name_style_fn(character) for character in G.nodes()},  # type: ignore
-    )
+    mapping = {}
+    for character in G.nodes():
+        # NOTE: it is *possible* to have a graph where nodes are not
+        # characters (for example, simple strings). Therefore, we are
+        # lenient here
+        try:
+            mapping[character] = name_style_fn(character)
+        except AttributeError:
+            mapping[character] = character
+
+    return nx.relabel_nodes(G, mapping)
 
 
 def layout_with_names(
