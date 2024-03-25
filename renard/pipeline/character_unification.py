@@ -98,7 +98,12 @@ class NaiveCharacterUnifier(PipelineStep):
             character for it to be valid
         """
         self.min_appearances = min_appearances
+        # a default value, will be est by _pipeline_init_
+        self.character_ner_tag = "PER"
         super().__init__()
+
+    def _pipeline_init_(self, lang: str, character_ner_tag: str, **kwargs):
+        self.character_ner_tag = character_ner_tag
 
     def __call__(
         self,
@@ -112,7 +117,7 @@ class NaiveCharacterUnifier(PipelineStep):
         :param tokens:
         :param entities:
         """
-        persons = [e for e in entities if e.tag == "PER"]
+        persons = [e for e in entities if e.tag == self.character_ner_tag]
 
         characters = defaultdict(list)
         for entity in persons:
@@ -177,14 +182,17 @@ class GraphRulesCharacterUnifier(PipelineStep):
         self.min_appearances = min_appearances
         self.additional_hypocorisms = additional_hypocorisms
         self.link_corefs_mentions = link_corefs_mentions
+        self.character_ner_tag = "PER"  # a default value, will be set by _pipeline_init
 
         super().__init__()
 
-    def _pipeline_init_(self, lang: str, **kwargs):
+    def _pipeline_init_(self, lang: str, character_ner_tag: str, **kwargs):
         self.hypocorism_gazetteer = HypocorismGazetteer(lang=lang)
         if not self.additional_hypocorisms is None:
             for name, nicknames in self.additional_hypocorisms:
                 self.hypocorism_gazetteer._add_hypocorism_(name, nicknames)
+
+        self.character_ner_tag = character_ner_tag
 
         return super()._pipeline_init_(lang, **kwargs)
 
@@ -196,7 +204,7 @@ class GraphRulesCharacterUnifier(PipelineStep):
     ) -> Dict[str, Any]:
         import networkx as nx
 
-        mentions = [m for m in entities if m.tag == "PER"]
+        mentions = [m for m in entities if m.tag == self.character_ner_tag]
         mentions_str = [" ".join(m.tokens) for m in mentions]
 
         # * create a graph where each node is a mention detected by NER
