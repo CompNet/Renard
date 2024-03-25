@@ -49,13 +49,12 @@ class BertSpeakerDetector(PipelineStep):
 
         super().__init__()
 
-    def _pipeline_init_(self, lang: str, progress_reporter: ProgressReporter):
+    def _pipeline_init_(self, lang: str, **kwargs):
         from transformers import AutoTokenizer
 
-        super()._pipeline_init_(lang, progress_reporter)
+        super()._pipeline_init_(lang, **kwargs)
 
         if self.model is None:
-
             # the user supplied a huggingface ID: load model from the HUB
             if not self.huggingface_model_id is None:
                 self.model = SpeakerAttributionModel.from_pretrained(

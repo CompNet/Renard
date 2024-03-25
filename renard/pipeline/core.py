@@ -79,11 +79,18 @@ class PipelineStep:
         """Initialize the :class:`PipelineStep` with a given configuration."""
         pass
 
-    def _pipeline_init_(self, lang: str, progress_reporter: ProgressReporter):
-        """Set the step configuration that is common to the whole pipeline.
+    def _pipeline_init_(
+        self, lang: str, progress_reporter: ProgressReporter, **kwargs
+    ) -> Optional[Dict[Pipeline.PipelineParameter, Any]]:
+        """Set the step configuration that is common to the whole
+        pipeline.
 
-        :param lang: ISO 639-3 language string
-        :param progress_report:
+        :param lang: the lang of the whole pipeline
+        :param progress_reporter:
+        :param kwargs: additional pipeline parameters.
+
+        :return: a step can return a dictionary of pipeline params if
+                 it wish to modify some of these.
         """
         supported_langs = self.supported_langs()
         if not supported_langs == "any" and not lang in supported_langs:
@@ -475,6 +482,10 @@ class PipelineState:
 class Pipeline:
     """A flexible NLP pipeline"""
 
+    #: all the possible parameters of the whole pipeline, that are
+    #: shared between steps
+    PipelineParameter = Literal["lang", "progress_reporter", "character_ner_tag"]
+
     def __init__(
         self,
         steps: List[PipelineStep],
@@ -497,17 +508,26 @@ class Pipeline:
         self.progress_reporter = get_progress_reporter(progress_report)
 
         self.lang = lang
+        self.character_ner_tag = "PER"
         self.warn = warn
 
-    def _pipeline_init_steps(self, ignored_steps: Optional[List[str]] = None):
-        """
+    def _pipeline_init_steps_(self, ignored_steps: Optional[List[str]] = None):
+        """Initialise steps with global pipeline parameters.
+
         :param ignored_steps: a list of steps production.  All steps
             with a production in ``ignored_steps`` will be ignored.
         """
         steps_progress_reporter = get_progress_reporter(self.progress_report)
         steps = self._non_ignored_steps(ignored_steps)
+        pipeline_params = {}
         for step in steps:
-            step._pipeline_init_(self.lang, steps_progress_reporter)
+            step_additional_params = step._pipeline_init_(
+                self.lang, progress_reporter=steps_progress_reporter, **pipeline_params
+            )
+            if not step_additional_params is None:
+                for key, value in step_additional_params.items():
+                    setattr(self, key, value)
+                    pipeline_params[key] = value
 
     def _non_ignored_steps(
         self, ignored_steps: Optional[List[str]]
@@ -585,7 +605,7 @@ class Pipeline:
             for warning in warnings_or_errors:
                 print(f"[warning] : {warning}")
 
-        self._pipeline_init_steps(ignored_steps)
+        self._pipeline_init_steps_(ignored_steps)
 
         state = PipelineState(text)
         # sets attributes to PipelineState dynamically. This ensures
