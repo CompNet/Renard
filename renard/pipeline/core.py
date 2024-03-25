@@ -519,11 +519,12 @@ class Pipeline:
         """
         steps_progress_reporter = get_progress_reporter(self.progress_report)
         steps = self._non_ignored_steps(ignored_steps)
-        pipeline_params = {}
+        pipeline_params = {
+            "progress_reporter": steps_progress_reporter,
+            "character_ner_tag": self.character_ner_tag,
+        }
         for step in steps:
-            step_additional_params = step._pipeline_init_(
-                self.lang, progress_reporter=steps_progress_reporter, **pipeline_params
-            )
+            step_additional_params = step._pipeline_init_(self.lang, **pipeline_params)
             if not step_additional_params is None:
                 for key, value in step_additional_params.items():
                     setattr(self, key, value)

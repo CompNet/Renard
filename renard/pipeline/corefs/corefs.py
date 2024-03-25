@@ -61,7 +61,7 @@ class BertCoreferenceResolver(PipelineStep):
 
         super().__init__()
 
-    def _pipeline_init_(self, lang: str, progress_reporter: ProgressReporter):
+    def _pipeline_init_(self, lang: str, **kwargs):
         from tibert import BertForCoreferenceResolution
         from transformers import BertTokenizerFast, AutoTokenizer
 
@@ -86,7 +86,7 @@ class BertCoreferenceResolver(PipelineStep):
 
         assert not self.tokenizer is None
 
-        super()._pipeline_init_(lang, progress_reporter)
+        super()._pipeline_init_(lang, **kwargs)
 
     def __call__(self, tokens: List[str], **kwargs) -> Dict[str, Any]:
         from tibert import stream_predict_coref
