@@ -19,61 +19,63 @@ def sent_index_for_token_index(token_index: int, sentences: List[List[str]]) -> 
     return next((i for i, l in enumerate(sents_len) if l > token_index))
 
 
-def sent_indices_for_chapter(
-    chapters: List[List[str]], chapter_idx: int, sentences: List[List[str]]
+def sent_indices_for_blocks(
+    dynamic_blocks: List[List[str]], block_idx: int, sentences: List[List[str]]
 ) -> Tuple[int, int]:
     """Return the indices of the first and the last sentence of a
-    chapter
+    block
 
-    :param chapters: all chapters
-    :param chapter_idx: index of the chapter for which sentence
+    :param dynamic_blocks: all blocks
+    :param block_idx: index of the block for which sentence
         indices are returned
     :param sentences: all sentences
     :return: ``(first sentence index, last sentence index)``
     """
-    chapter_start_idx = sum([len(c) for i, c in enumerate(chapters) if i < chapter_idx])
-    chapter_end_idx = chapter_start_idx + len(chapters[chapter_idx])
+    block_start_idx = sum(
+        [len(c) for i, c in enumerate(dynamic_blocks) if i < block_idx]
+    )
+    block_end_idx = block_start_idx + len(dynamic_blocks[block_idx])
     sents_start_idx = None
     sents_end_idx = None
     count = 0
     for sent_i, sent in enumerate(sentences):
         start_idx, end_idx = (count, count + len(sent))
         count = end_idx
-        if sents_start_idx is None and start_idx >= chapter_start_idx:
+        if sents_start_idx is None and start_idx >= block_start_idx:
             sents_start_idx = sent_i
-        if sents_end_idx is None and end_idx >= chapter_end_idx:
+        if sents_end_idx is None and end_idx >= block_end_idx:
             sents_end_idx = sent_i
             break
     assert not sents_start_idx is None and not sents_end_idx is None
     return (sents_start_idx, sents_end_idx)
 
 
-def mentions_for_chapters(
-    chapters: List[List[str]],
+def mentions_for_blocks(
+    dynamic_blocks: List[List[str]],
     mentions: List[Tuple[Character, NEREntity]],
 ) -> List[List[Tuple[Character, NEREntity]]]:
-    """Return each chapter mentions
+    """Return each block mentions
 
-    :param chapters:
+    :param blocks:
     :param mentions:
 
-    :return: a list of mentions per chapters.  This list has len
-             ``len(chapters)``.
+    :return: a list of mentions per blocks.  This list has len
+             ``len(blocks)``.
     """
-    chapters_mentions = [[] for _ in range(len(chapters))]
+    blocks_mentions = [[] for _ in range(len(dynamic_blocks))]
 
     start_indices = list(
-        itertools.accumulate([0] + [len(chapter) for chapter in chapters[:-1]])
+        itertools.accumulate([0] + [len(block) for block in dynamic_blocks[:-1]])
     )
-    end_indices = start_indices[1:] + [start_indices[-1] + len(chapters[-1])]
+    end_indices = start_indices[1:] + [start_indices[-1] + len(dynamic_blocks[-1])]
 
     for mention in mentions:
-        for chapter_i, (start_i, end_i) in enumerate(zip(start_indices, end_indices)):
+        for block_i, (start_i, end_i) in enumerate(zip(start_indices, end_indices)):
             if mention[1].start_idx >= start_i and mention[1].end_idx < end_i:
-                chapters_mentions[chapter_i].append(mention)
+                blocks_mentions[block_i].append(mention)
                 break
 
-    return chapters_mentions
+    return blocks_mentions
 
 
 class CoOccurrencesGraphExtractor(PipelineStep):
@@ -111,9 +113,9 @@ class CoOccurrencesGraphExtractor(PipelineStep):
                   that case, ``dynamic_window`` and
                   ``dynamic_overlap``*can* be specified.  If
                   ``dynamic_window`` is not specified, this step is
-                  expecting the text to be cut into chapters', and a
-                  graph will be extracted for each 'chapter'.  In that
-                  case, ``chapters`` must be passed to the pipeline as
+                  expecting the text to be cut into 'dynamic blocks', and a
+                  graph will be extracted for each block.  In that
+                  case, ``dynamic_blocks`` must be passed to the pipeline as
                   a ``List[str]`` at runtime.
 
         :param dynamic_window: dynamic window, in number of
@@ -143,14 +145,14 @@ class CoOccurrencesGraphExtractor(PipelineStep):
         self.dynamic = dynamic
         self.dynamic_window = dynamic_window
         self.dynamic_overlap = dynamic_overlap
-        self.dynamic_needs_chapter = dynamic == "nx" and dynamic_window is None
+        self.need_dynamic_blocks = dynamic == "nx" and dynamic_window is None
         super().__init__()
 
     def __call__(
         self,
         characters: Set[Character],
         sentences: List[List[str]],
-        chapter_tokens: Optional[List[List[str]]] = None,
+        dynamic_blocks_tokens: Optional[List[List[str]]] = None,
         sentences_polarities: Optional[List[float]] = None,
         **kwargs,
     ) -> Dict[str, Any]:
@@ -174,7 +176,7 @@ class CoOccurrencesGraphExtractor(PipelineStep):
                     mentions,
                     self.dynamic_window,
                     self.dynamic_overlap,
-                    chapter_tokens,
+                    dynamic_blocks_tokens,
                     sentences,
                     sentences_polarities,
                 )
@@ -294,22 +296,22 @@ class CoOccurrencesGraphExtractor(PipelineStep):
         mentions: List[Tuple[Character, NEREntity]],
         window: Optional[int],
         overlap: int,
-        chapter_tokens: Optional[List[List[str]]],
+        dynamic_blocks_tokens: Optional[List[List[str]]],
         sentences: List[List[str]],
         sentences_polarities: Optional[List[float]],
     ) -> List[nx.Graph]:
         """
         .. note::
 
-            only one of ``window`` or ``chapter_tokens`` should be specified
+            only one of ``window`` or ``dynamic_blocks_tokens`` should be specified
 
         :param mentions: A list of character mentions, ordered by appearance
         :param window: dynamic window, in tokens.
         :param overlap: window overlap
-        :param chapter_tokens: list of tokens for each chapter.  If
-            given, one graph will be extracted per chapter.
+        :param dynamic_blocks_tokens: list of tokens for each block.  If
+            given, one graph will be extracted per block.
         """
-        assert window is None or chapter_tokens is None
+        assert window is None or dynamic_blocks_tokens is None
         compute_polarity = not sentences is None and not sentences_polarities is None
 
         if not window is None:
@@ -322,39 +324,39 @@ class CoOccurrencesGraphExtractor(PipelineStep):
                 for ct in windowed(mentions, window, step=window - overlap)
             ]
 
-        assert not chapter_tokens is None
+        assert not dynamic_blocks_tokens is None
 
         graphs = []
 
-        chapters_mentions = mentions_for_chapters(chapter_tokens, mentions)
-        for chapter_i, (_, chapter_mentions) in enumerate(
-            zip(chapter_tokens, chapters_mentions)
+        blocks_mentions = mentions_for_blocks(dynamic_blocks_tokens, mentions)
+        for block_i, (_, block_mentions) in enumerate(
+            zip(dynamic_blocks_tokens, blocks_mentions)
         ):
-            chapter_start_idx = sum(
-                [len(c) for i, c in enumerate(chapter_tokens) if i < chapter_i]
+            block_start_idx = sum(
+                [len(c) for i, c in enumerate(dynamic_blocks_tokens) if i < block_i]
             )
-            # make mentions coordinates chapter local
-            chapter_mentions = [
-                (c, m.shifted(-chapter_start_idx)) for c, m in chapter_mentions
+            # make mentions coordinates block local
+            block_mentions = [
+                (c, m.shifted(-block_start_idx)) for c, m in block_mentions
             ]
 
-            sent_start_idx, sent_end_idx = sent_indices_for_chapter(
-                chapter_tokens, chapter_i, sentences
+            sent_start_idx, sent_end_idx = sent_indices_for_blocks(
+                dynamic_blocks_tokens, block_i, sentences
             )
-            chapter_sentences = sentences[sent_start_idx : sent_end_idx + 1]
+            block_sentences = sentences[sent_start_idx : sent_end_idx + 1]
 
-            chapter_sentences_polarities = None
+            block_sentences_polarities = None
             if compute_polarity:
                 assert not sentences_polarities is None
-                chapter_sentences_polarities = sentences_polarities[
+                block_sentences_polarities = sentences_polarities[
                     sent_start_idx : sent_end_idx + 1
                 ]
 
             graphs.append(
                 self._extract_graph(
-                    chapter_mentions,
-                    chapter_sentences,
-                    chapter_sentences_polarities,
+                    block_mentions,
+                    block_sentences,
+                    block_sentences_polarities,
                 )
             )
 
@@ -414,8 +416,8 @@ class CoOccurrencesGraphExtractor(PipelineStep):
 
     def needs(self) -> Set[str]:
         needs = {"characters", "sentences"}
-        if self.dynamic_needs_chapter:
-            needs.add("chapter_tokens")
+        if self.need_dynamic_blocks:
+            needs.add("dynamic_blocks_tokens")
         return needs
 
     def production(self) -> Set[str]:
