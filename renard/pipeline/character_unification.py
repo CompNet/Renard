@@ -185,13 +185,13 @@ class GraphRulesCharacterUnifier(PipelineStep):
 
         super().__init__()
 
-    def _pipeline_init_(self, lang: str, progress_reporter: ProgressReporter):
+    def _pipeline_init_(self, lang: str, **kwargs):
         self.hypocorism_gazetteer = HypocorismGazetteer(lang=lang)
         if not self.additional_hypocorisms is None:
             for name, nicknames in self.additional_hypocorisms:
                 self.hypocorism_gazetteer._add_hypocorism_(name, nicknames)
 
-        return super()._pipeline_init_(lang, progress_reporter)
+        return super()._pipeline_init_(lang, **kwargs)
 
     def __call__(
         self,

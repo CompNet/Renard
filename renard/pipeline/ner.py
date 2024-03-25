@@ -16,6 +16,7 @@ from renard.ner_utils import ner_entities
 if TYPE_CHECKING:
     from transformers.tokenization_utils_base import BatchEncoding
     from transformers import PreTrainedModel, PreTrainedTokenizerFast
+    from renard.pipeline.core import Pipeline
 
 
 @dataclass
@@ -214,10 +215,10 @@ class BertNamedEntityRecognizer(PipelineStep):
 
         super().__init__()
 
-    def _pipeline_init_(self, lang: str, progress_reporter: ProgressReporter):
+    def _pipeline_init_(self, lang: str, **kwargs):
         from transformers import AutoModelForTokenClassification, AutoTokenizer  # type: ignore
 
-        super()._pipeline_init_(lang, progress_reporter)
+        super()._pipeline_init_(lang, **kwargs)
 
         # init model if needed (this happens if the user did not pass
         # the instance of a model)
