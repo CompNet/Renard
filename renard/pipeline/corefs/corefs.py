@@ -66,7 +66,6 @@ class BertCoreferenceResolver(PipelineStep):
         from transformers import BertTokenizerFast, AutoTokenizer
 
         if self.model is None:
-
             # the user supplied a huggingface ID: load model from the HUB
             if not self.hugginface_model_id is None:
                 self.model = BertForCoreferenceResolution.from_pretrained(
@@ -239,19 +238,19 @@ class SpacyCorefereeCoreferenceResolver(PipelineStep):
         self,
         text: str,
         tokens: List[str],
-        chapter_tokens: Optional[List[List[str]]] = None,
+        dynamic_blocks_tokens: Optional[List[List[str]]] = None,
         **kwargs,
     ) -> Dict[str, Any]:
         from spacy.tokens import Doc
         from coreferee.manager import CorefereeBroker
 
-        if chapter_tokens is None:
-            chapter_tokens = [tokens]
+        if dynamic_blocks_tokens is None:
+            dynamic_blocks_tokens = [tokens]
 
-        if len(chapter_tokens) > 1:
+        if len(dynamic_blocks_tokens) > 1:
             chunks = []
-            for chapter in chapter_tokens:
-                chunks += self._cut_into_chunks(chapter)
+            for block in dynamic_blocks_tokens:
+                chunks += self._cut_into_chunks(block)
         else:
             chunks = self._cut_into_chunks(tokens)
 
@@ -317,7 +316,7 @@ class SpacyCorefereeCoreferenceResolver(PipelineStep):
         return {"tokens"}
 
     def optional_needs(self) -> Set[str]:
-        return {"chapter_tokens"}
+        return {"dynamic_blocks_tokens"}
 
     def production(self) -> Set[str]:
         return {"corefs"}

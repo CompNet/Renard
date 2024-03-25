@@ -17,19 +17,19 @@ class NLTKTokenizer(PipelineStep):
         super().__init__()
 
     def __call__(
-        self, text: str, chapters: Optional[List[str]] = None, **kwargs
+        self, text: str, dynamic_blocks: Optional[List[str]] = None, **kwargs
     ) -> Dict[str, Any]:
         """
         :param text:
         """
-        if not chapters is None:
-            out_dicts = [self.__call__(chapter, None) for chapter in chapters]
+        if not dynamic_blocks is None:
+            out_dicts = [self.__call__(block, None) for block in dynamic_blocks]
             return {
                 "tokens": list(itertools.chain(*[d["tokens"] for d in out_dicts])),
                 "sentences": list(
                     itertools.chain(*[d["sentences"] for d in out_dicts])
                 ),
-                "chapter_tokens": [d["tokens"] for d in out_dicts],
+                "dynamic_blocks_tokens": [d["tokens"] for d in out_dicts],
             }
 
         sentences = nltk.sent_tokenize(
@@ -52,4 +52,4 @@ class NLTKTokenizer(PipelineStep):
         return {"text"}
 
     def production(self) -> Set[str]:
-        return {"tokens", "chapter_tokens", "sentences"}
+        return {"tokens", "dynamic_blocks_tokens", "sentences"}
