@@ -242,48 +242,6 @@ graph to a directory. Meanwhile,
 dynamic graph to the Gephi format.
 
 
-Custom Segmentation
--------------------
-
-The ``dynamic_window`` parameter of
-:class:`.CoOccurencesGraphExtractor` determines the segmentation of
-the dynamic networks, in number of interactions. In the example above,
-a new graph will be created for each 20 interactions.
-
-While one can rely on the arguments of the graph extractor of the
-pipeline to determine the dynamic window, Renard allows to specify a
-custom segmentation of a text with the ``dynamic_blocks``
-argument. When running a pipeline, you can cut your text however you
-want and pass this argument instead of the usual text:
-
-
-.. code-block:: python
-
-   from renard.pipeline import Pipeline
-   from renard.pipeline.tokenization import NLTKTokenizer
-   from renard.pipeline.ner import NLTKNamedEntityRecognizer
-   from renard.pipeline.character_unification import GraphRulesCharacterUnifier
-   from renard.pipeline.graph_extraction import CoOccurrencesGraphExtractor
-
-   with open("./my_doc.txt") as f:
-       text = f.read()
-
-   # let's suppose the 'cut_into_chapters' function cut the text into chapters
-   chapters = cut_into_chapters(text)
-
-   pipeline = Pipeline(
-       [
-           NLTKTokenizer(),
-           NLTKNamedEntityRecognizer(),
-           GraphRulesCharacterUnifier(min_appearances=10),
-           CoOccurrencesGraphExtractor(co_occurrences_dist=25, dynamic=True)
-       ]
-   )
-
-   out = pipeline(dynamic_blocks=chapters)
-
-
-
 Multilingual Support
 ====================
 
