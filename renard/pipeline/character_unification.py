@@ -61,6 +61,8 @@ def _assign_coreference_mentions(
     # we assign each chain to the character with highest name
     # occurence in it
     for chain in corefs:
+        if len(char_mentions) == 0:
+            break
         # determine the characters with the highest number of
         # occurences
         occ_counter = {}
