@@ -8,18 +8,18 @@ tags:
 authors:
   - name: Arthur Amalvy
     orcid: 0000-0003-4629-0923
-	affiliation: 1
+    affiliation: 1
   - name: Vincent Labatut
-	orcid: 0000-0002-2619-2835
-	affiliation: 1
+    orcid: 0000-0002-2619-2835
+    affiliation: 1
   - name: Richard Dufour
-	orcid: 0000-0003-1203-9108
-	affiliation: 2
+    orcid: 0000-0003-1203-9108
+    affiliation: 2
 affiliations:
   - name: Laboratoire Informatique d'Avignon, France
-	index: 1
+    index: 1
   - name: Laboratoire des Sciences du Numérique de Nantes, France
-	index: 2
+    index: 2
 date: 29 February 2024
 bibliography: paper.bib
 ---
