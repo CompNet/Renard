@@ -40,7 +40,7 @@ Renard is a fully configurable pipeline that can extract static and dynamic netw
 
 # Design and Main Features
 
-Renard is centered about the concept of *pipeline*. In Renard, a pipeline is a series of sequential *steps* that are run one after the other in order to extract a character network from a text. When using Renard, the user simply *describes* this pipeline in Python by specifying this series of steps, and can apply it to different texts afterwards. The following code block examplifies that philosophy:
+Renard is centered about the concept of *pipeline*. In Renard, a pipeline is a series of sequential *steps* that are run one after the other in order to extract a character network from a text. When using Renard, the user simply *describes* this pipeline in Python by specifying this series of steps, and can apply it to different texts afterwards. The following code block exemplifies that philosophy:
 
 ```python
 from renard.pipeline import Pipeline
@@ -64,7 +64,7 @@ pipeline = Pipeline(
 out = pipeline(text)
 ```
 
-![Co-occurrence character network of Jane Austen's "Pride and Prejudice", extracted automatically using Renard. Vertex size and color denote degree, while edge thickness and color denote the number of co-occurrences between two character.](./pp.pdf){#fig:pp_network height=30% }
+![Co-occurrence character network of Jane Austen's "Pride and Prejudice", extracted automatically using Renard. Vertex size and color denote degree, while edge thickness and color denote the number of co-occurrences between two characters.](./pp.pdf){#fig:pp_network height=30% }
 
 As an example, Figure \ref{fig:pp_network} shows the co-occurrence character network Jane Austen's 1813 novel "Pride and Prejudice", extracted using the Renard pipeline above. Renard uses the NetworkX Python library [@hagberg-2008-networkx] to manipulate graphs, ensuring compatibility with a wide array of tools and formats.
 
