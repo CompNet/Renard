@@ -38,6 +38,9 @@ Renard is a fully configurable pipeline that can extract static and dynamic netw
 2. The pipeline can easily incorporate new advances in NLP, by simply implementing a new step when necessary.
 3. One can study the impact of the performance of each step on the quality of the extracted networks.
 
+We intend for Renard to be used by digital humanity researchers as well as NLP researchers and practitioners. The former category of users can use Renard to quickly extract character networks for literary analysis. Meanwhile, the latter can use Renard to easily represent textual content using networks, which can be used as inputs for downstream NLP tasks (classification, recommendation...). 
+
+
 # Design and Main Features
 
 Renard is centered about the concept of *pipeline*. In Renard, a pipeline is a series of sequential *steps* that are run one after the other in order to extract a character network from a text. When using Renard, the user simply *describes* this pipeline in Python by specifying this series of steps, and can apply it to different texts afterwards. The following code block exemplifies that philosophy:
