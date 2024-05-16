@@ -1,11 +1,10 @@
-import itertools
 from typing import Dict, Any, List, Set, Optional, Tuple, Literal, Union
+import itertools as it
 import operator
-from itertools import accumulate
 
 import networkx as nx
 import numpy as np
-from more_itertools import windowed
+from more_itertools import windowed, flatten
 
 from renard.pipeline.ner import NEREntity
 from renard.pipeline.core import PipelineStep
@@ -15,12 +14,12 @@ from renard.pipeline.quote_detection import Quote
 
 def sent_index_for_token_index(token_index: int, sentences: List[List[str]]) -> int:
     """Compute the index of the sentence of the token at ``token_index``"""
-    sents_len = accumulate([len(s) for s in sentences], operator.add)
+    sents_len = it.accumulate([len(s) for s in sentences], operator.add)
     return next((i for i, l in enumerate(sents_len) if l > token_index))
 
 
-def sent_indices_for_blocks(
-    dynamic_blocks: List[List[str]], block_idx: int, sentences: List[List[str]]
+def sent_indices_for_block(
+    dynamic_blocks: List[List[str]], block_i: int, sentences: List[List[str]]
 ) -> Tuple[int, int]:
     """Return the indices of the first and the last sentence of a
     block
@@ -31,23 +30,21 @@ def sent_indices_for_blocks(
     :param sentences: all sentences
     :return: ``(first sentence index, last sentence index)``
     """
-    block_start_idx = sum(
-        [len(c) for i, c in enumerate(dynamic_blocks) if i < block_idx]
-    )
-    block_end_idx = block_start_idx + len(dynamic_blocks[block_idx])
-    sents_start_idx = None
-    sents_end_idx = None
+    block_start = sum([len(c) for i, c in enumerate(dynamic_blocks) if i < block_i])
+    block_end = block_start + len(dynamic_blocks[block_i])
+    sents_start = None
+    sents_end = None
     count = 0
     for sent_i, sent in enumerate(sentences):
-        start_idx, end_idx = (count, count + len(sent))
-        count = end_idx
-        if sents_start_idx is None and start_idx >= block_start_idx:
-            sents_start_idx = sent_i
-        if sents_end_idx is None and end_idx >= block_end_idx:
-            sents_end_idx = sent_i
+        start, end = (count, count + len(sent))
+        count = end
+        if sents_start is None and start >= block_start:
+            sents_start = sent_i
+        if sents_end is None and end >= block_end:
+            sents_end = sent_i
             break
-    assert not sents_start_idx is None and not sents_end_idx is None
-    return (sents_start_idx, sents_end_idx)
+    assert not sents_start is None and not sents_end is None
+    return (sents_start, sents_end)
 
 
 def mentions_for_blocks(
@@ -65,7 +62,7 @@ def mentions_for_blocks(
     blocks_mentions = [[] for _ in range(len(dynamic_blocks))]
 
     start_indices = list(
-        itertools.accumulate([0] + [len(block) for block in dynamic_blocks[:-1]])
+        it.accumulate([0] + [len(block) for block in dynamic_blocks[:-1]])
     )
     end_indices = start_indices[1:] + [start_indices[-1] + len(dynamic_blocks[-1])]
 
@@ -85,13 +82,10 @@ class CoOccurrencesGraphExtractor(PipelineStep):
         self,
         co_occurrences_dist: Optional[
             Union[int, Tuple[int, Literal["tokens", "sentences"]]]
-        ],
+        ] = None,
         dynamic: bool = False,
         dynamic_window: Optional[int] = None,
         dynamic_overlap: int = 0,
-        co_occurences_dist: Optional[
-            Union[int, Tuple[int, Literal["tokens", "sentences"]]]
-        ] = None,
         additional_ner_classes: Optional[List[str]] = None,
     ) -> None:
         """
@@ -125,21 +119,11 @@ class CoOccurrencesGraphExtractor(PipelineStep):
 
         :param dynamic_overlap: overlap, in number of interactions.
 
-        :param co_occurences_dist: same as ``co_occurrences_dist``.
-            Included because of retro-compatibility, as it was a
-            previously included typo.
-
         :param additional_ner_classes: if specified, will include
             entities other than characters in the final graph.  No
-            attempt will be made at unfying the entities (for example,
+            attempt will be made at unifying the entities (for example,
             "New York" will be distinct from "New York City").
         """
-        # typo retrocompatibility
-        if not co_occurences_dist is None:
-            co_occurrences_dist = co_occurences_dist
-        if co_occurrences_dist is None and co_occurences_dist is None:
-            raise ValueError()
-
         if isinstance(co_occurrences_dist, int):
             co_occurrences_dist = (co_occurrences_dist, "tokens")
         self.co_occurrences_dist = co_occurrences_dist
@@ -164,15 +148,19 @@ class CoOccurrencesGraphExtractor(PipelineStep):
         dynamic_blocks_tokens: Optional[List[List[str]]] = None,
         sentences_polarities: Optional[List[float]] = None,
         entities: Optional[List[NEREntity]] = None,
+        co_occurrences_blocks: Optional[List[Tuple[int, int]]] = None,
         **kwargs,
     ) -> Dict[str, Any]:
         """Extract a characters graph
 
-        :param characters:
+        :param co_occurrences_blocks: a list of tuple, each of the
+            form (BLOCK_START_INDEX, BLOCK_END_INDEX).  custom blocks
+            where co-occurrences should be recorded.  For example,
+            this can be used to perform chapter level co-occurrences.
 
         :return: a ``dict`` with key ``'character_network'`` and a
-            :class:`nx.Graph` or a list of :class:`nx.Graph` as
-            value.
+                 :class:`nx.Graph` or a list of :class:`nx.Graph` as
+                 value.
         """
         mentions = []
         for character in characters:
@@ -196,52 +184,69 @@ class CoOccurrencesGraphExtractor(PipelineStep):
                     dynamic_blocks_tokens,
                     sentences,
                     sentences_polarities,
+                    co_occurrences_blocks,
                 )
             }
         return {
             "character_network": self._extract_graph(
-                mentions, sentences, sentences_polarities
+                mentions, sentences, sentences_polarities, co_occurrences_blocks
             )
         }
 
-    def _mentions_interact(
-        self,
-        mention_1: NEREntity,
-        mention_2: NEREntity,
-        sentences: Optional[List[List[str]]] = None,
-    ) -> bool:
-        """Check if two mentions are close enough to be in interactions.
+    def _create_co_occurrences_blocks(
+        self, sentences: List[List[str]], mentions: List[Tuple[Any, NEREntity]]
+    ) -> List[Tuple[int, int]]:
+        """Create co-occurrences blocks using
+        ``self.co_occurrences_dist``.  All entities within a block are
+        considered as co-occurring.
 
-        .. note::
-
-            the attribute ``self.co_occurrences_dist`` is used to know wether mentions are in co_occurences
-
-        :param mention_1:
-        :param mention_2:
         :param sentences:
-        :return: a boolean indicating wether the two mentions are co-occuring
         """
         assert not self.co_occurrences_dist is None
-        if self.co_occurrences_dist[1] == "tokens":
-            return (
-                abs(mention_2.start_idx - mention_1.start_idx)
-                <= self.co_occurrences_dist[0]
-            )
-        elif self.co_occurrences_dist[1] == "sentences":
-            assert not sentences is None
-            mention_1_sent = sent_index_for_token_index(mention_1.start_idx, sentences)
-            mention_2_sent = sent_index_for_token_index(
-                mention_2.end_idx - 1, sentences
-            )
-            return abs(mention_2_sent - mention_1_sent) <= self.co_occurrences_dist[0]
+
+        dist_unit = self.co_occurrences_dist[1]
+
+        if dist_unit == "tokens":
+            tokens_dist = self.co_occurrences_dist[0]
+            blocks = []
+            for _, entity in mentions:
+                block_start = entity.start_idx - tokens_dist
+                block_end = entity.end_idx + tokens_dist
+                blocks.append((block_start, block_end))
+            return blocks
+
+        elif dist_unit == "sentences":
+            blocks_indices = set()
+            sent_dist = self.co_occurrences_dist[0]
+            for _, entity in mentions:
+                start_sent_i = max(
+                    0,
+                    sent_index_for_token_index(entity.start_idx, sentences) - sent_dist,
+                )
+                start_token_i = sum(len(sent) for sent in sentences[:start_sent_i])
+                end_sent_i = min(
+                    len(sentences) - 1,
+                    sent_index_for_token_index(entity.end_idx - 1, sentences)
+                    + sent_dist,
+                )
+                end_token_i = sum(len(sent) for sent in sentences[: end_sent_i + 1])
+                blocks_indices.add((start_token_i, end_token_i))
+            return [
+                (start, end)
+                for start, end in sorted(blocks_indices, key=lambda indices: indices[0])
+            ]
+
         else:
-            raise NotImplementedError
+            raise ValueError(
+                f"co_occurrences_dist unit should be one of: 'tokens', 'sentences'"
+            )
 
     def _extract_graph(
         self,
         mentions: List[Tuple[Any, NEREntity]],
         sentences: List[List[str]],
         sentences_polarities: Optional[List[float]],
+        co_occurrences_blocks: Optional[List[Tuple[int, int]]],
     ):
         """
         :param mentions: A list of entity mentions, ordered by
@@ -257,23 +262,32 @@ class CoOccurrencesGraphExtractor(PipelineStep):
             sentence polarity between those two mentions.
         """
         compute_polarity = not sentences_polarities is None
+        if co_occurrences_blocks is None:
+            co_occurrences_blocks = self._create_co_occurrences_blocks(
+                sentences, mentions
+            )
 
         # co-occurence matrix, where C[i][j] is 1 when appearance
         # i co-occur with j if i < j, or 0 when it doesn't
         C = np.zeros((len(mentions), len(mentions)))
-        for i, (char1, mention_1) in enumerate(mentions):
-            # check ahead for co-occurences
-            for j, (char2, mention_2) in enumerate(mentions[i + 1 :]):
-                if not self._mentions_interact(mention_1, mention_2, sentences):
-                    # dist between current token and future token is
-                    # too great : we finished co-occurences search for
-                    # the current token
+        for block_start, block_end in co_occurrences_blocks:
+            # collect all mentions in this co-occurrences block
+            block_mentions = []
+            for i, (key, mention) in enumerate(mentions):
+                if mention.start_idx >= block_start and mention.end_idx <= block_end:
+                    block_mentions.append((i, key, mention))
+                # since mentions are ordered, the first mention
+                # outside of the blocks ends the search inside this block
+                if mention.start_idx > block_end:
                     break
-                # ignore co-occurences with self
-                if char1 == char2:
+            # assign mentions in this co-occurrences blocks to C
+            for m1, m2 in it.combinations(block_mentions, 2):
+                i1, key1, mention1 = m1
+                i2, key2, mention2 = m2
+                # ignore co-occurrence with self
+                if key1 == key2:
                     continue
-                # record co_occurence
-                C[i][i + 1 + j] = 1
+                C[i1][i2] = 1
 
         # * Construct graph from co-occurence matrix
         G = nx.Graph()
@@ -318,6 +332,7 @@ class CoOccurrencesGraphExtractor(PipelineStep):
         dynamic_blocks_tokens: Optional[List[List[str]]],
         sentences: List[List[str]],
         sentences_polarities: Optional[List[float]],
+        co_occurrences_blocks: Optional[List[Tuple[int, int]]],
     ) -> List[nx.Graph]:
         """
         .. note::
@@ -331,6 +346,7 @@ class CoOccurrencesGraphExtractor(PipelineStep):
         :param overlap: window overlap
         :param dynamic_blocks_tokens: list of tokens for each block.  If
             given, one graph will be extracted per block.
+        :param co_occurrences_blocks:
         """
         assert window is None or dynamic_blocks_tokens is None
         compute_polarity = not sentences is None and not sentences_polarities is None
@@ -341,6 +357,7 @@ class CoOccurrencesGraphExtractor(PipelineStep):
                     [elt for elt in ct if not elt is None],
                     sentences,
                     sentences_polarities,
+                    co_occurrences_blocks,
                 )
                 for ct in windowed(mentions, window, step=window - overlap)
             ]
@@ -350,18 +367,17 @@ class CoOccurrencesGraphExtractor(PipelineStep):
         graphs = []
 
         blocks_mentions = mentions_for_blocks(dynamic_blocks_tokens, mentions)
-        for block_i, (_, block_mentions) in enumerate(
+        for block_i, (block_tokens, block_mentions) in enumerate(
             zip(dynamic_blocks_tokens, blocks_mentions)
         ):
-            block_start_idx = sum(
+            block_start = sum(
                 [len(c) for i, c in enumerate(dynamic_blocks_tokens) if i < block_i]
             )
+            block_end = block_start + len(block_tokens)
             # make mentions coordinates block local
-            block_mentions = [
-                (c, m.shifted(-block_start_idx)) for c, m in block_mentions
-            ]
+            block_mentions = [(c, m.shifted(-block_start)) for c, m in block_mentions]
 
-            sent_start_idx, sent_end_idx = sent_indices_for_blocks(
+            sent_start_idx, sent_end_idx = sent_indices_for_block(
                 dynamic_blocks_tokens, block_i, sentences
             )
             block_sentences = sentences[sent_start_idx : sent_end_idx + 1]
@@ -373,64 +389,25 @@ class CoOccurrencesGraphExtractor(PipelineStep):
                     sent_start_idx : sent_end_idx + 1
                 ]
 
+            if co_occurrences_blocks is None:
+                block_co_occurrences_blocks = None
+            else:
+                block_co_occurrences_blocks = [
+                    (start, end)
+                    for start, end in co_occurrences_blocks
+                    if start >= block_start and end <= block_end
+                ]
+
             graphs.append(
                 self._extract_graph(
                     block_mentions,
                     block_sentences,
                     block_sentences_polarities,
+                    block_co_occurrences_blocks,
                 )
             )
 
         return graphs
-
-    def _extract_gephi_dynamic_graph(
-        self, mentions: List[Tuple[Character, NEREntity]], sentences: List[List[str]]
-    ) -> nx.Graph:
-        """
-        :param mentions: A list of character mentions, ordered by appearance
-        :param sentences:
-        """
-        # keep only longest name in graph node : possible only if it is unique
-        # TODO: might want to try and get shorter names if longest names aren't
-        #       unique
-        characters = set([e[0] for e in mentions])
-
-        G = nx.Graph()
-
-        character_to_last_appearance: Dict[Character, Optional[NEREntity]] = {
-            character: None for character in characters
-        }
-
-        for i, (character, mention) in enumerate(mentions):
-            if not character in characters:
-                continue
-            character_to_last_appearance[character] = mention
-            close_characters = [
-                c
-                for c, last_appearance in character_to_last_appearance.items()
-                if not last_appearance is None
-                and self._mentions_interact(mention, last_appearance, sentences)
-                and not c == character
-            ]
-            for close_character in close_characters:
-                if not G.has_edge(character, close_character):
-                    G.add_edge(character, close_character)
-                    G.edges[character, close_character]["start"] = i
-                    G.edges[character, close_character]["dweight"] = []
-                # add a new entry to the weight series according to networkx
-                # source code, each entry must be of the form
-                # [value, start, end]
-                weights = G.edges[character, close_character]["dweight"]
-                if len(weights) != 0:
-                    # end of last weight attribute
-                    weights[-1][-1] = i
-                # value, start and end of current weight attribute
-                last_weight_value = weights[-1][0] if len(weights) > 0 else 0
-                G.edges[character, close_character]["dweight"].append(
-                    [float(last_weight_value) + 1, i, len(mentions)]
-                )
-
-        return G
 
     def supported_langs(self) -> Union[Set[str], Literal["any"]]:
         return "any"
@@ -441,6 +418,8 @@ class CoOccurrencesGraphExtractor(PipelineStep):
             needs.add("dynamic_blocks_tokens")
         if len(self.additional_ner_classes) > 0:
             needs.add("entities")
+        if self.co_occurrences_dist is None:
+            needs.add("co_occurrences_blocks")
         return needs
 
     def production(self) -> Set[str]:
