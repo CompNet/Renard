@@ -55,7 +55,7 @@ def test_nltk_pipeline_runs():
     pipeline = nltk_pipeline(
         warn=False,
         progress_report=None,
-        graph_extractor_kwargs={"co_occurences_dist": (1, "sentences")},
+        graph_extractor_kwargs={"co_occurrences_dist": (1, "sentences")},
     )
     pipeline(text)
 
@@ -67,7 +67,7 @@ def test_bert_pipeline_runs():
     pipeline = bert_pipeline(
         warn=False,
         progress_report=None,
-        graph_extractor_kwargs={"co_occurences_dist": (1, "sentences")},
+        graph_extractor_kwargs={"co_occurrences_dist": (1, "sentences")},
     )
     pipeline(text)
 
