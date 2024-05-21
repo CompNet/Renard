@@ -264,6 +264,7 @@ want and pass this argument instead of the usual text:
    from renard.pipeline.ner import NLTKNamedEntityRecognizer
    from renard.pipeline.character_unification import GraphRulesCharacterUnifier
    from renard.pipeline.graph_extraction import CoOccurrencesGraphExtractor
+   from renard.utils import blocks_indices
 
    with open("./my_doc.txt") as f:
        text = f.read()
@@ -280,7 +281,7 @@ want and pass this argument instead of the usual text:
        ]
    )
 
-   out = pipeline(dynamic_blocks=chapters)
+   out = pipeline(dynamic_blocks=block_indices(chapters))
 
 
 

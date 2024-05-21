@@ -4,12 +4,21 @@ import operator
 
 import networkx as nx
 import numpy as np
-from more_itertools import windowed, flatten
+from more_itertools import windowed
 
 from renard.pipeline.ner import NEREntity
 from renard.pipeline.core import PipelineStep
 from renard.pipeline.character_unification import Character
 from renard.pipeline.quote_detection import Quote
+
+
+def char_blocks_to_token_blocks(
+    char_blocks: List[Tuple[int, int]], char2token: List[int]
+) -> List[Tuple[int, int]]:
+    tokens_blocks = []
+    for char_block_start, char_block_end in char_blocks:
+        tokens_blocks.append((char2token[char_block_start], char2token[char_block_end]))
+    return tokens_blocks
 
 
 def sent_index_for_token_index(token_index: int, sentences: List[List[str]]) -> int:
@@ -19,19 +28,15 @@ def sent_index_for_token_index(token_index: int, sentences: List[List[str]]) -> 
 
 
 def sent_indices_for_block(
-    dynamic_blocks: List[List[str]], block_i: int, sentences: List[List[str]]
+    dynamic_block: Tuple[int, int], sentences: List[List[str]]
 ) -> Tuple[int, int]:
     """Return the indices of the first and the last sentence of a
     block
 
-    :param dynamic_blocks: all blocks
-    :param block_idx: index of the block for which sentence
-        indices are returned
-    :param sentences: all sentences
+    :param dynamic_block: (START, END) in tokens
     :return: ``(first sentence index, last sentence index)``
     """
-    block_start = sum([len(c) for i, c in enumerate(dynamic_blocks) if i < block_i])
-    block_end = block_start + len(dynamic_blocks[block_i])
+    block_start, block_end = dynamic_block
     sents_start = None
     sents_end = None
     count = 0
@@ -41,6 +46,11 @@ def sent_indices_for_block(
         if sents_start is None and start >= block_start:
             sents_start = sent_i
         if sents_end is None and end >= block_end:
+            # this happens when the block is _smaller_ than the
+            # current sentence. In that case, we return the current
+            # sentence even though it overflows the block.
+            if sents_start is None:
+                sents_start = sent_i
             sents_end = sent_i
             break
     assert not sents_start is None and not sents_end is None
@@ -48,7 +58,7 @@ def sent_indices_for_block(
 
 
 def mentions_for_blocks(
-    dynamic_blocks: List[List[str]],
+    dynamic_blocks: List[Tuple[int, int]],
     mentions: List[Tuple[Any, NEREntity]],
 ) -> List[List[Tuple[Any, NEREntity]]]:
     """Return each block mentions
@@ -61,13 +71,8 @@ def mentions_for_blocks(
     """
     blocks_mentions = [[] for _ in range(len(dynamic_blocks))]
 
-    start_indices = list(
-        it.accumulate([0] + [len(block) for block in dynamic_blocks[:-1]])
-    )
-    end_indices = start_indices[1:] + [start_indices[-1] + len(dynamic_blocks[-1])]
-
     for mention in mentions:
-        for block_i, (start_i, end_i) in enumerate(zip(start_indices, end_indices)):
+        for block_i, (start_i, end_i) in enumerate(dynamic_blocks):
             if mention[1].start_idx >= start_i and mention[1].end_idx < end_i:
                 blocks_mentions[block_i].append(mention)
                 break
@@ -127,6 +132,7 @@ class CoOccurrencesGraphExtractor(PipelineStep):
         if isinstance(co_occurrences_dist, int):
             co_occurrences_dist = (co_occurrences_dist, "tokens")
         self.co_occurrences_dist = co_occurrences_dist
+        self.need_co_occurrences_blocks = co_occurrences_dist is None
 
         if dynamic:
             if not dynamic_window is None:
@@ -135,7 +141,7 @@ class CoOccurrencesGraphExtractor(PipelineStep):
         self.dynamic = dynamic
         self.dynamic_window = dynamic_window
         self.dynamic_overlap = dynamic_overlap
-        self.need_dynamic_blocks = dynamic == "nx" and dynamic_window is None
+        self.need_dynamic_blocks = dynamic and dynamic_window is None
 
         self.additional_ner_classes = additional_ner_classes or []
 
@@ -145,7 +151,8 @@ class CoOccurrencesGraphExtractor(PipelineStep):
         self,
         characters: Set[Character],
         sentences: List[List[str]],
-        dynamic_blocks_tokens: Optional[List[List[str]]] = None,
+        char2token: Optional[List[int]] = None,
+        dynamic_blocks: Optional[List[Tuple[int, int]]] = None,
         sentences_polarities: Optional[List[float]] = None,
         entities: Optional[List[NEREntity]] = None,
         co_occurrences_blocks: Optional[List[Tuple[int, int]]] = None,
@@ -154,9 +161,10 @@ class CoOccurrencesGraphExtractor(PipelineStep):
         """Extract a characters graph
 
         :param co_occurrences_blocks: a list of tuple, each of the
-            form (BLOCK_START_INDEX, BLOCK_END_INDEX).  custom blocks
-            where co-occurrences should be recorded.  For example,
-            this can be used to perform chapter level co-occurrences.
+            form (BLOCK_START_INDEX, BLOCK_END_INDEX), in characters.
+            custom blocks where co-occurrences should be recorded.
+            For example, this can be used to perform chapter level
+            co-occurrences.
 
         :return: a ``dict`` with key ``'character_network'`` and a
                  :class:`nx.Graph` or a list of :class:`nx.Graph` as
@@ -175,13 +183,23 @@ class CoOccurrencesGraphExtractor(PipelineStep):
 
         mentions = sorted(mentions, key=lambda cm: cm[1].start_idx)
 
+        # convert from char blocks to token blocks
+        if not dynamic_blocks is None:
+            assert not char2token is None
+            dynamic_blocks = char_blocks_to_token_blocks(dynamic_blocks, char2token)
+        if not co_occurrences_blocks is None:
+            assert not char2token is None
+            co_occurrences_blocks = char_blocks_to_token_blocks(
+                co_occurrences_blocks, char2token
+            )
+
         if self.dynamic:
             return {
                 "character_network": self._extract_dynamic_graph(
                     mentions,
                     self.dynamic_window,
                     self.dynamic_overlap,
-                    dynamic_blocks_tokens,
+                    dynamic_blocks,
                     sentences,
                     sentences_polarities,
                     co_occurrences_blocks,
@@ -247,7 +265,7 @@ class CoOccurrencesGraphExtractor(PipelineStep):
         sentences: List[List[str]],
         sentences_polarities: Optional[List[float]],
         co_occurrences_blocks: Optional[List[Tuple[int, int]]],
-    ):
+    ) -> nx.Graph:
         """
         :param mentions: A list of entity mentions, ordered by
             appearance, each of the form (KEY MENTION).  KEY
@@ -329,7 +347,7 @@ class CoOccurrencesGraphExtractor(PipelineStep):
         mentions: List[Tuple[Any, NEREntity]],
         window: Optional[int],
         overlap: int,
-        dynamic_blocks_tokens: Optional[List[List[str]]],
+        dynamic_blocks: Optional[List[Tuple[int, int]]],
         sentences: List[List[str]],
         sentences_polarities: Optional[List[float]],
         co_occurrences_blocks: Optional[List[Tuple[int, int]]],
@@ -344,11 +362,12 @@ class CoOccurrencesGraphExtractor(PipelineStep):
             determines the unicity of the entity.
         :param window: dynamic window, in tokens.
         :param overlap: window overlap
-        :param dynamic_blocks_tokens: list of tokens for each block.  If
-            given, one graph will be extracted per block.
-        :param co_occurrences_blocks:
+        :param dynamic_blocks: boundaries of each dynamic block, in
+            characters.
+        :param co_occurrences_blocks: boundaries of each
+            co-occurrences blocks, in characters
         """
-        assert window is None or dynamic_blocks_tokens is None
+        assert window is None or dynamic_blocks is None
         compute_polarity = not sentences is None and not sentences_polarities is None
 
         if not window is None:
@@ -362,31 +381,24 @@ class CoOccurrencesGraphExtractor(PipelineStep):
                 for ct in windowed(mentions, window, step=window - overlap)
             ]
 
-        assert not dynamic_blocks_tokens is None
+        assert not dynamic_blocks is None
 
         graphs = []
 
-        blocks_mentions = mentions_for_blocks(dynamic_blocks_tokens, mentions)
-        for block_i, (block_tokens, block_mentions) in enumerate(
-            zip(dynamic_blocks_tokens, blocks_mentions)
+        blocks_mentions = mentions_for_blocks(dynamic_blocks, mentions)
+        for block_i, (dynamic_block, block_mentions) in enumerate(
+            zip(dynamic_blocks, blocks_mentions)
         ):
-            block_start = sum(
-                [len(c) for i, c in enumerate(dynamic_blocks_tokens) if i < block_i]
-            )
-            block_end = block_start + len(block_tokens)
-            # make mentions coordinates block local
-            block_mentions = [(c, m.shifted(-block_start)) for c, m in block_mentions]
+            block_start, block_end = dynamic_block
 
-            sent_start_idx, sent_end_idx = sent_indices_for_block(
-                dynamic_blocks_tokens, block_i, sentences
-            )
-            block_sentences = sentences[sent_start_idx : sent_end_idx + 1]
+            sent_start, sent_end = sent_indices_for_block(dynamic_block, sentences)
+            block_sentences = sentences[sent_start : sent_end + 1]
 
             block_sentences_polarities = None
             if compute_polarity:
                 assert not sentences_polarities is None
                 block_sentences_polarities = sentences_polarities[
-                    sent_start_idx : sent_end_idx + 1
+                    sent_start : sent_end + 1
                 ]
 
             if co_occurrences_blocks is None:
@@ -414,12 +426,17 @@ class CoOccurrencesGraphExtractor(PipelineStep):
 
     def needs(self) -> Set[str]:
         needs = {"characters", "sentences"}
+
         if self.need_dynamic_blocks:
-            needs.add("dynamic_blocks_tokens")
+            needs.add("dynamic_blocks")
+            needs.add("char2token")
+        if self.need_co_occurrences_blocks:
+            needs.add("co_occurrences_blocks")
+            needs.add("char2token")
+
         if len(self.additional_ner_classes) > 0:
             needs.add("entities")
-        if self.co_occurrences_dist is None:
-            needs.add("co_occurrences_blocks")
+
         return needs
 
     def production(self) -> Set[str]:
