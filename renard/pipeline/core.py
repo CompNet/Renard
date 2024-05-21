@@ -157,14 +157,14 @@ class PipelineState:
     #: input text
     text: Optional[str]
 
-    #: text split into blocks of texts. When blocks are given, the
-    #: final network is dynamic, and split according to blocks.
-    dynamic_blocks: Optional[List[str]] = None
+    #: text split into blocks of texts. When dynamic blocks are given,
+    #: the final network is dynamic, and split according to blocks.
+    dynamic_blocks: Optional[List[Tuple[int, int]]] = None
 
     #: text splitted in tokens
     tokens: Optional[List[str]] = None
-    #: text splitted in tokens, by dynamic blocks
-    dynamic_blocks_tokens: Optional[List[List[str]]] = None
+    #: mapping from a character to its corresponding token
+    char2token: Optional[List[int]] = None
     #: text splitted into sentences, each sentence being a list of
     #: tokens
     sentences: Optional[List[List[str]]] = None
