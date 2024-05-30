@@ -111,7 +111,7 @@ document. Here is a simple example:</p>
     <span class="p">[</span>
         <span class="n">NLTKTokenizer</span><span class="p">(),</span>
         <span class="n">NLTKNamedEntityRecognizer</span><span class="p">(),</span>
-        <span class="n">GraphRulesCharacterUnifier</span><span class="p">(</span><span class="n">min_appearances</span><span class="o">=</span><span class="mi">10</span><span class="p">),</span>
+        <span class="n">GraphRulesCharacterUnifier</span><span class="p">(</span><span class="n">min_appearance</span><span class="o">=</span><span class="mi">10</span><span class="p">),</span>
         <span class="n">CoOccurrencesGraphExtractor</span><span class="p">(</span><span class="n">co_occurrences_dist</span><span class="o">=</span><span class="mi">25</span><span class="p">)</span>
     <span class="p">]</span>
 <span class="p">)</span>
@@ -140,19 +140,13 @@ to compute them yourself:</p>
 <span class="n">pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span>
     <span class="p">[</span>
         <span class="n">NLTKNamedEntityRecognizer</span><span class="p">(),</span>
-        <span class="n">GraphRulesCharacterUnifier</span><span class="p">(</span><span class="n">min_appearances</span><span class="o">=</span><span class="mi">10</span><span class="p">),</span>
+        <span class="n">NaiveCharactersExtractor</span><span class="p">(</span><span class="n">min_appearance</span><span class="o">=</span><span class="mi">10</span><span class="p">),</span>
         <span class="n">CoOccurrencesGraphExtractor</span><span class="p">(</span><span class="n">co_occurrences_dist</span><span class="o">=</span><span class="mi">25</span><span class="p">)</span>
     <span class="p">]</span>
 <span class="p">)</span>
 
 <span class="c1"># tokens are passed at call time</span>
 <span class="n">out</span> <span class="o">=</span> <span class="n">pipeline</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">tokens</span><span class="o">=</span><span class="n">my_tokenization_function</span><span class="p">(</span><span class="n">text</span><span class="p">))</span>
-</pre></div>
-</div>
-<p>In that case, the <code class="docutils literal notranslate"><span class="pre">tokens</span></code> requirements is fulfilled at run time. If
-you don’t pass the parameter, Renard will throw the following
-exception:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="ne">ValueError</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;step 1 (NLTKNamedEntityRecognizer) has unsatisfied needs (needs : {&#39;tokens&#39;}, available : {&#39;text&#39;})&quot;</span><span class="p">]</span>
 </pre></div>
 </div>
 <p>For simplicity, one can use one of the preconfigured pipelines:</p>
