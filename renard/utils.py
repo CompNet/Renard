@@ -76,3 +76,14 @@ def search_pattern(seq: Iterable[R], pattern: List[R]) -> List[int]:
         if list(subseq) == pattern:
             start_indices.append(subseq_i)
     return start_indices
+
+
+def block_indices(blocks: List[str]) -> List[Tuple[int, int]]:
+    """Return the boundaries of a series of blocks."""
+    indices = []
+    start = 0
+    for block in blocks:
+        end = start + len(block)
+        indices.append((start, end))
+        start = end
+    return indices
