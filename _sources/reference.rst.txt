@@ -184,3 +184,10 @@ Plot utils
 
 .. automodule:: renard.plot_utils
    :members:
+
+
+NER utils
+---------
+
+.. automodule:: renard.ner_utils
+   :members:

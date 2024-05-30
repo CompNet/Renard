@@ -1,0 +1,1757 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   contentScriptType="text/ecmascript"
+   width="1275.0"
+   zoomAndPan="magnify"
+   contentStyleType="text/css"
+   viewBox="-624.000000 -654.000000 1275.000000 1292.000000"
+   height="1292.0"
+   preserveAspectRatio="xMidYMid meet"
+   version="1.1"
+   id="svg401"
+   sodipodi:docname="pp.svg"
+   inkscape:version="1.1.2 (0a00cf5339, 2022-02-04)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs405" />
+  <sodipodi:namedview
+     id="namedview403"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     showgrid="false"
+     inkscape:zoom="0.42141813"
+     inkscape:cx="637.13443"
+     inkscape:cy="646.62619"
+     inkscape:window-width="1920"
+     inkscape:window-height="1034"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg401" />
+  <g
+     id="edges"
+     transform="matrix(0.92909861,0,0,0.92909861,-0.72110707,13.679758)"
+     style="stroke-width:1.07631">
+    <path
+       fill="none"
+       stroke-width="1.07631"
+       d="M 629.7132,44.934517 594.34283,-191.14722"
+       class="id_Mr._Bennet id_Mr._Bingley"
+       stroke-opacity="1"
+       stroke="#afb9d9"
+       id="path2" />
+    <path
+       fill="none"
+       stroke-width="3.22894"
+       d="M 629.7132,44.934517 103.98697,-77.640457"
+       class="id_Mr._Bennet id_Elizabeth"
+       stroke-opacity="1"
+       stroke="#9c68ad"
+       id="path4" />
+    <path
+       fill="none"
+       stroke-width="4.30525"
+       d="M 629.7132,44.934517 -223.04411,-329.70648"
+       class="id_Mr._Bennet id_Mr._Collins"
+       stroke-opacity="1"
+       stroke="#a093c4"
+       id="path6" />
+    <path
+       fill="none"
+       stroke-width="2.15262"
+       d="M 629.7132,44.934517 -92.335732,65.53344"
+       class="id_Mr._Bennet id_Mr._Darcy"
+       stroke-opacity="1"
+       stroke="#9e7ab7"
+       id="path8" />
+    <path
+       fill="none"
+       stroke-width="2.15262"
+       d="M 629.7132,44.934517 -212.60049,300.26636"
+       class="id_Mr._Bennet id_Lydia"
+       stroke-opacity="1"
+       stroke="#9f8dc1"
+       id="path10" />
+    <path
+       fill="none"
+       stroke-width="1.07631"
+       d="M 629.7132,44.934517 -117.8462,-129.77792"
+       class="id_Mr._Bennet id_Jane"
+       stroke-opacity="1"
+       stroke="#a099c7"
+       id="path12" />
+    <path
+       fill="none"
+       stroke-width="1.07631"
+       d="M 629.7132,44.934517 -457.89105,375.24078"
+       class="id_Mr._Bennet id_Mrs._Gardiner"
+       stroke-opacity="1"
+       stroke="#b8c2de"
+       id="path14" />
+    <path
+       fill="none"
+       stroke-width="1.07631"
+       d="M 629.7132,44.934517 378.08478,103.39219"
+       class="id_Mr._Bennet id_Bingley"
+       stroke-opacity="1"
+       stroke="#bcc6e0"
+       id="path16" />
+    <path
+       fill="none"
+       stroke-width="2.15262"
+       d="M -103.44683,627.34815 263.24182,-549.28064"
+       class="id_Mrs._Long id_Charlotte"
+       stroke-opacity="1"
+       stroke="#c0cbe2"
+       id="path18" />
+    <path
+       fill="none"
+       stroke-width="1.07631"
+       d="M -103.44683,627.34815 -599.25147,-38.673054"
+       class="id_Mrs._Long id_Kitty"
+       stroke-opacity="1"
+       stroke="#c9d4e7"
+       id="path20" />
+    <path
+       fill="none"
+       stroke-width="10.7631"
+       d="m -212.60049,300.26636 94.75429,-430.04428"
+       class="id_Lydia id_Jane"
+       stroke-opacity="1"
+       stroke="#8864aa"
+       id="path22" />
+    <path
+       fill="none"
+       stroke-width="10.7631"
+       d="M -212.60049,300.26636 265.36218,-308.15433"
+       class="id_Lydia id_Miss_De_Bourgh"
+       stroke-opacity="1"
+       stroke="#9b88be"
+       id="path24" />
+    <path
+       fill="none"
+       stroke-width="7.53418"
+       d="m -212.60049,300.26636 382.09368,266.2904"
+       class="id_Lydia id_Colonel_Forster"
+       stroke-opacity="1"
+       stroke="#a896c5"
+       id="path26" />
+    <path
+       fill="none"
+       stroke-width="25.8315"
+       d="M -212.60049,300.26636 103.98697,-77.640457"
+       class="id_Lydia id_Elizabeth"
+       stroke-opacity="1"
+       stroke="#843390"
+       id="path28" />
+    <path
+       fill="none"
+       stroke-width="10.7631"
+       d="M -212.60049,300.26636 -599.25147,-38.673054"
+       class="id_Lydia id_Kitty"
+       stroke-opacity="1"
+       stroke="#9684bc"
+       id="path30" />
+    <path
+       fill="none"
+       stroke-width="5.38156"
+       d="M -212.60049,300.26636 102.85033,168.85506"
+       class="id_Lydia id_Mr._Denny"
+       stroke-opacity="1"
+       stroke="#b5a3cd"
+       id="path32" />
+    <path
+       fill="none"
+       stroke-width="5.38156"
+       d="M -212.60049,300.26636 40.900017,-382.22125"
+       class="id_Lydia id_Mrs._Bennet"
+       stroke-opacity="1"
+       stroke="#875ea7"
+       id="path34" />
+    <path
+       fill="none"
+       stroke-width="3.22894"
+       d="M -212.60049,300.26636 -384.48172,125.37288"
+       class="id_Lydia id_Mr._Wickham"
+       stroke-opacity="1"
+       stroke="#9684bc"
+       id="path36" />
+    <path
+       fill="none"
+       stroke-width="3.22894"
+       d="m -212.60049,300.26636 -10.44362,-629.97284"
+       class="id_Lydia id_Mr._Collins"
+       stroke-opacity="1"
+       stroke="#875ea7"
+       id="path38" />
+    <path
+       fill="none"
+       stroke-width="11.8394"
+       d="M -212.60049,300.26636 -92.335732,65.53344"
+       class="id_Lydia id_Mr._Darcy"
+       stroke-opacity="1"
+       stroke="#85459a"
+       id="path40" />
+    <path
+       fill="none"
+       stroke-width="1.07631"
+       d="M -212.60049,300.26636 402.65732,-132.28836"
+       class="id_Lydia id_Mrs._Hurst"
+       stroke-opacity="1"
+       stroke="#ac9ac8"
+       id="path42" />
+    <path
+       fill="none"
+       stroke-width="1.07631"
+       d="m -212.60049,300.26636 761.89767,-18.5719"
+       class="id_Lydia id_Miss_Bingley"
+       stroke-opacity="1"
+       stroke="#9f8dc1"
+       id="path44" />
+    <path
+       fill="none"
+       stroke-width="4.30525"
+       d="m -212.60049,300.26636 -245.29056,74.97442"
+       class="id_Lydia id_Mrs._Gardiner"
+       stroke-opacity="1"
+       stroke="#9f8dc1"
+       id="path46" />
+    <path
+       fill="none"
+       stroke-width="3.22894"
+       d="m -212.60049,300.26636 -0.34237,-863.22351"
+       class="id_Lydia id_Mary"
+       stroke-opacity="1"
+       stroke="#9f8dc1"
+       id="path48" />
+    <path
+       fill="none"
+       stroke-width="1.07631"
+       d="M -212.60049,300.26636 -594.95251,194.82289"
+       class="id_Lydia id_Georgiana"
+       stroke-opacity="1"
+       stroke="#b19fca"
+       id="path50" />
+    <path
+       fill="none"
+       stroke-width="1.07631"
+       d="M -212.60049,300.26636 3.721385,371.37222"
+       class="id_Lydia id_Mr."
+       stroke-opacity="1"
+       stroke="#9b88be"
+       id="path52" />
+    <path
+       fill="none"
+       stroke-width="1.07631"
+       d="M -212.60049,300.26636 385.96356,506.07733"
+       class="id_Lydia id_Meryton"
+       stroke-opacity="1"
+       stroke="#ac9ac8"
+       id="path54" />
+    <path
+       fill="none"
+       stroke-width="13.9921"
+       d="M 594.34283,-191.14722 103.98697,-77.640457"
+       class="id_Mr._Bingley id_Elizabeth"
+       stroke-opacity="1"
+       stroke="#935fa8"
+       id="path56" />
+    <path
+       fill="none"
+       stroke-width="6.45787"
+       d="M 594.34283,-191.14722 -92.335732,65.53344"
+       class="id_Mr._Bingley id_Mr._Darcy"
+       stroke-opacity="1"
+       stroke="#9571b2"
+       id="path58" />
+    <path
+       fill="none"
+       stroke-width="2.15262"
+       d="M 594.34283,-191.14722 263.24182,-549.28064"
+       class="id_Mr._Bingley id_Charlotte"
+       stroke-opacity="1"
+       stroke="#9da7cf"
+       id="path60" />
+    <path
+       fill="none"
+       stroke-width="1.07631"
+       d="M 594.34283,-191.14722 473.64471,-409.19324"
+       class="id_Mr._Bingley id_Sir_William"
+       stroke-opacity="1"
+       stroke="#aab4d6"
+       id="path62" />
+    <path
+       fill="none"
+       stroke-width="4.30525"
+       d="M 594.34283,-191.14722 40.900017,-382.22125"
+       class="id_Mr._Bingley id_Mrs._Bennet"
+       stroke-opacity="1"
+       stroke="#978abf"
+       id="path64" />
+    <path
+       fill="none"
+       stroke-width="9.68681"
+       d="m 594.34283,-191.14722 -712.18903,61.3693"
+       class="id_Mr._Bingley id_Jane"
+       stroke-opacity="1"
+       stroke="#9790c2"
+       id="path66" />
+    <path
+       fill="none"
+       stroke-width="2.15262"
+       d="m 594.34283,-191.14722 -191.68551,58.85886"
+       class="id_Mr._Bingley id_Mrs._Hurst"
+       stroke-opacity="1"
+       stroke="#bcc6e0"
+       id="path68" />
+    <path
+       fill="none"
+       stroke-width="2.15262"
+       d="m 594.34283,-191.14722 -978.82455,316.5201"
+       class="id_Mr._Bingley id_Mr._Wickham"
+       stroke-opacity="1"
+       stroke="#a6b0d4"
+       id="path70" />
+    <path
+       fill="none"
+       stroke-width="1.07631"
+       d="M 594.34283,-191.14722 -223.04411,-329.70648"
+       class="id_Mr._Bingley id_Mr._Collins"
+       stroke-opacity="1"
+       stroke="#978abf"
+       id="path72" />
+    <path
+       fill="none"
+       stroke-width="6.45787"
+       d="M 473.64471,-409.19324 263.24182,-549.28064"
+       class="id_Sir_William id_Charlotte"
+       stroke-opacity="1"
+       stroke="#a1abd1"
+       id="path74" />
+    <path
+       fill="none"
+       stroke-width="4.30525"
+       d="M 473.64471,-409.19324 103.98697,-77.640457"
+       class="id_Sir_William id_Elizabeth"
+       stroke-opacity="1"
+       stroke="#9864aa"
+       id="path76" />
+    <path
+       fill="none"
+       stroke-width="1.07631"
+       d="M 473.64471,-409.19324 -92.335732,65.53344"
+       class="id_Sir_William id_Mr._Darcy"
+       stroke-opacity="1"
+       stroke="#9976b4"
+       id="path78" />
+    <path
+       fill="none"
+       stroke-width="1.07631"
+       d="M 473.64471,-409.19324 57.163155,-630.34161"
+       class="id_Sir_William id_Lady_Catherine"
+       stroke-opacity="1"
+       stroke="#afb9d9"
+       id="path80" />
+    <path
+       fill="none"
+       stroke-width="1.07631"
+       d="M 473.64471,-409.19324 3.721385,371.37222"
+       class="id_Sir_William id_Mr."
+       stroke-opacity="1"
+       stroke="#afb9d9"
+       id="path82" />
+    <path
+       fill="none"
+       stroke-width="3.22894"
+       d="m 473.64471,-409.19324 -696.68882,79.48676"
+       class="id_Sir_William id_Mr._Collins"
+       stroke-opacity="1"
+       stroke="#9b8ec2"
+       id="path84" />
+    <path
+       fill="none"
+       stroke-width="1.07631"
+       d="M 473.64471,-409.19324 378.08478,103.39219"
+       class="id_Sir_William id_Bingley"
+       stroke-opacity="1"
+       stroke="#b7c2dd"
+       id="path86" />
+    <path
+       fill="none"
+       stroke-width="1.07631"
+       d="M 473.64471,-409.19324 239.06605,348.04553"
+       class="id_Sir_William id_Mrs._Philips"
+       stroke-opacity="1"
+       stroke="#bcc6e0"
+       id="path88" />
+    <path
+       fill="none"
+       stroke-width="1.07631"
+       d="m 263.24182,-549.28064 -476.18468,-13.67651"
+       class="id_Charlotte id_Mary"
+       stroke-opacity="1"
+       stroke="#a6b0d4"
+       id="path90" />
+    <path
+       fill="none"
+       stroke-width="3.22894"
+       d="M 263.24182,-549.28064 -117.8462,-129.77792"
+       class="id_Charlotte id_Jane"
+       stroke-opacity="1"
+       stroke="#8e87bd"
+       id="path92" />
+    <path
+       fill="none"
+       stroke-width="3.22894"
+       d="M 263.24182,-549.28064 40.900017,-382.22125"
+       class="id_Charlotte id_Mrs._Bennet"
+       stroke-opacity="1"
+       stroke="#8e81ba"
+       id="path94" />
+    <path
+       fill="none"
+       stroke-width="9.68681"
+       d="M 263.24182,-549.28064 103.98697,-77.640457"
+       class="id_Charlotte id_Elizabeth"
+       stroke-opacity="1"
+       stroke="#8a56a3"
+       id="path96" />
+    <path
+       fill="none"
+       stroke-width="4.30525"
+       d="M 263.24182,-549.28064 -92.335732,65.53344"
+       class="id_Charlotte id_Mr._Darcy"
+       stroke-opacity="1"
+       stroke="#8c68ad"
+       id="path98" />
+    <path
+       fill="none"
+       stroke-width="1.07631"
+       d="M 263.24182,-549.28064 169.49319,566.55676"
+       class="id_Charlotte id_Colonel_Forster"
+       stroke-opacity="1"
+       stroke="#aeb9d8"
+       id="path100" />
+    <path
+       fill="none"
+       stroke-width="7.53418"
+       d="m 263.24182,-549.28064 -486.28593,219.57416"
+       class="id_Charlotte id_Mr._Collins"
+       stroke-opacity="1"
+       stroke="#8e81ba"
+       id="path102" />
+    <path
+       fill="none"
+       stroke-width="1.07631"
+       d="m 263.24182,-549.28064 2.12036,241.12631"
+       class="id_Charlotte id_Miss_De_Bourgh"
+       stroke-opacity="1"
+       stroke="#a1abd1"
+       id="path104" />
+    <path
+       fill="none"
+       stroke-width="2.15262"
+       d="M 263.24182,-549.28064 -599.25147,-38.673054"
+       class="id_Charlotte id_Kitty"
+       stroke-opacity="1"
+       stroke="#9da7cf"
+       id="path106" />
+    <path
+       fill="none"
+       stroke-width="40.8999"
+       d="M 103.98697,-77.640457 -92.335732,65.53344"
+       class="id_Elizabeth id_Mr._Darcy"
+       stroke-opacity="1"
+       stroke="#822186"
+       id="path108" />
+    <path
+       fill="none"
+       stroke-width="48.434"
+       d="M 103.98697,-77.640457 -117.8462,-129.77792"
+       class="id_Elizabeth id_Jane"
+       stroke-opacity="1"
+       stroke="#854096"
+       id="path110" />
+    <path
+       fill="none"
+       stroke-width="3.22894"
+       d="M 103.98697,-77.640457 -212.94286,-562.95715"
+       class="id_Elizabeth id_Mary"
+       stroke-opacity="1"
+       stroke="#9c68ad"
+       id="path112" />
+    <path
+       fill="none"
+       stroke-width="18.2973"
+       d="M 103.98697,-77.640457 549.29718,281.69446"
+       class="id_Elizabeth id_Miss_Bingley"
+       stroke-opacity="1"
+       stroke="#9c68ad"
+       id="path114" />
+    <path
+       fill="none"
+       stroke-width="4.30525"
+       d="M 103.98697,-77.640457 265.36218,-308.15433"
+       class="id_Elizabeth id_Miss_De_Bourgh"
+       stroke-opacity="1"
+       stroke="#9864aa"
+       id="path116" />
+    <path
+       fill="none"
+       stroke-width="7.53418"
+       d="M 103.98697,-77.640457 402.65732,-132.28836"
+       class="id_Elizabeth id_Mrs._Hurst"
+       stroke-opacity="1"
+       stroke="#a976b4"
+       id="path118" />
+    <path
+       fill="none"
+       stroke-width="11.8394"
+       d="M 103.98697,-77.640457 378.08478,103.39219"
+       class="id_Elizabeth id_Bingley"
+       stroke-opacity="1"
+       stroke="#a06daf"
+       id="path120" />
+    <path
+       fill="none"
+       stroke-width="9.68681"
+       d="M 103.98697,-77.640457 40.900017,-382.22125"
+       class="id_Elizabeth id_Mrs._Bennet"
+       stroke-opacity="1"
+       stroke="#843993"
+       id="path122" />
+    <path
+       fill="none"
+       stroke-width="10.7631"
+       d="M 103.98697,-77.640457 57.163155,-630.34161"
+       class="id_Elizabeth id_Lady_Catherine"
+       stroke-opacity="1"
+       stroke="#9864aa"
+       id="path124" />
+    <path
+       fill="none"
+       stroke-width="10.7631"
+       d="M 103.98697,-77.640457 -223.04411,-329.70648"
+       class="id_Elizabeth id_Mr._Collins"
+       stroke-opacity="1"
+       stroke="#843993"
+       id="path126" />
+    <path
+       fill="none"
+       stroke-width="7.53418"
+       d="M 103.98697,-77.640457 -384.48172,125.37288"
+       class="id_Elizabeth id_Mr._Wickham"
+       stroke-opacity="1"
+       stroke="#935fa8"
+       id="path128" />
+    <path
+       fill="none"
+       stroke-width="1.07631"
+       d="M 103.98697,-77.640457 239.06605,348.04553"
+       class="id_Elizabeth id_Mrs._Philips"
+       stroke-opacity="1"
+       stroke="#a571b1"
+       id="path130" />
+    <path
+       fill="none"
+       stroke-width="7.53418"
+       d="m 103.98697,-77.640457 -703.23844,38.967403"
+       class="id_Elizabeth id_Kitty"
+       stroke-opacity="1"
+       stroke="#935fa8"
+       id="path132" />
+    <path
+       fill="none"
+       stroke-width="3.22894"
+       d="M 103.98697,-77.640457 -412.5675,-470.02078"
+       class="id_Elizabeth id_Colonel_Fitzwilliam"
+       stroke-opacity="1"
+       stroke="#ae7ab6"
+       id="path134" />
+    <path
+       fill="none"
+       stroke-width="11.8394"
+       d="M 103.98697,-77.640457 -457.89105,375.24078"
+       class="id_Elizabeth id_Mrs._Gardiner"
+       stroke-opacity="1"
+       stroke="#9c68ad"
+       id="path136" />
+    <path
+       fill="none"
+       stroke-width="2.15262"
+       d="M 103.98697,-77.640457 -571.23639,-269.54559"
+       class="id_Elizabeth id_Mrs._Reynolds"
+       stroke-opacity="1"
+       stroke="#b27fb9"
+       id="path138" />
+    <path
+       fill="none"
+       stroke-width="2.15262"
+       d="M 103.98697,-77.640457 3.721385,371.37222"
+       class="id_Elizabeth id_Mr."
+       stroke-opacity="1"
+       stroke="#9864aa"
+       id="path140" />
+    <path
+       fill="none"
+       stroke-width="4.30525"
+       d="M 103.98697,-77.640457 -594.95251,194.82289"
+       class="id_Elizabeth id_Georgiana"
+       stroke-opacity="1"
+       stroke="#ae7ab6"
+       id="path142" />
+    <path
+       fill="none"
+       stroke-width="1.07631"
+       d="M 103.98697,-77.640457 -367.75824,-141.98099"
+       class="id_Elizabeth id_Longbourn"
+       stroke-opacity="1"
+       stroke="#a571b1"
+       id="path144" />
+    <path
+       fill="none"
+       stroke-width="2.15262"
+       d="m -117.8462,-129.77792 -95.09666,-433.17923"
+       class="id_Jane id_Mary"
+       stroke-opacity="1"
+       stroke="#a099c7"
+       id="path146" />
+    <path
+       fill="none"
+       stroke-width="7.53418"
+       d="M -117.8462,-129.77792 549.29718,281.69446"
+       class="id_Jane id_Miss_Bingley"
+       stroke-opacity="1"
+       stroke="#a099c7"
+       id="path148" />
+    <path
+       fill="none"
+       stroke-width="3.22894"
+       d="M -117.8462,-129.77792 -92.335732,65.53344"
+       class="id_Jane id_Mr._Darcy"
+       stroke-opacity="1"
+       stroke="#8652a0"
+       id="path150" />
+    <path
+       fill="none"
+       stroke-width="16.1447"
+       d="M -117.8462,-129.77792 378.08478,103.39219"
+       class="id_Jane id_Bingley"
+       stroke-opacity="1"
+       stroke="#a49ec9"
+       id="path152" />
+    <path
+       fill="none"
+       stroke-width="2.15262"
+       d="m -117.8462,-129.77792 -249.91204,-12.20307"
+       class="id_Jane id_Longbourn"
+       stroke-opacity="1"
+       stroke="#a9a2cc"
+       id="path154" />
+    <path
+       fill="none"
+       stroke-width="3.22894"
+       d="M -117.8462,-129.77792 40.900017,-382.22125"
+       class="id_Jane id_Mrs._Bennet"
+       stroke-opacity="1"
+       stroke="#886aae"
+       id="path156" />
+    <path
+       fill="none"
+       stroke-width="4.30525"
+       d="M -117.8462,-129.77792 -223.04411,-329.70648"
+       class="id_Jane id_Mr._Collins"
+       stroke-opacity="1"
+       stroke="#886aae"
+       id="path158" />
+    <path
+       fill="none"
+       stroke-width="2.15262"
+       d="m -117.8462,-129.77792 -266.63552,255.1508"
+       class="id_Jane id_Mr._Wickham"
+       stroke-opacity="1"
+       stroke="#9790c2"
+       id="path160" />
+    <path
+       fill="none"
+       stroke-width="2.15262"
+       d="m -117.8462,-129.77792 -340.04485,505.0187"
+       class="id_Jane id_Mrs._Gardiner"
+       stroke-opacity="1"
+       stroke="#a099c7"
+       id="path162" />
+    <path
+       fill="none"
+       stroke-width="1.07631"
+       d="M -117.8462,-129.77792 265.36218,-308.15433"
+       class="id_Jane id_Miss_De_Bourgh"
+       stroke-opacity="1"
+       stroke="#9c95c5"
+       id="path164" />
+    <path
+       fill="none"
+       stroke-width="2.15262"
+       d="m -117.8462,-129.77792 -481.40527,91.104866"
+       class="id_Jane id_Kitty"
+       stroke-opacity="1"
+       stroke="#9790c2"
+       id="path166" />
+    <path
+       fill="none"
+       stroke-width="2.15262"
+       d="M 40.900017,-382.22125 378.08478,103.39219"
+       class="id_Mrs._Bennet id_Bingley"
+       stroke-opacity="1"
+       stroke="#a497c6"
+       id="path168" />
+    <path
+       fill="none"
+       stroke-width="2.15262"
+       d="m 40.900017,-382.22125 -263.944127,52.51477"
+       class="id_Mrs._Bennet id_Mr._Collins"
+       stroke-opacity="1"
+       stroke="#8864ab"
+       id="path170" />
+    <path
+       fill="none"
+       stroke-width="2.15262"
+       d="M 40.900017,-382.22125 239.06605,348.04553"
+       class="id_Mrs._Bennet id_Mrs._Philips"
+       stroke-opacity="1"
+       stroke="#a89cc9"
+       id="path172" />
+    <path
+       fill="none"
+       stroke-width="1.07631"
+       d="M 40.900017,-382.22125 3.721385,371.37222"
+       class="id_Mrs._Bennet id_Mr."
+       stroke-opacity="1"
+       stroke="#9b8ec2"
+       id="path174" />
+    <path
+       fill="none"
+       stroke-width="1.07631"
+       d="M 40.900017,-382.22125 169.49319,566.55676"
+       class="id_Mrs._Bennet id_Colonel_Forster"
+       stroke-opacity="1"
+       stroke="#a89cc9"
+       id="path176" />
+    <path
+       fill="none"
+       stroke-width="4.30525"
+       d="M 40.900017,-382.22125 -599.25147,-38.673054"
+       class="id_Mrs._Bennet id_Kitty"
+       stroke-opacity="1"
+       stroke="#978abf"
+       id="path178" />
+    <path
+       fill="none"
+       stroke-width="3.22894"
+       d="M 40.900017,-382.22125 -212.94286,-562.95715"
+       class="id_Mrs._Bennet id_Mary"
+       stroke-opacity="1"
+       stroke="#a093c4"
+       id="path180" />
+    <path
+       fill="none"
+       stroke-width="1.07631"
+       d="M 40.900017,-382.22125 -457.89105,375.24078"
+       class="id_Mrs._Bennet id_Mrs._Gardiner"
+       stroke-opacity="1"
+       stroke="#a093c4"
+       id="path182" />
+    <path
+       fill="none"
+       stroke-width="1.07631"
+       d="M 40.900017,-382.22125 385.96356,506.07733"
+       class="id_Mrs._Bennet id_Meryton"
+       stroke-opacity="1"
+       stroke="#ada0cb"
+       id="path184" />
+    <path
+       fill="none"
+       stroke-width="1.07631"
+       d="m 40.900017,-382.22125 224.462163,74.06692"
+       class="id_Mrs._Bennet id_Miss_De_Bourgh"
+       stroke-opacity="1"
+       stroke="#9b8ec2"
+       id="path186" />
+    <path
+       fill="none"
+       stroke-width="1.07631"
+       d="M 40.900017,-382.22125 -367.75824,-141.98099"
+       class="id_Mrs._Bennet id_Longbourn"
+       stroke-opacity="1"
+       stroke="#a89cc9"
+       id="path188" />
+    <path
+       fill="none"
+       stroke-width="1.07631"
+       d="M 40.900017,-382.22125 57.163155,-630.34161"
+       class="id_Mrs._Bennet id_Lady_Catherine"
+       stroke-opacity="1"
+       stroke="#9b8ec2"
+       id="path190" />
+    <path
+       fill="none"
+       stroke-width="1.07631"
+       d="M -599.25147,-38.673054 -384.48172,125.37288"
+       class="id_Kitty id_Mr._Wickham"
+       stroke-opacity="1"
+       stroke="#a6b0d4"
+       id="path192" />
+    <path
+       fill="none"
+       stroke-width="1.07631"
+       d="M -599.25147,-38.673054 169.49319,566.55676"
+       class="id_Kitty id_Colonel_Forster"
+       stroke-opacity="1"
+       stroke="#b7c2dd"
+       id="path194" />
+    <path
+       fill="none"
+       stroke-width="7.53418"
+       d="M -599.25147,-38.673054 -212.94286,-562.95715"
+       class="id_Kitty id_Mary"
+       stroke-opacity="1"
+       stroke="#afb9d9"
+       id="path196" />
+    <path
+       fill="none"
+       stroke-width="3.22894"
+       d="M -599.25147,-38.673054 -92.335732,65.53344"
+       class="id_Kitty id_Mr._Darcy"
+       stroke-opacity="1"
+       stroke="#9571b2"
+       id="path198" />
+    <path
+       fill="none"
+       stroke-width="1.07631"
+       d="M -212.94286,-562.95715 549.29718,281.69446"
+       class="id_Mary id_Miss_Bingley"
+       stroke-opacity="1"
+       stroke="#b8c2de"
+       id="path200" />
+    <path
+       fill="none"
+       stroke-width="1.07631"
+       d="m -212.94286,-562.95715 -10.10125,233.25067"
+       class="id_Mary id_Mr._Collins"
+       stroke-opacity="1"
+       stroke="#a093c4"
+       id="path202" />
+    <path
+       fill="none"
+       stroke-width="4.30525"
+       d="M 402.65732,-132.28836 -92.335732,65.53344"
+       class="id_Mrs._Hurst id_Mr._Darcy"
+       stroke-opacity="1"
+       stroke="#ab88be"
+       id="path204" />
+    <path
+       fill="none"
+       stroke-width="10.7631"
+       d="M 402.65732,-132.28836 549.29718,281.69446"
+       class="id_Mrs._Hurst id_Miss_Bingley"
+       stroke-opacity="1"
+       stroke="#c5cfe5"
+       id="path206" />
+    <path
+       fill="none"
+       stroke-width="15.0684"
+       d="M -92.335732,65.53344 378.08478,103.39219"
+       class="id_Mr._Darcy id_Bingley"
+       stroke-opacity="1"
+       stroke="#a27fb9"
+       id="path208" />
+    <path
+       fill="none"
+       stroke-width="1.07631"
+       d="M -92.335732,65.53344 169.49319,566.55676"
+       class="id_Mr._Darcy id_Colonel_Forster"
+       stroke-opacity="1"
+       stroke="#a683bb"
+       id="path210" />
+    <path
+       fill="none"
+       stroke-width="13.9921"
+       d="M -92.335732,65.53344 549.29718,281.69446"
+       class="id_Mr._Darcy id_Miss_Bingley"
+       stroke-opacity="1"
+       stroke="#9e7ab7"
+       id="path212" />
+    <path
+       fill="none"
+       stroke-width="1.07631"
+       d="M -92.335732,65.53344 265.36218,-308.15433"
+       class="id_Mr._Darcy id_Miss_De_Bourgh"
+       stroke-opacity="1"
+       stroke="#9976b4"
+       id="path214" />
+    <path
+       fill="none"
+       stroke-width="1.07631"
+       d="M -92.335732,65.53344 -384.48172,125.37288"
+       class="id_Mr._Darcy id_Mr._Wickham"
+       stroke-opacity="1"
+       stroke="#9571b2"
+       id="path216" />
+    <path
+       fill="none"
+       stroke-width="4.30525"
+       d="M -92.335732,65.53344 57.163155,-630.34161"
+       class="id_Mr._Darcy id_Lady_Catherine"
+       stroke-opacity="1"
+       stroke="#9976b4"
+       id="path218" />
+    <path
+       fill="none"
+       stroke-width="4.30525"
+       d="M -92.335732,65.53344 -412.5675,-470.02078"
+       class="id_Mr._Darcy id_Colonel_Fitzwilliam"
+       stroke-opacity="1"
+       stroke="#af8cc0"
+       id="path220" />
+    <path
+       fill="none"
+       stroke-width="4.30525"
+       d="M -92.335732,65.53344 -594.95251,194.82289"
+       class="id_Mr._Darcy id_Georgiana"
+       stroke-opacity="1"
+       stroke="#af8cc0"
+       id="path222" />
+    <path
+       fill="none"
+       stroke-width="1.07631"
+       d="M -92.335732,65.53344 -367.75824,-141.98099"
+       class="id_Mr._Darcy id_Longbourn"
+       stroke-opacity="1"
+       stroke="#a683bb"
+       id="path224" />
+    <path
+       fill="none"
+       stroke-width="2.15262"
+       d="M -92.335732,65.53344 -571.23639,-269.54559"
+       class="id_Mr._Darcy id_Mrs._Reynolds"
+       stroke-opacity="1"
+       stroke="#b491c3"
+       id="path226" />
+    <path
+       fill="none"
+       stroke-width="4.30525"
+       d="M -92.335732,65.53344 -457.89105,375.24078"
+       class="id_Mr._Darcy id_Mrs._Gardiner"
+       stroke-opacity="1"
+       stroke="#9e7ab7"
+       id="path228" />
+    <path
+       fill="none"
+       stroke-width="1.07631"
+       d="M -92.335732,65.53344 3.721385,371.37222"
+       class="id_Mr._Darcy id_Mr."
+       stroke-opacity="1"
+       stroke="#9976b4"
+       id="path230" />
+    <path
+       fill="none"
+       stroke-width="1.07631"
+       d="M 549.29718,281.69446 -457.89105,375.24078"
+       class="id_Miss_Bingley id_Mrs._Gardiner"
+       stroke-opacity="1"
+       stroke="#b8c2de"
+       id="path232" />
+    <path
+       fill="none"
+       stroke-width="1.07631"
+       d="m 549.29718,281.69446 -283.935,-589.84879"
+       class="id_Miss_Bingley id_Miss_De_Bourgh"
+       stroke-opacity="1"
+       stroke="#b3bddb"
+       id="path234" />
+    <path
+       fill="none"
+       stroke-width="1.07631"
+       d="m 378.08478,103.39219 -973.03729,91.4307"
+       class="id_Bingley id_Georgiana"
+       stroke-opacity="1"
+       stroke="#cdd8e9"
+       id="path236" />
+    <path
+       fill="none"
+       stroke-width="1.07631"
+       d="M 265.36218,-308.15433 57.163155,-630.34161"
+       class="id_Miss_De_Bourgh id_Lady_Catherine"
+       stroke-opacity="1"
+       stroke="#afb9d9"
+       id="path238" />
+    <path
+       fill="none"
+       stroke-width="1.07631"
+       d="m 265.36218,-308.15433 -488.40629,-21.55215"
+       class="id_Miss_De_Bourgh id_Mr._Collins"
+       stroke-opacity="1"
+       stroke="#9b8ec2"
+       id="path240" />
+    <path
+       fill="none"
+       stroke-width="1.07631"
+       d="M 169.49319,566.55676 102.85033,168.85506"
+       class="id_Colonel_Forster id_Mr._Denny"
+       stroke-opacity="1"
+       stroke="#d6e1ee"
+       id="path242" />
+    <path
+       fill="none"
+       stroke-width="1.07631"
+       d="M 385.96356,506.07733 239.06605,348.04553"
+       class="id_Meryton id_Mrs._Philips"
+       stroke-opacity="1"
+       stroke="#cdd8e9"
+       id="path244" />
+    <path
+       fill="none"
+       stroke-width="1.07631"
+       d="M 385.96356,506.07733 -384.48172,125.37288"
+       class="id_Meryton id_Mr._Wickham"
+       stroke-opacity="1"
+       stroke="#bcc6e0"
+       id="path246" />
+    <path
+       fill="none"
+       stroke-width="1.07631"
+       d="m 385.96356,506.07733 -753.7218,-648.05832"
+       class="id_Meryton id_Longbourn"
+       stroke-opacity="1"
+       stroke="#cdd8e9"
+       id="path248" />
+    <path
+       fill="none"
+       stroke-width="2.15262"
+       d="M 239.06605,348.04553 -223.04411,-329.70648"
+       class="id_Mrs._Philips id_Mr._Collins"
+       stroke-opacity="1"
+       stroke="#a89cc9"
+       id="path250" />
+    <path
+       fill="none"
+       stroke-width="1.07631"
+       d="M 239.06605,348.04553 3.721385,371.37222"
+       class="id_Mrs._Philips id_Mr."
+       stroke-opacity="1"
+       stroke="#bcc6e0"
+       id="path252" />
+    <path
+       fill="none"
+       stroke-width="1.07631"
+       d="m -367.75824,-141.98099 144.71413,-187.72549"
+       class="id_Longbourn id_Mr._Collins"
+       stroke-opacity="1"
+       stroke="#a89cc9"
+       id="path254" />
+    <path
+       fill="none"
+       stroke-width="13.9921"
+       d="M -457.89105,375.24078 3.721385,371.37222"
+       class="id_Mrs._Gardiner id_Mr."
+       stroke-opacity="1"
+       stroke="#b3bddb"
+       id="path256" />
+    <path
+       fill="none"
+       stroke-width="5.38156"
+       d="M -223.04411,-329.70648 3.721385,371.37222"
+       class="id_Mr._Collins id_Mr."
+       stroke-opacity="1"
+       stroke="#9b8ec2"
+       id="path258" />
+    <path
+       fill="none"
+       stroke-width="2.15262"
+       d="M -223.04411,-329.70648 -384.48172,125.37288"
+       class="id_Mr._Collins id_Mr._Wickham"
+       stroke-opacity="1"
+       stroke="#978abf"
+       id="path260" />
+    <path
+       fill="none"
+       stroke-width="3.22894"
+       d="m -223.04411,-329.70648 -82.21041,868.76776"
+       class="id_Mr._Collins id_Rosings"
+       stroke-opacity="1"
+       stroke="#baaed3"
+       id="path262" />
+    <path
+       fill="none"
+       stroke-width="5.38156"
+       d="M -223.04411,-329.70648 57.163155,-630.34161"
+       class="id_Mr._Collins id_Lady_Catherine"
+       stroke-opacity="1"
+       stroke="#9b8ec2"
+       id="path264" />
+    <path
+       fill="none"
+       stroke-width="1.07631"
+       d="M -223.04411,-329.70648 -412.5675,-470.02078"
+       class="id_Mr._Collins id_Colonel_Fitzwilliam"
+       stroke-opacity="1"
+       stroke="#b1a5ce"
+       id="path266" />
+    <path
+       fill="none"
+       stroke-width="1.07631"
+       d="M 57.163155,-630.34161 3.721385,371.37222"
+       class="id_Lady_Catherine id_Mr."
+       stroke-opacity="1"
+       stroke="#afb9d9"
+       id="path268" />
+    <path
+       fill="none"
+       stroke-width="1.07631"
+       d="M 57.163155,-630.34161 -412.5675,-470.02078"
+       class="id_Lady_Catherine id_Colonel_Fitzwilliam"
+       stroke-opacity="1"
+       stroke="#c5cfe5"
+       id="path270" />
+    <path
+       fill="none"
+       stroke-width="1.07631"
+       d="M 57.163155,-630.34161 -305.25452,539.06128"
+       class="id_Lady_Catherine id_Rosings"
+       stroke-opacity="1"
+       stroke="#ced8ea"
+       id="path272" />
+    <path
+       fill="none"
+       stroke-width="1.07631"
+       d="M 102.85033,168.85506 -384.48172,125.37288"
+       class="id_Mr._Denny id_Mr._Wickham"
+       stroke-opacity="1"
+       stroke="#c5cfe5"
+       id="path274" />
+    <path
+       fill="none"
+       stroke-width="1.07631"
+       d="M -384.48172,125.37288 -571.23639,-269.54559"
+       class="id_Mr._Wickham id_Mrs._Reynolds"
+       stroke-opacity="1"
+       stroke="#c5cfe5"
+       id="path276" />
+  </g>
+  <g
+     id="nodes"
+     transform="matrix(0.92909861,0,0,0.92909861,-0.72110707,13.679758)"
+     style="stroke-width:1.07631">
+    <circle
+       fill-opacity="1"
+       fill="#b8c2de"
+       r="20.909092"
+       cx="629.7132"
+       class="id_Mr._Bennet"
+       cy="44.934517"
+       stroke="#000000"
+       stroke-opacity="1"
+       stroke-width="1.07631"
+       id="circle279" />
+    <circle
+       fill-opacity="1"
+       fill="#edf8fb"
+       r="10"
+       cx="-103.44683"
+       class="id_Mrs._Long"
+       cy="627.34814"
+       stroke="#000000"
+       stroke-opacity="1"
+       stroke-width="1.07631"
+       id="circle281" />
+    <circle
+       fill-opacity="1"
+       fill="#8758a4"
+       r="39.090912"
+       cx="-212.60049"
+       class="id_Lydia"
+       cy="300.26636"
+       stroke="#000000"
+       stroke-opacity="1"
+       stroke-width="1.07631"
+       id="circle283" />
+    <circle
+       fill-opacity="1"
+       fill="#a6b0d4"
+       r="24.545456"
+       cx="594.34283"
+       class="id_Mr._Bingley"
+       cy="-191.14722"
+       stroke="#000000"
+       stroke-opacity="1"
+       stroke-width="1.07631"
+       id="circle285" />
+    <circle
+       fill-opacity="1"
+       fill="#afb9d9"
+       r="22.727272"
+       cx="473.64471"
+       class="id_Sir_William"
+       cy="-409.19324"
+       stroke="#000000"
+       stroke-opacity="1"
+       stroke-width="1.07631"
+       id="circle287" />
+    <circle
+       fill-opacity="1"
+       fill="#949eca"
+       r="28.181818"
+       cx="263.24182"
+       class="id_Charlotte"
+       cy="-549.28064"
+       stroke="#000000"
+       stroke-opacity="1"
+       stroke-width="1.07631"
+       id="circle289" />
+    <circle
+       fill-opacity="1"
+       fill="#810f7c"
+       r="50"
+       cx="103.98697"
+       class="id_Elizabeth"
+       cy="-77.640457"
+       stroke="#000000"
+       stroke-opacity="1"
+       stroke-width="1.07631"
+       id="circle291" />
+    <circle
+       fill-opacity="1"
+       fill="#8971b1"
+       r="35.454544"
+       cx="-117.8462"
+       class="id_Jane"
+       cy="-129.77792"
+       stroke="#000000"
+       stroke-opacity="1"
+       stroke-width="1.07631"
+       id="circle293" />
+    <circle
+       fill-opacity="1"
+       fill="#8864ab"
+       r="37.272728"
+       cx="40.900017"
+       class="id_Mrs._Bennet"
+       cy="-382.22125"
+       stroke="#000000"
+       stroke-opacity="1"
+       stroke-width="1.07631"
+       id="circle295" />
+    <circle
+       fill-opacity="1"
+       fill="#a6b0d4"
+       r="24.545456"
+       cx="-599.25146"
+       class="id_Kitty"
+       cy="-38.673054"
+       stroke="#000000"
+       stroke-opacity="1"
+       stroke-width="1.07631"
+       id="circle297" />
+    <circle
+       fill-opacity="1"
+       fill="#b8c2de"
+       r="20.909092"
+       cx="-212.94286"
+       class="id_Mary"
+       cy="-562.95715"
+       stroke="#000000"
+       stroke-opacity="1"
+       stroke-width="1.07631"
+       id="circle299" />
+    <circle
+       fill-opacity="1"
+       fill="#d2ddec"
+       r="15.454546"
+       cx="402.65732"
+       class="id_Mrs._Hurst"
+       cy="-132.28836"
+       stroke="#000000"
+       stroke-opacity="1"
+       stroke-width="1.07631"
+       id="circle301" />
+    <circle
+       fill-opacity="1"
+       fill="#843390"
+       r="44.545456"
+       cx="-92.335732"
+       class="id_Mr._Darcy"
+       cy="65.53344"
+       stroke="#000000"
+       stroke-opacity="1"
+       stroke-width="1.07631"
+       id="circle303" />
+    <circle
+       fill-opacity="1"
+       fill="#b8c2de"
+       r="20.909092"
+       cx="549.29718"
+       class="id_Miss_Bingley"
+       cy="281.69446"
+       stroke="#000000"
+       stroke-opacity="1"
+       stroke-width="1.07631"
+       id="circle305" />
+    <circle
+       fill-opacity="1"
+       fill="#c0cbe2"
+       r="19.090908"
+       cx="378.08478"
+       class="id_Bingley"
+       cy="103.39219"
+       stroke="#000000"
+       stroke-opacity="1"
+       stroke-width="1.07631"
+       id="circle307" />
+    <circle
+       fill-opacity="1"
+       fill="#afb9d9"
+       r="22.727272"
+       cx="265.36218"
+       class="id_Miss_De_Bourgh"
+       cy="-308.15433"
+       stroke="#000000"
+       stroke-opacity="1"
+       stroke-width="1.07631"
+       id="circle309" />
+    <circle
+       fill-opacity="1"
+       fill="#c9d4e7"
+       r="17.272728"
+       cx="169.49319"
+       class="id_Colonel_Forster"
+       cy="566.55676"
+       stroke="#000000"
+       stroke-opacity="1"
+       stroke-width="1.07631"
+       id="circle311" />
+    <circle
+       fill-opacity="1"
+       fill="#d2ddec"
+       r="15.454546"
+       cx="385.96356"
+       class="id_Meryton"
+       cy="506.07733"
+       stroke="#000000"
+       stroke-opacity="1"
+       stroke-width="1.07631"
+       id="circle313" />
+    <circle
+       fill-opacity="1"
+       fill="#c9d4e7"
+       r="17.272728"
+       cx="239.06606"
+       class="id_Mrs._Philips"
+       cy="348.04553"
+       stroke="#000000"
+       stroke-opacity="1"
+       stroke-width="1.07631"
+       id="circle315" />
+    <circle
+       fill-opacity="1"
+       fill="#c9d4e7"
+       r="17.272728"
+       cx="-367.75824"
+       class="id_Longbourn"
+       cy="-141.98099"
+       stroke="#000000"
+       stroke-opacity="1"
+       stroke-width="1.07631"
+       id="circle317" />
+    <circle
+       fill-opacity="1"
+       fill="#b8c2de"
+       r="20.909092"
+       cx="-457.89105"
+       class="id_Mrs._Gardiner"
+       cy="375.24078"
+       stroke="#000000"
+       stroke-opacity="1"
+       stroke-width="1.07631"
+       id="circle319" />
+    <circle
+       fill-opacity="1"
+       fill="#8864ab"
+       r="37.272728"
+       cx="-223.04411"
+       class="id_Mr._Collins"
+       cy="-329.70648"
+       stroke="#000000"
+       stroke-opacity="1"
+       stroke-width="1.07631"
+       id="circle321" />
+    <circle
+       fill-opacity="1"
+       fill="#afb9d9"
+       r="22.727272"
+       cx="57.163155"
+       class="id_Lady_Catherine"
+       cy="-630.34161"
+       stroke="#000000"
+       stroke-opacity="1"
+       stroke-width="1.07631"
+       id="circle323" />
+    <circle
+       fill-opacity="1"
+       fill="#e4eff6"
+       r="11.818182"
+       cx="102.85033"
+       class="id_Mr._Denny"
+       cy="168.85506"
+       stroke="#000000"
+       stroke-opacity="1"
+       stroke-width="1.07631"
+       id="circle325" />
+    <circle
+       fill-opacity="1"
+       fill="#a6b0d4"
+       r="24.545456"
+       cx="-384.48172"
+       class="id_Mr._Wickham"
+       cy="125.37288"
+       stroke="#000000"
+       stroke-opacity="1"
+       stroke-width="1.07631"
+       id="circle327" />
+    <circle
+       fill-opacity="1"
+       fill="#afb9d9"
+       r="22.727272"
+       cx="3.7213848"
+       class="id_Mr."
+       cy="371.37222"
+       stroke="#000000"
+       stroke-opacity="1"
+       stroke-width="1.07631"
+       id="circle329" />
+    <circle
+       fill-opacity="1"
+       fill="#edf8fb"
+       r="10"
+       cx="-305.25452"
+       class="id_Rosings"
+       cy="539.06128"
+       stroke="#000000"
+       stroke-opacity="1"
+       stroke-width="1.07631"
+       id="circle331" />
+    <circle
+       fill-opacity="1"
+       fill="#dbe6f1"
+       r="13.636364"
+       cx="-412.5675"
+       class="id_Colonel_Fitzwilliam"
+       cy="-470.02078"
+       stroke="#000000"
+       stroke-opacity="1"
+       stroke-width="1.07631"
+       id="circle333" />
+    <circle
+       fill-opacity="1"
+       fill="#dbe6f1"
+       r="13.636364"
+       cx="-594.95251"
+       class="id_Georgiana"
+       cy="194.82289"
+       stroke="#000000"
+       stroke-opacity="1"
+       stroke-width="1.07631"
+       id="circle335" />
+    <circle
+       fill-opacity="1"
+       fill="#e4eff6"
+       r="11.818182"
+       cx="-571.23639"
+       class="id_Mrs._Reynolds"
+       cy="-269.54559"
+       stroke="#000000"
+       stroke-opacity="1"
+       stroke-width="1.07631"
+       id="circle337" />
+  </g>
+  <g
+     id="node-labels"
+     transform="matrix(0.92909861,0,0,0.92909861,-0.72110707,13.679758)"
+     style="stroke-width:1.07631">
+    <text
+       font-size="33px"
+       x="629.7132"
+       y="50.936714"
+       fill="#000000"
+       style="dominant-baseline:central;text-anchor:middle;stroke-width:1.15845"
+       font-family="Arial"
+       class="id_Mr._Bennet"
+       id="text340">Mr. Bennet</text>
+    <text
+       font-size="16px"
+       x="-103.44683"
+       y="631.05389"
+       fill="#000000"
+       style="dominant-baseline:central;text-anchor:middle;stroke-width:1.15845"
+       font-family="Arial"
+       class="id_Mrs._Long"
+       id="text342">Mrs. Long</text>
+    <text
+       font-size="63px"
+       x="-212.60049"
+       y="314.85767"
+       fill="#000000"
+       style="dominant-baseline:central;text-anchor:middle;stroke-width:1.15845"
+       font-family="Arial"
+       class="id_Lydia"
+       id="text344">Lydia</text>
+    <text
+       font-size="39px"
+       x="594.34283"
+       y="-182.1145"
+       fill="#000000"
+       style="dominant-baseline:central;text-anchor:middle;stroke-width:1.15845"
+       font-family="Arial"
+       class="id_Mr._Bingley"
+       id="text346">Mr. Bingley</text>
+    <text
+       font-size="36px"
+       x="473.64471"
+       y="-402.5282"
+       fill="#000000"
+       style="dominant-baseline:central;text-anchor:middle;stroke-width:1.15845"
+       font-family="Arial"
+       class="id_Sir_William"
+       id="text348">Sir William</text>
+    <text
+       font-size="45px"
+       x="263.24182"
+       y="-540.94934"
+       fill="#000000"
+       style="dominant-baseline:central;text-anchor:middle;stroke-width:1.15845"
+       font-family="Arial"
+       class="id_Charlotte"
+       id="text350">Charlotte</text>
+    <text
+       font-size="80px"
+       x="103.98697"
+       y="-63.089676"
+       fill="#000000"
+       style="dominant-baseline:central;text-anchor:middle;stroke-width:1.15845"
+       font-family="Arial"
+       class="id_Elizabeth"
+       id="text352">Elizabeth</text>
+    <text
+       font-size="57px"
+       x="-117.8462"
+       y="-119.40121"
+       fill="#000000"
+       style="dominant-baseline:central;text-anchor:middle;stroke-width:1.15845"
+       font-family="Arial"
+       class="id_Jane"
+       id="text354">Jane</text>
+    <text
+       font-size="60px"
+       x="40.900017"
+       y="-371.30817"
+       fill="#000000"
+       style="dominant-baseline:central;text-anchor:middle;stroke-width:1.15845"
+       font-family="Arial"
+       class="id_Mrs._Bennet"
+       id="text356">Mrs. Bennet</text>
+    <text
+       font-size="39px"
+       x="-599.25146"
+       y="-29.640339"
+       fill="#000000"
+       style="dominant-baseline:central;text-anchor:middle;stroke-width:1.15845"
+       font-family="Arial"
+       class="id_Kitty"
+       id="text358">Kitty</text>
+    <text
+       font-size="33px"
+       x="-212.94286"
+       y="-555.31409"
+       fill="#000000"
+       style="dominant-baseline:central;text-anchor:middle;stroke-width:1.15845"
+       font-family="Arial"
+       class="id_Mary"
+       id="text360">Mary</text>
+    <text
+       font-size="25px"
+       x="402.65732"
+       y="-127.74124"
+       fill="#000000"
+       style="dominant-baseline:central;text-anchor:middle;stroke-width:1.15845"
+       font-family="Arial"
+       class="id_Mrs._Hurst"
+       id="text362">Mrs. Hurst</text>
+    <text
+       font-size="71px"
+       x="-92.335732"
+       y="81.977615"
+       fill="#000000"
+       style="dominant-baseline:central;text-anchor:middle;stroke-width:1.15845"
+       font-family="Arial"
+       class="id_Mr._Darcy"
+       id="text364">Mr. Darcy</text>
+    <text
+       font-size="33px"
+       x="549.29718"
+       y="289.33752"
+       fill="#000000"
+       style="dominant-baseline:central;text-anchor:middle;stroke-width:1.15845"
+       font-family="Arial"
+       class="id_Miss_Bingley"
+       id="text366">Miss Bingley</text>
+    <text
+       font-size="31px"
+       x="378.08478"
+       y="110.57204"
+       fill="#000000"
+       style="dominant-baseline:central;text-anchor:middle;stroke-width:1.15845"
+       font-family="Arial"
+       class="id_Bingley"
+       id="text368">Bingley</text>
+    <text
+       font-size="36px"
+       x="265.36218"
+       y="-299.81644"
+       fill="#000000"
+       style="dominant-baseline:central;text-anchor:middle;stroke-width:1.15845"
+       font-family="Arial"
+       class="id_Miss_De_Bourgh"
+       id="text370">Miss De Bourgh</text>
+    <text
+       font-size="28px"
+       x="169.49319"
+       y="571.74072"
+       fill="#000000"
+       style="dominant-baseline:central;text-anchor:middle;stroke-width:1.15845"
+       font-family="Arial"
+       class="id_Colonel_Forster"
+       id="text372">Colonel Forster</text>
+    <text
+       font-size="25px"
+       x="385.96356"
+       y="511.86752"
+       fill="#000000"
+       style="dominant-baseline:central;text-anchor:middle;stroke-width:1.15845"
+       font-family="Arial"
+       class="id_Meryton"
+       id="text374">Meryton</text>
+    <text
+       font-size="28px"
+       x="239.06606"
+       y="354.44852"
+       fill="#000000"
+       style="dominant-baseline:central;text-anchor:middle;stroke-width:1.15845"
+       font-family="Arial"
+       class="id_Mrs._Philips"
+       id="text376">Mrs. Philips</text>
+    <text
+       font-size="28px"
+       x="-367.75824"
+       y="-135.49596"
+       fill="#000000"
+       style="dominant-baseline:central;text-anchor:middle;stroke-width:1.15845"
+       font-family="Arial"
+       class="id_Longbourn"
+       id="text378">Longbourn</text>
+    <text
+       font-size="33px"
+       x="-457.89105"
+       y="381.3504"
+       fill="#000000"
+       style="dominant-baseline:central;text-anchor:middle;stroke-width:1.15845"
+       font-family="Arial"
+       class="id_Mrs._Gardiner"
+       id="text380">Mrs. Gardiner</text>
+    <text
+       font-size="60px"
+       x="-223.04411"
+       y="-318.59808"
+       fill="#000000"
+       style="dominant-baseline:central;text-anchor:middle;stroke-width:1.15845"
+       font-family="Arial"
+       class="id_Mr._Collins"
+       id="text382">Mr. Collins</text>
+    <text
+       font-size="36px"
+       x="57.163155"
+       y="-621.8924"
+       fill="#000000"
+       style="dominant-baseline:central;text-anchor:middle;stroke-width:1.15845"
+       font-family="Arial"
+       class="id_Lady_Catherine"
+       id="text384">Lady Catherine</text>
+    <text
+       font-size="19px"
+       x="102.85033"
+       y="173.25562"
+       fill="#000000"
+       style="dominant-baseline:central;text-anchor:middle;stroke-width:1.15845"
+       font-family="Arial"
+       class="id_Mr._Denny"
+       id="text386">Mr. Denny</text>
+    <text
+       font-size="39px"
+       x="-384.48172"
+       y="132.46638"
+       fill="#000000"
+       style="dominant-baseline:central;text-anchor:middle;stroke-width:1.15845"
+       font-family="Arial"
+       class="id_Mr._Wickham"
+       id="text388">Mr. Wickham</text>
+    <text
+       font-size="36px"
+       x="3.7213848"
+       y="377.81461"
+       fill="#000000"
+       style="dominant-baseline:central;text-anchor:middle;stroke-width:1.15845"
+       font-family="Arial"
+       class="id_Mr."
+       id="text390">Mr.</text>
+    <text
+       font-size="16px"
+       x="-305.25452"
+       y="542.76703"
+       fill="#000000"
+       style="dominant-baseline:central;text-anchor:middle;stroke-width:1.15845"
+       font-family="Arial"
+       class="id_Rosings"
+       id="text392">Rosings</text>
+    <text
+       font-size="22px"
+       x="-412.5675"
+       y="-465.94769"
+       fill="#000000"
+       style="dominant-baseline:central;text-anchor:middle;stroke-width:1.15845"
+       font-family="Arial"
+       class="id_Colonel_Fitzwilliam"
+       id="text394">Colonel Fitzwilliam</text>
+    <text
+       font-size="22px"
+       x="-594.95251"
+       y="199.9863"
+       fill="#000000"
+       style="dominant-baseline:central;text-anchor:middle;stroke-width:1.15845"
+       font-family="Arial"
+       class="id_Georgiana"
+       id="text396">Georgiana</text>
+    <text
+       font-size="19px"
+       x="-571.23639"
+       y="-265.14505"
+       fill="#000000"
+       style="dominant-baseline:central;text-anchor:middle;stroke-width:1.15845"
+       font-family="Arial"
+       class="id_Mrs._Reynolds"
+       id="text398">Mrs. Reynolds</text>
+  </g>
+</svg>
