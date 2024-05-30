@@ -240,6 +240,9 @@ When executing the above block of code, the output attribute
 >>> out.character_network
 [<networkx.classes.graph.Graph object at 0x7fd9e9115900>]
 
+See :class:`.CoOccurrencesGraphExtractor` for more details on the
+usage of the ``dynamic`` and ``dynamic_window`` arguments.
+
 Plot and export functions work as one would expect
 intuitively. :meth:`.PipelineState.plot_graph` allow to visualize the
 dynamic graph using a slider, and
