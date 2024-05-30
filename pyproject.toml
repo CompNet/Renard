@@ -8,6 +8,9 @@ readme = "README.md"
 packages = [
     { include = "renard" }
 ]
+homepage = "https://github.com/CompNet/Renard"
+repository = "https://github.com/CompNet/Renard"
+documentation = "https://compnet.github.io/Renard/"
 
 [tool.poetry.dependencies]
 # optional dependencies
