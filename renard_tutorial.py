@@ -91,7 +91,7 @@
 from renard.pipeline import Pipeline
 from renard.pipeline.character_unification import GraphRulesCharacterUnifier
 from renard.pipeline.graph_extraction import CoOccurrencesGraphExtractor
-from renard.utils import load_conll2002_bio
+from renard.ner_utils import load_conll2002_bio
 
 # the utility function "load_conll2002_bio" allows loading BIO NER
 # annotations from disk.
@@ -133,14 +133,14 @@ plt.show()
 # %% [markdown]
 # # Extraction Setup
 #
-# Here are a few examples of tweaks you can apply in the extraction setup. Depending on your text, these can enhance the quality of the extracted graph.
+# Here are a few examples of tweaks you can apply in the extraction setup. Depending on your text, these can enhance the quality of the extracted graph. For example, the `min_appearances` parameter filters character that appear unfrequently, which can reduce noise from the detection process, at the cost of eliminating some minor characters. The `co_occurences_dist` parameter changes the minimum co-occurrences to register an interaction between two characters. A lower value results in rarer interactions, while a higher value will yield more frequent (but less strict) interactions.
 
 # %%
 pipeline = Pipeline(
     [
-        # at least 3 occurences of a characters are needed for them to
+        # at least 10 occurences of a characters are needed for them to
         # be included in the graph (default is 1)
-        GraphRulesCharacterUnifier(min_appearances=3),
+        GraphRulesCharacterUnifier(min_appearances=10),
         # A co-occurence between two characters is counted if its
         # range is lower or equal to 10 sentences
         CoOccurrencesGraphExtractor(co_occurrences_dist=(10, "sentences")),
@@ -171,18 +171,18 @@ print(nx.density(out.character_network))
 out.export_graph_to_gexf("./my_graph.gexf")
 
 # %% [markdown]
-# ## Extraction d'un graphe dynamique
+# ## Extracting a dynamic graph
 #
 # It is possible to ask the `CoOccurrencesGraphExtractor` step to extract a _dynamic_ graph using the `dynamic` argument and a few parameters.
 
 # %%
 pipeline = Pipeline(
     [
-        GraphRulesCharacterUnifier(min_appearances=3),
+        GraphRulesCharacterUnifier(min_appearances=10),
         CoOccurrencesGraphExtractor(
             co_occurrences_dist=(20, "sentences"),
             dynamic=True,  # we want to extract a dynamic graph (i.e. a list of sequential graphs)
-            dynamic_window=20,  # the size, in interaction, of each graph
+            dynamic_window=20,  # the size, in number of interactions, of each graph
             dynamic_overlap=0,  # overlap between windows
         ),
     ],
