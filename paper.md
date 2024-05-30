@@ -26,13 +26,13 @@ bibliography: paper.bib
 
 # Summary
 
-Renard (*Relationships Extraction from NARrative Documents*) is a Python library that allows to define custom natural language processing (NLP) pipelines to extract character networks from narrative texts. Contrary to the few existing tools, Renard can extract *dynamic* networks, as well as the more common static networks. Renard pipelines are modular: the user can choose the implementation of each NLP subtask needed to extract a character network. This allows to specialize pipelines to particular types of texts and to study the impact of each subtask on the extracted network.
+Renard (*Relationships Extraction from NARrative Documents*) is a Python library that allows to define custom natural language processing (NLP) pipelines to extract character networks from narrative texts. Contrary to the few existing tools, Renard can extract *dynamic* networks, as well as the more common static networks. Renard pipelines are modular: users can choose the implementation of each NLP subtask needed to extract a character network. This allows specializing pipelines to particular types of texts and to study the impact of each subtask on the extracted network.
 
 # Statement of Need
 
-Character networks (that is, graphs where vertices represent characters and edges represent their relationships) extracted from narrative texts are useful in a number of applications, from visualization to literary analysis [@labatut-2019]. There are different ways of modeling relationships (co-occurrences, conversations, actions...), and networks can be static or dynamic (i.e. series of networks representing the evolution of relationships through time). This variety means one can extract different kinds of networks depending on the targeted applications. While some authors extract these networks by relying on manually annotated data [@rochat-2014-phd_thesis; @rochat-2015-character_networks_zola; @rochat-2017; @park-2013-character_networks; @park-2013-character_networksb], it is a time-costly endeavor, and the fully automatic extraction of these networks is therefore of interest. Unfortunately, there are only a few existing software and tools that can extract character networks [@marazzato-2014-chaplin; @metrailler-2023-charnetto], and none of these can output dynamic networks. Furthermore, automatically extracting a character network requires solving several successive natural language processing tasks, such as named entity recognition (NER) or coreference resolution, and algorithms carrying these tasks are bound to make errors. To our knowledge, the cascading impact of these errors on the quality of the extracted networks has yet to be studied extensively. This is an important issue since knowing which tasks have more influence on the extracted networks would allow prioritizing research efforts.
+Character networks (i.e., graphs where vertices represent characters and edges represent their relationships) extracted from narrative texts are useful in a number of applications, from visualization to literary analysis [@labatut-2019]. There are different ways of modeling relationships (co-occurrences, conversations, actions, etc.), and networks can be static or dynamic (i.e., series of networks representing the evolution of relationships through time). This variety means one can extract different kinds of networks depending on the targeted applications. While some authors extract these networks by relying on manually annotated data [@rochat-2014-phd_thesis; @rochat-2015-character_networks_zola; @rochat-2017; @park-2013-character_networks; @park-2013-character_networksb], it is a time-costly endeavor, and the fully automatic extraction of these networks is therefore of interest. Unfortunately, there are only a few existing software and tools that can extract character networks [@marazzato-2014-chaplin; @metrailler-2023-charnetto], but none of these can output dynamic networks. Furthermore, automatically extracting a character network requires solving several successive natural language processing tasks, such as named entity recognition (NER) or coreference resolution, and algorithms carrying these tasks are bound to make errors. To our knowledge, the cascading impact of these errors on the quality of the extracted networks has yet to be studied extensively. This is an important issue since knowing which tasks have more influence on the extracted networks would allow prioritizing research efforts.
 
-Renard is a fully configurable pipeline that can extract static and dynamic networks from narrative texts. We design it so that it is as modular as possible, which allows the user to select the implementation of each extraction step as needed. This has several advantages:
+Renard is a fully configurable pipeline that can extract static and dynamic networks from narrative texts. We base Renard on the generic character network extraction framework highlighted by the survey of [@labatut-2019]. We design it so that it is as modular as possible, which allows the user to select the implementation of each extraction step as needed. This has several advantages:
 
 1. Depending on the input text, the user can choose the most relevant series of steps and configure each of them as needed. Therefore, the pipeline can be specialized for different types of texts, allowing for better performance.
 2. The pipeline can easily incorporate new advances in NLP, by simply implementing a new step when necessary.
@@ -43,7 +43,7 @@ We intend for Renard to be used by digital humanities researchers as well as NLP
 
 # Design and Main Features
 
-Renard is centered about the concept of *pipeline*. In Renard, a pipeline is a series of sequential *steps* that are run one after the other in order to extract a character network from a text. When using Renard, the user simply *describes* this pipeline in Python by specifying this series of steps, and can apply it to different texts afterwards. The following code block exemplifies that philosophy:
+Renard is centered about the concept of a *pipeline*. In Renard, a pipeline is a series of sequential *steps* that are run one after the other in order to extract a character network from a text. When using Renard, the user simply *describes* this pipeline in Python by specifying this series of steps, and can apply it to different texts afterwards. The following code block exemplifies that philosophy:
 
 ```python
 from renard.pipeline import Pipeline
@@ -81,24 +81,24 @@ The flexibility of this approach introduces the possibility of creating invalid 
 
 : Existing steps and their supported languages in Renard. \label{tab:steps}
 
-| Step                                | Supported Languages                   |
-|-------------------------------------|---------------------------------------|
-| `StanfordCoreNLPPipeline`           | eng                                   |
-| `CustomSubstitutionPreprocessor`    | any                                   |
-| `NLTKTokenizer`                     | eng, fra, rus, ita, spa... (12 other) |
-| `QuoteDetector`                     | any                                   |
-| `NLTKNamedEntityRecognizer`         | eng, rus                              |
-| `BertNamedEntityRecognizer`         | eng, fra                              |
-| `BertCoreferenceResolver`           | eng                                   |
-| `SpacyCorefereeCoreferenceResolver` | eng                                   |
-| `NaiveCharacterUnifier`             | any                                   |
-| `GraphRulesCharacterUnifier`        | eng, fra                              |
-| `BertSpeakerDetector`               | eng                                   |
-| `CoOccurencesGraphExtractor`        | any                                   |
-| `ConversationalGraphExtractor`      | any                                   |
+| Step                                                                          | Supported Languages                   |
+|-------------------------------------------------------------------------------|---------------------------------------|
+| `StanfordCoreNLPPipeline`                                                     | eng                                   |
+| `CustomSubstitutionPreprocessor`                                              | any                                   |
+| `NLTKTokenizer`                                                               | eng, fra, rus, ita, spa... (12 other) |
+| `QuoteDetector`                                                               | any                                   |
+| `NLTKNamedEntityRecognizer`                                                   | eng, rus                              |
+| `BertNamedEntityRecognizer`                                                   | eng, fra                              |
+| `BertCoreferenceResolver`                                                     | eng                                   |
+| `SpacyCorefereeCoreferenceResolver`                                           | eng                                   |
+| `NaiveCharacterUnifier`                                                       | any                                   |
+| `GraphRulesCharacterUnifier` (inspired from [@vala-2015-character_detection]) | eng, fra                              |
+| `BertSpeakerDetector`                                                         | eng                                   |
+| `CoOccurencesGraphExtractor`                                                  | any                                   |
+| `ConversationalGraphExtractor`                                                | any                                   |
 
 
-Renard lets the user select the targeted language of its custom pipeline. A pipeline can be configured to run in any language, as long as each of its steps supports it. Table \ref{tab:steps} shows all the currently available steps in Renard and their supported languages.
+Renard lets users select the targeted language of its their custom pipelines. A pipeline can be configured to run in any language, as long as each of its steps supports it. Table \ref{tab:steps} shows all the currently available steps in Renard and their supported languages.
 
 
 
