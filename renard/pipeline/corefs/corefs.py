@@ -129,7 +129,7 @@ class BertCoreferenceResolver(PipelineStep):
         ):
             coref_docs.append(doc)
 
-        return {"corefs": CoreferenceDocument.concatenated(coref_docs)}
+        return {"corefs": CoreferenceDocument.concatenated(coref_docs).coref_chains}
 
     def needs(self) -> Set[str]:
         return {"tokens"}
