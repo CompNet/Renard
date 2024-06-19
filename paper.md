@@ -26,7 +26,7 @@ bibliography: paper.bib
 
 # Summary
 
-Renard (*Relationships Extraction from NARrative Documents*) is a Python library that allows to define custom natural language processing (NLP) pipelines to extract character networks from narrative texts. Contrary to the few existing tools, Renard can extract *dynamic* networks, as well as the more common static networks. Renard pipelines are modular: users can choose the implementation of each NLP subtask needed to extract a character network. This allows specializing pipelines to particular types of texts and to study the impact of each subtask on the extracted network.
+Renard (*Relationships Extraction from NARrative Documents*) is a Python library that allows users to define custom natural language processing (NLP) pipelines to extract character networks from narrative texts. Contrary to the few existing tools, Renard can extract *dynamic* networks, as well as the more common static networks. Renard pipelines are modular: users can choose the implementation of each NLP subtask needed to extract a character network. This allows users to specialize pipelines to particular types of texts and to study the impact of each subtask on the extracted network.
 
 # Statement of Need
 
