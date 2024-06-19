@@ -84,10 +84,8 @@
 <h2>Creating new steps<a class="headerlink" href="#creating-new-steps" title="Permalink to this headline"></a></h2>
 <p>Usually, steps must implement at least four functions :</p>
 <ul class="simple">
-<li><p><a class="reference internal" href="reference.html#renard.pipeline.core.PipelineStep.__init__" title="renard.pipeline.core.PipelineStep.__init__"><code class="xref py py-meth docutils literal notranslate"><span class="pre">PipelineStep.__init__()</span></code></a>: is used to pass options at step init
-time. Options passed at step init time should be valid for a
-collection of texts, and not be text specific.</p></li>
-<li><p><a class="reference internal" href="reference.html#renard.pipeline.core.PipelineStep.__call__" title="renard.pipeline.core.PipelineStep.__call__"><code class="xref py py-meth docutils literal notranslate"><span class="pre">PipelineStep.__call__()</span></code></a>: is called at pipeline run time.</p></li>
+<li><p><a class="reference internal" href="reference.html#renard.pipeline.core.PipelineStep.__init__" title="renard.pipeline.core.PipelineStep.__init__"><code class="xref py py-meth docutils literal notranslate"><span class="pre">PipelineStep.__init__()</span></code></a>: is used to pass options at step init time</p></li>
+<li><p><a class="reference internal" href="reference.html#renard.pipeline.core.PipelineStep.__call__" title="renard.pipeline.core.PipelineStep.__call__"><code class="xref py py-meth docutils literal notranslate"><span class="pre">PipelineStep.__call__()</span></code></a>: is called at pipeline run time</p></li>
 <li><p><a class="reference internal" href="reference.html#renard.pipeline.core.PipelineStep.needs" title="renard.pipeline.core.PipelineStep.needs"><code class="xref py py-meth docutils literal notranslate"><span class="pre">PipelineStep.needs()</span></code></a>: declares the set of informations needed
 from the pipeline state by this step. Each returned string should be
 an attribute of <a class="reference internal" href="reference.html#renard.pipeline.core.PipelineState" title="renard.pipeline.core.PipelineState"><code class="xref py py-class docutils literal notranslate"><span class="pre">PipelineState</span></code></a>.</p></li>
