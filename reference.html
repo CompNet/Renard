@@ -96,7 +96,6 @@
 <li class="toctree-l2"><a class="reference internal" href="#module-renard.utils">Utils</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#module-renard.graph_utils">Graph utils</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-renard.plot_utils">Plot utils</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-renard.ner_utils">NER utils</a></li>
 </ul>
 </li>
 </ul>
@@ -1138,14 +1137,6 @@ chain being <a class="reference internal" href="#renard.pipeline.core.Mention" t
 <dt class="sig sig-object py" id="renard.pipeline.core.Mention.__eq__">
 <span class="sig-name descname"><span class="pre">__eq__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.core.Mention.__eq__" title="Permalink to this definition"></a></dt>
 <dd><p>Return self==value.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>other</strong> (<a class="reference internal" href="#renard.pipeline.core.Mention" title="renard.pipeline.core.Mention"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mention</span></code></a>) – </p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
-</dd>
-</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -1772,7 +1763,7 @@ the string <code class="docutils literal notranslate"><span class="pre">'any'</s
 <h3>GraphRulesCharacterUnifier<a class="headerlink" href="#graphrulescharacterunifier" title="Permalink to this headline"></a></h3>
 <dl class="py class">
 <dt class="sig sig-object py" id="renard.pipeline.character_unification.GraphRulesCharacterUnifier">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">renard.pipeline.character_unification.</span></span><span class="sig-name descname"><span class="pre">GraphRulesCharacterUnifier</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">min_appearances</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">additional_hypocorisms</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">link_corefs_mentions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore_lone_titles</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.character_unification.GraphRulesCharacterUnifier" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">renard.pipeline.character_unification.</span></span><span class="sig-name descname"><span class="pre">GraphRulesCharacterUnifier</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">min_appearances</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">additional_hypocorisms</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">link_corefs_mentions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.character_unification.GraphRulesCharacterUnifier" title="Permalink to this definition"></a></dt>
 <dd><p>Unify characters by creating a graph where mentions are
 linked when they refer to the same character, and then
 merging this graph nodes.</p>
@@ -1786,7 +1777,6 @@ merging this graph nodes.</p>
 <li><p><strong>min_appearances</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – </p></li>
 <li><p><strong>additional_hypocorisms</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]]]) – </p></li>
 <li><p><strong>link_corefs_mentions</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – </p></li>
-<li><p><strong>ignore_lone_titles</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Set</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – </p></li>
 </ul>
 </dd>
 </dl>
@@ -1810,7 +1800,7 @@ merging this graph nodes.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="renard.pipeline.character_unification.GraphRulesCharacterUnifier.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">min_appearances</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">additional_hypocorisms</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">link_corefs_mentions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore_lone_titles</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.character_unification.GraphRulesCharacterUnifier.__init__" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">min_appearances</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">additional_hypocorisms</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">link_corefs_mentions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.character_unification.GraphRulesCharacterUnifier.__init__" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -1826,9 +1816,6 @@ is disabled by default since a coreference model can
 extract a lot of spurious links.  However, linking by
 coref is sometimes the only way to resolve a character
 alias.</p></li>
-<li><p><strong>ignore_lone_titles</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Set</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – a set of titles to ignore when
-they stand on their own.  This avoids extracting false
-positives characters such as ‘Mr.’ or ‘Miss’.</p></li>
 </ul>
 </dd>
 </dl>
@@ -2747,174 +2734,6 @@ character to its name</p></li>
 <li><p><strong>layout</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>]) – if given, this graph layout will be applied.
 Otherwise, use <code class="xref py py-func docutils literal notranslate"><span class="pre">layout_nx_graph_reasonably()</span></code>.</p></li>
 </ul>
-</dd>
-</dl>
-</dd></dl>
-
-</section>
-<section id="module-renard.ner_utils">
-<span id="ner-utils"></span><h3>NER utils<a class="headerlink" href="#module-renard.ner_utils" title="Permalink to this headline"></a></h3>
-<dl class="py class">
-<dt class="sig sig-object py" id="renard.ner_utils.DataCollatorForTokenClassificationWithBatchEncoding">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">renard.ner_utils.</span></span><span class="sig-name descname"><span class="pre">DataCollatorForTokenClassificationWithBatchEncoding</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tokenizer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pad_to_multiple_of</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.ner_utils.DataCollatorForTokenClassificationWithBatchEncoding" title="Permalink to this definition"></a></dt>
-<dd><p>Same as <code class="docutils literal notranslate"><span class="pre">transformers.DataCollatorForTokenClassification</span></code>,
-except it correctly returns a <code class="docutils literal notranslate"><span class="pre">BatchEncoding</span></code> object with
-correct <code class="docutils literal notranslate"><span class="pre">encodings</span></code> attribute.</p>
-<p>Don’t know why this is not the default ?</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>tokenizer</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">PreTrainedTokenizerFast</span></code>) – </p></li>
-<li><p><strong>pad_to_multiple_of</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]) – </p></li>
-</ul>
-</dd>
-</dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="renard.ner_utils.DataCollatorForTokenClassificationWithBatchEncoding.__call__">
-<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">features</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.ner_utils.DataCollatorForTokenClassificationWithBatchEncoding.__call__" title="Permalink to this definition"></a></dt>
-<dd><p>Call self as a function.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>features</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>]) – </p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">BatchEncoding</span></code>]</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="renard.ner_utils.DataCollatorForTokenClassificationWithBatchEncoding.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tokenizer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pad_to_multiple_of</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.ner_utils.DataCollatorForTokenClassificationWithBatchEncoding.__init__" title="Permalink to this definition"></a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>tokenizer</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">PreTrainedTokenizerFast</span></code>) – </p></li>
-<li><p><strong>pad_to_multiple_of</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]) – </p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="renard.ner_utils.NERDataset">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">renard.ner_utils.</span></span><span class="sig-name descname"><span class="pre">NERDataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">elements</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tokenizer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context_mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.ner_utils.NERDataset" title="Permalink to this definition"></a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Variables</dt>
-<dd class="field-odd"><p><strong>_context_mask</strong> – for each element, a mask indicating which
-tokens are part of the context (1 for context, 0 for text on
-which to perform inference).  The mask allows to discard
-predictions made for context at inference time, even though
-the context can still be passed as input to the model.</p>
-</dd>
-<dt class="field-even">Parameters</dt>
-<dd class="field-even"><ul class="simple">
-<li><p><strong>elements</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – </p></li>
-<li><p><strong>tokenizer</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">PreTrainedTokenizerFast</span></code>) – </p></li>
-<li><p><strong>context_mask</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]]]) – </p></li>
-</ul>
-</dd>
-</dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="renard.ner_utils.NERDataset.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">elements</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tokenizer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context_mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.ner_utils.NERDataset.__init__" title="Permalink to this definition"></a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>elements</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – </p></li>
-<li><p><strong>tokenizer</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">PreTrainedTokenizerFast</span></code>) – </p></li>
-<li><p><strong>context_mask</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]]]) – </p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="renard.ner_utils._tokenize_and_align_labels">
-<span class="sig-prename descclassname"><span class="pre">renard.ner_utils.</span></span><span class="sig-name descname"><span class="pre">_tokenize_and_align_labels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">examples</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tokenizer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label_all_tokens</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.ner_utils._tokenize_and_align_labels" title="Permalink to this definition"></a></dt>
-<dd><p>Adapted from <a class="reference external" href="https://colab.research.google.com/github/huggingface/notebooks/blob/master/examples/token_classification.ipynb#scrollTo=vc0BSBLIIrJQ">https://colab.research.google.com/github/huggingface/notebooks/blob/master/examples/token_classification.ipynb#scrollTo=vc0BSBLIIrJQ</a></p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>examples</strong> – an object with keys ‘tokens’ and ‘labels’</p></li>
-<li><p><strong>tokenizer</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">PreTrainedTokenizerFast</span></code>) – </p></li>
-<li><p><strong>label_all_tokens</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – </p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="renard.ner_utils.hgdataset_from_conll2002">
-<span class="sig-prename descclassname"><span class="pre">renard.ner_utils.</span></span><span class="sig-name descname"><span class="pre">hgdataset_from_conll2002</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tag_conversion_map</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">separator</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'\\t'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.ner_utils.hgdataset_from_conll2002" title="Permalink to this definition"></a></dt>
-<dd><p>Load a CoNLL-2002 file as a Huggingface Dataset.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>path</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – passed to <a class="reference internal" href="#renard.ner_utils.load_conll2002_bio" title="renard.ner_utils.load_conll2002_bio"><code class="xref py py-func docutils literal notranslate"><span class="pre">load_conll2002_bio()</span></code></a></p></li>
-<li><p><strong>tag_conversion_map</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – passed to <a class="reference internal" href="#renard.ner_utils.load_conll2002_bio" title="renard.ner_utils.load_conll2002_bio"><code class="xref py py-func docutils literal notranslate"><span class="pre">load_conll2002_bio()</span></code></a></p></li>
-<li><p><strong>separator</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – passed to <a class="reference internal" href="#renard.ner_utils.load_conll2002_bio" title="renard.ner_utils.load_conll2002_bio"><code class="xref py py-func docutils literal notranslate"><span class="pre">load_conll2002_bio()</span></code></a></p></li>
-<li><p><strong>kwargs</strong> – passed to <a class="reference internal" href="#renard.ner_utils.load_conll2002_bio" title="renard.ner_utils.load_conll2002_bio"><code class="xref py py-func docutils literal notranslate"><span class="pre">load_conll2002_bio()</span></code></a></p></li>
-</ul>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></p>
-</dd>
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>a <code class="xref py py-class docutils literal notranslate"><span class="pre">datasets.Dataset</span></code> with features ‘tokens’ and ‘labels’.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="renard.ner_utils.load_conll2002_bio">
-<span class="sig-prename descclassname"><span class="pre">renard.ner_utils.</span></span><span class="sig-name descname"><span class="pre">load_conll2002_bio</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tag_conversion_map</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">separator</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'\\t'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.ner_utils.load_conll2002_bio" title="Permalink to this definition"></a></dt>
-<dd><p>Load a file under CoNLL2022 BIO format.  Sentences are expected
-to be separated by end of lines.  Tags should be in the CoNLL-2002
-format (such as ‘B-PER I-PER’) - If this is not the case, see the
-<code class="docutils literal notranslate"><span class="pre">tag_conversion_map</span></code> argument.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>path</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – path to the CoNLL-2002 formatted file</p></li>
-<li><p><strong>separator</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – separator between token and BIO tags</p></li>
-<li><p><strong>tag_conversion_map</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – conversion map for tags found in the
-input file.  Example : <code class="docutils literal notranslate"><span class="pre">{'B':</span> <span class="pre">'B-PER',</span> <span class="pre">'I':</span> <span class="pre">'I-PER'}</span></code></p></li>
-<li><p><strong>kwargs</strong> – additional kwargs for <code class="docutils literal notranslate"><span class="pre">open</span></code> (such as
-<code class="docutils literal notranslate"><span class="pre">encoding</span></code> or <code class="docutils literal notranslate"><span class="pre">newline</span></code>).</p></li>
-</ul>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]], <code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<a class="reference internal" href="#renard.pipeline.ner.NEREntity" title="renard.pipeline.ner.NEREntity"><code class="xref py py-class docutils literal notranslate"><span class="pre">NEREntity</span></code></a>]]</p>
-</dd>
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">(sentences,</span> <span class="pre">tokens,</span> <span class="pre">entities)</span></code></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="renard.ner_utils.ner_entities">
-<span class="sig-prename descclassname"><span class="pre">renard.ner_utils.</span></span><span class="sig-name descname"><span class="pre">ner_entities</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tokens</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bio_tags</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolve_inconsistencies</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.ner_utils.ner_entities" title="Permalink to this definition"></a></dt>
-<dd><p>Extract NER entities from a list of BIO tags</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>tokens</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – a list of tokens</p></li>
-<li><p><strong>bio_tags</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – a list of BIO tags.  In particular, BIO tags
-should be in the CoNLL-2002 form (such as ‘B-PER I-PER’)</p></li>
-<li><p><strong>resolve_inconsistencies</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – </p></li>
-</ul>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<a class="reference internal" href="#renard.pipeline.ner.NEREntity" title="renard.pipeline.ner.NEREntity"><code class="xref py py-class docutils literal notranslate"><span class="pre">NEREntity</span></code></a>]</p>
-</dd>
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>A list of ner entities, in apparition order</p>
 </dd>
 </dl>
 </dd></dl>
