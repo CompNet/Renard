@@ -84,7 +84,7 @@ To allow for custom needs, we design Renard to be very flexible. If a step is no
 - Implement their own step to integrate their custom processing into Renard by subclassing the existing `PipelineStep` class. If necessary, this `PipelineStep` can act as an adapter to an external process that may or may not be written in Python.
 
 
-The flexibility of this approach introduces the possibility of creating invalid pipelines because steps often require information computed by previously ran steps: for example, solving the NER task requires a tokenized version of the input text. To counteract this issue, each step therefore declares its requirements and the new information it produces, which allows Renard to check whether a pipeline is valid, and to explain at runtime to the user why it may not be[^2].
+The flexibility of this approach introduces the possibility of creating invalid pipelines because steps often require information computed by previously run steps: for example, solving the NER task requires a tokenized version of the input text. To counteract this issue, each step therefore declares its requirements and the new information it produces, which allows Renard to check whether a pipeline is valid, and to explain at runtime to the user why it may not be[^2].
 
 [^2]: See [the documentation](https://compnet.github.io/Renard/pipeline.html#the-pipeline) for more details on steps requirements.
 
