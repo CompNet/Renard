@@ -159,6 +159,7 @@ class GraphRulesCharacterUnifier(PipelineStep):
         min_appearances: int = 0,
         additional_hypocorisms: Optional[List[Tuple[str, List[str]]]] = None,
         link_corefs_mentions: bool = False,
+        ignore_lone_titles: Optional[Set[str]] = None,
     ) -> None:
         """
         :param min_appearances: minimum number of appearances of a
@@ -173,10 +174,14 @@ class GraphRulesCharacterUnifier(PipelineStep):
             extract a lot of spurious links.  However, linking by
             coref is sometimes the only way to resolve a character
             alias.
+        :param ignore_lone_titles: a set of titles to ignore when
+            they stand on their own.  This avoids extracting false
+            positives characters such as 'Mr.' or 'Miss'.
         """
         self.min_appearances = min_appearances
         self.additional_hypocorisms = additional_hypocorisms
         self.link_corefs_mentions = link_corefs_mentions
+        self.ignore_lone_titles = ignore_lone_titles or set()
 
         super().__init__()
 
@@ -197,11 +202,16 @@ class GraphRulesCharacterUnifier(PipelineStep):
         import networkx as nx
 
         mentions = [m for m in entities if m.tag == "PER"]
-        mentions_str = [" ".join(m.tokens) for m in mentions]
+        mentions_str = set(
+            filter(
+                lambda m: not m in self.ignore_lone_titles,
+                map(lambda m: " ".join(m.tokens), mentions),
+            )
+        )
 
         # * create a graph where each node is a mention detected by NER
         G = nx.Graph()
-        for mention_str in set(mentions_str):
+        for mention_str in mentions_str:
             G.add_node(mention_str)
 
         # * HumanName local configuration - dependant on language
