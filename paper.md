@@ -74,7 +74,7 @@ out = pipeline(text)
 
 ![Co-occurrence character network of Jane Austen's "Pride and Prejudice", extracted automatically using Renard. Vertex size and color denote degree, while edge thickness and color denote the number of co-occurrences between two characters.](./pp.pdf){#fig:pp_network height=30% }
 
-As an example, Figure \ref{fig:pp_network} shows the co-occurrence character network Jane Austen's 1813 novel "Pride and Prejudice", extracted using the Renard pipeline above. While this network is static, users can also extract a dynamic network by passing the `dynamic=True` argument to the last step of the pipeline, and specifying the `dynamic_window` argument: in that case, Renard outputs a list of graphs corresponding to a dynamic network instead of a single network[^1]. Renard uses the NetworkX Python library [@hagberg-2008-networkx] to manipulate graphs, ensuring compatibility with a wide array of tools and formats.
+As an example, Figure \ref{fig:pp_network} shows the co-occurrence character network of Jane Austen's 1813 novel "Pride and Prejudice", extracted using the Renard pipeline above. While this network is static, users can also extract a dynamic network by passing the `dynamic=True` argument to the last step of the pipeline, and specifying the `dynamic_window` argument: in that case, Renard outputs a list of graphs corresponding to a dynamic network instead of a single network[^1]. Renard uses the NetworkX Python library [@hagberg-2008-networkx] to manipulate graphs, ensuring compatibility with a wide array of tools and formats.
 
 [^1]: See [the documentation on dynamic networks](https://compnet.github.io/Renard/pipeline.html#dynamic-graphs) for more details.
 
