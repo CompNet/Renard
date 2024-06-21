@@ -1,5 +1,7 @@
 # Renard
 
+[![DOI](https://joss.theoj.org/papers/10.21105/joss.06574/status.svg)](https://doi.org/10.21105/joss.06574)
+
 Renard (Relationships Extraction from NARrative Documents) is a library for creating and using custom character networks extraction pipelines. Renard can extract dynamic as well as static character networks.
 
 ![Character network extracted from "Pride and Prejudice"](./docs/pp_white_bg.svg)
