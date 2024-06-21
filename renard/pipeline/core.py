@@ -288,6 +288,9 @@ class PipelineState:
         cumulative: bool = False,
         stable_layout: bool = False,
         layout: Optional[CharactersGraphLayout] = None,
+        node_kwargs: Optional[List[Dict[str, Any]]] = None,
+        edge_kwargs: Optional[List[Dict[str, Any]]] = None,
+        label_kwargs: Optional[List[Dict[str, Any]]] = None,
     ):
         """Plot ``self.character_graph`` using reasonable default
         parameters, and save the produced figures in the specified
@@ -302,6 +305,9 @@ class PipelineState:
             timestep.  Characters' positions are based on the final
             cumulative graph layout.
         :param layout: pre-computed graph layout
+        :param node_kwargs: passed to :func:`nx.draw_networkx_nodes`
+        :param edge_kwargs: passed to :func:`nx.draw_networkx_nodes`
+        :param label_kwargs: passed to :func:`nx.draw_networkx_labels`
         """
         import matplotlib.pyplot as plt
 
@@ -325,13 +331,24 @@ class PipelineState:
             )
             layout = layout_nx_graph_reasonably(layout_graph)
 
+        node_kwargs = node_kwargs or [{} for _ in range(len(self.character_network))]
+        edge_kwargs = edge_kwargs or [{} for _ in range(len(self.character_network))]
+        label_kwargs = label_kwargs or [{} for _ in range(len(self.character_network))]
+
         for i, G in enumerate(graphs):
             _, ax = plt.subplots()
             local_layout = layout
             if not local_layout is None:
                 local_layout = layout_with_names(G, local_layout, name_style)
             G = graph_with_names(G, name_style=name_style)
-            plot_nx_graph_reasonably(G, ax=ax, layout=local_layout)
+            plot_nx_graph_reasonably(
+                G,
+                ax=ax,
+                layout=local_layout,
+                node_kwargs=node_kwargs[i],
+                edge_kwargs=edge_kwargs[i],
+                label_kwargs=label_kwargs[i],
+            )
             plt.savefig(f"{directory}/{i}.png")
             plt.close()
 
@@ -343,6 +360,9 @@ class PipelineState:
         ] = "most_frequent",
         layout: Optional[CharactersGraphLayout] = None,
         fig: Optional[plt.Figure] = None,
+        node_kwargs: Optional[Dict[str, Any]] = None,
+        edge_kwargs: Optional[Dict[str, Any]] = None,
+        label_kwargs: Optional[Dict[str, Any]] = None,
     ):
         """Plot ``self.character_graph`` using reasonable parameters,
         and save the produced figure to a file
@@ -352,6 +372,9 @@ class PipelineState:
         :param layout: pre-computed graph layout
         :param fig: if specified, this matplotlib figure will be used
             for plotting
+        :param node_kwargs: passed to :func:`nx.draw_networkx_nodes`
+        :param edge_kwargs: passed to :func:`nx.draw_networkx_nodes`
+        :param label_kwargs: passed to :func:`nx.draw_networkx_labels`
         """
         import matplotlib.pyplot as plt
 
@@ -369,7 +392,14 @@ class PipelineState:
             fig.set_dpi(300)
             fig.set_size_inches(24, 24)
         ax = fig.add_subplot(111)
-        plot_nx_graph_reasonably(G, ax=ax, layout=layout)
+        plot_nx_graph_reasonably(
+            G,
+            ax=ax,
+            layout=layout,
+            node_kwargs=node_kwargs,
+            edge_kwargs=edge_kwargs,
+            label_kwargs=label_kwargs,
+        )
         plt.savefig(path)
         plt.close()
 
@@ -383,6 +413,9 @@ class PipelineState:
         graph_start_idx: int = 1,
         stable_layout: bool = False,
         layout: Optional[CharactersGraphLayout] = None,
+        node_kwargs: Optional[Union[Dict[str, Any], List[Dict[str, Any]]]] = None,
+        edge_kwargs: Optional[Union[Dict[str, Any], List[Dict[str, Any]]]] = None,
+        label_kwargs: Optional[Union[Dict[str, Any], List[Dict[str, Any]]]] = None,
     ):
         """Plot ``self.character_network`` using reasonable default
         parameters
@@ -408,6 +441,9 @@ class PipelineState:
             same position in space at each timestep.  Characters'
             positions are based on the final cumulative graph layout.
         :param layout: pre-computed graph layout
+        :param node_kwargs: passed to :func:`nx.draw_networkx_nodes`
+        :param edge_kwargs: passed to :func:`nx.draw_networkx_nodes`
+        :param label_kwargs: passed to :func:`nx.draw_networkx_labels`
         """
         import matplotlib.pyplot as plt
         from matplotlib.widgets import Slider
@@ -426,12 +462,29 @@ class PipelineState:
                 fig.set_dpi(300)
                 fig.set_size_inches(24, 24)
             ax = fig.add_subplot(111)
-            plot_nx_graph_reasonably(G, ax=ax, layout=layout)
+            assert not isinstance(node_kwargs, list)
+            assert not isinstance(edge_kwargs, list)
+            assert not isinstance(label_kwargs, list)
+            plot_nx_graph_reasonably(
+                G,
+                ax=ax,
+                layout=layout,
+                node_kwargs=node_kwargs,
+                edge_kwargs=edge_kwargs,
+                label_kwargs=label_kwargs,
+            )
             return
 
         if not isinstance(self.character_network, list):
             raise TypeError
         # self.character_network is a list: plot a dynamic graph
+
+        node_kwargs = node_kwargs or [{} for _ in range(len(self.character_network))]
+        assert isinstance(node_kwargs, list)
+        edge_kwargs = edge_kwargs or [{} for _ in range(len(self.character_network))]
+        assert isinstance(edge_kwargs, list)
+        label_kwargs = label_kwargs or [{} for _ in range(len(self.character_network))]
+        assert isinstance(label_kwargs, list)
 
         if fig is None:
             fig, ax = plt.subplots()
@@ -448,12 +501,13 @@ class PipelineState:
 
         def update(slider_value):
             assert isinstance(self.character_network, list)
+            slider_i = int(slider_value) - 1
 
             character_networks = self.character_network
             if cumulative:
                 character_networks = cumulative_character_networks
 
-            G = character_networks[int(slider_value) - 1]
+            G = character_networks[slider_i]
 
             local_layout = layout
             if not local_layout is None:
@@ -461,7 +515,14 @@ class PipelineState:
             G = graph_with_names(G, name_style)
 
             ax.clear()
-            plot_nx_graph_reasonably(G, ax=ax, layout=local_layout)
+            plot_nx_graph_reasonably(
+                G,
+                ax=ax,
+                layout=local_layout,
+                node_kwargs=node_kwargs[slider_i],
+                edge_kwargs=edge_kwargs[slider_i],
+                label_kwargs=label_kwargs[slider_i],
+            )
             ax.set_xlim(-1.2, 1.2)
             ax.set_ylim(-1.2, 1.2)
 
