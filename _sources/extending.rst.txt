@@ -8,10 +8,8 @@ Creating new steps
 
 Usually, steps must implement at least four functions :
 
-- :meth:`.PipelineStep.__init__`: is used to pass options at step init
-  time. Options passed at step init time should be valid for a
-  collection of texts, and not be text specific.
-- :meth:`.PipelineStep.__call__`: is called at pipeline run time.
+- :meth:`.PipelineStep.__init__`: is used to pass options at step init time
+- :meth:`.PipelineStep.__call__`: is called at pipeline run time
 - :meth:`.PipelineStep.needs`: declares the set of informations needed
   from the pipeline state by this step. Each returned string should be
   an attribute of :class:`.PipelineState`.
