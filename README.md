@@ -65,3 +65,25 @@ Expensive tests are disabled by default. These can be run by setting the environ
 # Contributing
 
 see [the "Contributing" section of the documentation](https://compnet.github.io/Renard/contributing.html).
+
+
+# How to cite
+
+If you use Renard in your research project, please cite it as follows:
+
+```bibtex
+@Article{Amalvy2024,
+  doi	       = {10.21105/joss.06574},
+  year	       = {2024},
+  publisher    = {The Open Journal},
+  volume       = {9},
+  number       = {98},
+  pages	       = {6574},
+  author       = {Amalvy, A. and Labatut, V. and Dufour, R.},
+  title	       = {Renard: A Modular Pipeline for Extracting Character
+                  Networks from Narrative Texts},
+  journal      = {Journal of Open Source Software},
+} 
+```
+
+We would be happy to hear about your usage of Renard, so don't hesitate to reach out!
