@@ -74,7 +74,7 @@ For simplicity, one can use one of the preconfigured pipelines:
        text = f.read()
 
    pipeline = bert_pipeline(
-       graph_extractor_kwargs={"co_occurences_dist": (1, "sentences")}
+       graph_extractor_kwargs={"co_occurrences_dist": (1, "sentences")}
    )
    out = pipeline(text)
 
