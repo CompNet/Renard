@@ -578,7 +578,7 @@ class Pipeline:
         :param ignored_steps: a list of steps production.  All steps
             with a production in ``ignored_steps`` will be ignored.
         """
-        steps_progress_reporter = get_progress_reporter(self.progress_report)
+        steps_progress_reporter = self.progress_reporter.get_subreporter()
         steps = self._non_ignored_steps(ignored_steps)
         pipeline_params = {
             "progress_reporter": steps_progress_reporter,

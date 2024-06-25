@@ -1,3 +1,4 @@
+from __future__ import annotations
 from typing import Iterable, Literal, Optional, TypeVar, Generator
 from tqdm import tqdm
 
@@ -20,6 +21,10 @@ class ProgressReporter:
         """Update reporter current message."""
         pass
 
+    def get_subreporter(self) -> ProgressReporter:
+        """Get the subreporter corresponding to that reporter."""
+        raise NotImplementedError
+
 
 class NoopProgressReporter(ProgressReporter):
     def reset_(self):
@@ -27,6 +32,28 @@ class NoopProgressReporter(ProgressReporter):
 
     def update_progress_(self, added_progress: int):
         pass
+
+    def get_subreporter(self) -> ProgressReporter:
+        return NoopProgressReporter()
+
+
+class TQDMSubProgressReporter(ProgressReporter):
+    def __init__(self, reporter: TQDMProgressReporter) -> None:
+        super().__init__()
+        self.reporter = reporter
+
+    def start_(self, total: int):
+        super().start_(total)
+        self.progress = 0
+
+    def update_progress_(self, added_progress: int):
+        self.progress += added_progress
+        self.reporter.tqdm.set_postfix(step=f"({self.progress}/{self.total})")
+
+    def update_message_(self, message: str):
+        self.reporter.tqdm.set_postfix(
+            step=f"({self.progress}/{self.total})", message=message
+        )
 
 
 class TQDMProgressReporter(ProgressReporter):
@@ -39,6 +66,9 @@ class TQDMProgressReporter(ProgressReporter):
 
     def update_message_(self, message: str):
         self.tqdm.set_description_str(message)
+
+    def get_subreporter(self) -> ProgressReporter:
+        return TQDMSubProgressReporter(self)
 
 
 T = TypeVar("T")
