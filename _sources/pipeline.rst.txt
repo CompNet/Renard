@@ -264,12 +264,12 @@ want and pass this argument instead of the usual text:
    from renard.pipeline.ner import NLTKNamedEntityRecognizer
    from renard.pipeline.character_unification import GraphRulesCharacterUnifier
    from renard.pipeline.graph_extraction import CoOccurrencesGraphExtractor
-   from renard.utils import blocks_indices
+   from renard.utils import block_bounds
 
    with open("./my_doc.txt") as f:
        text = f.read()
 
-   # let's suppose the 'cut_into_chapters' function cut the text into chapters
+   # let's suppose the 'cut_into_chapters' function cut the text into chapters.
    chapters = cut_into_chapters(text)
 
    pipeline = Pipeline(
@@ -281,7 +281,9 @@ want and pass this argument instead of the usual text:
        ]
    )
 
-   out = pipeline(dynamic_blocks=block_indices(chapters))
+   # the 'block_bounds' function automatically extracts the boundaries of your
+   # block of text.
+   out = pipeline(text, dynamic_blocks=block_bounds(chapters))
 
 
 

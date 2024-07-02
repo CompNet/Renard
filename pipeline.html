@@ -329,12 +329,12 @@ want and pass this argument instead of the usual text:</p>
 <span class="kn">from</span> <span class="nn">renard.pipeline.ner</span> <span class="kn">import</span> <span class="n">NLTKNamedEntityRecognizer</span>
 <span class="kn">from</span> <span class="nn">renard.pipeline.character_unification</span> <span class="kn">import</span> <span class="n">GraphRulesCharacterUnifier</span>
 <span class="kn">from</span> <span class="nn">renard.pipeline.graph_extraction</span> <span class="kn">import</span> <span class="n">CoOccurrencesGraphExtractor</span>
-<span class="kn">from</span> <span class="nn">renard.utils</span> <span class="kn">import</span> <span class="n">blocks_indices</span>
+<span class="kn">from</span> <span class="nn">renard.utils</span> <span class="kn">import</span> <span class="n">block_bounds</span>
 
 <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;./my_doc.txt&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
     <span class="n">text</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
 
-<span class="c1"># let&#39;s suppose the &#39;cut_into_chapters&#39; function cut the text into chapters</span>
+<span class="c1"># let&#39;s suppose the &#39;cut_into_chapters&#39; function cut the text into chapters.</span>
 <span class="n">chapters</span> <span class="o">=</span> <span class="n">cut_into_chapters</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
 
 <span class="n">pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span>
@@ -346,7 +346,9 @@ want and pass this argument instead of the usual text:</p>
     <span class="p">]</span>
 <span class="p">)</span>
 
-<span class="n">out</span> <span class="o">=</span> <span class="n">pipeline</span><span class="p">(</span><span class="n">dynamic_blocks</span><span class="o">=</span><span class="n">block_indices</span><span class="p">(</span><span class="n">chapters</span><span class="p">))</span>
+<span class="c1"># the &#39;block_bounds&#39; function automatically extracts the boundaries of your</span>
+<span class="c1"># block of text.</span>
+<span class="n">out</span> <span class="o">=</span> <span class="n">pipeline</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">dynamic_blocks</span><span class="o">=</span><span class="n">block_bounds</span><span class="p">(</span><span class="n">chapters</span><span class="p">))</span>
 </pre></div>
 </div>
 </section>
