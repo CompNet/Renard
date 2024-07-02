@@ -1,4 +1,5 @@
-from typing import List, Tuple, TypeVar, Collection, Iterable, cast
+from typing import List, Literal, Tuple, TypeVar, Collection, Iterable, cast, Union
+import sys
 from more_itertools.more import windowed
 import torch
 
@@ -78,12 +79,56 @@ def search_pattern(seq: Iterable[R], pattern: List[R]) -> List[int]:
     return start_indices
 
 
-def block_indices(blocks: List[str]) -> List[Tuple[int, int]]:
-    """Return the boundaries of a series of blocks."""
+#: A `BlockBounds` delimits blocks in either raw text ("characters") or
+#: tokenized text ("tokens"). It has the following form:
+#:
+#: ([(block start, block end), ...], unit)
+#:
+#: see :func:`block_indices` to easily create `BlockBounds`
+BlockBounds = Tuple[List[Tuple[int, int]], Literal["characters", "tokens"]]
+
+
+def block_bounds(blocks: Union[List[str], List[List[str]]]) -> BlockBounds:
+    """Return the boundaries of a series of blocks.
+
+    :param blocks: either a list of raw texts or a list of tokenized
+        texts.
+
+    :return: A `BlockBounds` with the correct unit.
+    """
+    if len(blocks) == 0:
+        print("[warning] computing block bounds on 0 blocks.", file=sys.stderr)
+        return ([], ("characters"))
+
+    if isinstance(blocks[0], str):
+        unit = "characters"
+    elif isinstance(blocks[0], list):
+        unit = "tokens"
+    else:
+        raise ValueError(blocks)
+
     indices = []
     start = 0
     for block in blocks:
         end = start + len(block)
         indices.append((start, end))
         start = end
-    return indices
+
+    return (indices, unit)
+
+
+def charbb2tokenbb(char_bb: BlockBounds, char2token: List[int]) -> BlockBounds:
+    """Convert a `BlockBounds` in characters to a `BlockBounds` in
+    tokens.
+
+    :param char_bb: block bounds, in 'characters'.
+    :param char2token: a list with ``char2token[i]`` being the index
+        of token corresponding to character ``i``.
+
+    :return: a `BlockBounds`, in 'tokens'.
+    """
+    assert char_bb[1] == "characters"
+    tokens_blocks = []
+    for char_block_start, char_block_end in char_bb[0]:
+        tokens_blocks.append((char2token[char_block_start], char2token[char_block_end]))
+    return (tokens_blocks, "tokens")
