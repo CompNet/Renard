@@ -276,7 +276,7 @@ want and pass this argument instead of the usual text:
        [
            NLTKTokenizer(),
            NLTKNamedEntityRecognizer(),
-           GraphRulesCharacterUnifier(min_appearances=10),
+           GraphRulesCharacterUnifier(),
            CoOccurrencesGraphExtractor(co_occurrences_dist=25, dynamic=True)
        ]
    )
