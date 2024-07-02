@@ -68,7 +68,7 @@ In that case, the ``tokens`` requirements is fulfilled at run time. If
 you don't pass the parameter, Renard will throw the following
 exception:
 
->>> ValueError: ["step 1 (NLTKNamedEntityRecognizer) has unsatisfied needs (needs : {'tokens'}, available : {'text'})"]
+>>> ValueError: ["step 1 (NLTKNamedEntityRecognizer) has unsatisfied needs. needs: {'tokens'}. available: {'text'}). missing: {'tokens'}."]
 
 
 For simplicity, one can use one of the preconfigured pipelines:

@@ -632,13 +632,27 @@ class Pipeline:
                 return (
                     False,
                     [
-                        f"step {i + 1} ({step.__class__.__name__}) has unsatisfied needs (needs : {step.needs()}, available : {pipeline_state})"
+                        "".join(
+                            [
+                                f"step {i + 1} ({step.__class__.__name__}) has unsatisfied needs. "
+                                + f"needs: {step.needs()}. "
+                                + f"available: {pipeline_state}). "
+                                + f"missing: {step.needs() - pipeline_state}."
+                            ]
+                        ),
                     ],
                 )
 
             if not step.optional_needs().issubset(pipeline_state):
                 warnings.append(
-                    f"step {i + 1} ({step.__class__.__name__}) has unsatisfied optional needs : (optional needs : {step.optional_needs()}, available : {pipeline_state})"
+                    "".join(
+                        [
+                            f"step {i + 1} ({step.__class__.__name__}) has unsatisfied optional needs. "
+                            + f"needs: {step.optional_needs.needs()}. "
+                            + f"available: {pipeline_state}). "
+                            + f"missing: {step.optional_needs() - pipeline_state}."
+                        ]
+                    )
                 )
 
             pipeline_state = pipeline_state.union(step.production())
