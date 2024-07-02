@@ -1,5 +1,6 @@
 from __future__ import annotations
 from typing import Iterable, Literal, Optional, TypeVar, Generator
+import sys
 from tqdm import tqdm
 
 
@@ -92,5 +93,5 @@ def get_progress_reporter(name: Optional[Literal["tqdm"]]) -> ProgressReporter:
         return NoopProgressReporter()
     if name == "tqdm":
         return TQDMProgressReporter()
-    print(f"[warning] unknown progress reporter: {name}")
+    print(f"[warning] unknown progress reporter: {name}", file=sys.stderr)
     return NoopProgressReporter()

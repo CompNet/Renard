@@ -648,7 +648,7 @@ class Pipeline:
                     "".join(
                         [
                             f"step {i + 1} ({step.__class__.__name__}) has unsatisfied optional needs. "
-                            + f"needs: {step.optional_needs.needs()}. "
+                            + f"needs: {step.optional_needs()}. "
                             + f"available: {pipeline_state}). "
                             + f"missing: {step.optional_needs() - pipeline_state}."
                         ]
@@ -679,7 +679,7 @@ class Pipeline:
             raise ValueError(warnings_or_errors)
         if self.warn:
             for warning in warnings_or_errors:
-                print(f"[warning] : {warning}")
+                print(f"[warning] : {warning}", file=sys.stderr)
 
         self._pipeline_init_steps_(ignored_steps)
 
