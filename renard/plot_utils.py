@@ -15,7 +15,7 @@ CharactersGraphLayout = Union[
 
 
 def layout_nx_graph_reasonably(G: nx.Graph) -> Dict[Any, np.ndarray]:
-    return nx.spring_layout(G, k=2 / math.sqrt(len(G.nodes)))  # type: ignore
+    return nx.spring_layout(G, k=min(1.5, 8 / math.sqrt(len(G.nodes))))  # type: ignore
 
 
 def plot_nx_graph_reasonably(
@@ -44,7 +44,7 @@ def plot_nx_graph_reasonably(
     node_kwargs["node_color"] = node_kwargs.get(
         "node_color", [degree for _, degree in G.degree]
     )
-    node_kwargs["cmap"] = node_kwargs.get("cmap", "winter_r")
+    node_kwargs["cmap"] = node_kwargs.get("cmap", "viridis")
     node_kwargs["node_size"] = node_kwargs.get(
         "node_size", [1 + degree * 10 for _, degree in G.degree]
     )
@@ -66,9 +66,7 @@ def plot_nx_graph_reasonably(
         edge_kwargs["edge_color"] = edge_kwargs.get(
             "edge_color", [math.log(d["weight"]) for *_, d in G.edges.data()]
         )
-        edge_kwargs["edge_cmap"] = edge_kwargs.get(
-            "edge_cmap", plt.get_cmap("winter_r")
-        )
+        edge_kwargs["edge_cmap"] = edge_kwargs.get("edge_cmap", plt.get_cmap("viridis"))
     edge_kwargs["width"] = edge_kwargs.get(
         "width", [1 + math.log(d["weight"]) for _, _, d in G.edges.data()]
     )
