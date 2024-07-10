@@ -190,14 +190,12 @@ class PipelineState:
     #: network)
     character_network: Optional[Union[List[nx.Graph], nx.Graph]] = None
 
+    # aliases of self.character_network
     def get_characters_graph(self) -> Optional[Union[List[nx.Graph], nx.Graph]]:
-        print(
-            "[warning] the characters_graph attribute is deprecated, use character_network instead",
-            file=sys.stderr,
-        )
         return self.character_network
 
     characters_graph = property(get_characters_graph)
+    character_graph = property(get_characters_graph)
 
     def get_character(
         self, name: str, partial_match: bool = True
