@@ -2,6 +2,9 @@
 Introduction
 ============
 
+.. image:: renard.svg
+	   
+
 Renard (Relationships Extraction from NARrative Documents) is a
 character networks extraction pipeline written in Python. Character
 networks are graphs where each node represent a character, and the
