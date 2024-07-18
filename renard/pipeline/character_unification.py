@@ -61,6 +61,8 @@ def _assign_coreference_mentions(
     # we assign each chain to the character with highest name
     # occurence in it
     for chain in corefs:
+        if len(char_mentions) == 0:
+            break
         # determine the characters with the highest number of
         # occurences
         occ_counter = {}
@@ -98,7 +100,12 @@ class NaiveCharacterUnifier(PipelineStep):
             character for it to be valid
         """
         self.min_appearances = min_appearances
+        # a default value, will be est by _pipeline_init_
+        self.character_ner_tag = "PER"
         super().__init__()
+
+    def _pipeline_init_(self, lang: str, character_ner_tag: str, **kwargs):
+        self.character_ner_tag = character_ner_tag
 
     def __call__(
         self,
@@ -112,7 +119,7 @@ class NaiveCharacterUnifier(PipelineStep):
         :param tokens:
         :param entities:
         """
-        persons = [e for e in entities if e.tag == "PER"]
+        persons = [e for e in entities if e.tag == self.character_ner_tag]
 
         characters = defaultdict(list)
         for entity in persons:
@@ -182,16 +189,19 @@ class GraphRulesCharacterUnifier(PipelineStep):
         self.additional_hypocorisms = additional_hypocorisms
         self.link_corefs_mentions = link_corefs_mentions
         self.ignore_lone_titles = ignore_lone_titles or set()
+        self.character_ner_tag = "PER"  # a default value, will be set by _pipeline_init
 
         super().__init__()
 
-    def _pipeline_init_(self, lang: str, progress_reporter: ProgressReporter):
+    def _pipeline_init_(self, lang: str, character_ner_tag: str, **kwargs):
         self.hypocorism_gazetteer = HypocorismGazetteer(lang=lang)
         if not self.additional_hypocorisms is None:
             for name, nicknames in self.additional_hypocorisms:
                 self.hypocorism_gazetteer._add_hypocorism_(name, nicknames)
 
-        return super()._pipeline_init_(lang, progress_reporter)
+        self.character_ner_tag = character_ner_tag
+
+        return super()._pipeline_init_(lang, **kwargs)
 
     def __call__(
         self,
@@ -201,7 +211,7 @@ class GraphRulesCharacterUnifier(PipelineStep):
     ) -> Dict[str, Any]:
         import networkx as nx
 
-        mentions = [m for m in entities if m.tag == "PER"]
+        mentions = [m for m in entities if m.tag == self.character_ner_tag]
         mentions_str = set(
             filter(
                 lambda m: not m in self.ignore_lone_titles,

@@ -25,6 +25,7 @@ class BertCoreferenceResolver(PipelineStep):
         device: Literal["auto", "cuda", "cpu"] = "auto",
         tokenizer: Optional[PreTrainedTokenizerFast] = None,
         block_size: int = 512,
+        hierarchical_merging: bool = False,
     ) -> None:
         """
         .. note::
@@ -40,6 +41,10 @@ class BertCoreferenceResolver(PipelineStep):
         :param device: computation device
         :param block_size: size of blocks to pass to the coreference
             model
+        :param hierarchical_merging: if ``True``, attempts to use
+            tibert's hierarchical merging feature.  In that case,
+            blocks of size ``block_size`` are merged to perform
+            inference on the whole document.
         """
         if isinstance(model, str):
             self.hugginface_model_id = hugginface_model_id
@@ -58,15 +63,15 @@ class BertCoreferenceResolver(PipelineStep):
             self.device = torch.device(device)
 
         self.block_size = block_size
+        self.hierarchical_merging = hierarchical_merging
 
         super().__init__()
 
-    def _pipeline_init_(self, lang: str, progress_reporter: ProgressReporter):
+    def _pipeline_init_(self, lang: str, **kwargs):
         from tibert import BertForCoreferenceResolution
         from transformers import BertTokenizerFast, AutoTokenizer
 
         if self.model is None:
-
             # the user supplied a huggingface ID: load model from the HUB
             if not self.hugginface_model_id is None:
                 self.model = BertForCoreferenceResolution.from_pretrained(
@@ -87,15 +92,28 @@ class BertCoreferenceResolver(PipelineStep):
 
         assert not self.tokenizer is None
 
-        super()._pipeline_init_(lang, progress_reporter)
+        super()._pipeline_init_(lang, **kwargs)
 
     def __call__(self, tokens: List[str], **kwargs) -> Dict[str, Any]:
-        from tibert import stream_predict_coref
+        from tibert import stream_predict_coref, predict_coref
+        from tibert.bertcoref import CoreferenceDocument
 
         blocks = [
             tokens[block_start : block_start + self.block_size]
             for block_start in range(0, len(tokens), self.block_size)
         ]
+
+        if self.hierarchical_merging:
+            doc = predict_coref(
+                blocks,
+                self.model,
+                self.tokenizer,
+                batch_size=self.batch_size,
+                quiet=True,
+                device_str=self.device,
+                hierarchical_merging=True,
+            )
+            return {"corefs": doc.coref_chains}
 
         coref_docs = []
         for doc in self._progress_(
@@ -111,26 +129,7 @@ class BertCoreferenceResolver(PipelineStep):
         ):
             coref_docs.append(doc)
 
-        # chains found in coref_docs are each local to their
-        # blocks. The following code adjusts their start and end index
-        # to match their global coordinate in the text.
-        coref_chains = []
-        cur_doc_start = 0
-        for doc in coref_docs:
-            for chain in doc.coref_chains:
-                adjusted_chain = []
-                for mention in chain:
-                    # FIXME: It seems that a rare bug in Tibert can
-                    # -----  sometimes produce this unwanted state.
-                    if mention.start_idx is None:
-                        mention.start_idx = 0
-                    start_idx = mention.start_idx + cur_doc_start
-                    end_idx = mention.end_idx + cur_doc_start
-                    adjusted_chain.append(Mention(mention.tokens, start_idx, end_idx))
-                coref_chains.append(adjusted_chain)
-            cur_doc_start += len(doc)
-
-        return {"corefs": coref_chains}
+        return {"corefs": CoreferenceDocument.concatenated(coref_docs).coref_chains}
 
     def needs(self) -> Set[str]:
         return {"tokens"}
@@ -239,19 +238,19 @@ class SpacyCorefereeCoreferenceResolver(PipelineStep):
         self,
         text: str,
         tokens: List[str],
-        chapter_tokens: Optional[List[List[str]]] = None,
+        dynamic_blocks_tokens: Optional[List[List[str]]] = None,
         **kwargs,
     ) -> Dict[str, Any]:
         from spacy.tokens import Doc
         from coreferee.manager import CorefereeBroker
 
-        if chapter_tokens is None:
-            chapter_tokens = [tokens]
+        if dynamic_blocks_tokens is None:
+            dynamic_blocks_tokens = [tokens]
 
-        if len(chapter_tokens) > 1:
+        if len(dynamic_blocks_tokens) > 1:
             chunks = []
-            for chapter in chapter_tokens:
-                chunks += self._cut_into_chunks(chapter)
+            for block in dynamic_blocks_tokens:
+                chunks += self._cut_into_chunks(block)
         else:
             chunks = self._cut_into_chunks(tokens)
 
@@ -317,7 +316,7 @@ class SpacyCorefereeCoreferenceResolver(PipelineStep):
         return {"tokens"}
 
     def optional_needs(self) -> Set[str]:
-        return {"chapter_tokens"}
+        return {"dynamic_blocks_tokens"}
 
     def production(self) -> Set[str]:
         return {"corefs"}

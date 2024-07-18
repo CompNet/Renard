@@ -110,6 +110,10 @@ class NERDataset(Dataset):
         elt_context_mask = self._context_mask[index]
         for i in range(len(element)):
             w2t = batch.word_to_tokens(0, i)
+            # w2t can be None in case of truncation, which can happen
+            # if `element' is too long
+            if w2t is None:
+                continue
             mask_value = elt_context_mask[i]
             tokens_mask = [mask_value] * (w2t.end - w2t.start)
             batch["context_mask"][w2t.start : w2t.end] = tokens_mask

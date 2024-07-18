@@ -68,7 +68,7 @@ In that case, the ``tokens`` requirements is fulfilled at run time. If
 you don't pass the parameter, Renard will throw the following
 exception:
 
->>> ValueError: ["step 1 (NLTKNamedEntityRecognizer) has unsatisfied needs (needs : {'tokens'}, available : {'text'})"]
+>>> ValueError: ["step 1 (NLTKNamedEntityRecognizer) has unsatisfied needs. needs: {'tokens'}. available: {'text'}). missing: {'tokens'}."]
 
 
 For simplicity, one can use one of the preconfigured pipelines:
@@ -250,6 +250,51 @@ dynamic graph using a slider, and
 graph to a directory. Meanwhile,
 :meth:`.PipelineState.export_graph_to_gexf` correctly exports the
 dynamic graph to the Gephi format.
+
+
+Custom Segmentation
+-------------------
+
+The ``dynamic_window`` parameter of
+:class:`.CoOccurencesGraphExtractor` determines the segmentation of
+the dynamic networks, in number of interactions. In the example above,
+a new graph will be created for each 20 interactions.
+
+While one can rely on the arguments of the graph extractor of the
+pipeline to determine the dynamic window, Renard allows to specify a
+custom segmentation of a text with the ``dynamic_blocks``
+argument. When running a pipeline, you can cut your text however you
+want and pass this argument instead of the usual text:
+
+
+.. code-block:: python
+
+   from renard.pipeline import Pipeline
+   from renard.pipeline.tokenization import NLTKTokenizer
+   from renard.pipeline.ner import NLTKNamedEntityRecognizer
+   from renard.pipeline.character_unification import GraphRulesCharacterUnifier
+   from renard.pipeline.graph_extraction import CoOccurrencesGraphExtractor
+   from renard.utils import block_bounds
+
+   with open("./my_doc.txt") as f:
+       text = f.read()
+
+   # let's suppose the 'cut_into_chapters' function cut the text into chapters.
+   chapters = cut_into_chapters(text)
+
+   pipeline = Pipeline(
+       [
+           NLTKTokenizer(),
+           NLTKNamedEntityRecognizer(),
+           GraphRulesCharacterUnifier(),
+           CoOccurrencesGraphExtractor(co_occurrences_dist=25, dynamic=True)
+       ]
+   )
+
+   # the 'block_bounds' function automatically extracts the boundaries of your
+   # block of text.
+   out = pipeline(text, dynamic_blocks=block_bounds(chapters))
+
 
 
 Multilingual Support

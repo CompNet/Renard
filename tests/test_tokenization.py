@@ -11,7 +11,7 @@ from renard.pipeline.progress import get_progress_reporter
 @fixture
 def nltk_tokenizer() -> NLTKTokenizer:
     tokenizer = NLTKTokenizer()
-    tokenizer._pipeline_init_("eng", get_progress_reporter(None))
+    tokenizer._pipeline_init_("eng", progress_reporter=get_progress_reporter(None))
     return tokenizer
 
 

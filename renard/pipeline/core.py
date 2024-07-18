@@ -79,11 +79,18 @@ class PipelineStep:
         """Initialize the :class:`PipelineStep` with a given configuration."""
         pass
 
-    def _pipeline_init_(self, lang: str, progress_reporter: ProgressReporter):
-        """Set the step configuration that is common to the whole pipeline.
+    def _pipeline_init_(
+        self, lang: str, progress_reporter: ProgressReporter, **kwargs
+    ) -> Optional[Dict[Pipeline.PipelineParameter, Any]]:
+        """Set the step configuration that is common to the whole
+        pipeline.
 
-        :param lang: ISO 639-3 language string
-        :param progress_report:
+        :param lang: the lang of the whole pipeline
+        :param progress_reporter:
+        :param kwargs: additional pipeline parameters.
+
+        :return: a step can return a dictionary of pipeline params if
+                 it wish to modify some of these.
         """
         supported_langs = self.supported_langs()
         if not supported_langs == "any" and not lang in supported_langs:
@@ -150,13 +157,14 @@ class PipelineState:
     #: input text
     text: Optional[str]
 
-    #: text split into chapters
-    chapters: Optional[List[str]] = None
+    #: text split into blocks of texts. When dynamic blocks are given,
+    #: the final network is dynamic, and split according to blocks.
+    dynamic_blocks: Optional[List[Tuple[int, int]]] = None
 
     #: text splitted in tokens
     tokens: Optional[List[str]] = None
-    #: text splitted in tokens, by chapter
-    chapter_tokens: Optional[List[List[str]]] = None
+    #: mapping from a character to its corresponding token
+    char2token: Optional[List[int]] = None
     #: text splitted into sentences, each sentence being a list of
     #: tokens
     sentences: Optional[List[List[str]]] = None
@@ -182,14 +190,12 @@ class PipelineState:
     #: network)
     character_network: Optional[Union[List[nx.Graph], nx.Graph]] = None
 
+    # aliases of self.character_network
     def get_characters_graph(self) -> Optional[Union[List[nx.Graph], nx.Graph]]:
-        print(
-            "[warning] the characters_graph attribute is deprecated, use character_network instead",
-            file=sys.stderr,
-        )
         return self.character_network
 
     characters_graph = property(get_characters_graph)
+    character_graph = property(get_characters_graph)
 
     def get_character(
         self, name: str, partial_match: bool = True
@@ -280,6 +286,9 @@ class PipelineState:
         cumulative: bool = False,
         stable_layout: bool = False,
         layout: Optional[CharactersGraphLayout] = None,
+        node_kwargs: Optional[List[Dict[str, Any]]] = None,
+        edge_kwargs: Optional[List[Dict[str, Any]]] = None,
+        label_kwargs: Optional[List[Dict[str, Any]]] = None,
     ):
         """Plot ``self.character_graph`` using reasonable default
         parameters, and save the produced figures in the specified
@@ -294,6 +303,9 @@ class PipelineState:
             timestep.  Characters' positions are based on the final
             cumulative graph layout.
         :param layout: pre-computed graph layout
+        :param node_kwargs: passed to :func:`nx.draw_networkx_nodes`
+        :param edge_kwargs: passed to :func:`nx.draw_networkx_nodes`
+        :param label_kwargs: passed to :func:`nx.draw_networkx_labels`
         """
         import matplotlib.pyplot as plt
 
@@ -317,13 +329,24 @@ class PipelineState:
             )
             layout = layout_nx_graph_reasonably(layout_graph)
 
+        node_kwargs = node_kwargs or [{} for _ in range(len(self.character_network))]
+        edge_kwargs = edge_kwargs or [{} for _ in range(len(self.character_network))]
+        label_kwargs = label_kwargs or [{} for _ in range(len(self.character_network))]
+
         for i, G in enumerate(graphs):
             _, ax = plt.subplots()
             local_layout = layout
             if not local_layout is None:
                 local_layout = layout_with_names(G, local_layout, name_style)
             G = graph_with_names(G, name_style=name_style)
-            plot_nx_graph_reasonably(G, ax=ax, layout=local_layout)
+            plot_nx_graph_reasonably(
+                G,
+                ax=ax,
+                layout=local_layout,
+                node_kwargs=node_kwargs[i],
+                edge_kwargs=edge_kwargs[i],
+                label_kwargs=label_kwargs[i],
+            )
             plt.savefig(f"{directory}/{i}.png")
             plt.close()
 
@@ -335,6 +358,9 @@ class PipelineState:
         ] = "most_frequent",
         layout: Optional[CharactersGraphLayout] = None,
         fig: Optional[plt.Figure] = None,
+        node_kwargs: Optional[Dict[str, Any]] = None,
+        edge_kwargs: Optional[Dict[str, Any]] = None,
+        label_kwargs: Optional[Dict[str, Any]] = None,
     ):
         """Plot ``self.character_graph`` using reasonable parameters,
         and save the produced figure to a file
@@ -344,6 +370,9 @@ class PipelineState:
         :param layout: pre-computed graph layout
         :param fig: if specified, this matplotlib figure will be used
             for plotting
+        :param node_kwargs: passed to :func:`nx.draw_networkx_nodes`
+        :param edge_kwargs: passed to :func:`nx.draw_networkx_nodes`
+        :param label_kwargs: passed to :func:`nx.draw_networkx_labels`
         """
         import matplotlib.pyplot as plt
 
@@ -361,7 +390,14 @@ class PipelineState:
             fig.set_dpi(300)
             fig.set_size_inches(24, 24)
         ax = fig.add_subplot(111)
-        plot_nx_graph_reasonably(G, ax=ax, layout=layout)
+        plot_nx_graph_reasonably(
+            G,
+            ax=ax,
+            layout=layout,
+            node_kwargs=node_kwargs,
+            edge_kwargs=edge_kwargs,
+            label_kwargs=label_kwargs,
+        )
         plt.savefig(path)
         plt.close()
 
@@ -375,6 +411,9 @@ class PipelineState:
         graph_start_idx: int = 1,
         stable_layout: bool = False,
         layout: Optional[CharactersGraphLayout] = None,
+        node_kwargs: Optional[Union[Dict[str, Any], List[Dict[str, Any]]]] = None,
+        edge_kwargs: Optional[Union[Dict[str, Any], List[Dict[str, Any]]]] = None,
+        label_kwargs: Optional[Union[Dict[str, Any], List[Dict[str, Any]]]] = None,
     ):
         """Plot ``self.character_network`` using reasonable default
         parameters
@@ -400,6 +439,9 @@ class PipelineState:
             same position in space at each timestep.  Characters'
             positions are based on the final cumulative graph layout.
         :param layout: pre-computed graph layout
+        :param node_kwargs: passed to :func:`nx.draw_networkx_nodes`
+        :param edge_kwargs: passed to :func:`nx.draw_networkx_nodes`
+        :param label_kwargs: passed to :func:`nx.draw_networkx_labels`
         """
         import matplotlib.pyplot as plt
         from matplotlib.widgets import Slider
@@ -418,12 +460,29 @@ class PipelineState:
                 fig.set_dpi(300)
                 fig.set_size_inches(24, 24)
             ax = fig.add_subplot(111)
-            plot_nx_graph_reasonably(G, ax=ax, layout=layout)
+            assert not isinstance(node_kwargs, list)
+            assert not isinstance(edge_kwargs, list)
+            assert not isinstance(label_kwargs, list)
+            plot_nx_graph_reasonably(
+                G,
+                ax=ax,
+                layout=layout,
+                node_kwargs=node_kwargs,
+                edge_kwargs=edge_kwargs,
+                label_kwargs=label_kwargs,
+            )
             return
 
         if not isinstance(self.character_network, list):
             raise TypeError
         # self.character_network is a list: plot a dynamic graph
+
+        node_kwargs = node_kwargs or [{} for _ in range(len(self.character_network))]
+        assert isinstance(node_kwargs, list)
+        edge_kwargs = edge_kwargs or [{} for _ in range(len(self.character_network))]
+        assert isinstance(edge_kwargs, list)
+        label_kwargs = label_kwargs or [{} for _ in range(len(self.character_network))]
+        assert isinstance(label_kwargs, list)
 
         if fig is None:
             fig, ax = plt.subplots()
@@ -440,12 +499,13 @@ class PipelineState:
 
         def update(slider_value):
             assert isinstance(self.character_network, list)
+            slider_i = int(slider_value) - 1
 
             character_networks = self.character_network
             if cumulative:
                 character_networks = cumulative_character_networks
 
-            G = character_networks[int(slider_value) - 1]
+            G = character_networks[slider_i]
 
             local_layout = layout
             if not local_layout is None:
@@ -453,7 +513,14 @@ class PipelineState:
             G = graph_with_names(G, name_style)
 
             ax.clear()
-            plot_nx_graph_reasonably(G, ax=ax, layout=local_layout)
+            plot_nx_graph_reasonably(
+                G,
+                ax=ax,
+                layout=local_layout,
+                node_kwargs=node_kwargs[slider_i],
+                edge_kwargs=edge_kwargs[slider_i],
+                label_kwargs=label_kwargs[slider_i],
+            )
             ax.set_xlim(-1.2, 1.2)
             ax.set_ylim(-1.2, 1.2)
 
@@ -473,6 +540,10 @@ class PipelineState:
 
 class Pipeline:
     """A flexible NLP pipeline"""
+
+    #: all the possible parameters of the whole pipeline, that are
+    #: shared between steps
+    PipelineParameter = Literal["lang", "progress_reporter", "character_ner_tag"]
 
     def __init__(
         self,
@@ -496,17 +567,27 @@ class Pipeline:
         self.progress_reporter = get_progress_reporter(progress_report)
 
         self.lang = lang
+        self.character_ner_tag = "PER"
         self.warn = warn
 
-    def _pipeline_init_steps(self, ignored_steps: Optional[List[str]] = None):
-        """
+    def _pipeline_init_steps_(self, ignored_steps: Optional[List[str]] = None):
+        """Initialise steps with global pipeline parameters.
+
         :param ignored_steps: a list of steps production.  All steps
             with a production in ``ignored_steps`` will be ignored.
         """
-        steps_progress_reporter = get_progress_reporter(self.progress_report)
+        steps_progress_reporter = self.progress_reporter.get_subreporter()
         steps = self._non_ignored_steps(ignored_steps)
+        pipeline_params = {
+            "progress_reporter": steps_progress_reporter,
+            "character_ner_tag": self.character_ner_tag,
+        }
         for step in steps:
-            step._pipeline_init_(self.lang, steps_progress_reporter)
+            step_additional_params = step._pipeline_init_(self.lang, **pipeline_params)
+            if not step_additional_params is None:
+                for key, value in step_additional_params.items():
+                    setattr(self, key, value)
+                    pipeline_params[key] = value
 
     def _non_ignored_steps(
         self, ignored_steps: Optional[List[str]]
@@ -549,13 +630,27 @@ class Pipeline:
                 return (
                     False,
                     [
-                        f"step {i + 1} ({step.__class__.__name__}) has unsatisfied needs (needs : {step.needs()}, available : {pipeline_state})"
+                        "".join(
+                            [
+                                f"step {i + 1} ({step.__class__.__name__}) has unsatisfied needs. "
+                                + f"needs: {step.needs()}. "
+                                + f"available: {pipeline_state}). "
+                                + f"missing: {step.needs() - pipeline_state}."
+                            ]
+                        ),
                     ],
                 )
 
             if not step.optional_needs().issubset(pipeline_state):
                 warnings.append(
-                    f"step {i + 1} ({step.__class__.__name__}) has unsatisfied optional needs : (optional needs : {step.optional_needs()}, available : {pipeline_state})"
+                    "".join(
+                        [
+                            f"step {i + 1} ({step.__class__.__name__}) has unsatisfied optional needs. "
+                            + f"needs: {step.optional_needs()}. "
+                            + f"available: {pipeline_state}). "
+                            + f"missing: {step.optional_needs() - pipeline_state}."
+                        ]
+                    )
                 )
 
             pipeline_state = pipeline_state.union(step.production())
@@ -582,9 +677,9 @@ class Pipeline:
             raise ValueError(warnings_or_errors)
         if self.warn:
             for warning in warnings_or_errors:
-                print(f"[warning] : {warning}")
+                print(f"[warning] : {warning}", file=sys.stderr)
 
-        self._pipeline_init_steps(ignored_steps)
+        self._pipeline_init_steps_(ignored_steps)
 
         state = PipelineState(text)
         # sets attributes to PipelineState dynamically. This ensures

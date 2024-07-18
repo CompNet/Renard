@@ -1,6 +1,6 @@
 from typing import Dict, List, Set, Tuple
 from collections import defaultdict
-import os
+import os, sys
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
 
@@ -24,7 +24,8 @@ class HypocorismGazetteer:
         """
         if not lang in HypocorismGazetteer.supported_langs:
             print(
-                f"[warning] {lang} not supported by {type(self)} (supported languages: {HypocorismGazetteer.supported_langs})"
+                f"[warning] {lang} not supported by {type(self)} (supported languages: {HypocorismGazetteer.supported_langs})",
+                file=sys.stderr,
             )
 
         self.name_to_nicknames = defaultdict(set)
