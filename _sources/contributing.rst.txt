@@ -36,4 +36,9 @@ the ``tests`` directory. We use ``pytest`` to test code, and also use
 ``hypothesis`` when applicable. If you open a patch, make sure that
 all tests are passing. In particular, do not rely on the CI, as it
 does not run time costly tests! Check for yourself locally, using
-``RENARD_TEST_ALL=1 python -m pytest tests``
+``RENARD_TEST_ALL=1 python -m pytest tests``. Note that there are
+specific tests and environment variable for optional dependencies such
+as *stanza* (``RENARD_TEST_STANZA_OPTDEP``). These must be explicitely
+set to ``1`` if you want to test optional dependencies, as
+``RENARD_TEST_ALL=1`` does not enable test on these optional
+dependencies.

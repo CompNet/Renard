@@ -59,7 +59,10 @@
 <li class="toctree-l3"><a class="reference internal" href="#graph-extraction">Graph Extraction</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#dynamic-graphs">Dynamic Graphs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#dynamic-graphs">Dynamic Graphs</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#custom-segmentation">Custom Segmentation</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="#multilingual-support">Multilingual Support</a></li>
 </ul>
 </li>
@@ -152,7 +155,7 @@ to compute them yourself:</p>
 <p>In that case, the <code class="docutils literal notranslate"><span class="pre">tokens</span></code> requirements is fulfilled at run time. If
 you don’t pass the parameter, Renard will throw the following
 exception:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="ne">ValueError</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;step 1 (NLTKNamedEntityRecognizer) has unsatisfied needs (needs : {&#39;tokens&#39;}, available : {&#39;text&#39;})&quot;</span><span class="p">]</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="ne">ValueError</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;step 1 (NLTKNamedEntityRecognizer) has unsatisfied needs. needs: {&#39;tokens&#39;}. available: {&#39;text&#39;}). missing: {&#39;tokens&#39;}.&quot;</span><span class="p">]</span>
 </pre></div>
 </div>
 <p>For simplicity, one can use one of the preconfigured pipelines:</p>
@@ -318,6 +321,45 @@ dynamic graph using a slider, and
 graph to a directory. Meanwhile,
 <a class="reference internal" href="reference.html#renard.pipeline.core.PipelineState.export_graph_to_gexf" title="renard.pipeline.core.PipelineState.export_graph_to_gexf"><code class="xref py py-meth docutils literal notranslate"><span class="pre">PipelineState.export_graph_to_gexf()</span></code></a> correctly exports the
 dynamic graph to the Gephi format.</p>
+<section id="custom-segmentation">
+<h3>Custom Segmentation<a class="headerlink" href="#custom-segmentation" title="Permalink to this headline"></a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">dynamic_window</span></code> parameter of
+<code class="xref py py-class docutils literal notranslate"><span class="pre">CoOccurencesGraphExtractor</span></code> determines the segmentation of
+the dynamic networks, in number of interactions. In the example above,
+a new graph will be created for each 20 interactions.</p>
+<p>While one can rely on the arguments of the graph extractor of the
+pipeline to determine the dynamic window, Renard allows to specify a
+custom segmentation of a text with the <code class="docutils literal notranslate"><span class="pre">dynamic_blocks</span></code>
+argument. When running a pipeline, you can cut your text however you
+want and pass this argument instead of the usual text:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">renard.pipeline</span> <span class="kn">import</span> <span class="n">Pipeline</span>
+<span class="kn">from</span> <span class="nn">renard.pipeline.tokenization</span> <span class="kn">import</span> <span class="n">NLTKTokenizer</span>
+<span class="kn">from</span> <span class="nn">renard.pipeline.ner</span> <span class="kn">import</span> <span class="n">NLTKNamedEntityRecognizer</span>
+<span class="kn">from</span> <span class="nn">renard.pipeline.character_unification</span> <span class="kn">import</span> <span class="n">GraphRulesCharacterUnifier</span>
+<span class="kn">from</span> <span class="nn">renard.pipeline.graph_extraction</span> <span class="kn">import</span> <span class="n">CoOccurrencesGraphExtractor</span>
+<span class="kn">from</span> <span class="nn">renard.utils</span> <span class="kn">import</span> <span class="n">block_bounds</span>
+
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;./my_doc.txt&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">text</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+
+<span class="c1"># let&#39;s suppose the &#39;cut_into_chapters&#39; function cut the text into chapters.</span>
+<span class="n">chapters</span> <span class="o">=</span> <span class="n">cut_into_chapters</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+
+<span class="n">pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span>
+    <span class="p">[</span>
+        <span class="n">NLTKTokenizer</span><span class="p">(),</span>
+        <span class="n">NLTKNamedEntityRecognizer</span><span class="p">(),</span>
+        <span class="n">GraphRulesCharacterUnifier</span><span class="p">(),</span>
+        <span class="n">CoOccurrencesGraphExtractor</span><span class="p">(</span><span class="n">co_occurrences_dist</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span> <span class="n">dynamic</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="p">]</span>
+<span class="p">)</span>
+
+<span class="c1"># the &#39;block_bounds&#39; function automatically extracts the boundaries of your</span>
+<span class="c1"># block of text.</span>
+<span class="n">out</span> <span class="o">=</span> <span class="n">pipeline</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">dynamic_blocks</span><span class="o">=</span><span class="n">block_bounds</span><span class="p">(</span><span class="n">chapters</span><span class="p">))</span>
+</pre></div>
+</div>
+</section>
 </section>
 <section id="multilingual-support">
 <h2>Multilingual Support<a class="headerlink" href="#multilingual-support" title="Permalink to this headline"></a></h2>

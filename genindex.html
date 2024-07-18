@@ -222,19 +222,19 @@
 </li>
       <li><a href="reference.html#renard.pipeline.corefs.SpacyCorefereeCoreferenceResolver._coreferee_get_mention_tokens">_coreferee_get_mention_tokens() (renard.pipeline.corefs.SpacyCorefereeCoreferenceResolver static method)</a>
 </li>
+      <li><a href="reference.html#renard.pipeline.graph_extraction.CoOccurrencesGraphExtractor._create_co_occurrences_blocks">_create_co_occurrences_blocks() (renard.pipeline.graph_extraction.CoOccurrencesGraphExtractor method)</a>
+</li>
       <li><a href="reference.html#renard.pipeline.graph_extraction.CoOccurrencesGraphExtractor._extract_dynamic_graph">_extract_dynamic_graph() (renard.pipeline.graph_extraction.CoOccurrencesGraphExtractor method)</a>
 </li>
-      <li><a href="reference.html#renard.pipeline.graph_extraction.CoOccurrencesGraphExtractor._extract_gephi_dynamic_graph">_extract_gephi_dynamic_graph() (renard.pipeline.graph_extraction.CoOccurrencesGraphExtractor method)</a>
-</li>
       <li><a href="reference.html#renard.pipeline.graph_extraction.CoOccurrencesGraphExtractor._extract_graph">_extract_graph() (renard.pipeline.graph_extraction.CoOccurrencesGraphExtractor method)</a>
-</li>
-      <li><a href="reference.html#renard.pipeline.graph_extraction.CoOccurrencesGraphExtractor._mentions_interact">_mentions_interact() (renard.pipeline.graph_extraction.CoOccurrencesGraphExtractor method)</a>
 </li>
       <li><a href="reference.html#renard.pipeline.core.Pipeline._non_ignored_steps">_non_ignored_steps() (renard.pipeline.core.Pipeline method)</a>
 </li>
       <li><a href="reference.html#renard.pipeline.character_unification.GraphRulesCharacterUnifier._pipeline_init_">_pipeline_init_() (renard.pipeline.character_unification.GraphRulesCharacterUnifier method)</a>
 
       <ul>
+        <li><a href="reference.html#renard.pipeline.character_unification.NaiveCharacterUnifier._pipeline_init_">(renard.pipeline.character_unification.NaiveCharacterUnifier method)</a>
+</li>
         <li><a href="reference.html#renard.pipeline.core.PipelineStep._pipeline_init_">(renard.pipeline.core.PipelineStep method)</a>
 </li>
         <li><a href="reference.html#renard.pipeline.corefs.BertCoreferenceResolver._pipeline_init_">(renard.pipeline.corefs.BertCoreferenceResolver method)</a>
@@ -245,8 +245,10 @@
 </li>
         <li><a href="reference.html#renard.pipeline.speaker_attribution.BertSpeakerDetector._pipeline_init_">(renard.pipeline.speaker_attribution.BertSpeakerDetector method)</a>
 </li>
+        <li><a href="reference.html#renard.pipeline.tokenization.NLTKTokenizer._pipeline_init_">(renard.pipeline.tokenization.NLTKTokenizer method)</a>
+</li>
       </ul></li>
-      <li><a href="reference.html#renard.pipeline.core.Pipeline._pipeline_init_steps">_pipeline_init_steps() (renard.pipeline.core.Pipeline method)</a>
+      <li><a href="reference.html#renard.pipeline.core.Pipeline._pipeline_init_steps_">_pipeline_init_steps_() (renard.pipeline.core.Pipeline method)</a>
 </li>
       <li><a href="reference.html#renard.pipeline.corefs.SpacyCorefereeCoreferenceResolver._spacy_try_infer_spaces">_spacy_try_infer_spaces() (renard.pipeline.corefs.SpacyCorefereeCoreferenceResolver static method)</a>
 </li>
@@ -270,13 +272,17 @@
 </li>
       <li><a href="reference.html#renard.pipeline.ner.BertNamedEntityRecognizer.batch_labels">batch_labels() (renard.pipeline.ner.BertNamedEntityRecognizer method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference.html#renard.pipeline.corefs.BertCoreferenceResolver">BertCoreferenceResolver (class in renard.pipeline.corefs)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference.html#renard.pipeline.ner.BertNamedEntityRecognizer">BertNamedEntityRecognizer (class in renard.pipeline.ner)</a>
 </li>
       <li><a href="reference.html#renard.pipeline.speaker_attribution.BertSpeakerDetector">BertSpeakerDetector (class in renard.pipeline.speaker_attribution)</a>
+</li>
+      <li><a href="reference.html#renard.utils.block_bounds">block_bounds() (in module renard.utils)</a>
+</li>
+      <li><a href="reference.html#renard.utils.BlockBounds">BlockBounds (in module renard.utils)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -284,15 +290,15 @@
 <h2 id="C">C</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="reference.html#renard.pipeline.core.PipelineState.chapter_tokens">chapter_tokens (renard.pipeline.core.PipelineState attribute)</a>
-</li>
-      <li><a href="reference.html#renard.pipeline.core.PipelineState.chapters">chapters (renard.pipeline.core.PipelineState attribute)</a>
+      <li><a href="reference.html#renard.pipeline.core.PipelineState.char2token">char2token (renard.pipeline.core.PipelineState attribute)</a>
 </li>
       <li><a href="reference.html#renard.pipeline.character_unification.Character">Character (class in renard.pipeline.character_unification)</a>
 </li>
       <li><a href="reference.html#renard.pipeline.core.PipelineState.character_network">character_network (renard.pipeline.core.PipelineState attribute)</a>
 </li>
       <li><a href="reference.html#renard.pipeline.core.PipelineState.characters">characters (renard.pipeline.core.PipelineState attribute)</a>
+</li>
+      <li><a href="reference.html#renard.utils.charbb2tokenbb">charbb2tokenbb() (in module renard.utils)</a>
 </li>
       <li><a href="reference.html#renard.pipeline.core.Pipeline.check_valid">check_valid() (renard.pipeline.core.Pipeline method)</a>
 </li>
@@ -320,6 +326,8 @@
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference.html#renard.pipeline.core.PipelineState.dynamic_blocks">dynamic_blocks (renard.pipeline.core.PipelineState attribute)</a>
+</li>
       <li><a href="reference.html#renard.graph_utils.dynamic_graph_to_gephi_graph">dynamic_graph_to_gephi_graph() (in module renard.graph_utils)</a>
 </li>
   </ul></td>
@@ -492,6 +500,8 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference.html#renard.pipeline.core.Pipeline">Pipeline (class in renard.pipeline.core)</a>
+</li>
+      <li><a href="reference.html#renard.pipeline.core.Pipeline.PipelineParameter">PipelineParameter (renard.pipeline.core.Pipeline attribute)</a>
 </li>
       <li><a href="reference.html#renard.pipeline.core.PipelineState">PipelineState (class in renard.pipeline.core)</a>
 </li>

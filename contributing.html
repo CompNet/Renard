@@ -108,7 +108,12 @@ the <code class="docutils literal notranslate"><span class="pre">tests</span></c
 <code class="docutils literal notranslate"><span class="pre">hypothesis</span></code> when applicable. If you open a patch, make sure that
 all tests are passing. In particular, do not rely on the CI, as it
 does not run time costly tests! Check for yourself locally, using
-<code class="docutils literal notranslate"><span class="pre">RENARD_TEST_ALL=1</span> <span class="pre">python</span> <span class="pre">-m</span> <span class="pre">pytest</span> <span class="pre">tests</span></code></p>
+<code class="docutils literal notranslate"><span class="pre">RENARD_TEST_ALL=1</span> <span class="pre">python</span> <span class="pre">-m</span> <span class="pre">pytest</span> <span class="pre">tests</span></code>. Note that there are
+specific tests and environment variable for optional dependencies such
+as <em>stanza</em> (<code class="docutils literal notranslate"><span class="pre">RENARD_TEST_STANZA_OPTDEP</span></code>). These must be explicitely
+set to <code class="docutils literal notranslate"><span class="pre">1</span></code> if you want to test optional dependencies, as
+<code class="docutils literal notranslate"><span class="pre">RENARD_TEST_ALL=1</span></code> does not enable test on these optional
+dependencies.</p>
 </section>
 </section>
 
