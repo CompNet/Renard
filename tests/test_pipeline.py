@@ -84,6 +84,9 @@ def test_conversational_pipeline_runs():
         warn=False,
         progress_report=None,
         conversational=True,
-        graph_extractor_kwargs={"conversation_dist": (3, "sentences")},
+        graph_extractor_kwargs={
+            "graph_type": "conversation",
+            "conversation_dist": (3, "sentences"),
+        },
     )
     pipeline(text)
