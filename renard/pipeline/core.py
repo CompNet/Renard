@@ -361,6 +361,7 @@ class PipelineState:
         node_kwargs: Optional[Dict[str, Any]] = None,
         edge_kwargs: Optional[Dict[str, Any]] = None,
         label_kwargs: Optional[Dict[str, Any]] = None,
+        tight_layout: bool = False,
     ):
         """Plot ``self.character_graph`` using reasonable parameters,
         and save the produced figure to a file
@@ -373,6 +374,7 @@ class PipelineState:
         :param node_kwargs: passed to :func:`nx.draw_networkx_nodes`
         :param edge_kwargs: passed to :func:`nx.draw_networkx_nodes`
         :param label_kwargs: passed to :func:`nx.draw_networkx_labels`
+        :param tight_layout: if ``True``, will use matplotlib's tight_layout
         """
         import matplotlib.pyplot as plt
 
@@ -398,6 +400,8 @@ class PipelineState:
             edge_kwargs=edge_kwargs,
             label_kwargs=label_kwargs,
         )
+        if tight_layout:
+            fig.tight_layout()
         plt.savefig(path)
         plt.close()
 
@@ -414,6 +418,7 @@ class PipelineState:
         node_kwargs: Optional[Union[Dict[str, Any], List[Dict[str, Any]]]] = None,
         edge_kwargs: Optional[Union[Dict[str, Any], List[Dict[str, Any]]]] = None,
         label_kwargs: Optional[Union[Dict[str, Any], List[Dict[str, Any]]]] = None,
+        tight_layout: bool = False,
     ):
         """Plot ``self.character_network`` using reasonable default
         parameters
@@ -442,6 +447,7 @@ class PipelineState:
         :param node_kwargs: passed to :func:`nx.draw_networkx_nodes`
         :param edge_kwargs: passed to :func:`nx.draw_networkx_nodes`
         :param label_kwargs: passed to :func:`nx.draw_networkx_labels`
+        :param tight_layout: if ``True``, will use matplotlib's tight_layout
         """
         import matplotlib.pyplot as plt
         from matplotlib.widgets import Slider
@@ -463,6 +469,8 @@ class PipelineState:
             assert not isinstance(node_kwargs, list)
             assert not isinstance(edge_kwargs, list)
             assert not isinstance(label_kwargs, list)
+            if tight_layout:
+                fig.tight_layout()
             plot_nx_graph_reasonably(
                 G,
                 ax=ax,
@@ -525,6 +533,8 @@ class PipelineState:
             ax.set_ylim(-1.2, 1.2)
 
         slider_ax = fig.add_axes([0.1, 0.05, 0.8, 0.04])
+        if tight_layout:
+            fig.tight_layout()
         # HACK: we save the slider to the figure. This ensure the
         # slider is still alive at plotting time.
         fig.slider = Slider(  # type: ignore
