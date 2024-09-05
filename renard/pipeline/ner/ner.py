@@ -39,7 +39,7 @@ class NEREntity(Mention):
         """
         .. note::
 
-            This method is implemtented here to avoid type issues.  Since
+            This method is implemented here to avoid type issues.  Since
             :meth:`.Mention.shifted` cannot be annotated as returning
             ``Self``, this method annotate the correct return type when
             using :meth:`.NEREntity.shifted`.

@@ -20,7 +20,7 @@ class BertCoreferenceResolver(PipelineStep):
     def __init__(
         self,
         model: Optional[Union[BertForCoreferenceResolution]] = None,
-        hugginface_model_id: Optional[str] = None,
+        huggingface_model_id: Optional[str] = None,
         batch_size: int = 1,
         device: Literal["auto", "cuda", "cpu"] = "auto",
         tokenizer: Optional[PreTrainedTokenizerFast] = None,
@@ -47,7 +47,7 @@ class BertCoreferenceResolver(PipelineStep):
             inference on the whole document.
         """
         if isinstance(model, str):
-            self.hugginface_model_id = hugginface_model_id
+            self.hugginface_model_id = huggingface_model_id
             self.model = None  # model will be init by _pipeline_init_
         else:
             self.hugginface_model_id = None
