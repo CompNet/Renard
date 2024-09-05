@@ -72,7 +72,7 @@ class NERContextRetriever:
             [lctx + element + rctx for lctx, element, rctx in elements_with_context],
             dataset.tokenizer,
             [
-                [0] * len(lctx) + [1] * len(element) + [0] * len(rctx)
+                [1] * len(lctx) + [0] * len(element) + [1] * len(rctx)
                 for lctx, element, rctx in elements_with_context
             ],
         )
