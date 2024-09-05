@@ -74,7 +74,7 @@ class DataCollatorForTokenClassificationWithBatchEncoding:
 class NERDataset(Dataset):
     """
     :ivar _context_mask: for each element, a mask indicating which
-        tokens are part of the context (1 for context, 0 for text on
+        tokens are part of the context (0 for context, 1 for text on
         which to perform inference).  The mask allows to discard
         predictions made for context at inference time, even though
         the context can still be passed as input to the model.
@@ -96,7 +96,7 @@ class NERDataset(Dataset):
 
         self.tokenizer = tokenizer
 
-    def __getitem__(self, index: Union[int, List[int]]) -> BatchEncoding:
+    def __getitem__(self, index: int) -> BatchEncoding:
         element = self.elements[index]
 
         batch = self.tokenizer(
@@ -106,17 +106,7 @@ class NERDataset(Dataset):
             is_split_into_words=True,
         )
 
-        batch["context_mask"] = [0] * len(batch["input_ids"])
-        elt_context_mask = self._context_mask[index]
-        for i in range(len(element)):
-            w2t = batch.word_to_tokens(0, i)
-            # w2t can be None in case of truncation, which can happen
-            # if `element' is too long
-            if w2t is None:
-                continue
-            mask_value = elt_context_mask[i]
-            tokens_mask = [mask_value] * (w2t.end - w2t.start)
-            batch["context_mask"][w2t.start : w2t.end] = tokens_mask
+        batch["context_mask"] = self._context_mask[index]
 
         return batch
 

@@ -260,7 +260,7 @@ class BertNamedEntityRecognizer(PipelineStep):
         batch_i: int,
         wp_labels: List[str],
         tokens: List[str],
-        context_mask: torch.Tensor,
+        ctxmask: torch.Tensor,
     ) -> List[str]:
         """Align labels to tokens rather than wordpiece tokens.
 
@@ -271,13 +271,21 @@ class BertNamedEntityRecognizer(PipelineStep):
         """
         batch_labels = ["O"] * len(tokens)
 
+        try:
+            inference_start = ctxmask[batch_i].tolist().index(1)
+        except ValueError:
+            inference_start = 0
+
         for wplabel_j, wp_label in enumerate(wp_labels):
-            if context_mask[batch_i][wplabel_j] == 1:
-                continue
+
             token_i = batchs.token_to_word(batch_i, wplabel_j)
             if token_i is None:
                 continue
-            batch_labels[token_i] = wp_label
+
+            if ctxmask[batch_i][token_i] == 0:
+                continue
+
+            batch_labels[token_i - inference_start] = wp_label
 
         return batch_labels
 
