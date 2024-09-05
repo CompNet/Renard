@@ -55,16 +55,12 @@ class NERContextRetriever:
                 key=lambda m: m.element_i,
             )
             lctx = list(flatten([m.element for m in lctx]))
-            if len(lctx) > 0:
-                lctx += [dataset.tokenizer.sep_token]
 
             rctx = sorted(
                 (m for m in matchs if m.side == "right"),
                 key=lambda m: m.element_i,
             )
             rctx = list(flatten([m.element for m in rctx]))
-            if len(rctx) > 0:
-                rctx = [dataset.tokenizer.sep_token] + rctx
 
             elements_with_context.append((lctx, elt, rctx))
 
