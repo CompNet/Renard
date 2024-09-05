@@ -92,7 +92,7 @@ class NERDataset(Dataset):
             assert all(
                 [len(cm) == len(elt) for elt, cm in zip(self.elements, context_mask)]
             )
-        self._context_mask = context_mask or [[0] * len(elt) for elt in self.elements]
+        self._context_mask = context_mask or [[1] * len(elt) for elt in self.elements]
 
         self.tokenizer = tokenizer
 
