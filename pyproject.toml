@@ -34,6 +34,7 @@ pytest = "^7.2.1"
 tibert = "^0.4.0"
 grimbert = "^0.1.0"
 datasets = "^2.16.1"
+rank-bm25 = "^0.2.2"
 
 [tool.poetry.dev-dependencies]
 hypothesis = "^6.24.0"

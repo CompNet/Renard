@@ -1,6 +1,15 @@
 from __future__ import annotations
-import random, itertools
-from typing import TYPE_CHECKING, List, Dict, Any, Set, Tuple, Optional, Union, Literal
+from typing import (
+    TYPE_CHECKING,
+    List,
+    Dict,
+    Any,
+    Set,
+    Tuple,
+    Optional,
+    Union,
+    Literal,
+)
 from dataclasses import dataclass
 import torch
 from seqeval.metrics import precision_score, recall_score, f1_score
@@ -10,13 +19,15 @@ from renard.ner_utils import (
     NERDataset,
 )
 from renard.pipeline.core import PipelineStep, Mention
-from renard.pipeline.progress import ProgressReporter
 from renard.ner_utils import ner_entities
 
 if TYPE_CHECKING:
     from transformers.tokenization_utils_base import BatchEncoding
-    from transformers import PreTrainedModel, PreTrainedTokenizerFast
-    from renard.pipeline.core import Pipeline
+    from transformers import (
+        PreTrainedModel,
+        PreTrainedTokenizerFast,
+    )
+    from renard.pipeline.ner.retrieval import NERContextRetriever
 
 
 @dataclass
@@ -100,64 +111,6 @@ class NLTKNamedEntityRecognizer(PipelineStep):
 
     def production(self) -> Set[str]:
         return {"entities"}
-
-
-class NERContextRetriever:
-    def __call__(self, dataset: NERDataset) -> NERDataset:
-        raise NotImplementedError
-
-
-class NERSamenounContextRetriever(NERContextRetriever):
-    """
-    Retrieve relevant context using the samenoun strategy as in
-    Amalvy et al.  2023.
-    """
-
-    def __init__(self, k: int) -> None:
-        """
-        :param k: the number of sentences to retrieve
-        """
-        self.k = k
-
-    def __call__(self, dataset: NERDataset) -> NERDataset:
-        import nltk
-
-        # NOTE: POS tagging is not incorporated in the pipeline yet,
-        # so we manually compute it here.
-        elements_names = [
-            {t[0] for t in nltk.pos_tag(element) if t[1].startswith("NN")}
-            for element in dataset.elements
-        ]
-
-        elements_with_context = []
-
-        for elt_i, elt in enumerate(dataset.elements):
-            retrieved_elts = [
-                other_elt
-                for other_elt_i, other_elt in enumerate(dataset.elements)
-                if not other_elt_i == elt_i
-                and len(elements_names[elt_i].intersection(elements_names[other_elt_i]))
-                > 0
-            ]
-            retrieved_elts = random.sample(
-                retrieved_elts, k=min(self.k, len(retrieved_elts))
-            )
-            elements_with_context.append(
-                (
-                    elt,
-                    [dataset.tokenizer.sep_token]
-                    + list(itertools.chain.from_iterable(retrieved_elts)),
-                )
-            )
-
-        return NERDataset(
-            [element + context for element, context in elements_with_context],
-            dataset.tokenizer,
-            [
-                [0] * len(element) + [1] * len(context)
-                for element, context in elements_with_context
-            ],
-        )
 
 
 class BertNamedEntityRecognizer(PipelineStep):
