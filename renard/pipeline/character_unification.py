@@ -365,13 +365,18 @@ class GraphRulesCharacterUnifier(PipelineStep):
             or self.hypocorism_gazetteer.are_related(raw_name1, raw_name2)
         )
 
-    def names_are_in_coref(self, name1: str, name2: str, corefs: List[List[Mention]]):
+    def names_are_in_coref(
+        self, name1: str, name2: str, corefs: List[List[Mention]]
+    ) -> bool:
+        once_together = False
         for coref_chain in corefs:
-            if any([name1 == " ".join(m.tokens) for m in coref_chain]) and any(
-                [name2 == " ".join(m.tokens) for m in coref_chain]
-            ):
-                return True
-        return False
+            name1_in = any([name1 == " ".join(m.tokens) for m in coref_chain])
+            name2_in = any([name2 == " ".join(m.tokens) for m in coref_chain])
+            if name1_in == (not name2_in):
+                return False
+            elif name1_in and name2_in:
+                once_together = True
+        return once_together
 
     def infer_name_gender(
         self,
