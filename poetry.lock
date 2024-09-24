@@ -3444,13 +3444,13 @@ files = [
 
 [[package]]
 name = "tibert"
-version = "0.4.0"
+version = "0.5.0"
 description = "BERT for Coreference Resolution"
 optional = false
 python-versions = "<3.11,>=3.8"
 files = [
-    {file = "tibert-0.4.0-py3-none-any.whl", hash = "sha256:41c54da2f907cc0ba95a2bc5ba94e9c14d7399cecfea6bd47abd4b00e8b73d8f"},
-    {file = "tibert-0.4.0.tar.gz", hash = "sha256:29dc56c8e59b34d4e21f0de74aa4af5668a9cd070e86b8312e85325466f4082f"},
+    {file = "tibert-0.5.0-py3-none-any.whl", hash = "sha256:15473733091b5b28d266c7c5a400086d1d87fe8ae34ea664f1cd095647f80ccd"},
+    {file = "tibert-0.5.0.tar.gz", hash = "sha256:405c7cd8ae545275badf5191dd1627c3e421082ffa0173eed779cda4bcda60b6"},
 ]
 
 [package.dependencies]
@@ -4160,4 +4160,4 @@ stanza = ["stanza"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8,<3.11"
-content-hash = "0312af90e5b065db53228a01dbba805fe576b251d2c7d63987c2a163611dd706"
+content-hash = "1f2c81811a7e5b00949f5b52789d41034e4372df587f0621dc2936c9540257e8"
