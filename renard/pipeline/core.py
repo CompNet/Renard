@@ -289,6 +289,7 @@ class PipelineState:
         node_kwargs: Optional[List[Dict[str, Any]]] = None,
         edge_kwargs: Optional[List[Dict[str, Any]]] = None,
         label_kwargs: Optional[List[Dict[str, Any]]] = None,
+        legend: bool = False,
     ):
         """Plot ``self.character_graph`` using reasonable default
         parameters, and save the produced figures in the specified
@@ -306,6 +307,7 @@ class PipelineState:
         :param node_kwargs: passed to :func:`nx.draw_networkx_nodes`
         :param edge_kwargs: passed to :func:`nx.draw_networkx_nodes`
         :param label_kwargs: passed to :func:`nx.draw_networkx_labels`
+        :param legend: passed to :func:`.plot_nx_graph_reasonably`
         """
         import matplotlib.pyplot as plt
 
@@ -346,6 +348,7 @@ class PipelineState:
                 node_kwargs=node_kwargs[i],
                 edge_kwargs=edge_kwargs[i],
                 label_kwargs=label_kwargs[i],
+                legend=legend,
             )
             plt.savefig(f"{directory}/{i}.png")
             plt.close()
@@ -362,6 +365,7 @@ class PipelineState:
         edge_kwargs: Optional[Dict[str, Any]] = None,
         label_kwargs: Optional[Dict[str, Any]] = None,
         tight_layout: bool = False,
+        legend: bool = False,
     ):
         """Plot ``self.character_graph`` using reasonable parameters,
         and save the produced figure to a file
@@ -375,6 +379,7 @@ class PipelineState:
         :param edge_kwargs: passed to :func:`nx.draw_networkx_nodes`
         :param label_kwargs: passed to :func:`nx.draw_networkx_labels`
         :param tight_layout: if ``True``, will use matplotlib's tight_layout
+        :param legend: passed to :func:`.plot_nx_graph_reasonably`
         """
         import matplotlib.pyplot as plt
 
@@ -399,6 +404,7 @@ class PipelineState:
             node_kwargs=node_kwargs,
             edge_kwargs=edge_kwargs,
             label_kwargs=label_kwargs,
+            legend=legend,
         )
         if tight_layout:
             fig.tight_layout()
@@ -419,6 +425,7 @@ class PipelineState:
         edge_kwargs: Optional[Union[Dict[str, Any], List[Dict[str, Any]]]] = None,
         label_kwargs: Optional[Union[Dict[str, Any], List[Dict[str, Any]]]] = None,
         tight_layout: bool = False,
+        legend: bool = False,
     ):
         """Plot ``self.character_network`` using reasonable default
         parameters
@@ -448,6 +455,7 @@ class PipelineState:
         :param edge_kwargs: passed to :func:`nx.draw_networkx_nodes`
         :param label_kwargs: passed to :func:`nx.draw_networkx_labels`
         :param tight_layout: if ``True``, will use matplotlib's tight_layout
+        :param legend: passed to :func:`.plot_nx_graph_reasonably`
         """
         import matplotlib.pyplot as plt
         from matplotlib.widgets import Slider
@@ -478,6 +486,7 @@ class PipelineState:
                 node_kwargs=node_kwargs,
                 edge_kwargs=edge_kwargs,
                 label_kwargs=label_kwargs,
+                legend=legend,
             )
             return
 
@@ -528,6 +537,7 @@ class PipelineState:
                 node_kwargs=node_kwargs[slider_i],
                 edge_kwargs=edge_kwargs[slider_i],
                 label_kwargs=label_kwargs[slider_i],
+                legend=legend,
             )
             ax.set_xlim(-1.2, 1.2)
             ax.set_ylim(-1.2, 1.2)

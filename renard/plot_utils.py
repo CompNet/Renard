@@ -25,6 +25,7 @@ def plot_nx_graph_reasonably(
     node_kwargs: Optional[Dict[str, Any]] = None,
     edge_kwargs: Optional[Dict[str, Any]] = None,
     label_kwargs: Optional[Dict[str, Any]] = None,
+    legend: bool = False,
 ):
     """Try to plot a :class:`nx.Graph` with 'reasonable' parameters
 
@@ -35,6 +36,7 @@ def plot_nx_graph_reasonably(
     :param node_kwargs: passed to :func:`nx.draw_networkx_nodes`
     :param edge_kwargs: passed to :func:`nx.draw_networkx_nodes`
     :param label_kwargs: passed to :func:`nx.draw_networkx_labels`
+    :param legend: if ``True``, will try to plot an additional legend.
     """
     pos = layout
     if pos is None:
@@ -48,7 +50,12 @@ def plot_nx_graph_reasonably(
     node_kwargs["node_size"] = node_kwargs.get(
         "node_size", [1 + degree * 10 for _, degree in G.degree]
     )
-    nx.draw_networkx_nodes(G, pos, ax=ax, **node_kwargs)
+    scatter = nx.draw_networkx_nodes(G, pos, ax=ax, **node_kwargs)
+    if legend:
+        if ax:
+            ax.legend(*sc.legend_elements("sizes"))
+        else:
+            plt.legend(*sc.legend_elements("sizes"))
 
     edge_kwargs = edge_kwargs or {}
     edges_attrs = graph_edges_attributes(G)
@@ -64,11 +71,11 @@ def plot_nx_graph_reasonably(
         edge_kwargs["edge_cmap"] = None
     else:
         edge_kwargs["edge_color"] = edge_kwargs.get(
-            "edge_color", [math.log(d["weight"]) for *_, d in G.edges.data()]
+            "edge_color", [math.log(d.get("weight", 1)) for *_, d in G.edges.data()]
         )
         edge_kwargs["edge_cmap"] = edge_kwargs.get("edge_cmap", plt.get_cmap("viridis"))
     edge_kwargs["width"] = edge_kwargs.get(
-        "width", [1 + math.log(d["weight"]) for _, _, d in G.edges.data()]
+        "width", [1 + math.log(d.get("weight", 1)) for _, _, d in G.edges.data()]
     )
     edge_kwargs["alpha"] = edge_kwargs.get("alpha", 0.35)
     nx.draw_networkx_edges(G, pos, ax=ax, **edge_kwargs)
