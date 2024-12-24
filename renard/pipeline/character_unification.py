@@ -1,5 +1,5 @@
 from typing import Any, Dict, List, FrozenSet, Set, Optional, Tuple, Union, Literal
-import copy
+import re, sys
 from itertools import combinations
 from collections import defaultdict, Counter
 from dataclasses import dataclass
@@ -11,6 +11,7 @@ from renard.pipeline.ner import NEREntity
 from renard.pipeline.progress import ProgressReporter
 from renard.resources.hypocorisms import HypocorismGazetteer
 from renard.resources.pronouns import is_a_female_pronoun, is_a_male_pronoun
+from renard.resources.determiners import singular_determiners
 from renard.resources.titles import is_a_male_title, is_a_female_title, all_titles
 
 
@@ -167,6 +168,7 @@ class GraphRulesCharacterUnifier(PipelineStep):
         additional_hypocorisms: Optional[List[Tuple[str, List[str]]]] = None,
         link_corefs_mentions: bool = False,
         ignore_lone_titles: Optional[Set[str]] = None,
+        ignore_leading_determiner: bool = False,
     ) -> None:
         """
         :param min_appearances: minimum number of appearances of a
@@ -181,15 +183,20 @@ class GraphRulesCharacterUnifier(PipelineStep):
             extract a lot of spurious links.  However, linking by
             coref is sometimes the only way to resolve a character
             alias.
-        :param ignore_lone_titles: a set of titles to ignore when
-            they stand on their own.  This avoids extracting false
+        :param ignore_lone_titles: a set of titles to ignore when they
+            stand on their own.  This avoids extracting false
             positives characters such as 'Mr.' or 'Miss'.
+        :param ignore_leading_determiner: if ``True``, will ignore the
+            leading determiner when applying unification rules.  This
+            is useful if the NER model used in the pipeline adds
+            leading determiners as part of entites.
         """
         self.min_appearances = min_appearances
         self.additional_hypocorisms = additional_hypocorisms
         self.link_corefs_mentions = link_corefs_mentions
         self.ignore_lone_titles = ignore_lone_titles or set()
         self.character_ner_tag = "PER"  # a default value, will be set by _pipeline_init
+        self.ignore_leading_determiner = ignore_leading_determiner
 
         super().__init__()
 
@@ -229,23 +236,28 @@ class GraphRulesCharacterUnifier(PipelineStep):
 
         # * link nodes based on several rules
         for name1, name2 in combinations(G.nodes(), 2):
+
+            # preprocess name when needed
+            pname1 = self._preprocess_name(name1)
+            pname2 = self._preprocess_name(name2)
+
             # is one name a known hypocorism of the other ? (also
             # checks if both names are the same)
-            if self.hypocorism_gazetteer.are_related(name1, name2):
+            if self.hypocorism_gazetteer.are_related(pname1, pname2):
                 G.add_edge(name1, name2)
                 continue
 
             # if we remove the title, is one name related to the other
             # ?
             if self.names_are_related_after_title_removal(
-                name1, name2, hname_constants
+                pname1, pname2, hname_constants
             ):
                 G.add_edge(name1, name2)
                 continue
 
             # add an edge if two characters have the same family names
-            human_name1 = HumanName(name1, constants=hname_constants)
-            human_name2 = HumanName(name2, constants=hname_constants)
+            human_name1 = HumanName(pname1, constants=hname_constants)
+            human_name2 = HumanName(pname2, constants=hname_constants)
             if (
                 len(human_name1.last) > 0
                 and human_name1.last.lower() == human_name2.last.lower()
@@ -282,10 +294,15 @@ class GraphRulesCharacterUnifier(PipelineStep):
                 pass
 
         for name1, name2 in combinations(G.nodes(), 2):
+
+            # preprocess names when needed
+            pname1 = self._preprocess_name(name1)
+            pname2 = self._preprocess_name(name2)
+
             # check if characters have the same last name but a
             # different first name.
-            human_name1 = HumanName(name1, constants=hname_constants)
-            human_name2 = HumanName(name2, constants=hname_constants)
+            human_name1 = HumanName(pname1, constants=hname_constants)
+            human_name2 = HumanName(pname2, constants=hname_constants)
             if (
                 len(human_name1.last) > 0
                 and len(human_name2.last) > 0
@@ -336,6 +353,17 @@ class GraphRulesCharacterUnifier(PipelineStep):
         ]
 
         return {"characters": characters}
+
+    def _preprocess_name(self, name) -> str:
+        if self.ignore_leading_determiner:
+            if not self.lang in singular_determiners:
+                print(
+                    f"[warning] can't ignore leading determiners for {self.lang}",
+                    file=sys.stderr,
+                )
+            for determiner in singular_determiners.get(self.lang, []):
+                name = re.sub(f"^{determiner} ", " ", name, flags=re.I)
+        return name
 
     def _make_hname_constants(self) -> Constants:
         if self.lang == "eng":
