@@ -184,6 +184,7 @@ def load_conll2002_bio(
     path: str,
     tag_conversion_map: Optional[Dict[str, str]] = None,
     separator: str = "\t",
+    max_sent_len: Optional[int] = None,
     **kwargs,
 ) -> Tuple[List[List[str]], List[str], List[NEREntity]]:
     """Load a file under CoNLL2022 BIO format.  Sentences are expected
@@ -195,7 +196,9 @@ def load_conll2002_bio(
     :param separator: separator between token and BIO tags
     :param tag_conversion_map: conversion map for tags found in the
         input file.  Example : ``{'B': 'B-PER', 'I': 'I-PER'}``
-    :param kwargs: additional kwargs for ``open`` (such as
+    :param max_sent_len: if specified, maximum length, in tokens, of
+        sentences.
+    :param kwargs: additional kwargs for :func:`open` (such as
         ``encoding`` or ``newline``).
 
     :return: ``(sentences, tokens, entities)``
@@ -210,7 +213,9 @@ def load_conll2002_bio(
     tags = []
     for line in raw_data.split("\n"):
         line = line.strip("\n")
-        if re.fullmatch(r"\s*", line):
+        if re.fullmatch(r"\s*", line) or (
+            not max_sent_len is None and len(sent_tokens) >= max_sent_len
+        ):
             if len(sent_tokens) == 0:
                 continue
             sents.append(sent_tokens)
@@ -230,6 +235,7 @@ def hgdataset_from_conll2002(
     path: str,
     tag_conversion_map: Optional[Dict[str, str]] = None,
     separator: str = "\t",
+    max_sent_len: Optional[int] = None,
     **kwargs,
 ) -> HGDataset:
     """Load a CoNLL-2002 file as a Huggingface Dataset.
@@ -237,12 +243,13 @@ def hgdataset_from_conll2002(
     :param path: passed to :func:`.load_conll2002_bio`
     :param tag_conversion_map: passed to :func:`load_conll2002_bio`
     :param separator: passed to :func:`load_conll2002_bio`
-    :param kwargs: passed to :func:`load_conll2002_bio`
+    :param max_sent_len: passed to :func:`load_conll2002_bio`
+    :param kwargs: additional kwargs for :func:`open`
 
     :return: a :class:`datasets.Dataset` with features 'tokens' and 'labels'.
     """
     sentences, tokens, entities = load_conll2002_bio(
-        path, tag_conversion_map, separator, **kwargs
+        path, tag_conversion_map, separator, max_sent_len, **kwargs
     )
 
     # convert entities to labels
