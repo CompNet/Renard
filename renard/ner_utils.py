@@ -104,9 +104,18 @@ class NERDataset(Dataset):
             truncation=True,
             max_length=512,  # TODO
             is_split_into_words=True,
+            return_length=True,
         )
 
-        batch["context_mask"] = self._context_mask[index]
+        length = batch["length"][0]
+        del batch["length"]
+        if self.tokenizer.truncation_side == "right":
+            batch["context_mask"] = self._context_mask[index][:length]
+        else:
+            assert self.tokenizer.truncation_side == "left"
+            batch["context_mask"] = self._context_mask[index][
+                len(batch["input_ids"]) - length :
+            ]
 
         return batch
 
