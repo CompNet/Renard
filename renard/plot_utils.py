@@ -53,9 +53,9 @@ def plot_nx_graph_reasonably(
     scatter = nx.draw_networkx_nodes(G, pos, ax=ax, **node_kwargs)
     if legend:
         if ax:
-            ax.legend(*sc.legend_elements("sizes"))
+            ax.legend(*scatter.legend_elements("sizes"))
         else:
-            plt.legend(*sc.legend_elements("sizes"))
+            plt.legend(*scatter.legend_elements("sizes"))
 
     edge_kwargs = edge_kwargs or {}
     edges_attrs = graph_edges_attributes(G)
