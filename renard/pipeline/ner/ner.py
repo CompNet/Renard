@@ -12,7 +12,6 @@ from typing import (
 )
 from dataclasses import dataclass
 import torch
-from seqeval.metrics import precision_score, recall_score, f1_score
 from renard.nltk_utils import nltk_fix_bio_tags
 from renard.ner_utils import (
     DataCollatorForTokenClassificationWithBatchEncoding,
@@ -53,18 +52,21 @@ class NEREntity(Mention):
 def score_ner(
     pred_bio_tags: List[str], ref_bio_tags: List[str]
 ) -> Tuple[float, float, float]:
-    """Score NER as in CoNLL-2003 shared task using ``seqeval``
+    """Score NER as in CoNLL-2003 shared task using the ``seqeval``
+    library, if installed.
 
     Precision is the percentage of named entities in ``ref_bio_tags``
-    that are correct. Recall is the percentage of named entities in
-    pred_bio_tags that are in ref_bio_tags. F1 is the harmonic mean of
-    both.
+    that are correct.  Recall is the percentage of named entities in
+    pred_bio_tags that are in ref_bio_tags.  F1 is the harmonic mean
+    of both.
 
     :param pred_bio_tags:
     :param ref_bio_tags:
-    :return: ``(precision, recall, F1 score)``
 
+    :return: ``(precision, recall, F1 score)``
     """
+    from seqeval.metrics import precision_score, recall_score, f1_score
+
     assert len(pred_bio_tags) == len(ref_bio_tags)
     return (
         precision_score([ref_bio_tags], [pred_bio_tags]),
@@ -82,11 +84,18 @@ class NLTKNamedEntityRecognizer(PipelineStep):
         """
         import nltk
 
-        nltk.download("averaged_perceptron_tagger", quiet=True)
+        nltk.download(f"averaged_perceptron_tagger", quiet=True)
         nltk.download("maxent_ne_chunker", quiet=True)
+        nltk.download("maxent_ne_chunker_tab", quiet=True)
         nltk.download("words", quiet=True)
 
         super().__init__()
+
+    def _pipeline_init_(self, lang: str, **kwargs):
+        import nltk
+
+        nltk.download(f"averaged_perceptron_tagger_{lang}", quiet=True)
+        super()._pipeline_init_(lang, **kwargs)
 
     def __call__(self, tokens: List[str], **kwargs) -> Dict[str, Any]:
         """

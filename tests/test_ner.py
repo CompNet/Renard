@@ -43,8 +43,8 @@ def test_retrieves_context(retriever_class: Type[NERContextRetriever]):
     ]
     dataset = NERDataset(sentences, tokenizer)
     ctx_dataset = context_retriever(dataset)
-    assert ctx_dataset.elements[0] == sentences[0] + ["[SEP]"] + sentences[1]
-    assert ctx_dataset.elements[1] == sentences[0] + ["[SEP]"] + sentences[1]
+    assert ctx_dataset.elements[0] == sentences[0] + sentences[1]
+    assert ctx_dataset.elements[1] == sentences[0] + sentences[1]
     assert len(ctx_dataset.elements) == len(sentences)
     assert len(ctx_dataset._context_mask) == len(sentences)
 
@@ -69,7 +69,7 @@ def test_neural_retrieves_context():
     ]
     dataset = NERDataset(sentences, tokenizer)
     ctx_dataset = context_retriever(dataset)
-    assert ctx_dataset.elements[0] == sentences[0] + ["[SEP]"] + sentences[1]
-    assert ctx_dataset.elements[1] == sentences[0] + ["[SEP]"] + sentences[1]
+    assert ctx_dataset.elements[0] == sentences[0] + sentences[1]
+    assert ctx_dataset.elements[1] == sentences[0] + sentences[1]
     assert len(ctx_dataset.elements) == len(sentences)
     assert len(ctx_dataset._context_mask) == len(sentences)

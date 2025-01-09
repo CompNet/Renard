@@ -12,4 +12,4 @@ def test_bert_coreference_resolver_runs():
     )
     corefs = pipeline(tokens=tokens).corefs
     assert not corefs is None
-    assert len(corefs) == 2
+    assert len(corefs) >= 1

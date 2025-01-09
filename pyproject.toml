@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "renard-pipeline"
-version = "0.5.0"
+version = "0.6.0"
 description = "Relationships Extraction from NARrative Documents"
 authors = ["Arthur Amalvy <arthur.amalvy@univ-avignon.fr>"]
 license = "GPL-3.0-only"
@@ -14,30 +14,29 @@ documentation = "https://compnet.github.io/Renard/"
 
 [tool.poetry.dependencies]
 # optional dependencies
-stanza = { version = "^1.3.0", optional = true }
-spacy = { version = "^3.5.0", optional = true }
-coreferee = { version = "^1.4.0", optional = true }
-spacy-transformers = {version = "^1.2.1", optional = true}
+stanza = { version = "^1.3", optional = true }
+spacy = { version = "^3.5", optional = true }
+coreferee = { version = "^1.4", optional = true }
+spacy-transformers = {version = "^1.3", optional = true}
 # required dependencies
-python = "^3.8,<3.11"
+python = "^3.8,<3.12"
 torch = ">=2.0.0, !=2.0.1"
-transformers = "^4.36.0"
-nltk = "^3.6.5"
+transformers = "^4.36"
+nltk = "^3.9"
 tqdm = "^4.62.3"
-networkx = "^2.6.3"
-more-itertools = "^10.1.0"
-nameparser = "^1.1.0"
-matplotlib = "^3.5.3"
-seqeval = "1.2.2"
-pandas = "^2.0.0"
-pytest = "^7.2.1"
-tibert = "^0.5.0"
-grimbert = "^0.1.0"
-datasets = "^2.16.1"
+networkx = "^3.0"
+more-itertools = "^10.5"
+nameparser = "^1.1"
+matplotlib = "^3.5"
+pandas = "^2.0"
+pytest = "^8.3.0"
+tibert = "^0.5"
+grimbert = "^0.1"
+datasets = "^3.0"
 rank-bm25 = "^0.2.2"
 
 [tool.poetry.dev-dependencies]
-hypothesis = "^6.24.0"
+hypothesis = "^6.82"
 Sphinx = "^4.3.1"
 sphinx-rtd-theme = "^1.0.0"
 sphinx-autodoc-typehints = "^1.12.0"
