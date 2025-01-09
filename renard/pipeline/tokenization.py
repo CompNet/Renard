@@ -37,6 +37,7 @@ class NLTKTokenizer(PipelineStep):
 
     def __init__(self):
         nltk.download("punkt", quiet=True)
+        nltk.download("punkt_tab", quiet=True)
         self.word_tokenizer = None
         self.sent_tokenizer = None
         super().__init__()
