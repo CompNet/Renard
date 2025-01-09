@@ -17,6 +17,10 @@ from renard.pipeline.ner.retrieval import (
 )
 
 
+@pytest.mark.skipif(
+    os.getenv("RENARD_TEST_SEQEVAL_OPTDEP") != "1",
+    reason="not testing seqeval based functions",
+)
 @given(lists(sampled_from(("B-PER", "I-PER", "O")), min_size=1))
 def test_score_same_tags(tags: List[str]):
     assume("B-PER" in tags)
