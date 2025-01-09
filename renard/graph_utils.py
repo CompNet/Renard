@@ -124,6 +124,15 @@ def dynamic_graph_to_gephi_graph(graphs: List[nx.Graph]) -> nx.Graph:
     G = nx.Graph()
 
     for H_i, H in enumerate(graphs):
+
+        # update node attributes
+        for u in H.nodes:
+            G.add_node(u)
+            for key, value in H.nodes[u].items():
+                # format : (VALUE, START, END)
+                series = G.nodes[u].get(key, [])
+                G.nodes[u][key] = series + [(value, H_i, H_i + 1)]
+
         for u, v in H.edges:
             # create a new edge between two characters if it doesn't
             # exist yet
