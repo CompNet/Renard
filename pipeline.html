@@ -101,11 +101,11 @@
 <a class="reference internal" href="reference.html#renard.pipeline.core.Pipeline" title="renard.pipeline.core.Pipeline"><code class="xref py py-class docutils literal notranslate"><span class="pre">Pipeline</span></code></a> is a list of <a class="reference internal" href="reference.html#renard.pipeline.core.PipelineStep" title="renard.pipeline.core.PipelineStep"><code class="xref py py-class docutils literal notranslate"><span class="pre">PipelineStep</span></code></a> that are run
 sequentially in order to extract a character graph from a
 document. Here is a simple example:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">renard.pipeline</span> <span class="kn">import</span> <span class="n">Pipeline</span>
-<span class="kn">from</span> <span class="nn">renard.pipeline.tokenization</span> <span class="kn">import</span> <span class="n">NLTKTokenizer</span>
-<span class="kn">from</span> <span class="nn">renard.pipeline.ner</span> <span class="kn">import</span> <span class="n">NLTKNamedEntityRecognizer</span>
-<span class="kn">from</span> <span class="nn">renard.pipeline.character_unification</span> <span class="kn">import</span> <span class="n">GraphRulesCharacterUnifier</span>
-<span class="kn">from</span> <span class="nn">renard.pipeline.graph_extraction</span> <span class="kn">import</span> <span class="n">CoOccurrencesGraphExtractor</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">renard.pipeline</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pipeline</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">renard.pipeline.tokenization</span><span class="w"> </span><span class="kn">import</span> <span class="n">NLTKTokenizer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">renard.pipeline.ner</span><span class="w"> </span><span class="kn">import</span> <span class="n">NLTKNamedEntityRecognizer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">renard.pipeline.character_unification</span><span class="w"> </span><span class="kn">import</span> <span class="n">GraphRulesCharacterUnifier</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">renard.pipeline.graph_extraction</span><span class="w"> </span><span class="kn">import</span> <span class="n">CoOccurrencesGraphExtractor</span>
 
 <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;./my_doc.txt&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
     <span class="n">text</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
@@ -131,10 +131,10 @@ in case it is intractable.</p>
 <p>You can also specify the result of certains steps manually when
 calling the pipeline if you already have those results or if you want
 to compute them yourself:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">renard.pipeline</span> <span class="kn">import</span> <span class="n">Pipeline</span>
-<span class="kn">from</span> <span class="nn">renard.pipeline.ner</span> <span class="kn">import</span> <span class="n">NLTKNamedEntityRecognizer</span>
-<span class="kn">from</span> <span class="nn">renard.pipeline.character_unification</span> <span class="kn">import</span> <span class="n">GraphRulesCharacterUnifier</span>
-<span class="kn">from</span> <span class="nn">renard.pipeline.graph_extraction</span> <span class="kn">import</span> <span class="n">CoOccurrencesGraphExtractor</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">renard.pipeline</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pipeline</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">renard.pipeline.ner</span><span class="w"> </span><span class="kn">import</span> <span class="n">NLTKNamedEntityRecognizer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">renard.pipeline.character_unification</span><span class="w"> </span><span class="kn">import</span> <span class="n">GraphRulesCharacterUnifier</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">renard.pipeline.graph_extraction</span><span class="w"> </span><span class="kn">import</span> <span class="n">CoOccurrencesGraphExtractor</span>
 
 <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;./my_doc.txt&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
     <span class="n">text</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
@@ -159,7 +159,7 @@ exception:</p>
 </pre></div>
 </div>
 <p>For simplicity, one can use one of the preconfigured pipelines:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">renard.pipeline.preconfigured</span> <span class="kn">import</span> <span class="n">bert_pipeline</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">renard.pipeline.preconfigured</span><span class="w"> </span><span class="kn">import</span> <span class="n">bert_pipeline</span>
 
 <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;./my_doc.txt&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
     <span class="n">text</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
@@ -186,7 +186,7 @@ a networkx graph:</p>
 <p>A few matplotlib-based plot functions are provided for convenience
 (<a class="reference internal" href="reference.html#renard.pipeline.core.PipelineState.plot_graph" title="renard.pipeline.core.PipelineState.plot_graph"><code class="xref py py-meth docutils literal notranslate"><span class="pre">PipelineState.plot_graph()</span></code></a>,
 <a class="reference internal" href="reference.html#renard.pipeline.core.PipelineState.plot_graph_to_file" title="renard.pipeline.core.PipelineState.plot_graph_to_file"><code class="xref py py-meth docutils literal notranslate"><span class="pre">PipelineState.plot_graph_to_file()</span></code></a>):</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">out</span><span class="o">.</span><span class="n">plot_graph</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
@@ -281,11 +281,11 @@ to a unique character.</p>
 <p>Renard can also extract <em>dynamic graphs</em>: graphs that evolve through
 time. In Renard, such graphs are representend by a <code class="docutils literal notranslate"><span class="pre">List</span></code> of
 <code class="docutils literal notranslate"><span class="pre">networkx.Graph</span></code>.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">renard.pipeline</span> <span class="kn">import</span> <span class="n">Pipeline</span>
-<span class="kn">from</span> <span class="nn">renard.pipeline.tokenization</span> <span class="kn">import</span> <span class="n">NLTKTokenizer</span>
-<span class="kn">from</span> <span class="nn">renard.pipeline.ner</span> <span class="kn">import</span> <span class="n">NLTKNamedEntityRecognizer</span>
-<span class="kn">from</span> <span class="nn">renard.pipeline.character_unification</span> <span class="kn">import</span> <span class="n">GraphRulesCharacterUnifier</span>
-<span class="kn">from</span> <span class="nn">renard.pipeline.graph_extraction</span> <span class="kn">import</span> <span class="n">CoOccurrencesGraphExtractor</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">renard.pipeline</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pipeline</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">renard.pipeline.tokenization</span><span class="w"> </span><span class="kn">import</span> <span class="n">NLTKTokenizer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">renard.pipeline.ner</span><span class="w"> </span><span class="kn">import</span> <span class="n">NLTKNamedEntityRecognizer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">renard.pipeline.character_unification</span><span class="w"> </span><span class="kn">import</span> <span class="n">GraphRulesCharacterUnifier</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">renard.pipeline.graph_extraction</span><span class="w"> </span><span class="kn">import</span> <span class="n">CoOccurrencesGraphExtractor</span>
 
 <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;./my_doc.txt&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
     <span class="n">text</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
@@ -332,12 +332,12 @@ pipeline to determine the dynamic window, Renard allows to specify a
 custom segmentation of a text with the <code class="docutils literal notranslate"><span class="pre">dynamic_blocks</span></code>
 argument. When running a pipeline, you can cut your text however you
 want and pass this argument instead of the usual text:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">renard.pipeline</span> <span class="kn">import</span> <span class="n">Pipeline</span>
-<span class="kn">from</span> <span class="nn">renard.pipeline.tokenization</span> <span class="kn">import</span> <span class="n">NLTKTokenizer</span>
-<span class="kn">from</span> <span class="nn">renard.pipeline.ner</span> <span class="kn">import</span> <span class="n">NLTKNamedEntityRecognizer</span>
-<span class="kn">from</span> <span class="nn">renard.pipeline.character_unification</span> <span class="kn">import</span> <span class="n">GraphRulesCharacterUnifier</span>
-<span class="kn">from</span> <span class="nn">renard.pipeline.graph_extraction</span> <span class="kn">import</span> <span class="n">CoOccurrencesGraphExtractor</span>
-<span class="kn">from</span> <span class="nn">renard.utils</span> <span class="kn">import</span> <span class="n">block_bounds</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">renard.pipeline</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pipeline</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">renard.pipeline.tokenization</span><span class="w"> </span><span class="kn">import</span> <span class="n">NLTKTokenizer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">renard.pipeline.ner</span><span class="w"> </span><span class="kn">import</span> <span class="n">NLTKNamedEntityRecognizer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">renard.pipeline.character_unification</span><span class="w"> </span><span class="kn">import</span> <span class="n">GraphRulesCharacterUnifier</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">renard.pipeline.graph_extraction</span><span class="w"> </span><span class="kn">import</span> <span class="n">CoOccurrencesGraphExtractor</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">renard.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">block_bounds</span>
 
 <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;./my_doc.txt&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
     <span class="n">text</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
@@ -368,11 +368,11 @@ is configured for English, but can create a pipeline for any language
 <em>as long as all of its steps support it</em>. To configure a pipeline for
 another language, you can pass the ISO 639-3 code of the language you
 want:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">renard.pipeline</span> <span class="kn">import</span> <span class="n">Pipeline</span>
-<span class="kn">from</span> <span class="nn">renard.pipeline.tokenization</span> <span class="kn">import</span> <span class="n">NLTKTokenizer</span>
-<span class="kn">from</span> <span class="nn">renard.pipeline.ner</span> <span class="kn">import</span> <span class="n">BertNamedEntityRecognizer</span>
-<span class="kn">from</span> <span class="nn">renard.pipeline.character_unification</span> <span class="kn">import</span> <span class="n">GraphRulesCharacterUnifier</span>
-<span class="kn">from</span> <span class="nn">renard.pipeline.graph_extraction</span> <span class="kn">import</span> <span class="n">CoOccurrencesGraphExtractor</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">renard.pipeline</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pipeline</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">renard.pipeline.tokenization</span><span class="w"> </span><span class="kn">import</span> <span class="n">NLTKTokenizer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">renard.pipeline.ner</span><span class="w"> </span><span class="kn">import</span> <span class="n">BertNamedEntityRecognizer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">renard.pipeline.character_unification</span><span class="w"> </span><span class="kn">import</span> <span class="n">GraphRulesCharacterUnifier</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">renard.pipeline.graph_extraction</span><span class="w"> </span><span class="kn">import</span> <span class="n">CoOccurrencesGraphExtractor</span>
 
 <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;./my_doc_in_french.txt&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
     <span class="n">text</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
