@@ -13,7 +13,7 @@ You can install the latest version using pip:
 
 > pip install renard-pipeline
 
-Currently, Renard supports Python 3.8, 3.9 and 3.10.
+Currently, Renard supports Python>=3.8,<=3.11
 
 
 # Documentation
