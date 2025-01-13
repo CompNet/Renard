@@ -25,8 +25,9 @@ The project uses `Poetry <https://python-poetry.org/>`_ to manage dependencies. 
 - ``poetry shell`` to get into a virtual environment with dependencies
 
 
-If you ever want to use the Stanford CoreNLP pipeline, you can install
-the ``stanza`` extra with ``poetry install -E stanza``.
+If you ever want to use the Stanford CoreNLP pipeline, you must install
+``stanza`` (``pip install stanza``).
 
-If you want to use the Spacy Coreferee coreference solver, use
-``poetry install -E spacy``.
+If you want to use the Spacy Coreferee coreference solver, you need to
+install ``spacy``, ``spacy-transformers`` and ``corefereee`` (``pip
+install spacy spacy-transformers coreferee``).
