@@ -17,12 +17,11 @@ You can also install the following extras:
 Manual Installation
 ===================
 
-The project uses `Poetry <https://python-poetry.org/>`_ to manage dependencies. Use :
+The project uses `uv <https://docs.astral.sh/uv/>`_ to manage dependencies. Use :
 
-- ``poetry install`` to install dependencies
-- ``poetry run python my_script.py`` to run a script under the virtual
+- ``uv sync`` to install dependencies
+- ``uv run python my_script.py`` to run a script under the virtual
   environment with dependencies
-- ``poetry shell`` to get into a virtual environment with dependencies
 
 
 If you ever want to use the Stanford CoreNLP pipeline, you must install

@@ -1,20 +1,21 @@
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="./">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>The Pipeline &mdash; Renard  documentation</title>
-      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <!--[if lt IE 9]>
-    <script src="_static/js/html5shiv.min.js"></script>
-  <![endif]-->
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
   
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/doctools.js"></script>
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9a2dae69"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -96,7 +97,7 @@
            <div itemprop="articleBody">
              
   <section id="the-pipeline">
-<h1>The Pipeline<a class="headerlink" href="#the-pipeline" title="Permalink to this headline"></a></h1>
+<h1>The Pipeline<a class="headerlink" href="#the-pipeline" title="Link to this heading"></a></h1>
 <p>Renard’s central concept is the <a class="reference internal" href="reference.html#renard.pipeline.core.Pipeline" title="renard.pipeline.core.Pipeline"><code class="xref py py-class docutils literal notranslate"><span class="pre">Pipeline</span></code></a>. A
 <a class="reference internal" href="reference.html#renard.pipeline.core.Pipeline" title="renard.pipeline.core.Pipeline"><code class="xref py py-class docutils literal notranslate"><span class="pre">Pipeline</span></code></a> is a list of <a class="reference internal" href="reference.html#renard.pipeline.core.PipelineStep" title="renard.pipeline.core.PipelineStep"><code class="xref py py-class docutils literal notranslate"><span class="pre">PipelineStep</span></code></a> that are run
 sequentially in order to extract a character graph from a
@@ -171,7 +172,7 @@ exception:</p>
 </pre></div>
 </div>
 <section id="pipeline-output-the-pipeline-state">
-<h2>Pipeline Output: the Pipeline State<a class="headerlink" href="#pipeline-output-the-pipeline-state" title="Permalink to this headline"></a></h2>
+<h2>Pipeline Output: the Pipeline State<a class="headerlink" href="#pipeline-output-the-pipeline-state" title="Link to this heading"></a></h2>
 <p>The <a class="reference internal" href="reference.html#renard.pipeline.core.PipelineState" title="renard.pipeline.core.PipelineState"><code class="xref py py-class docutils literal notranslate"><span class="pre">PipelineState</span></code></a> represents a state that is propagated and
 annotated during the execution of a <a class="reference internal" href="reference.html#renard.pipeline.core.Pipeline" title="renard.pipeline.core.Pipeline"><code class="xref py py-class docutils literal notranslate"><span class="pre">Pipeline</span></code></a>. It is the
 final value returned when running a pipeline with
@@ -200,17 +201,17 @@ Gephi’s <cite>gexf</cite> format:</p>
 </div>
 </section>
 <section id="available-steps-an-overview">
-<h2>Available Steps: An Overview<a class="headerlink" href="#available-steps-an-overview" title="Permalink to this headline"></a></h2>
+<h2>Available Steps: An Overview<a class="headerlink" href="#available-steps-an-overview" title="Link to this heading"></a></h2>
 <p>Below is an overview of the different steps that can make up a
 pipeline. Note that <a class="reference internal" href="reference.html#renard.pipeline.stanford_corenlp.StanfordCoreNLPPipeline" title="renard.pipeline.stanford_corenlp.StanfordCoreNLPPipeline"><code class="xref py py-class docutils literal notranslate"><span class="pre">StanfordCoreNLPPipeline</span></code></a> is a special
 case and regroup several steps as the same time.</p>
 <section id="preprocessing">
-<h3>Preprocessing<a class="headerlink" href="#preprocessing" title="Permalink to this headline"></a></h3>
+<h3>Preprocessing<a class="headerlink" href="#preprocessing" title="Link to this heading"></a></h3>
 <p><a class="reference internal" href="reference.html#renard.pipeline.preprocessing.CustomSubstitutionPreprocessor" title="renard.pipeline.preprocessing.CustomSubstitutionPreprocessor"><code class="xref py py-class docutils literal notranslate"><span class="pre">CustomSubstitutionPreprocessor</span></code></a> allows to make regex-based
 substitutions in the text.</p>
 </section>
 <section id="tokenization">
-<h3>Tokenization<a class="headerlink" href="#tokenization" title="Permalink to this headline"></a></h3>
+<h3>Tokenization<a class="headerlink" href="#tokenization" title="Link to this heading"></a></h3>
 <p>Tokenization is the task of cutting text in <em>tokens</em>. It is usually
 the first task to apply to a text. 2 tokenizer are available:</p>
 <ul class="simple">
@@ -220,7 +221,7 @@ of its full NLP pipeline.</p></li>
 </ul>
 </section>
 <section id="named-entity-recognition">
-<h3>Named Entity Recognition<a class="headerlink" href="#named-entity-recognition" title="Permalink to this headline"></a></h3>
+<h3>Named Entity Recognition<a class="headerlink" href="#named-entity-recognition" title="Link to this heading"></a></h3>
 <p>Named entity recognition (NER) detects entities occurences in the
 text. 3 modules are available:</p>
 <ul class="simple">
@@ -231,7 +232,7 @@ its full NLP pipeline.</p></li>
 </ul>
 </section>
 <section id="coreference-resolution">
-<h3>Coreference Resolution<a class="headerlink" href="#coreference-resolution" title="Permalink to this headline"></a></h3>
+<h3>Coreference Resolution<a class="headerlink" href="#coreference-resolution" title="Link to this heading"></a></h3>
 <ul class="simple">
 <li><p><a class="reference internal" href="reference.html#renard.pipeline.corefs.SpacyCorefereeCoreferenceResolver" title="renard.pipeline.corefs.SpacyCorefereeCoreferenceResolver"><code class="xref py py-class docutils literal notranslate"><span class="pre">SpacyCorefereeCoreferenceResolver</span></code></a></p></li>
 <li><p><a class="reference internal" href="reference.html#renard.pipeline.corefs.BertCoreferenceResolver" title="renard.pipeline.corefs.BertCoreferenceResolver"><code class="xref py py-class docutils literal notranslate"><span class="pre">BertCoreferenceResolver</span></code></a>, using the Tibert library.</p></li>
@@ -240,20 +241,20 @@ resolution model as part of its pipeline.</p></li>
 </ul>
 </section>
 <section id="quote-detection">
-<h3>Quote Detection<a class="headerlink" href="#quote-detection" title="Permalink to this headline"></a></h3>
+<h3>Quote Detection<a class="headerlink" href="#quote-detection" title="Link to this heading"></a></h3>
 <ul class="simple">
 <li><p><a class="reference internal" href="reference.html#renard.pipeline.quote_detection.QuoteDetector" title="renard.pipeline.quote_detection.QuoteDetector"><code class="xref py py-class docutils literal notranslate"><span class="pre">QuoteDetector</span></code></a></p></li>
 </ul>
 </section>
 <section id="sentiment-analysis">
-<h3>Sentiment Analysis<a class="headerlink" href="#sentiment-analysis" title="Permalink to this headline"></a></h3>
+<h3>Sentiment Analysis<a class="headerlink" href="#sentiment-analysis" title="Link to this heading"></a></h3>
 <ul class="simple">
 <li><p><a class="reference internal" href="reference.html#renard.pipeline.sentiment_analysis.NLTKSentimentAnalyzer" title="renard.pipeline.sentiment_analysis.NLTKSentimentAnalyzer"><code class="xref py py-class docutils literal notranslate"><span class="pre">NLTKSentimentAnalyzer</span></code></a> leverages NLTK’s Vader for sentiment
 analysis</p></li>
 </ul>
 </section>
 <section id="characters-extraction">
-<h3>Characters Extraction<a class="headerlink" href="#characters-extraction" title="Permalink to this headline"></a></h3>
+<h3>Characters Extraction<a class="headerlink" href="#characters-extraction" title="Link to this heading"></a></h3>
 <p>Characters extraction (or alias resolution) extract characters from
 occurences detected using NER. This is done by assigning each mention
 to a unique character.</p>
@@ -263,13 +264,13 @@ to a unique character.</p>
 </ul>
 </section>
 <section id="speaker-attribution">
-<h3>Speaker Attribution<a class="headerlink" href="#speaker-attribution" title="Permalink to this headline"></a></h3>
+<h3>Speaker Attribution<a class="headerlink" href="#speaker-attribution" title="Link to this heading"></a></h3>
 <ul class="simple">
 <li><p><a class="reference internal" href="reference.html#renard.pipeline.speaker_attribution.BertSpeakerDetector" title="renard.pipeline.speaker_attribution.BertSpeakerDetector"><code class="xref py py-class docutils literal notranslate"><span class="pre">BertSpeakerDetector</span></code></a></p></li>
 </ul>
 </section>
 <section id="graph-extraction">
-<h3>Graph Extraction<a class="headerlink" href="#graph-extraction" title="Permalink to this headline"></a></h3>
+<h3>Graph Extraction<a class="headerlink" href="#graph-extraction" title="Link to this heading"></a></h3>
 <ul class="simple">
 <li><p><a class="reference internal" href="reference.html#renard.pipeline.graph_extraction.CoOccurrencesGraphExtractor" title="renard.pipeline.graph_extraction.CoOccurrencesGraphExtractor"><code class="xref py py-class docutils literal notranslate"><span class="pre">CoOccurrencesGraphExtractor</span></code></a></p></li>
 <li><p><a class="reference internal" href="reference.html#renard.pipeline.graph_extraction.ConversationalGraphExtractor" title="renard.pipeline.graph_extraction.ConversationalGraphExtractor"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConversationalGraphExtractor</span></code></a></p></li>
@@ -277,7 +278,7 @@ to a unique character.</p>
 </section>
 </section>
 <section id="dynamic-graphs">
-<h2>Dynamic Graphs<a class="headerlink" href="#dynamic-graphs" title="Permalink to this headline"></a></h2>
+<h2>Dynamic Graphs<a class="headerlink" href="#dynamic-graphs" title="Link to this heading"></a></h2>
 <p>Renard can also extract <em>dynamic graphs</em>: graphs that evolve through
 time. In Renard, such graphs are representend by a <code class="docutils literal notranslate"><span class="pre">List</span></code> of
 <code class="docutils literal notranslate"><span class="pre">networkx.Graph</span></code>.</p>
@@ -322,7 +323,7 @@ graph to a directory. Meanwhile,
 <a class="reference internal" href="reference.html#renard.pipeline.core.PipelineState.export_graph_to_gexf" title="renard.pipeline.core.PipelineState.export_graph_to_gexf"><code class="xref py py-meth docutils literal notranslate"><span class="pre">PipelineState.export_graph_to_gexf()</span></code></a> correctly exports the
 dynamic graph to the Gephi format.</p>
 <section id="custom-segmentation">
-<h3>Custom Segmentation<a class="headerlink" href="#custom-segmentation" title="Permalink to this headline"></a></h3>
+<h3>Custom Segmentation<a class="headerlink" href="#custom-segmentation" title="Link to this heading"></a></h3>
 <p>The <code class="docutils literal notranslate"><span class="pre">dynamic_window</span></code> parameter of
 <code class="xref py py-class docutils literal notranslate"><span class="pre">CoOccurencesGraphExtractor</span></code> determines the segmentation of
 the dynamic networks, in number of interactions. In the example above,
@@ -362,7 +363,7 @@ want and pass this argument instead of the usual text:</p>
 </section>
 </section>
 <section id="multilingual-support">
-<h2>Multilingual Support<a class="headerlink" href="#multilingual-support" title="Permalink to this headline"></a></h2>
+<h2>Multilingual Support<a class="headerlink" href="#multilingual-support" title="Link to this heading"></a></h2>
 <p>Renard supports multiple languages. By default, a <a class="reference internal" href="reference.html#renard.pipeline.core.Pipeline" title="renard.pipeline.core.Pipeline"><code class="xref py py-class docutils literal notranslate"><span class="pre">Pipeline</span></code></a>
 is configured for English, but can create a pipeline for any language
 <em>as long as all of its steps support it</em>. To configure a pipeline for
