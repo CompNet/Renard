@@ -25,6 +25,13 @@ dependencies = [
     "rank-bm25>=0.2.2",
 ]
 
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build]
+include = ["renard"]
+
 [project.urls]
 Homepage = "https://github.com/CompNet/Renard"
 Documentation = "https://compnet.github.io/Renard/"
