@@ -306,8 +306,11 @@ class CoOccurrencesGraphExtractor(PipelineStep):
 
         # * Construct graph from co-occurence matrix
         G = nx.Graph()
-        for character, _ in mentions:
-            G.add_node(character)
+        for character, mention in mentions:
+            # NOTE: we add an 'entity_type' attribute. This is useful
+            # when using the 'additional_ner_classes' option, to
+            # differentiate between different entity types.
+            G.add_node(character, entity_type=mention.tag)
 
         for i, (char1, mention1) in enumerate(mentions):
             for j, (char2, mention2) in enumerate(mentions):

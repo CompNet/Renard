@@ -72,7 +72,7 @@ class StanfordCoreNLPPipeline(PipelineStep):
     .. note::
 
         The Stanford CoreNLP pipeline requires the ``stanza`` library.
-        You can install it with poetry using ``poetry install -E stanza``.
+        You can install it with uv using ``uv pip install stanza``.
 
     .. warning::
 

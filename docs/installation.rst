@@ -17,16 +17,16 @@ You can also install the following extras:
 Manual Installation
 ===================
 
-The project uses `Poetry <https://python-poetry.org/>`_ to manage dependencies. Use :
+The project uses `uv <https://docs.astral.sh/uv/>`_ to manage dependencies. Use :
 
-- ``poetry install`` to install dependencies
-- ``poetry run python my_script.py`` to run a script under the virtual
+- ``uv sync`` to install dependencies
+- ``uv run python my_script.py`` to run a script under the virtual
   environment with dependencies
-- ``poetry shell`` to get into a virtual environment with dependencies
 
 
-If you ever want to use the Stanford CoreNLP pipeline, you can install
-the ``stanza`` extra with ``poetry install -E stanza``.
+If you ever want to use the Stanford CoreNLP pipeline, you must install
+``stanza`` (``pip install stanza``).
 
-If you want to use the Spacy Coreferee coreference solver, use
-``poetry install -E spacy``.
+If you want to use the Spacy Coreferee coreference solver, you need to
+install ``spacy``, ``spacy-transformers`` and ``corefereee`` (``pip
+install spacy spacy-transformers coreferee``).

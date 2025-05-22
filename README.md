@@ -13,7 +13,7 @@ You can install the latest version using pip:
 
 > pip install renard-pipeline
 
-Currently, Renard supports Python 3.8, 3.9 and 3.10.
+Currently, Renard supports Python>=3.9,<=3.12
 
 
 # Documentation
@@ -57,7 +57,7 @@ For more information, see `renard_tutorial.py`, which is a tutorial in the `jupy
 
 `Renard` uses `pytest` for testing. To launch tests, use the following command : 
 
-> poetry run python -m pytest tests
+> uv run python -m pytest tests
 
 Expensive tests are disabled by default. These can be run by setting the environment variable `RENARD_TEST_ALL` to `1`.
 
