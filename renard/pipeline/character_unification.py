@@ -21,10 +21,14 @@ class Character:
     mentions: List[Mention]
     gender: Gender = Gender.UNKNOWN
 
-    def longest_name(self) -> str:
+    def longest_name(self) -> Optional[str]:
+        if len(self.names) == 0:
+            return None
         return max(self.names, key=len)
 
-    def shortest_name(self) -> str:
+    def shortest_name(self) -> Optional[str]:
+        if len(self.names) == 0:
+            return None
         return min(self.names, key=len)
 
     def most_frequent_name(self) -> Optional[str]:
@@ -236,7 +240,6 @@ class GraphRulesCharacterUnifier(PipelineStep):
 
         # * link nodes based on several rules
         for name1, name2 in combinations(G.nodes(), 2):
-
             # preprocess name when needed
             pname1 = self._preprocess_name(name1)
             pname2 = self._preprocess_name(name2)
@@ -294,7 +297,6 @@ class GraphRulesCharacterUnifier(PipelineStep):
                 pass
 
         for name1, name2 in combinations(G.nodes(), 2):
-
             # preprocess names when needed
             pname1 = self._preprocess_name(name1)
             pname2 = self._preprocess_name(name2)
