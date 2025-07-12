@@ -15,7 +15,7 @@ CharactersGraphLayout = Union[
 
 
 def layout_nx_graph_reasonably(G: nx.Graph) -> Dict[Any, np.ndarray]:
-    return nx.spring_layout(G, k=min(1.5, 8 / math.sqrt(len(G.nodes))))  # type: ignore
+    return nx.spring_layout(G, k=min(1.5, 8 / math.sqrt(len(G.nodes) + 1)))  # type: ignore
 
 
 def plot_nx_graph_reasonably(
