@@ -59,7 +59,25 @@ For more information, see `renard_tutorial.py`, which is a tutorial in the `jupy
 
 > uv run python -m pytest tests
 
+Alternatively, the project Makefile has a test target:
+
+> make test
+
 Expensive tests are disabled by default. These can be run by setting the environment variable `RENARD_TEST_ALL` to `1`.
+
+
+
+# Renard UI
+
+Since version 0.7, Renard has a web interface powered by gradio. First, install the additional dependencies:
+
+> uv sync --group ui
+
+Then, simply run:
+
+> make ui
+
+And open your browser at http://127.0.0.1:7860
 
 
 # Contributing
