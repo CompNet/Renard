@@ -1,7 +1,7 @@
 .PHONY: test
 test:
-	uv run python -m pytest tests
+	uv run --group dev python -m pytest tests
 
 .PHONE: ui
 ui:
-	uv run python -m renard.ui
+	uv run --group ui python -m renard.ui
