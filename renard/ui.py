@@ -1,5 +1,7 @@
 from typing import Any, Type
 from dataclasses import dataclass
+
+from tibert import Union
 from renard.pipeline import Pipeline, PipelineStep
 from renard.pipeline.ner import BertNamedEntityRecognizer
 from renard.pipeline.tokenization import NLTKTokenizer
@@ -19,7 +21,8 @@ import gradio as gr
 @dataclass
 class PipelineStepBuilder:
     cls: Type[PipelineStep]
-    kwargs: dict[str, Type]
+    # { name => (type, default value) }
+    kwargs: dict[str, tuple[Union[Type, str], Any]]
 
     def name(self) -> str:
         return self.cls.__name__
@@ -35,10 +38,22 @@ ner_step_builders = [
 ]
 coref_step_builders = [PipelineStepBuilder(BertCoreferenceResolver, {})]
 character_unification_step_builders = [
-    PipelineStepBuilder(GraphRulesCharacterUnifier, {}),
+    PipelineStepBuilder(
+        GraphRulesCharacterUnifier,
+        {
+            "min_appearances": ("uint", 0),
+            "link_corefs_mentions": (bool, False),
+            "ignore_leading_determiner": (bool, False),
+        },
+    ),
     PipelineStepBuilder(NaiveCharacterUnifier, {}),
 ]
-graph_extraction_step_builder = [PipelineStepBuilder(CoOccurrencesGraphExtractor, {})]
+graph_extraction_step_builder = [
+    PipelineStepBuilder(
+        CoOccurrencesGraphExtractor,
+        {"co_occurrences_dist": ("uint", 25)},
+    )
+]
 
 
 def select_step_builder(
@@ -47,11 +62,19 @@ def select_step_builder(
     return next(b for b in builders if b.name() == name)
 
 
-user_pipelines = {}
+@dataclass
+class UserState:
+    pipeline: Pipeline
+    last_run_kwargs: list[dict]
+
+
+user_state: dict[str, UserState] = {}
 
 
 def init_pipeline_(request: gr.Request):
-    global user_pipelines
+    if not request.session_hash:
+        return
+    global user_state
     default_pipeline = Pipeline(
         [
             NLTKTokenizer(),
@@ -60,13 +83,13 @@ def init_pipeline_(request: gr.Request):
             CoOccurrencesGraphExtractor(co_occurrences_dist=25),
         ]
     )
-    user_pipelines[request.session_hash] = default_pipeline
+    user_state[request.session_hash] = UserState(default_pipeline, [])
 
 
 def free_pipeline_(request: gr.Request):
     global user_pipelines
-    if request.session_hash in user_pipelines:
-        del user_pipelines[request.session_hash]
+    if request.session_hash in user_state:
+        del user_state[request.session_hash]
 
 
 def mfn(character: Character) -> str:
@@ -77,14 +100,15 @@ def mfn(character: Character) -> str:
 
 
 def update_pipeline(
-    pipeline: Pipeline,
+    state: UserState,
     step_builders: list[PipelineStepBuilder],
     step_kwargs: list[dict[str, Any]],
 ):
-    # TODO: does not take into account kwargs changes
-    step_names = [b.cls.__name__ for b in step_builders]
-    if step_names == [step.__class__.__name__ for step in pipeline.steps]:
-        return pipeline
+    step_names = [b.name() for b in step_builders]
+    pipeline_names = [step.__class__.__name__ for step in state.pipeline.steps]
+    if step_names == pipeline_names and step_kwargs == state.last_run_kwargs:
+        return state.pipeline
+
     pipeline = Pipeline(
         [
             builder.make_step(kwargs)
@@ -98,10 +122,23 @@ def run_pipeline(
     request: gr.Request,
     text: str,
     tokenization_step: str,
+    tokenization_kwargs: dict[str, Any],
     ner_step: str,
+    ner_kwargs: dict[str, Any],
     character_unification_step: str,
+    character_unification_kwargs: dict[str, Any],
+    graph_extraction_step: str,
+    graph_extraction_kwargs: dict[str, Any],
 ) -> tuple[plt.Figure, list[list], list[list]]:
-    pipeline = user_pipelines[request.session_hash]
+    global user_state
+    assert request.session_hash
+    pipeline = user_state[request.session_hash]
+    kwargs = [
+        tokenization_kwargs,
+        ner_kwargs,
+        character_unification_kwargs,
+        graph_extraction_kwargs,
+    ]
     pipeline = update_pipeline(
         pipeline,
         [
@@ -110,16 +147,12 @@ def run_pipeline(
             select_step_builder(
                 character_unification_step_builders, character_unification_step
             ),
-            # TODO: deal with graph extractor kwargs
-            select_step_builder(
-                graph_extraction_step_builder, "CoOccurrencesGraphExtractor"
-            ),
+            select_step_builder(graph_extraction_step_builder, graph_extraction_step),
         ],
-        # TODO:
-        [{} for _ in range(3)],
+        kwargs,
     )
-    user_pipelines[request.session_hash] = pipeline
-    print(pipeline.steps)
+    user_state[request.session_hash].pipeline = pipeline
+    user_state[request.session_hash].last_run_kwargs = kwargs
 
     out = pipeline(text)
     assert not out.characters is None
@@ -138,25 +171,97 @@ def run_pipeline(
     )
 
 
+def render_kwargs_(step_builder: PipelineStepBuilder, kwargs: gr.State):
+    def set_kwargs(kwargs: dict, name: str, value: Any):
+        return {**kwargs, name: value}
+
+    for name, (typ, default) in step_builder.kwargs.items():
+        key = f"{step_builder.name()}-{name}"
+        if typ == str:
+            tbox = gr.Textbox(label=name, value=default, interactive=True, key=key)
+            tbox.change(set_kwargs, [kwargs, gr.State(name), tbox], [kwargs])
+        if typ == int:
+            nb = gr.Number(label=name, value=float(default), interactive=True, key=key)
+            nb.change(set_kwargs, [kwargs, gr.State(name), nb], [kwargs])
+        if typ == "uint":
+            uint = gr.Number(
+                label=name, value=float(default), minimum=0, interactive=True, key=key
+            )
+            uint.change(set_kwargs, [kwargs, gr.State(name), uint], [kwargs])
+        elif typ == bool:
+            chk = gr.Checkbox(label=name, value=default, key=key)
+            chk.change(set_kwargs, [kwargs, gr.State(name), chk], [kwargs])
+        else:
+            print(f"unknown kwarg type for {name}: {typ}")
+
+
 with gr.Blocks(title="Renard") as demo:
     with gr.Row():
         # Inputs
         with gr.Column():
-            tok_radio = gr.Radio(
-                [s.name() for s in tokenization_step_builders],
-                value="NLTKTokenizer",
-                label="Tokenization step",
-            )
-            ner_radio = gr.Radio(
-                [s.name() for s in ner_step_builders],
-                value="NLTKNamedEntityRecognizer",
-                label="NER step",
-            )
-            cu_radio = gr.Radio(
-                [s.name() for s in character_unification_step_builders],
-                value="GraphRulesCharacterUnifier",
-                label="Character unification step",
-            )
+            with gr.Accordion("Tokenization", open=False):
+                tok_kwargs = gr.State({})
+                tok_ddown = gr.Dropdown(
+                    [s.name() for s in tokenization_step_builders],
+                    value=tokenization_step_builders[0].name(),
+                    label="Tokenization step",
+                )
+                tok_ddown.change(lambda: {}, [], [tok_kwargs])
+
+                @gr.render(inputs=tok_ddown)
+                def render_tok_kwargs(tok_step: str):
+                    step_builder = select_step_builder(
+                        tokenization_step_builders, tok_step
+                    )
+                    render_kwargs_(step_builder, tok_kwargs)
+
+            with gr.Accordion("NER", open=False):
+                ner_kwargs = gr.State({})
+                ner_ddown = gr.Dropdown(
+                    [s.name() for s in ner_step_builders],
+                    value=ner_step_builders[0].name,
+                    label="NER step",
+                )
+                ner_ddown.change(lambda: {}, [], [ner_kwargs])
+
+                @gr.render(inputs=ner_ddown)
+                def render_ner_kwargs(ner_step: str):
+                    ner_builder = select_step_builder(ner_step_builders, ner_step)
+                    render_kwargs_(ner_builder, ner_kwargs)
+
+            with gr.Accordion("Character Unification", open=False):
+                cu_kwargs = gr.State({})
+                cu_ddown = gr.Dropdown(
+                    [s.name() for s in character_unification_step_builders],
+                    value=character_unification_step_builders[0].name(),
+                    label="Character unification step",
+                )
+                cu_ddown.change(lambda: {}, [], [cu_kwargs])
+
+                @gr.render(inputs=cu_ddown)
+                def render_cu_kwargs(cu_step: str):
+                    step_builder = select_step_builder(
+                        character_unification_step_builders, cu_step
+                    )
+                    render_kwargs_(step_builder, cu_kwargs)
+
+            with gr.Accordion("Graph Extraction", open=False):
+                ge_kwargs = gr.State({})
+                ge_ddown = gr.Dropdown(
+                    [s.name() for s in graph_extraction_step_builder],
+                    value=graph_extraction_step_builder[0].name(),
+                    label="Graph extraction step",
+                )
+                ge_ddown.change(lambda: {}, [], [ge_kwargs])
+
+                @gr.render(inputs=ge_ddown)
+                def render_ge_kwargs(ge_step: str):
+                    step_builder = select_step_builder(
+                        graph_extraction_step_builder, ge_step
+                    )
+                    render_kwargs_(step_builder, ge_kwargs)
+
+            # TODO: pipeline level parameter like 'lang'
             text = gr.TextArea()
             run_btn = gr.Button()
 
@@ -177,7 +282,17 @@ with gr.Blocks(title="Renard") as demo:
             )
         run_btn.click(
             fn=run_pipeline,
-            inputs=[text, tok_radio, ner_radio, cu_radio],
+            inputs=[
+                text,
+                tok_ddown,
+                tok_kwargs,
+                ner_ddown,
+                ner_kwargs,
+                cu_ddown,
+                cu_kwargs,
+                ge_ddown,
+                ge_kwargs,
+            ],
             outputs=[out_plot, out_character_df, out_edge_df],
         )
 
