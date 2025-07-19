@@ -1,8 +1,8 @@
-from typing import Any, Type
+from typing import Any, Type, Union, Optional
+import os
 from dataclasses import dataclass
-
-from tibert import Union
 from renard.pipeline import Pipeline, PipelineStep
+from renard.pipeline.core import PipelineState
 from renard.pipeline.ner import BertNamedEntityRecognizer
 from renard.pipeline.tokenization import NLTKTokenizer
 from renard.pipeline.ner import NLTKNamedEntityRecognizer
@@ -13,8 +13,11 @@ from renard.pipeline.character_unification import (
     NaiveCharacterUnifier,
 )
 from renard.pipeline.graph_extraction import CoOccurrencesGraphExtractor
-import networkx as nx
+from renard.graph_utils import graph_with_names
 import matplotlib.pyplot as plt
+import matplotlib.colors
+import networkx as nx
+from pyvis.network import Network
 import gradio as gr
 
 
@@ -34,7 +37,9 @@ class PipelineStepBuilder:
 
 tokenization_step_builders = [PipelineStepBuilder(NLTKTokenizer, "", {})]
 ner_step_builders = [
-    PipelineStepBuilder(NLTKNamedEntityRecognizer, "Fast statistical NER model", {}),
+    PipelineStepBuilder(
+        NLTKNamedEntityRecognizer, "Fast NER method relying on POS tagging", {}
+    ),
     PipelineStepBuilder(
         BertNamedEntityRecognizer, "BERT based deep learning NER model", {}
     ),
@@ -75,6 +80,7 @@ def select_step_builder(
 class UserState:
     pipeline: Pipeline
     last_run_kwargs: list[dict]
+    last_run_state: Optional[PipelineState] = None
 
 
 user_state: dict[str, UserState] = {}
@@ -108,6 +114,13 @@ def mfn(character: Character) -> str:
     return name
 
 
+def get_viridis_hex(value: float, min_value: float, max_value: float) -> str:
+    value = max(min(value, max_value), min_value)
+    norm_value = (value - min_value) / (max_value - min_value)
+    color = plt.cm.viridis(norm_value)  # type: ignore
+    return matplotlib.colors.to_hex(color)
+
+
 def update_pipeline(
     state: UserState,
     step_builders: list[PipelineStepBuilder],
@@ -138,7 +151,7 @@ def run_pipeline(
     character_unification_kwargs: dict[str, Any],
     graph_extraction_step: str,
     graph_extraction_kwargs: dict[str, Any],
-) -> tuple[plt.Figure, list[list], list[list]]:
+) -> tuple[str, list[list], list[list], str]:
     global user_state
     assert request.session_hash
     pipeline = user_state[request.session_hash]
@@ -168,15 +181,38 @@ def run_pipeline(
     assert not out.character_network is None
     assert isinstance(out.character_network, nx.Graph)
 
-    fig, ax = plt.subplots()
-    out.plot_graph(name_style="most_frequent", fig=fig)
+    # plotting, see https://github.com/gradio-app/gradio/issues/4574
+    G = graph_with_names(out.character_network, name_style="most_frequent")
+    max_degree = max(v for _, v in G.degree)
+    for u in G.nodes:
+        G.nodes[u]["size"] = 10 + G.degree[u]
+        G.nodes[u]["color"] = get_viridis_hex(G.degree[u], 0, max_degree)
+        maybe_char = out.get_character(u)
+        if maybe_char is None:
+            continue
+        assert not maybe_char is None
+        G.nodes[u]["title"] = "aliases: " + ", ".join(maybe_char.names)
+
+    net = Network(width="100%")
+    net.from_nx(G)
+    for u in net.nodes:
+        u["font"] = {"size": max(12, 2 * G.degree[u["id"]])}
+    net.show_buttons(filter_=["physics"])
+    net.set_template(f"{os.path.dirname(__file__)}/pyvis_template.html")
+    html = net.generate_html()
+    html = html.replace("'", '"')
+    html = f"""<iframe style="width: 100%; height: 650px;" name="Character Network" srcdoc='{html}'></iframe>"""
+
+    out_path = f"{request.session_hash}.graphml"
+    nx.write_graphml(G, out_path)
 
     return (
-        fig,
+        html,
         # name    # occurrences    # aliases
         [[mfn(c), len(c.mentions), ", ".join(c.names)] for c in out.characters],
         # char 1,  char 2
         [[mfn(c1), mfn(c2)] for c1, c2 in out.character_network.edges],
+        out_path,
     )
 
 
@@ -205,102 +241,140 @@ def render_kwargs_(step_builder: PipelineStepBuilder, kwargs: gr.State):
 
 
 with gr.Blocks(title="Renard") as demo:
-    with gr.Row():
+    with gr.Column():
         # Inputs
-        with gr.Column():
-            with gr.Group("Tokenization"):
-                gr.Markdown("## Step 1: Tokenization")
-                with gr.Accordion("Click to expand", open=False):
-                    tok_kwargs = gr.State({})
-                    tok_ddown = gr.Dropdown(
-                        [s.name() for s in tokenization_step_builders],
-                        value=tokenization_step_builders[0].name(),
-                        label="Tokenization step",
-                    )
-                    tok_ddown.change(lambda: {}, [], [tok_kwargs])
-
-                    @gr.render(inputs=tok_ddown)
-                    def render_tok_kwargs(tok_step: str):
-                        step_builder = select_step_builder(
-                            tokenization_step_builders, tok_step
+        with gr.Row():
+            with gr.Column():
+                with gr.Group():
+                    gr.Markdown("## Step 1: Tokenization")
+                    with gr.Accordion("Click to expand", open=False):
+                        tok_kwargs = gr.State({})
+                        tok_ddown = gr.Dropdown(
+                            [s.name() for s in tokenization_step_builders],
+                            value=tokenization_step_builders[0].name(),
+                            label="Tokenization step",
                         )
-                        render_kwargs_(step_builder, tok_kwargs)
+                        tok_ddown.change(lambda: {}, [], [tok_kwargs])
 
-            with gr.Group("NER"):
-                gr.Markdown("## Step 2: Named Entity Recognition")
-                with gr.Accordion("Click to expand", open=False):
-                    ner_kwargs = gr.State({})
-                    ner_ddown = gr.Dropdown(
-                        [s.name() for s in ner_step_builders],
-                        value=ner_step_builders[0].name,
-                        label="NER step",
-                    )
-                    ner_ddown.change(lambda: {}, [], [ner_kwargs])
+                        @gr.render(inputs=tok_ddown)
+                        def render_tok_kwargs(tok_step: str):
+                            step_builder = select_step_builder(
+                                tokenization_step_builders, tok_step
+                            )
+                            gr.Markdown(step_builder.description)
+                            render_kwargs_(step_builder, tok_kwargs)
 
-                    @gr.render(inputs=ner_ddown)
-                    def render_ner_kwargs(ner_step: str):
-                        ner_builder = select_step_builder(ner_step_builders, ner_step)
-                        render_kwargs_(ner_builder, ner_kwargs)
-
-            with gr.Group("Character Unification"):
-                gr.Markdown("## Step 3: Character Unification")
-                with gr.Accordion("Click to expand", open=False):
-                    cu_kwargs = gr.State({})
-                    cu_ddown = gr.Dropdown(
-                        [s.name() for s in character_unification_step_builders],
-                        value=character_unification_step_builders[0].name(),
-                        label="Character unification step",
-                    )
-                    cu_ddown.change(lambda: {}, [], [cu_kwargs])
-
-                    @gr.render(inputs=cu_ddown)
-                    def render_cu_kwargs(cu_step: str):
-                        step_builder = select_step_builder(
-                            character_unification_step_builders, cu_step
+                with gr.Group():
+                    gr.Markdown("## Step 2: Named Entity Recognition")
+                    with gr.Accordion("Click to expand", open=False):
+                        ner_kwargs = gr.State({})
+                        ner_ddown = gr.Dropdown(
+                            [s.name() for s in ner_step_builders],
+                            value=ner_step_builders[0].name,
+                            label="NER step",
                         )
-                        render_kwargs_(step_builder, cu_kwargs)
+                        ner_ddown.change(lambda: {}, [], [ner_kwargs])
 
-            with gr.Group("Graph Extraction"):
-                gr.Markdown("## Step 4: Graph Extraction")
-                with gr.Accordion("Click to expand", open=False):
-                    ge_kwargs = gr.State({})
-                    ge_ddown = gr.Dropdown(
-                        [s.name() for s in graph_extraction_step_builder],
-                        value=graph_extraction_step_builder[0].name(),
-                        label="Graph extraction step",
-                    )
-                    ge_ddown.change(lambda: {}, [], [ge_kwargs])
+                        @gr.render(inputs=ner_ddown)
+                        def render_ner_kwargs(ner_step: str):
+                            ner_builder = select_step_builder(
+                                ner_step_builders, ner_step
+                            )
+                            gr.Markdown(ner_builder.description)
+                            render_kwargs_(ner_builder, ner_kwargs)
 
-                    @gr.render(inputs=ge_ddown)
-                    def render_ge_kwargs(ge_step: str):
-                        step_builder = select_step_builder(
-                            graph_extraction_step_builder, ge_step
+                with gr.Group():
+                    gr.Markdown("## Step 3: Character Unification")
+                    with gr.Accordion("Click to expand", open=False):
+                        cu_kwargs = gr.State({})
+                        cu_ddown = gr.Dropdown(
+                            [s.name() for s in character_unification_step_builders],
+                            value=character_unification_step_builders[0].name(),
+                            label="Character unification step",
                         )
-                        render_kwargs_(step_builder, ge_kwargs)
+                        cu_ddown.change(lambda: {}, [], [cu_kwargs])
 
-            # TODO: pipeline level parameter like 'lang'
-            text = gr.TextArea()
-            run_btn = gr.Button()
+                        @gr.render(inputs=cu_ddown)
+                        def render_cu_kwargs(cu_step: str):
+                            step_builder = select_step_builder(
+                                character_unification_step_builders, cu_step
+                            )
+                            gr.Markdown(step_builder.description)
+                            render_kwargs_(step_builder, cu_kwargs)
+
+                with gr.Group():
+                    gr.Markdown("## Step 4: Graph Extraction")
+                    with gr.Accordion("Click to expand", open=False):
+                        ge_kwargs = gr.State({})
+                        ge_ddown = gr.Dropdown(
+                            [s.name() for s in graph_extraction_step_builder],
+                            value=graph_extraction_step_builder[0].name(),
+                            label="Graph extraction step",
+                        )
+                        ge_ddown.change(lambda: {}, [], [ge_kwargs])
+
+                        @gr.render(inputs=ge_ddown)
+                        def render_ge_kwargs(ge_step: str):
+                            step_builder = select_step_builder(
+                                graph_extraction_step_builder, ge_step
+                            )
+                            gr.Markdown(step_builder.description)
+                            render_kwargs_(step_builder, ge_kwargs)
+
+            with gr.Column(scale=3):
+                # TODO: pipeline level parameter like 'lang'
+                input_text = gr.State()
+                input_text_radio = gr.Radio(
+                    choices=["Raw text", "Upload file"],
+                    label="Input type",
+                    value="Raw text",
+                )
+
+                # NOTE: for some reason, tabs have an issue where the
+                # component in the second tab is invisible.
+                @gr.render(inputs=input_text_radio)
+                def render_input_text(input_type: str):
+                    if input_type == "Upload file":
+                        upload_area = gr.File(
+                            label="Input text file", file_types=["text"]
+                        )
+                        upload_area.upload(
+                            lambda path: open(path).read(), [upload_area], [input_text]
+                        )
+                    elif input_type == "Raw text":
+                        text_area = gr.TextArea(label="Input text")
+                        text_area.change(lambda text: text, [text_area], [input_text])
+                    else:
+                        print(f"Unknown input type: {input_type}")
+
+                run_btn = gr.Button()
 
         # Outputs
         with gr.Column():
-            out_plot = gr.Plot()
-            out_character_df = gr.Dataframe(
-                headers=["name", "occurrences", "aliases"],
-                datatype=["str", "number", "str"],
-                type="array",
-                label="characters",
-            )
-            out_edge_df = gr.DataFrame(
-                headers=["character 1", "character 2"],
-                datatype=["str", "str"],
-                type="array",
-                label="edges",
-            )
+            with gr.Group():
+                gr.Markdown("## Character Network")
+                out_plot = gr.HTML(label="Character Network")
+                out_dl_btn = gr.DownloadButton("Download as .graphml")
+
+            with gr.Tab(label="Characters"):
+                out_character_df = gr.Dataframe(
+                    headers=["name", "occurrences", "aliases"],
+                    datatype=["str", "number", "str"],
+                    type="array",
+                    label="Characters",
+                )
+            with gr.Tab(label="Edges"):
+                out_edge_df = gr.DataFrame(
+                    headers=["character 1", "character 2"],
+                    datatype=["str", "str"],
+                    type="array",
+                    label="Edges",
+                )
+
         run_btn.click(
             fn=run_pipeline,
             inputs=[
-                text,
+                input_text,
                 tok_ddown,
                 tok_kwargs,
                 ner_ddown,
@@ -310,7 +384,7 @@ with gr.Blocks(title="Renard") as demo:
                 ge_ddown,
                 ge_kwargs,
             ],
-            outputs=[out_plot, out_character_df, out_edge_df],
+            outputs=[out_plot, out_character_df, out_edge_df, out_dl_btn],
         )
 
     demo.load(init_pipeline_)
