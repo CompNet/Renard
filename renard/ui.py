@@ -183,7 +183,7 @@ def run_pipeline(
 
     # plotting, see https://github.com/gradio-app/gradio/issues/4574
     G = graph_with_names(out.character_network, name_style="most_frequent")
-    max_degree = max(v for _, v in G.degree)
+    max_degree = max(v for _, v in G.degree) if len(G.degree) > 0 else 0
     for u in G.nodes:
         G.nodes[u]["size"] = 10 + G.degree[u]
         G.nodes[u]["color"] = get_viridis_hex(G.degree[u], 0, max_degree)
