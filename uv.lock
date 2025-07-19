@@ -2838,6 +2838,13 @@ dependencies = [
     { name = "transformers" },
 ]
 
+[package.optional-dependencies]
+ui = [
+    { name = "gradio", version = "4.44.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.10'" },
+    { name = "gradio", version = "5.36.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.10'" },
+    { name = "pyvis" },
+]
+
 [package.dev-dependencies]
 dev = [
     { name = "hypothesis" },
@@ -2849,15 +2856,11 @@ dev = [
     { name = "sphinx-autodoc-typehints", version = "3.2.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
     { name = "sphinx-rtd-theme" },
 ]
-ui = [
-    { name = "gradio", version = "4.44.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.10'" },
-    { name = "gradio", version = "5.36.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.10'" },
-    { name = "pyvis" },
-]
 
 [package.metadata]
 requires-dist = [
     { name = "datasets", specifier = ">=4.0.0" },
+    { name = "gradio", marker = "extra == 'ui'", specifier = ">=4.44.1" },
     { name = "grimbert", specifier = ">=0.1.4" },
     { name = "matplotlib", specifier = ">=3.9" },
     { name = "more-itertools", specifier = ">=10.7" },
@@ -2865,12 +2868,14 @@ requires-dist = [
     { name = "networkx", specifier = ">=3.2" },
     { name = "nltk", specifier = ">=3.9.1" },
     { name = "pytest", specifier = ">=8.4.1" },
+    { name = "pyvis", marker = "extra == 'ui'", specifier = ">=0.3.2" },
     { name = "rank-bm25", specifier = ">=0.2.2" },
     { name = "tibert", specifier = ">=0.5.2" },
     { name = "torch", specifier = ">=2.7.0" },
     { name = "tqdm", specifier = ">=4.67.1" },
     { name = "transformers", specifier = ">=4.53.2" },
 ]
+provides-extras = ["ui"]
 
 [package.metadata.requires-dev]
 dev = [
@@ -2878,10 +2883,6 @@ dev = [
     { name = "sphinx", specifier = ">=4.3" },
     { name = "sphinx-autodoc-typehints", specifier = ">=1.12.0" },
     { name = "sphinx-rtd-theme", specifier = ">=1.0.0" },
-]
-ui = [
-    { name = "gradio", specifier = ">=4.44.1" },
-    { name = "pyvis", specifier = ">=0.3.2" },
 ]
 
 [[package]]
