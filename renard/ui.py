@@ -353,9 +353,9 @@ with gr.Blocks(title="Renard") as demo:
                             label="Pride and Prejudice", value=pp, interactive=False
                         )
                         input_text.value = pp
-                    elif input_type == "Upload file":
+                    elif input_type == "Upload .txt file":
                         upload_area = gr.File(
-                            label="Input text file", file_types=["text"]
+                            label="Input .txt file", file_types=["text"]
                         )
                         upload_area.upload(
                             lambda path: open(path).read(), [upload_area], [input_text]
