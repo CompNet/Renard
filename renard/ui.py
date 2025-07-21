@@ -14,7 +14,7 @@ from renard.pipeline.character_unification import (
 )
 from renard.pipeline.graph_extraction import CoOccurrencesGraphExtractor
 from renard.graph_utils import graph_with_names
-from renard.resources.novels import load_novel
+from renard.resources.novels import load_novel_chapters
 import matplotlib.pyplot as plt
 import matplotlib.colors
 import networkx as nx
@@ -348,7 +348,7 @@ with gr.Blocks(title="Renard") as demo:
                 @gr.render(inputs=input_text_radio)
                 def render_input_text(input_type: str):
                     if input_type == "Predefined Example":
-                        pp = load_novel("pride_and_prejudice")
+                        pp = "\n".join(load_novel_chapters("pride_and_prejudice")[:10])
                         text_area = gr.TextArea(
                             label="Pride and Prejudice", value=pp, interactive=False
                         )
