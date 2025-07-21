@@ -14,6 +14,7 @@ from renard.pipeline.character_unification import (
 )
 from renard.pipeline.graph_extraction import CoOccurrencesGraphExtractor
 from renard.graph_utils import graph_with_names
+from renard.resources.novels import load_novel
 import matplotlib.pyplot as plt
 import matplotlib.colors
 import networkx as nx
@@ -195,6 +196,18 @@ def run_pipeline(
 
     net = Network(width="100%")
     net.from_nx(G)
+    # NOTE: layout found to have good default with "Pride and
+    # Prejudice" with default parameters
+    net.options.physics.use_barnes_hut(
+        {
+            "gravity": -22000,
+            "central_gravity": 4.9,
+            "spring_length": 95,
+            "spring_strength": 0.04,
+            "damping": 0.09,
+            "overlap": 0,
+        }
+    )
     for u in net.nodes:
         u["font"] = {"size": max(12, 2 * G.degree[u["id"]])}
     net.show_buttons(filter_=["physics"])
@@ -325,16 +338,22 @@ with gr.Blocks(title="Renard") as demo:
                 # TODO: pipeline level parameter like 'lang'
                 input_text = gr.State()
                 input_text_radio = gr.Radio(
-                    choices=["Raw text", "Upload file"],
+                    choices=["Predefined Example", "Raw text", "Upload .txt file"],
                     label="Input type",
-                    value="Raw text",
+                    value="Predefined Example",
                 )
 
                 # NOTE: for some reason, tabs have an issue where the
                 # component in the second tab is invisible.
                 @gr.render(inputs=input_text_radio)
                 def render_input_text(input_type: str):
-                    if input_type == "Upload file":
+                    if input_type == "Predefined Example":
+                        pp = load_novel("pride_and_prejudice")
+                        text_area = gr.TextArea(
+                            label="Pride and Prejudice", value=pp, interactive=False
+                        )
+                        input_text.value = pp
+                    elif input_type == "Upload file":
                         upload_area = gr.File(
                             label="Input text file", file_types=["text"]
                         )
