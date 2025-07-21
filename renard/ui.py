@@ -350,7 +350,9 @@ with gr.Blocks(title="Renard") as demo:
                     if input_type == "Predefined Example":
                         pp = "\n".join(load_novel_chapters("pride_and_prejudice")[:10])
                         text_area = gr.TextArea(
-                            label="Pride and Prejudice", value=pp, interactive=False
+                            label="Pride and Prejudice (10 first chapters)",
+                            value=pp,
+                            interactive=False,
                         )
                         input_text.value = pp
                     elif input_type == "Upload .txt file":
