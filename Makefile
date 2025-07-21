@@ -4,4 +4,4 @@ test:
 
 .PHONE: ui
 ui:
-	uv run --group ui python -m renard.ui
+	uv run --extra ui python -m renard.ui
