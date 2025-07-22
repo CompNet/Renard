@@ -23,6 +23,11 @@ Documentation, including installation instructions, can be found at https://comp
 If you need local documentation, it can be generated using `Sphinx`. From the `docs` directory, `make html` should create documentation under `docs/_build/html`. 
 
 
+# Interactive Demo
+
+You can check the [interactive demo of Renard at HuggingFace](https://huggingface.co/spaces/compnet-renard/renard-demo). The UI used for the demo is currently in development and will be available directly in Renard in the next version.
+
+
 # Tutorial
 
 Renard's central concept is the `Pipeline`.A `Pipeline` is a list of `PipelineStep` that are run sequentially in order to extract a character graph from a document. Here is a simple example:
@@ -52,19 +57,17 @@ out = pipeline(text)
 For more information, see `renard_tutorial.py`, which is a tutorial in the `jupytext` format. You can open it as a notebook in Jupyter Notebook (or export it as a notebook with `jupytext --to ipynb renard-tutorial.py`).
 
 
+# Contributing
 
-# Running tests 
+see [the "Contributing" section of the documentation](https://compnet.github.io/Renard/contributing.html).
+
+## Running tests 
 
 `Renard` uses `pytest` for testing. To launch tests, use the following command : 
 
 > uv run python -m pytest tests
 
 Expensive tests are disabled by default. These can be run by setting the environment variable `RENARD_TEST_ALL` to `1`.
-
-
-# Contributing
-
-see [the "Contributing" section of the documentation](https://compnet.github.io/Renard/contributing.html).
 
 
 # How to cite
