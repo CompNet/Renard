@@ -2,9 +2,9 @@
 
 [![DOI](https://joss.theoj.org/papers/10.21105/joss.06574/status.svg)](https://doi.org/10.21105/joss.06574)
 
-Renard (Relationship Extraction from NARrative Documents) is a library for creating and using custom character networks extraction pipelines. Renard can extract dynamic as well as static character networks.
-
 <img src="https://compnet.github.io/Renard/_images/renard.svg" align="right" alt="the Renard logo" width="240">
+
+Renard (Relationship Extraction from NARrative Documents) is a modular library for creating and using custom character networks extraction pipelines. Renard can extract dynamic as well as static character networks. Renard is modular, in the sense that you can easily create a custom extraction pipeline that fits your needs.
 
 
 # Installation
