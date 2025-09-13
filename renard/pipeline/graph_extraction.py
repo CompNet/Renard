@@ -598,6 +598,9 @@ class ConversationalGraphExtractor(PipelineStep):
 
         return {"character_network": G}
 
+    def supported_langs(self) -> Literal["any"]:
+        return "any"
+
     def needs(self) -> Set[str]:
         """sentences, quotes, speakers, characters"""
         return {"sentences", "quotes", "speakers", "characters"}
