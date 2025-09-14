@@ -10,7 +10,7 @@ readme = "README.md"
 requires-python = ">=3.9,<3.13"
 dependencies = [
     "torch>=2.7.0",
-    "transformers>=4.53.2",
+    "transformers>=4.56.1",
     "nltk>=3.9.1",
     "tqdm>=4.67.1",
     "networkx>=3.2",
@@ -19,9 +19,10 @@ dependencies = [
     "matplotlib>=3.9",
     "pytest>=8.4.1",
     "tibert>=0.5.2",
-    "grimbert>=0.1.4",
+    "grimbert>=0.1.5",
     "datasets>=4.0.0",
     "rank-bm25>=0.2.2",
+    "accelerate>=1.10.1"
 ]
 
 [build-system]
@@ -36,12 +37,6 @@ Homepage = "https://github.com/CompNet/Renard"
 Documentation = "https://compnet.github.io/Renard/"
 Repository = "https://github.com/CompNet/Renard"
 
-[project.optional-dependencies]
-ui = [
-    "gradio>=4.44.1",
-    "pyvis>=0.3.2",
-]
-
 [dependency-groups]
 dev = [
     "hypothesis>=6.82",
@@ -49,3 +44,44 @@ dev = [
     "sphinx-rtd-theme>=1.0.0",
     "sphinx-autodoc-typehints>=1.12.0",
 ]
+
+[project.optional-dependencies]
+ui = [
+    "gradio>=4.44.1",
+    "pyvis>=0.3.2",
+]
+# torch alternatives (default is cpu torch)
+cuda128 = [
+  "torch>=2.7.1",
+]
+rocm63 = [
+  "torch>=2.7.1",
+  "pytorch-triton-rocm>=3.1.0", 
+]
+
+[tool.uv]
+conflicts = [
+  [
+    { extra = "cuda128" },
+    { extra = "rocm63" },
+  ],
+]
+
+[tool.uv.sources]
+torch = [
+  { index = "pytorch-cuda128", extra = "cuda128" },
+  { index = "pytorch-rocm63", extra = "rocm63" },
+]
+pytorch-triton-rocm = [
+  { index = "pytorch-rocm63", extra = "rocm63" }
+]
+
+[[tool.uv.index]]
+name = "pytorch-cuda128"
+url = "https://download.pytorch.org/whl/cu128"
+explicit = true
+
+[[tool.uv.index]]
+name = "pytorch-rocm63"
+url = "https://download.pytorch.org/whl/rocm6.3"
+explicit = true
