@@ -428,6 +428,7 @@ class PipelineState:
         node_kwargs: Optional[Union[Dict[str, Any], List[Dict[str, Any]]]] = None,
         edge_kwargs: Optional[Union[Dict[str, Any], List[Dict[str, Any]]]] = None,
         label_kwargs: Optional[Union[Dict[str, Any], List[Dict[str, Any]]]] = None,
+        edge_label_kwargs: Optional[Union[Dict[str, Any], List[Dict[str, Any]]]] = None,
         tight_layout: bool = False,
         legend: bool = False,
     ):
@@ -458,7 +459,10 @@ class PipelineState:
         :param node_kwargs: passed to :func:`nx.draw_networkx_nodes`
         :param edge_kwargs: passed to :func:`nx.draw_networkx_nodes`
         :param label_kwargs: passed to :func:`nx.draw_networkx_labels`
-        :param tight_layout: if ``True``, will use matplotlib's tight_layout
+        :param edge_label_kwargs: passed to
+            :func:`nx.draw_networkx_labels`
+        :param tight_layout: if ``True``, will use matplotlib's
+            tight_layout
         :param legend: passed to :func:`.plot_nx_graph_reasonably`
         """
         import matplotlib.pyplot as plt
@@ -481,6 +485,7 @@ class PipelineState:
             assert not isinstance(node_kwargs, list)
             assert not isinstance(edge_kwargs, list)
             assert not isinstance(label_kwargs, list)
+            assert not isinstance(edge_label_kwargs, list)
             if tight_layout:
                 fig.tight_layout()
             plot_nx_graph_reasonably(
@@ -490,6 +495,7 @@ class PipelineState:
                 node_kwargs=node_kwargs,
                 edge_kwargs=edge_kwargs,
                 label_kwargs=label_kwargs,
+                edge_label_kwargs=edge_label_kwargs,
                 legend=legend,
             )
             return
@@ -504,6 +510,10 @@ class PipelineState:
         assert isinstance(edge_kwargs, list)
         label_kwargs = label_kwargs or [{} for _ in range(len(self.character_network))]
         assert isinstance(label_kwargs, list)
+        edge_label_kwargs = edge_label_kwargs or [
+            {} for _ in range(len(self.character_network))
+        ]
+        assert isinstance(edge_label_kwargs, list)
 
         if fig is None:
             fig, ax = plt.subplots()
@@ -541,6 +551,7 @@ class PipelineState:
                 node_kwargs=node_kwargs[slider_i],
                 edge_kwargs=edge_kwargs[slider_i],
                 label_kwargs=label_kwargs[slider_i],
+                edge_label_kwargs=edge_label_kwargs[slider_i],
                 legend=legend,
             )
             ax.set_xlim(-1.2, 1.2)
