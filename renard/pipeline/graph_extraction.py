@@ -1,5 +1,6 @@
 from typing import Dict, Any, List, Set, Optional, Tuple, Literal, Union
 import itertools as it
+from collections import defaultdict
 import operator
 
 import networkx as nx
@@ -11,6 +12,7 @@ from renard.pipeline.ner import NEREntity
 from renard.pipeline.core import PipelineStep
 from renard.pipeline.character_unification import Character
 from renard.pipeline.quote_detection import Quote
+from renard.pipeline.relation_extraction import Relation
 
 
 def sent_index_for_token_index(token_index: int, sentences: List[List[str]]) -> int:
@@ -147,7 +149,7 @@ class CoOccurrencesGraphExtractor(PipelineStep):
         sentences: List[List[str]],
         char2token: Optional[List[int]] = None,
         dynamic_blocks: Optional[BlockBounds] = None,
-        sentences_polarities: Optional[List[float]] = None,
+        sentence_polarities: Optional[List[float]] = None,
         entities: Optional[List[NEREntity]] = None,
         co_occurrences_blocks: Optional[BlockBounds] = None,
         **kwargs,
@@ -194,13 +196,13 @@ class CoOccurrencesGraphExtractor(PipelineStep):
                     self.dynamic_overlap,
                     dynamic_blocks,
                     sentences,
-                    sentences_polarities,
+                    sentence_polarities,
                     co_occurrences_blocks,
                 )
             }
         return {
             "character_network": self._extract_graph(
-                mentions, sentences, sentences_polarities, co_occurrences_blocks
+                mentions, sentences, sentence_polarities, co_occurrences_blocks
             )
         }
 
@@ -257,16 +259,16 @@ class CoOccurrencesGraphExtractor(PipelineStep):
         self,
         mentions: List[Tuple[Any, NEREntity]],
         sentences: List[List[str]],
-        sentences_polarities: Optional[List[float]],
+        sentence_polarities: Optional[List[float]],
         co_occurrences_blocks: Optional[BlockBounds],
     ) -> nx.Graph:
         """
         :param mentions: A list of entity mentions, ordered by
             appearance, each of the form (KEY MENTION).  KEY
             determines the unicity of the entity.
-        :param sentences: if specified, ``sentences_polarities`` must
+        :param sentences: if specified, ``sentence_polarities`` must
             be specified as well.
-        :param sentences_polarities: if specified, ``sentences`` must
+        :param sentence_polarities: if specified, ``sentences`` must
             be specified as well.  In that case, edges are annotated
             with the ``'polarity`` attribute, indicating the polarity
             of the relationship between two characters.  Polarity
@@ -274,7 +276,7 @@ class CoOccurrencesGraphExtractor(PipelineStep):
             sentence polarity between those two mentions.
         :param co_occurrences_blocks: only unit 'tokens' is accepted.
         """
-        compute_polarity = not sentences_polarities is None
+        compute_polarity = not sentence_polarities is None
 
         assert co_occurrences_blocks is None or co_occurrences_blocks[1] == "tokens"
         if co_occurrences_blocks is None:
@@ -324,7 +326,7 @@ class CoOccurrencesGraphExtractor(PipelineStep):
 
                 if compute_polarity:
                     assert not sentences is None
-                    assert not sentences_polarities is None
+                    assert not sentence_polarities is None
                     # TODO: optim
                     first_sent_idx = sent_index_for_token_index(
                         mention1.start_idx, sentences
@@ -332,7 +334,7 @@ class CoOccurrencesGraphExtractor(PipelineStep):
                     last_sent_idx = sent_index_for_token_index(
                         mention2.start_idx, sentences
                     )
-                    sents_polarities_between_mentions = sentences_polarities[
+                    sents_polarities_between_mentions = sentence_polarities[
                         first_sent_idx : last_sent_idx + 1
                     ]
                     polarity = max(sents_polarities_between_mentions, key=abs)
@@ -349,7 +351,7 @@ class CoOccurrencesGraphExtractor(PipelineStep):
         overlap: int,
         dynamic_blocks: Optional[BlockBounds],
         sentences: List[List[str]],
-        sentences_polarities: Optional[List[float]],
+        sentence_polarities: Optional[List[float]],
         co_occurrences_blocks: Optional[BlockBounds],
     ) -> List[nx.Graph]:
         """
@@ -367,14 +369,14 @@ class CoOccurrencesGraphExtractor(PipelineStep):
         """
         assert co_occurrences_blocks is None or co_occurrences_blocks[1] == "tokens"
         assert window is None or dynamic_blocks is None
-        compute_polarity = not sentences is None and not sentences_polarities is None
+        compute_polarity = not sentences is None and not sentence_polarities is None
 
         if not window is None:
             return [
                 self._extract_graph(
                     [elt for elt in ct if not elt is None],
                     sentences,
-                    sentences_polarities,
+                    sentence_polarities,
                     co_occurrences_blocks,
                 )
                 for ct in windowed(mentions, window, step=window - overlap)
@@ -391,10 +393,10 @@ class CoOccurrencesGraphExtractor(PipelineStep):
             sent_start, sent_end = sent_indices_for_block(dynamic_block, sentences)
             block_sentences = sentences[sent_start : sent_end + 1]
 
-            block_sentences_polarities = None
+            block_sentence_polarities = None
             if compute_polarity:
-                assert not sentences_polarities is None
-                block_sentences_polarities = sentences_polarities[
+                assert not sentence_polarities is None
+                block_sentence_polarities = sentence_polarities[
                     sent_start : sent_end + 1
                 ]
 
@@ -412,7 +414,7 @@ class CoOccurrencesGraphExtractor(PipelineStep):
                 self._extract_graph(
                     block_mentions,
                     block_sentences,
-                    block_sentences_polarities,
+                    block_sentence_polarities,
                     block_co_occ_bounds,
                 )
             )
@@ -441,7 +443,7 @@ class CoOccurrencesGraphExtractor(PipelineStep):
         return {"character_network"}
 
     def optional_needs(self) -> Set[str]:
-        return {"sentences_polarities"}
+        return {"sentence_polarities"}
 
 
 class ConversationalGraphExtractor(PipelineStep):
@@ -588,7 +590,6 @@ class ConversationalGraphExtractor(PipelineStep):
         characters: Set[Character],
         **kwargs,
     ) -> Dict[str, Any]:
-
         if self.graph_type == "conversation":
             G = self._conversation_extract(sentences, quotes, speakers, characters)
         elif self.graph_type == "mention":
@@ -607,4 +608,53 @@ class ConversationalGraphExtractor(PipelineStep):
 
     def production(self) -> Set[str]:
         """character_network"""
+        return {"character_network"}
+
+
+class RelationalGraphExtractor(PipelineStep):
+    """A graph extractor using relations between characters.
+
+    .. note::
+
+        Does not support dynamic networks yet.
+    """
+
+    def __init__(self, min_rel_occurrences: int = 1):
+        self.min_rel_occurrences = min_rel_occurrences
+
+    def __call__(
+        self,
+        characters: list[Character],
+        sentence_relations: list[list[Relation]],
+        **kwargs,
+    ) -> dict[str, Any]:
+        G = nx.Graph()
+        for character in characters:
+            G.add_node(character)
+
+        # { (char1, char2) => { relation: counter } }
+        edge_relations = defaultdict(dict)
+        for relations in sentence_relations:
+            for subj, rel, obj in relations:
+                counter = edge_relations[(subj, obj)].get(rel, 0)
+                edge_relations[(subj, obj)][rel] = counter + 1
+
+        for (char1, char2), counter in edge_relations.items():
+            relations = {
+                rel
+                for rel, count in counter.items()
+                if count >= self.min_rel_occurrences
+            }
+            if len(relations) > 0:
+                G.add_edge(char1, char2, relations=relations)
+
+        return {"character_network": G}
+
+    def supported_langs(self) -> Literal["any"]:
+        return "any"
+
+    def needs(self) -> set[str]:
+        return {"characters", "sentence_relations"}
+
+    def production(self) -> set[str]:
         return {"character_network"}

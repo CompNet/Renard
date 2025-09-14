@@ -25,6 +25,7 @@ def plot_nx_graph_reasonably(
     node_kwargs: Optional[Dict[str, Any]] = None,
     edge_kwargs: Optional[Dict[str, Any]] = None,
     label_kwargs: Optional[Dict[str, Any]] = None,
+    edge_labels_kwargs: Optional[Dict[str, Any]] = None,
     legend: bool = False,
 ):
     """Try to plot a :class:`nx.Graph` with 'reasonable' parameters
@@ -36,6 +37,7 @@ def plot_nx_graph_reasonably(
     :param node_kwargs: passed to :func:`nx.draw_networkx_nodes`
     :param edge_kwargs: passed to :func:`nx.draw_networkx_nodes`
     :param label_kwargs: passed to :func:`nx.draw_networkx_labels`
+    :param edge_label_kwargs: passed to :func:`nx.draw_networkx_edge_labels`
     :param legend: if ``True``, will try to plot an additional legend.
     """
     pos = layout
@@ -79,6 +81,18 @@ def plot_nx_graph_reasonably(
     )
     edge_kwargs["alpha"] = edge_kwargs.get("alpha", 0.35)
     nx.draw_networkx_edges(G, pos, ax=ax, **edge_kwargs)
+
+    edge_labels_kwargs = edge_labels_kwargs or {}
+    if not "edge_labels" in edge_labels_kwargs:
+        edge_labels_kwargs["edge_labels"] = {
+            (char1, char2): data.get("relations", "")
+            for char1, char2, data in G.edges.data()
+        }
+        for (char1, char2), rel in edge_labels_kwargs["edge_labels"].items():
+            if rel == set():
+                edge_labels_kwargs["edge_labels"][(char1, char2)] = ""
+    edge_labels_kwargs["font_size"] = edge_labels_kwargs.get("font_size", 6)
+    nx.draw_networkx_edge_labels(G, pos, ax=ax, **edge_labels_kwargs)
 
     label_kwargs = label_kwargs or {}
     label_kwargs["verticalalignment"] = label_kwargs.get("verticalalignment", "top")

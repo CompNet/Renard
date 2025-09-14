@@ -35,6 +35,7 @@ if TYPE_CHECKING:
     from renard.pipeline.character_unification import Character
     from renard.pipeline.ner import NEREntity
     from renard.pipeline.quote_detection import Quote
+    from renard.pipeline.relation_extraction import Relation
     import matplotlib.pyplot as plt
 
 
@@ -175,7 +176,10 @@ class PipelineState:
     speakers: Optional[List[Optional[Character]]] = None
 
     #: polarity of each sentence
-    sentences_polarities: Optional[List[float]] = None
+    sentence_polarities: Optional[List[float]] = None
+
+    #: relations detected in each sentence
+    sentence_relations: Optional[List[List[Relation]]] = None
 
     #: NER entities
     entities: Optional[List[NEREntity]] = None

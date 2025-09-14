@@ -2,8 +2,11 @@ from typing import Set
 import os
 import pytest
 from renard.pipeline.core import Pipeline, PipelineStep
-from renard.pipeline.preconfigured import bert_pipeline, nltk_pipeline
-from renard.resources.novels import load_novel
+from renard.pipeline.preconfigured import (
+    co_occurrence_pipeline,
+    conversational_pipeline,
+    relational_pipeline,
+)
 from renard.resources.novels.novels import load_novel_chapters
 
 
@@ -51,40 +54,24 @@ def test_pipeline_is_invalid():
 
 
 @pytest.mark.skipif(os.getenv("RENARD_TEST_ALL") != "1", reason="performance")
-def test_nltk_pipeline_runs():
+def test_co_occurrence_pipeline_runs():
     text = load_novel_chapters("pride_and_prejudice")[0]
-    pipeline = nltk_pipeline(
-        warn=False,
-        progress_report=None,
-        graph_extractor_kwargs={"co_occurrences_dist": (1, "sentences")},
-    )
-    pipeline(text)
-
-
-@pytest.mark.skipif(os.getenv("RENARD_TEST_ALL") != "1", reason="performance")
-def test_bert_pipeline_runs():
-    text = load_novel_chapters("pride_and_prejudice")[0]
-    pipeline = bert_pipeline(
-        warn=False,
-        progress_report=None,
-        graph_extractor_kwargs={"co_occurrences_dist": (1, "sentences")},
-    )
+    pipeline = co_occurrence_pipeline(warn=False, progress_report=None)
     pipeline(text)
 
 
 @pytest.mark.skipif(os.getenv("RENARD_TEST_ALL") != "1", reason="performance")
 def test_conversational_pipeline_runs():
     text = load_novel_chapters("pride_and_prejudice")[0]
-    # if the text is too long, speaker attribution takes a long time
-    text = text[:500]
+    # # if the text is too long, speaker attribution takes too much time
+    # text = text[:500]
 
-    pipeline = nltk_pipeline(
-        warn=False,
-        progress_report=None,
-        conversational=True,
-        graph_extractor_kwargs={
-            "graph_type": "conversation",
-            "conversation_dist": (3, "sentences"),
-        },
-    )
+    pipeline = conversational_pipeline(warn=False, progress_report=None)
+    pipeline(text)
+
+
+@pytest.mark.skipif(os.getenv("RENARD_TEST_ALL") != "1", reason="performance")
+def test_relational_pipeline_runs():
+    text = load_novel_chapters("pride_and_prejudice")[0]
+    pipeline = relational_pipeline(warn=False, progress_report=None)
     pipeline(text)
