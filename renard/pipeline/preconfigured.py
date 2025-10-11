@@ -7,7 +7,7 @@ def co_occurrence_pipeline(
     tokenizer_kwargs: Optional[dict] = None,
     ner_step: Type[PipelineStep] = NLTKNamedEntityRecognizer,
     ner_kwargs: Optional[dict] = None,
-    characters_extractor_kwargs: Optional[dict] = None,
+    character_unifier_kwargs: Optional[dict] = None,
     graph_extractor_kwargs: Optional[dict] = None,
     **pipeline_kwargs,
 ) -> Pipeline:
@@ -16,7 +16,7 @@ def co_occurrence_pipeline(
     :param tokenizer_kwargs: kwargs for :class:`.NLTKTokenizer`
     :param ner_step: the class of the NER step to use.
     :param ner_kwargs: kwargs for :class:`.BertNamedEntityRecognizer`
-    :param characters_extractor_kwargs: kwargs for
+    :param character_unifier_kwargs: kwargs for
         :class:`.GraphRulesCharacterUnifier`
     :param graph_extractor_kwargs: kwargs for
         :class:`.CoOccurrencesGraphExtractor`,
@@ -30,7 +30,7 @@ def co_occurrence_pipeline(
 
     tokenizer_kwargs = tokenizer_kwargs or {}
     ner_kwargs = ner_kwargs or {}
-    characters_extractor_kwargs = characters_extractor_kwargs or {}
+    character_unifier_kwargs = character_unifier_kwargs or {}
     graph_extractor_kwargs = graph_extractor_kwargs or {}
 
     if not "co_occurrences_dist" in graph_extractor_kwargs:
@@ -40,7 +40,7 @@ def co_occurrence_pipeline(
         [
             NLTKTokenizer(**tokenizer_kwargs),
             ner_step(**ner_kwargs),
-            GraphRulesCharacterUnifier(**characters_extractor_kwargs),
+            GraphRulesCharacterUnifier(**character_unifier_kwargs),
             CoOccurrencesGraphExtractor(**graph_extractor_kwargs),
         ],
         **pipeline_kwargs,
@@ -51,7 +51,7 @@ def conversational_pipeline(
     tokenizer_kwargs: Optional[dict] = None,
     ner_step: Type[PipelineStep] = NLTKNamedEntityRecognizer,
     ner_kwargs: Optional[dict] = None,
-    characters_extractor_kwargs: Optional[dict] = None,
+    character_unifier_kwargs: Optional[dict] = None,
     quote_detector_kwargs: Optional[dict] = None,
     speaker_detector_kwargs: Optional[dict] = None,
     graph_extractor_kwargs: Optional[dict] = None,
@@ -62,7 +62,7 @@ def conversational_pipeline(
     :param tokenizer_kwargs: kwargs for :class:`.NLTKTokenizer`
     :param ner_step: the type of the NER step to use.
     :param ner_kwargs: kwargs for :class:`.BertNamedEntityRecognizer`
-    :param characters_extractor_kwargs: kwargs for
+    :param character_unifier_kwargs: kwargs for
         :class:`.GraphRulesCharacterUnifier`
     :param quote_detector_kwargs: kwargs for :class:`.QuoteDetector`
     :param speaker_detector_kwargs: kwargs for
@@ -80,7 +80,7 @@ def conversational_pipeline(
 
     tokenizer_kwargs = tokenizer_kwargs or {}
     ner_kwargs = ner_kwargs or {}
-    characters_extractor_kwargs = characters_extractor_kwargs or {}
+    character_unifier_kwargs = character_unifier_kwargs or {}
     quote_detector_kwargs = quote_detector_kwargs or {}
     speaker_detector_kwargs = speaker_detector_kwargs or {}
     graph_extractor_kwargs = graph_extractor_kwargs or {}
@@ -93,7 +93,7 @@ def conversational_pipeline(
             NLTKTokenizer(**tokenizer_kwargs),
             QuoteDetector(**quote_detector_kwargs),
             ner_step(**ner_kwargs),
-            GraphRulesCharacterUnifier(**characters_extractor_kwargs),
+            GraphRulesCharacterUnifier(**character_unifier_kwargs),
             BertSpeakerDetector(**speaker_detector_kwargs),
             ConversationalGraphExtractor(**graph_extractor_kwargs),
         ],
@@ -105,7 +105,7 @@ def relational_pipeline(
     tokenizer_kwargs: Optional[dict] = None,
     ner_step: Type[PipelineStep] = NLTKNamedEntityRecognizer,
     ner_kwargs: Optional[dict] = None,
-    characters_extractor_kwargs: Optional[dict] = None,
+    character_unifier_kwargs: Optional[dict] = None,
     relation_extractor_kwargs: Optional[dict] = None,
     graph_extractor_kwargs: Optional[dict] = None,
     **pipeline_kwargs,
@@ -115,7 +115,7 @@ def relational_pipeline(
     :param tokenizer_kwargs: kwargs for :class:`.NLTKTokenizer`
     :param ner_step: the type of the NER step to use.
     :param ner_kwargs: kwargs for :class:`.BertNamedEntityRecognizer`
-    :param characters_extractor_kwargs: kwargs for
+    :param characters_unifier_kwargs: kwargs for
         :class:`.GraphRulesCharacterUnifier`
     :param relation_extraction_kwargs: kwargs for :class:`.T5RelationExtractor`
     :param pipeline_kwargs: kwargs for :class:`.Pipeline`
@@ -127,7 +127,7 @@ def relational_pipeline(
 
     tokenizer_kwargs = tokenizer_kwargs or {}
     ner_kwargs = ner_kwargs or {}
-    characters_extractor_kwargs = characters_extractor_kwargs or {}
+    character_unifier_kwargs = character_unifier_kwargs or {}
     relation_extractor_kwargs = relation_extractor_kwargs or {}
     graph_extractor_kwargs = graph_extractor_kwargs or {}
 
@@ -135,7 +135,7 @@ def relational_pipeline(
         [
             NLTKTokenizer(**tokenizer_kwargs),
             ner_step(**ner_kwargs),
-            GraphRulesCharacterUnifier(**characters_extractor_kwargs),
+            GraphRulesCharacterUnifier(**character_unifier_kwargs),
             T5RelationExtractor(**relation_extractor_kwargs),
             RelationalGraphExtractor(**graph_extractor_kwargs),
         ],
