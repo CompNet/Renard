@@ -1,7 +1,8 @@
-from typing import Any, Union, Optional
+from typing import Any, Union, Optional, Literal
 import ast, re
 import functools as ft
 from datasets import load_dataset, Dataset as HGDataset
+import torch
 from transformers import (
     AutoModelForSeq2SeqLM,
     T5ForConditionalGeneration,
@@ -79,15 +80,24 @@ class T5RelationExtractor(PipelineStep):
     DEFAULT_MODEL = "compnet-renard/t5-small-literary-relation-extraction"
 
     def __init__(
-        self, model: Optional[Union[PreTrainedModel, str]] = None, batch_size: int = 1
+        self,
+        model: Optional[Union[PreTrainedModel, str]] = None,
+        batch_size: int = 1,
+        device: Literal["cpu", "cuda", "auto"] = "auto",
     ):
         self.model = T5RelationExtractor.DEFAULT_MODEL if model is None else model
         self.hg_pipeline = None
         self.batch_size = batch_size
+        if device == "auto":
+            self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        else:
+            self.device = torch.device(device)
 
     def _pipeline_init_(self, lang: str, progress_reporter: ProgressReporter, **kwargs):
         super()._pipeline_init_(lang, progress_reporter, **kwargs)
-        self.hg_pipeline = hg_pipeline("text2text-generation", model=self.model)
+        self.hg_pipeline = hg_pipeline(
+            "text2text-generation", model=self.model, device=self.device
+        )
 
     def __call__(
         self, sentences: list[list[str]], characters: list[Character], **kwargs
