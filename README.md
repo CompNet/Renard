@@ -9,11 +9,16 @@ Renard (Relationship Extraction from NARrative Documents) is a library for creat
 
 # Installation
 
-You can install the latest version using pip:
+Currently, Renard supports Python>=3.9,<=3.12. You can install the
+latest version using pip:
 
 > pip install renard-pipeline
 
-Currently, Renard supports Python>=3.9,<=3.12
+If you have a GPU, there are accelerated versions for Nvidia CUDA and
+AMD ROCm:
+
+> pip install renard-pipeline[cuda128]
+> pip install renard-pipeline[rocm63]
 
 
 # Documentation
