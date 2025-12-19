@@ -3225,6 +3225,7 @@ dependencies = [
     { name = "nltk" },
     { name = "pytest" },
     { name = "rank-bm25" },
+    { name = "scikit-learn" },
     { name = "tibert" },
     { name = "torch", version = "2.7.0", source = { registry = "https://pypi.org/simple" }, marker = "(extra == 'extra-15-renard-pipeline-cuda128' and extra == 'extra-15-renard-pipeline-rocm63') or (extra != 'extra-15-renard-pipeline-cuda128' and extra != 'extra-15-renard-pipeline-rocm63')" },
     { name = "torch", version = "2.8.0+cu128", source = { registry = "https://download.pytorch.org/whl/cu128" }, marker = "extra == 'extra-15-renard-pipeline-cuda128'" },
@@ -3274,6 +3275,7 @@ requires-dist = [
     { name = "pytorch-triton-rocm", marker = "extra == 'rocm63'", specifier = ">=3.1.0", index = "https://download.pytorch.org/whl/rocm6.3", conflict = { package = "renard-pipeline", extra = "rocm63" } },
     { name = "pyvis", marker = "extra == 'ui'", specifier = ">=0.3.2" },
     { name = "rank-bm25", specifier = ">=0.2.2" },
+    { name = "scikit-learn", extras = ["rocm63", "ui"], specifier = ">=1.6.1" },
     { name = "tibert", specifier = ">=0.5.2" },
     { name = "torch", specifier = ">=2.7.0" },
     { name = "torch", marker = "extra == 'cuda128'", specifier = ">=2.7.1", index = "https://download.pytorch.org/whl/cu128", conflict = { package = "renard-pipeline", extra = "cuda128" } },
@@ -4077,14 +4079,14 @@ dependencies = [
     { name = "typing-extensions", marker = "extra == 'extra-15-renard-pipeline-cuda128'" },
 ]
 wheels = [
-    { url = "https://download.pytorch.org/whl/cu128/torch-2.8.0%2Bcu128-cp310-cp310-manylinux_2_28_x86_64.whl" },
-    { url = "https://download.pytorch.org/whl/cu128/torch-2.8.0%2Bcu128-cp310-cp310-win_amd64.whl" },
-    { url = "https://download.pytorch.org/whl/cu128/torch-2.8.0%2Bcu128-cp311-cp311-manylinux_2_28_x86_64.whl" },
-    { url = "https://download.pytorch.org/whl/cu128/torch-2.8.0%2Bcu128-cp311-cp311-win_amd64.whl" },
-    { url = "https://download.pytorch.org/whl/cu128/torch-2.8.0%2Bcu128-cp312-cp312-manylinux_2_28_x86_64.whl" },
-    { url = "https://download.pytorch.org/whl/cu128/torch-2.8.0%2Bcu128-cp312-cp312-win_amd64.whl" },
-    { url = "https://download.pytorch.org/whl/cu128/torch-2.8.0%2Bcu128-cp39-cp39-manylinux_2_28_x86_64.whl" },
-    { url = "https://download.pytorch.org/whl/cu128/torch-2.8.0%2Bcu128-cp39-cp39-win_amd64.whl" },
+    { url = "https://download.pytorch.org/whl/cu128/torch-2.8.0%2Bcu128-cp310-cp310-manylinux_2_28_x86_64.whl", hash = "sha256:0c96999d15cf1f13dd7c913e0b21a9a355538e6cfc10861a17158320292f5954" },
+    { url = "https://download.pytorch.org/whl/cu128/torch-2.8.0%2Bcu128-cp310-cp310-win_amd64.whl", hash = "sha256:43938e9a174c90e5eb9e906532b2f1e21532bbfa5a61b65193b4f54714d34f9e" },
+    { url = "https://download.pytorch.org/whl/cu128/torch-2.8.0%2Bcu128-cp311-cp311-manylinux_2_28_x86_64.whl", hash = "sha256:039b9dcdd6bdbaa10a8a5cd6be22c4cb3e3589a341e5f904cbb571ca28f55bed" },
+    { url = "https://download.pytorch.org/whl/cu128/torch-2.8.0%2Bcu128-cp311-cp311-win_amd64.whl", hash = "sha256:34c55443aafd31046a7963b63d30bc3b628ee4a704f826796c865fdfd05bb596" },
+    { url = "https://download.pytorch.org/whl/cu128/torch-2.8.0%2Bcu128-cp312-cp312-manylinux_2_28_x86_64.whl", hash = "sha256:4354fc05bb79b208d6995a04ca1ceef6a9547b1c4334435574353d381c55087c" },
+    { url = "https://download.pytorch.org/whl/cu128/torch-2.8.0%2Bcu128-cp312-cp312-win_amd64.whl", hash = "sha256:0ad925202387f4e7314302a1b4f8860fa824357f9b1466d7992bf276370ebcff" },
+    { url = "https://download.pytorch.org/whl/cu128/torch-2.8.0%2Bcu128-cp39-cp39-manylinux_2_28_x86_64.whl", hash = "sha256:b9357a87595a3d7b2a565ba602b97392a37c56f0b85698f0ccf0a2c58fbef5ec" },
+    { url = "https://download.pytorch.org/whl/cu128/torch-2.8.0%2Bcu128-cp39-cp39-win_amd64.whl", hash = "sha256:fca71fd04bf524a54370386b85e2e89840c2bbc86dc2a8df2aadedd3bba5645f" },
 ]
 
 [[package]]
@@ -4109,10 +4111,10 @@ dependencies = [
     { name = "typing-extensions", marker = "extra == 'extra-15-renard-pipeline-rocm63'" },
 ]
 wheels = [
-    { url = "https://download.pytorch.org/whl/rocm6.3/torch-2.8.0%2Brocm6.3-cp310-cp310-manylinux_2_28_x86_64.whl" },
-    { url = "https://download.pytorch.org/whl/rocm6.3/torch-2.8.0%2Brocm6.3-cp311-cp311-manylinux_2_28_x86_64.whl" },
-    { url = "https://download.pytorch.org/whl/rocm6.3/torch-2.8.0%2Brocm6.3-cp312-cp312-manylinux_2_28_x86_64.whl" },
-    { url = "https://download.pytorch.org/whl/rocm6.3/torch-2.8.0%2Brocm6.3-cp39-cp39-manylinux_2_28_x86_64.whl" },
+    { url = "https://download.pytorch.org/whl/rocm6.3/torch-2.8.0%2Brocm6.3-cp310-cp310-manylinux_2_28_x86_64.whl", hash = "sha256:a492665402d52a71dc3d3c025153ead15ef9d993d1f39abd67dbf8b3d0fadd35" },
+    { url = "https://download.pytorch.org/whl/rocm6.3/torch-2.8.0%2Brocm6.3-cp311-cp311-manylinux_2_28_x86_64.whl", hash = "sha256:8312c2defbd8890fd3cf2fc01cfcc53678fe00891d1c8314901025991e21f081" },
+    { url = "https://download.pytorch.org/whl/rocm6.3/torch-2.8.0%2Brocm6.3-cp312-cp312-manylinux_2_28_x86_64.whl", hash = "sha256:de0bb7f98c977ad9c74312fc34d375747efc5c5ddee60a4cd5163fa729211602" },
+    { url = "https://download.pytorch.org/whl/rocm6.3/torch-2.8.0%2Brocm6.3-cp39-cp39-manylinux_2_28_x86_64.whl", hash = "sha256:76fd0785090a84beaaa4e0abbb4efae1d4b44632a95d2c2d7db58783e7b17efc" },
 ]
 
 [[package]]

@@ -4,20 +4,24 @@ import functools as ft
 from datasets import load_dataset, Dataset as HGDataset
 import torch
 from transformers import (
-    AutoModelForSeq2SeqLM,
-    T5ForConditionalGeneration,
+    AutoModelForCausalLM,
     AutoTokenizer,
-    Seq2SeqTrainer,
-    Seq2SeqTrainingArguments,
+    Trainer,
+    TrainingArguments,
     PreTrainedTokenizerFast,
+    DataCollatorForLanguageModeling,
     DataCollatorForSeq2Seq,
     PreTrainedModel,
+    EvalPrediction,
     pipeline as hg_pipeline,
 )
+from more_itertools import flatten
 from transformers.pipelines.pt_utils import KeyDataset
 from renard.pipeline.core import PipelineStep
 from renard.pipeline.progress import ProgressReporter
 from renard.pipeline.character_unification import Character
+from renard.utils import make_vocab
+from sklearn.metrics import precision_recall_fscore_support
 
 #: (subject, relation, object)
 Relation = tuple[Character, str, Character]
@@ -30,13 +34,13 @@ def _load_ARF_line(example: dict, tokenizer: PreTrainedTokenizerFast) -> dict:
         return "({}, {}, {})".format(rel["entity1"], rel["relation"], rel["entity2"])
 
     labels = " ".join(map(format_rel, example["relations"]))
-    with tokenizer.as_target_tokenizer():
-        labels_batch = tokenizer(labels)
-    example["labels"] = labels_batch["input_ids"]
+    answer = {"role": "assistant", "content": labels}
+    example["labels"] = tokenizer.apply_chat_template([answer])
 
     text = example["chunk"] or ""
-    text = f"extract relations: {text}"
-    example["input_ids"] = tokenizer(text)["input_ids"]
+    example["input_ids"] = tokenizer.apply_chat_template(
+        GenerativeRelationExtractor.task_prompt(text)
+    )
 
     return example
 
@@ -52,31 +56,85 @@ def load_ARF_dataset(tokenizer: PreTrainedTokenizerFast) -> HGDataset:
         "synthetic_relations_in_fiction_books",
         split="train",
     )
-    dataset = dataset.train_test_split(test_size=0.1)
+    dataset = dataset.train_test_split(test_size=0.001)
     return dataset.map(ft.partial(_load_ARF_line, tokenizer=tokenizer))
 
 
-def train_t5_on_ARF(
-    t5_hg_id: str, targs: Seq2SeqTrainingArguments
-) -> T5ForConditionalGeneration:
-    tokenizer = AutoTokenizer.from_pretrained(t5_hg_id)
-    model = AutoModelForSeq2SeqLM.from_pretrained(t5_hg_id)
+def _triple_precision_recall_f1(
+    references: list[list[tuple[str, str, str]]],
+    predictions: list[list[tuple[str, str, str]]],
+) -> dict[str, float]:
+    triple_vocab = make_vocab(list(flatten(references)) + list(flatten(predictions)))
+
+    # the "null triple" indicates no prediction (or no reference
+    # available), useful to compute precision/recall.
+    null_triple_index = max(triple_vocab.values()) + 1
+
+    y, y_hat = [], []
+    for ref, pred in zip(references, predictions):
+        ref = {triple: triple_vocab[triple] for triple in ref}
+        pred = {triple: triple_vocab[triple] for triple in pred}
+        for ref_triple, ref_index in ref.items():
+            y.append(ref_index)
+            y_hat.append(pred.get(ref_triple, null_triple_index))
+            try:
+                del pred[ref_triple]
+            except KeyError:
+                pass
+        for pred_triple, pred_index in pred.items():
+            y_hat.append(pred_index)
+            y.append(ref.get(pred_triple, null_triple_index))
+
+    precision, recall, f1, _ = precision_recall_fscore_support(
+        y, y_hat, labels=list(triple_vocab.values()), average="micro"
+    )
+
+    return {"precision": float(precision), "recall": float(recall), "f1": float(f1)}
+
+
+def train_model_on_ARF(
+    model: str | PreTrainedModel,
+    targs: TrainingArguments,
+    tokenizer: PreTrainedTokenizerFast | None = None,
+) -> PreTrainedModel:
+    if isinstance(model, str):
+        assert tokenizer is None
+        tokenizer = AutoTokenizer.from_pretrained(model)
+        model = AutoModelForCausalLM.from_pretrained(model)
+    assert not tokenizer is None
+    tokenizer.pad_token = tokenizer.eos_token
+    pad_token_i = tokenizer.encode(tokenizer.pad_token)[0]
 
     dataset = load_ARF_dataset(tokenizer)
 
-    trainer = Seq2SeqTrainer(
+    def compute_metrics(eval_preds: EvalPrediction) -> dict[str, float]:
+        eval_preds.label_ids[eval_preds.label_ids == -100] = pad_token_i
+
+        labels_str = tokenizer.batch_decode(
+            eval_preds.label_ids, skip_special_tokens=True
+        )
+        labels = list(map(GenerativeRelationExtractor.parse_text_relations, labels_str))
+
+        pred_ids = eval_preds.predictions[0].argmax(axis=-1)
+        preds_str = tokenizer.batch_decode(pred_ids, skip_special_tokens=True)
+        preds = list(map(GenerativeRelationExtractor.parse_text_relations, preds_str))
+
+        return _triple_precision_recall_f1(labels, preds)
+
+    trainer = Trainer(
         model,
         targs,
         train_dataset=dataset["train"],
         eval_dataset=dataset["test"],
-        data_collator=DataCollatorForSeq2Seq(tokenizer),
+        data_collator=DataCollatorForLanguageModeling(tokenizer, mlm=False),
+        compute_metrics=compute_metrics,
     )
     trainer.train()
 
     return model
 
 
-class T5RelationExtractor(PipelineStep):
+class GenerativeRelationExtractor(PipelineStep):
     DEFAULT_MODEL = "compnet-renard/t5-small-literary-relation-extraction"
 
     def __init__(
@@ -85,7 +143,9 @@ class T5RelationExtractor(PipelineStep):
         batch_size: int = 1,
         device: Literal["cpu", "cuda", "auto"] = "auto",
     ):
-        self.model = T5RelationExtractor.DEFAULT_MODEL if model is None else model
+        self.model = (
+            GenerativeRelationExtractor.DEFAULT_MODEL if model is None else model
+        )
         self.hg_pipeline = None
         self.batch_size = batch_size
         if device == "auto":
@@ -96,7 +156,7 @@ class T5RelationExtractor(PipelineStep):
     def _pipeline_init_(self, lang: str, progress_reporter: ProgressReporter, **kwargs):
         super()._pipeline_init_(lang, progress_reporter, **kwargs)
         self.hg_pipeline = hg_pipeline(
-            "text2text-generation", model=self.model, device=self.device
+            "text-generation", model=self.model, device=self.device
         )
 
     def __call__(
@@ -108,7 +168,14 @@ class T5RelationExtractor(PipelineStep):
 
         # chunk as in the ARF dataset
         dataset = HGDataset.from_list(
-            [{"text": T5RelationExtractor.task_prompt(sent)} for sent in sentences]
+            [
+                {
+                    "text": self.hg_pipeline.tokenizer.apply_chat_template(
+                        (GenerativeRelationExtractor.task_prompt(" ".join(sent)))
+                    )
+                }
+                for sent in sentences
+            ]
         )
         for out in self._progress_(
             self.hg_pipeline(KeyDataset(dataset, "text"), batch_size=self.batch_size),
@@ -116,11 +183,17 @@ class T5RelationExtractor(PipelineStep):
         ):
             text_relations = out[0]["generated_text"]
 
-            raw_triples = T5RelationExtractor.parse_t5_text_relations(text_relations)
+            raw_triples = GenerativeRelationExtractor.parse_text_relations(
+                text_relations
+            )
             triples = []
             for subj, rel, obj in raw_triples:
-                subj_char = T5RelationExtractor.identify_character(subj, characters)
-                obj_char = T5RelationExtractor.identify_character(obj, characters)
+                subj_char = GenerativeRelationExtractor.identify_character(
+                    subj, characters
+                )
+                obj_char = GenerativeRelationExtractor.identify_character(
+                    obj, characters
+                )
                 if subj_char is None or obj_char is None or subj_char == obj_char:
                     continue
                 triples.append((subj_char, rel, obj_char))
@@ -129,12 +202,14 @@ class T5RelationExtractor(PipelineStep):
         return {"sentence_relations": sentence_relations}
 
     @staticmethod
-    def task_prompt(sentence: list[str]) -> str:
-        sent_text = " ".join(sentence)
-        return f"extract relations: {sent_text}"
+    def task_prompt(text: str) -> list[dict]:
+        return [
+            {"role": "system", "content": "Extract relations from the given text."},
+            {"role": "user", "content": text},
+        ]
 
     @staticmethod
-    def parse_t5_text_relations(text_relations: str) -> list[tuple[str, str, str]]:
+    def parse_text_relations(text_relations: str) -> list[tuple[str, str, str]]:
         return re.findall(r"\(([^,]+), ([^,]+), ([^,]+)\)", text_relations)
 
     @staticmethod
