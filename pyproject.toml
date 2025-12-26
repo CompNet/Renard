@@ -10,7 +10,7 @@ readme = "README.md"
 requires-python = ">=3.9,<3.13"
 dependencies = [
     "torch>=2.7.0",
-    "transformers>=4.56.1",
+    "transformers>=4.57.1",
     "nltk>=3.9.1",
     "tqdm>=4.67.1",
     "networkx>=3.2",
@@ -24,6 +24,8 @@ dependencies = [
     "rank-bm25>=0.2.2",
     "accelerate>=1.10.1",
     "scikit-learn[ui]>=1.6.1",
+    "tiktoken>=0.12.0",
+    "protobuf>=6.33.2",
 ]
 
 [build-system]

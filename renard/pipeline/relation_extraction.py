@@ -4,12 +4,11 @@ import functools as ft
 from datasets import load_dataset, Dataset as HGDataset
 import torch
 from transformers import (
-    AutoModelForCausalLM,
+    AutoModelForSeq2SeqLM,
     AutoTokenizer,
     Trainer,
     TrainingArguments,
     PreTrainedTokenizerFast,
-    DataCollatorForLanguageModeling,
     DataCollatorForSeq2Seq,
     PreTrainedModel,
     EvalPrediction,
@@ -34,13 +33,14 @@ def _load_ARF_line(example: dict, tokenizer: PreTrainedTokenizerFast) -> dict:
         return "({}, {}, {})".format(rel["entity1"], rel["relation"], rel["entity2"])
 
     labels = " ".join(map(format_rel, example["relations"]))
-    answer = {"role": "assistant", "content": labels}
-    example["labels"] = tokenizer.apply_chat_template([answer])
+    with tokenizer.as_target_tokenizer():
+        labels_batch = tokenizer(labels)
+    example["labels"] = labels_batch["input_ids"]
 
     text = example["chunk"] or ""
-    example["input_ids"] = tokenizer.apply_chat_template(
-        GenerativeRelationExtractor.task_prompt(text)
-    )
+    example["input_ids"] = tokenizer(GenerativeRelationExtractor.task_prompt(text))[
+        "input_ids"
+    ]
 
     return example
 
@@ -100,7 +100,7 @@ def train_model_on_ARF(
     if isinstance(model, str):
         assert tokenizer is None
         tokenizer = AutoTokenizer.from_pretrained(model)
-        model = AutoModelForCausalLM.from_pretrained(model)
+        model = AutoModelForSeq2SeqLM.from_pretrained(model)
     assert not tokenizer is None
     tokenizer.pad_token = tokenizer.eos_token
     pad_token_i = tokenizer.encode(tokenizer.pad_token)[0]
@@ -126,7 +126,7 @@ def train_model_on_ARF(
         targs,
         train_dataset=dataset["train"],
         eval_dataset=dataset["test"],
-        data_collator=DataCollatorForLanguageModeling(tokenizer, mlm=False),
+        data_collator=DataCollatorForSeq2Seq(tokenizer),
         compute_metrics=compute_metrics,
     )
     trainer.train()
@@ -156,7 +156,10 @@ class GenerativeRelationExtractor(PipelineStep):
     def _pipeline_init_(self, lang: str, progress_reporter: ProgressReporter, **kwargs):
         super()._pipeline_init_(lang, progress_reporter, **kwargs)
         self.hg_pipeline = hg_pipeline(
-            "text-generation", model=self.model, device=self.device
+            "text2text-generation",
+            torch_dtype=torch.bfloat16,
+            model=self.model,
+            device=self.device,
         )
 
     def __call__(
@@ -169,11 +172,7 @@ class GenerativeRelationExtractor(PipelineStep):
         # chunk as in the ARF dataset
         dataset = HGDataset.from_list(
             [
-                {
-                    "text": self.hg_pipeline.tokenizer.apply_chat_template(
-                        (GenerativeRelationExtractor.task_prompt(" ".join(sent)))
-                    )
-                }
+                {"text": GenerativeRelationExtractor.task_prompt(" ".join(sent))}
                 for sent in sentences
             ]
         )
@@ -202,11 +201,8 @@ class GenerativeRelationExtractor(PipelineStep):
         return {"sentence_relations": sentence_relations}
 
     @staticmethod
-    def task_prompt(text: str) -> list[dict]:
-        return [
-            {"role": "system", "content": "Extract relations from the given text."},
-            {"role": "user", "content": text},
-        ]
+    def task_prompt(text: str) -> str:
+        return f"Extract relations from the given text: {text}"
 
     @staticmethod
     def parse_text_relations(text_relations: str) -> list[tuple[str, str, str]]:
