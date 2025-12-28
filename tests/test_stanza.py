@@ -7,7 +7,7 @@ script_dir = os.path.abspath(os.path.dirname(__file__))
 
 
 @pytest.mark.skipif(
-    os.getenv("RENARD_TEST_STANZA_OPTDEP") != "1",
+    os.getenv("RENARD_TEST_OPTDEP_STANZA") != "1",
     reason="not testing stanza based modules",
 )
 def test_stanza_pipeline_runs():

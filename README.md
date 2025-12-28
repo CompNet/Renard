@@ -68,7 +68,7 @@ Alternatively, the project Makefile has a test target:
 
 > make test
 
-Expensive tests are disabled by default. These can be run by setting the environment variable `RENARD_TEST_ALL` to `1`.
+Expensive tests are disabled by default. These can be run by setting the environment variable `RENARD_TEST_SLOW` to `1`.
 
 
 

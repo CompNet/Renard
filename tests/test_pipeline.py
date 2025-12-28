@@ -53,14 +53,14 @@ def test_pipeline_is_invalid():
     assert not pipeline.check_valid()[0]
 
 
-@pytest.mark.skipif(os.getenv("RENARD_TEST_ALL") != "1", reason="performance")
+@pytest.mark.skipif(os.getenv("RENARD_TEST_SLOW") != "1", reason="performance")
 def test_co_occurrence_pipeline_runs():
     text = load_novel_chapters("pride_and_prejudice")[0]
     pipeline = co_occurrence_pipeline(warn=False, progress_report=None)
     pipeline(text)
 
 
-@pytest.mark.skipif(os.getenv("RENARD_TEST_ALL") != "1", reason="performance")
+@pytest.mark.skipif(os.getenv("RENARD_TEST_SLOW") != "1", reason="performance")
 def test_conversational_pipeline_runs():
     text = load_novel_chapters("pride_and_prejudice")[0]
     # # if the text is too long, speaker attribution takes too much time
@@ -70,7 +70,7 @@ def test_conversational_pipeline_runs():
     pipeline(text)
 
 
-@pytest.mark.skipif(os.getenv("RENARD_TEST_ALL") != "1", reason="performance")
+@pytest.mark.skipif(os.getenv("RENARD_TEST_SLOW") != "1", reason="performance")
 def test_relational_pipeline_runs():
     text = load_novel_chapters("pride_and_prejudice")[0]
     pipeline = relational_pipeline(warn=False, progress_report=None)

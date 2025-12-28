@@ -200,7 +200,7 @@ to a unique character.
 Relation Extraction
 -------------------
 
-- :class:`.T5RelationExtractor` extracts relations between characters
+- :class:`.GenerativeRelationExtractor` extracts relations between characters
   using a finetuned T5 model.
 
 

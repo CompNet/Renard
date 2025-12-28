@@ -7,7 +7,7 @@ issue if you encounter a problem or want to discuss a specific
 feature. If you want to contribute a patch:
 
 1. Check that your code matches our code quality guidelines and that
-   all existing tests are passing with ``RENARD_TEST_ALL=1``.
+   all existing tests are passing with ``RENARD_TEST_SLOW=1``.
 2. Create a Github pull request with your patch, explaining the
    rationale behind it and giving a high level overview of your
    code. Mention the relevant issue if applicable.
@@ -36,9 +36,7 @@ the ``tests`` directory. We use ``pytest`` to test code, and also use
 ``hypothesis`` when applicable. If you open a patch, make sure that
 all tests are passing. In particular, do not rely on the CI, as it
 does not run time costly tests! Check for yourself locally, using
-``RENARD_TEST_ALL=1 python -m pytest tests``. Note that there are
+``RENARD_TEST_SLOW=1 python -m pytest tests``. Note that there are
 specific tests and environment variable for optional dependencies such
-as *stanza* (``RENARD_TEST_STANZA_OPTDEP``). These must be explicitely
-set to ``1`` if you want to test optional dependencies, as
-``RENARD_TEST_ALL=1`` does not enable test on these optional
-dependencies.
+as *stanza* (``RENARD_TEST_OPTDEP_STANZA``). These must be explicitely
+set to ``1`` if you want to test optional dependencies.
