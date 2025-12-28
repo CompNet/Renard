@@ -263,10 +263,9 @@ When executing the above block of code, the output attribute
 >>> out.character_network
 [<networkx.classes.graph.Graph object at 0x7fd9e9115900>]
 
-See :class:`.CoOccurrencesGraphExtractor` for more details on the
-usage of the ``dynamic`` and ``dynamic_window`` arguments. Note that,
-currently, only the co-occurrence graph extractor supports dynamic
-networks.
+Both :class:`.CoOccurrencesGraphExtractor` and
+:class:`.ConversationalGraphExtractor` support dynamic networks. See
+their documentation for more details.
 
 Plot and export functions work as one would expect
 intuitively. :meth:`.PipelineState.plot_graph` allow to visualize the
@@ -280,10 +279,9 @@ dynamic graph to the Gephi format.
 Custom Segmentation
 -------------------
 
-The ``dynamic_window`` parameter of
-:class:`.CoOccurencesGraphExtractor` determines the segmentation of
-the dynamic networks, in number of interactions. In the example above,
-a new graph will be created for each 20 interactions.
+The ``dynamic_window`` parameter determines the segmentation of the
+dynamic networks, in number of interactions. In the example above, a
+new graph will be created for each 20 interactions.
 
 While one can rely on the arguments of the graph extractor of the
 pipeline to determine the dynamic window, Renard allows to specify a

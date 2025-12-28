@@ -76,6 +76,32 @@ def mentions_for_blocks(
     return blocks_mentions
 
 
+def quotes_for_blocks(
+    block_bounds: BlockBounds, quotes: List[Quote], speakers: List[Optional[Character]]
+) -> Tuple[List[List[Quote]], List[List[Optional[Character]]]]:
+    """Return quotes and associated speaker for each block.
+
+    :param block_bounds: block bounds, in tokens
+    :param mentions: a sorted list of mentions
+
+    :return: a list of quotes per block.  This list has len
+             ``len(block_bounds)``.
+    """
+    assert block_bounds[1] == "tokens"
+
+    block_quotes = [[] for _ in range(len(block_bounds[0]))]
+    block_speakers = [[] for _ in range(len(block_bounds[0]))]
+
+    for quote, speaker in zip(quotes, speakers):
+        for block_i, (start_i, end_i) in enumerate(block_bounds[0]):
+            if quote.start >= start_i and quote.end < end_i:
+                block_quotes[block_i].append(quote)
+                block_speakers[block_i].append(speaker)
+                break
+
+    return block_quotes, block_speakers
+
+
 class CoOccurrencesGraphExtractor(PipelineStep):
     """A simple character graph extractor using co-occurences"""
 
@@ -449,10 +475,6 @@ class CoOccurrencesGraphExtractor(PipelineStep):
 class ConversationalGraphExtractor(PipelineStep):
     """A graph extractor using conversation between characters or
     mentions.
-
-    .. note::
-
-        Does not support dynamic networks yet.
     """
 
     def __init__(
@@ -462,6 +484,9 @@ class ConversationalGraphExtractor(PipelineStep):
             Union[int, Tuple[int, Literal["tokens", "sentences"]]]
         ] = None,
         ignore_self_mention: bool = True,
+        dynamic: bool = False,
+        dynamic_window: Optional[int] = None,
+        dynamic_overlap: int = 0,
     ):
         """
         :param graph_type: either 'conversation' or 'mention'.
@@ -470,11 +495,31 @@ class ConversationalGraphExtractor(PipelineStep):
             occurring between characters.  'mention' extracts a
             directed graph where interactions are character mentions
             of one another in quoted speech.
+
         :param conversation_dist: must be supplied if `graph_type` is
             'conversation'.  The distance between two quotation for
             them to be considered as being interacting.
+
         :param ignore_self_mention: if ``True``, self mentions are
-            ignore for ``graph_type=='mention'``
+            ignored for ``graph_type=='mention'``
+
+        :param dynamic:
+
+                - if ``False`` (the default), a static ``nx.graph`` is
+                  extracted
+
+                - if ``True``, several ``nx.graph`` are extracted.  In
+                  that case, ``dynamic_window`` and
+                  ``dynamic_overlap``*can* be specified.  If
+                  ``dynamic_window`` is not specified, this step is
+                  expecting the text to be cut into 'dynamic blocks',
+                  and a graph will be extracted for each block.  In
+                  that case, ``dynamic_blocks`` must be passed to the
+                  pipeline as a ``List[str]`` at runtime.
+
+        :param dynamic_window: dynamic window, in number of quotes.
+
+        :param dynamic_overlap: overlap, in number of quotes.
         """
         self.graph_type = graph_type
 
@@ -483,6 +528,10 @@ class ConversationalGraphExtractor(PipelineStep):
         self.conversation_dist = conversation_dist
 
         self.ignore_self_mention = ignore_self_mention
+
+        self.dynamic = dynamic
+        self.dynamic_window = dynamic_window
+        self.dynamic_overlap = dynamic_overlap
 
         super().__init__()
 
@@ -564,12 +613,12 @@ class ConversationalGraphExtractor(PipelineStep):
             if speaker is None:
                 continue
 
-            # TODO: optim
             # find characters mentioned in quote and add a directed
             # edge speaker => character
             for character in characters:
                 if character == speaker and self.ignore_self_mention:
                     continue
+                # TODO: optim
                 for mention in character.mentions:
                     if (
                         mention.start_idx >= quote.start
@@ -582,22 +631,75 @@ class ConversationalGraphExtractor(PipelineStep):
 
         return G
 
-    def __call__(
+    def _extract_static(
         self,
         sentences: List[List[str]],
         quotes: List[Quote],
         speakers: List[Optional[Character]],
         characters: Set[Character],
-        **kwargs,
-    ) -> Dict[str, Any]:
+    ) -> nx.Graph:
         if self.graph_type == "conversation":
             G = self._conversation_extract(sentences, quotes, speakers, characters)
         elif self.graph_type == "mention":
             G = self._mention_extract(quotes, speakers, characters)
         else:
             raise ValueError(f"unknown graph_type: {self.graph_type}")
+        return G
 
-        return {"character_network": G}
+    def _extract_dynamic(
+        self,
+        sentences: List[List[str]],
+        quotes: List[Quote],
+        speakers: List[Optional[Character]],
+        characters: Set[Character],
+        dynamic_blocks: Optional[BlockBounds] = None,
+    ) -> List[nx.Graph]:
+        assert self.dynamic_window is None or dynamic_blocks is None
+
+        if not self.dynamic_window is None:
+            bounds = []
+            for block_quotes in windowed(
+                quotes,
+                self.dynamic_window,
+                step=self.dynamic_window - self.dynamic_overlap,
+            ):
+                block_quotes = [q for q in block_quotes if not q is None]
+                bounds.append((block_quotes[0].start, block_quotes[0].end))
+            dynamic_blocks = (bounds, "tokens")
+
+        assert not dynamic_blocks is None
+
+        quotes_for_each_block, speakers_for_each_block = quotes_for_blocks(
+            dynamic_blocks, quotes, speakers
+        )
+        return [
+            self._extract_static(sentences, block_quotes, block_speakers, characters)
+            for block_quotes, block_speakers in zip(
+                quotes_for_each_block, speakers_for_each_block
+            )
+        ]
+
+    def __call__(
+        self,
+        sentences: List[List[str]],
+        quotes: List[Quote],
+        speakers: List[Optional[Character]],
+        characters: Set[Character],
+        dynamic_blocks: Optional[BlockBounds] = None,
+        **kwargs,
+    ) -> Dict[str, Union[nx.Graph, List[nx.Graph]]]:
+        if self.dynamic:
+            return {
+                "character_network": self._extract_dynamic(
+                    sentences, quotes, speakers, characters, dynamic_blocks
+                )
+            }
+        else:
+            return {
+                "character_network": self._extract_static(
+                    sentences, quotes, speakers, characters
+                )
+            }
 
     def supported_langs(self) -> Literal["any"]:
         return "any"

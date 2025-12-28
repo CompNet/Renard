@@ -1,13 +1,17 @@
 from collections import defaultdict
-from typing import List
+from typing import List, Literal
 import itertools, string
 from hypothesis import given
-from hypothesis.strategies import lists, sampled_from
+from hypothesis.strategies import lists, sampled_from, one_of, just
 from hypothesis.strategies._internal.numbers import integers
 import networkx as nx
 from networkx.algorithms import isomorphism
-from renard.pipeline.graph_extraction import CoOccurrencesGraphExtractor
+from renard.pipeline.graph_extraction import (
+    CoOccurrencesGraphExtractor,
+    ConversationalGraphExtractor,
+)
 from renard.pipeline.character_unification import Character
+from renard.pipeline.speaker_attribution import Quote
 from renard.pipeline.ner import ner_entities, NEREntity
 
 
@@ -67,11 +71,6 @@ def test_basic_graph_extraction(tokens: List[str]):
 def test_dynamic_co_occurrences_graph_extraction(
     tokens: List[str], dynamic_window: int
 ):
-    """
-    .. note::
-
-        only tests execution.
-    """
     bio_tags = ["B-PER" for _ in tokens]
 
     mentions = ner_entities(tokens, bio_tags)
@@ -82,6 +81,35 @@ def test_dynamic_co_occurrences_graph_extraction(
     )
     out = graph_extractor(set(characters), [tokens])
 
+    assert isinstance(out["character_network"], list)
+    assert len(out["character_network"]) > 0
+
+
+@given(
+    one_of(just("conversation"), just("mention")),
+    lists(sampled_from(string.ascii_uppercase), min_size=1),
+    integers(min_value=1, max_value=5),
+)
+def test_dynamic_conversational_graph_extraction(
+    graph_type: Literal["conversation", "mention"],
+    tokens: List[str],
+    dynamic_window: int,
+):
+    mentions = ner_entities(tokens, ["B-PER" for _ in tokens])
+    characters = _characters_from_mentions(mentions)
+
+    quotes = [Quote(i, i + 1, tokens[i : i + 1]) for i in range(len(tokens))]
+    speakers = [characters[0] for _ in quotes]
+
+    graph_extractor = ConversationalGraphExtractor(
+        graph_type,
+        dynamic=True,
+        dynamic_window=dynamic_window,
+        ignore_self_mention=False,
+    )
+    out = graph_extractor([tokens], quotes, speakers, set(characters))
+
+    assert isinstance(out["character_network"], list)
     assert len(out["character_network"]) > 0
 
 
