@@ -117,12 +117,13 @@ def relational_pipeline(
     :param ner_kwargs: kwargs for :class:`.BertNamedEntityRecognizer`
     :param characters_unifier_kwargs: kwargs for
         :class:`.GraphRulesCharacterUnifier`
-    :param relation_extraction_kwargs: kwargs for :class:`.T5RelationExtractor`
+    :param relation_extraction_kwargs: kwargs for
+        :class:`.GenerativeRelationExtractor`
     :param pipeline_kwargs: kwargs for :class:`.Pipeline`
     """
     from renard.pipeline.tokenization import NLTKTokenizer
     from renard.pipeline.character_unification import GraphRulesCharacterUnifier
-    from renard.pipeline.relation_extraction import T5RelationExtractor
+    from renard.pipeline.relation_extraction import GenerativeRelationExtractor
     from renard.pipeline.graph_extraction import RelationalGraphExtractor
 
     tokenizer_kwargs = tokenizer_kwargs or {}
@@ -136,7 +137,7 @@ def relational_pipeline(
             NLTKTokenizer(**tokenizer_kwargs),
             ner_step(**ner_kwargs),
             GraphRulesCharacterUnifier(**character_unifier_kwargs),
-            T5RelationExtractor(**relation_extractor_kwargs),
+            GenerativeRelationExtractor(**relation_extractor_kwargs),
             RelationalGraphExtractor(**graph_extractor_kwargs),
         ],
         **pipeline_kwargs,
