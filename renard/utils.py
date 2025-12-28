@@ -84,7 +84,7 @@ def search_pattern(seq: Iterable[R], pattern: List[R]) -> List[int]:
 #:
 #: ([(block start, block end), ...], unit)
 #:
-#: see :func:`block_indices` to easily create `BlockBounds`
+#: see :func:`block_bounds` to easily create `BlockBounds`
 BlockBounds = Tuple[List[Tuple[int, int]], Literal["characters", "tokens"]]
 
 
