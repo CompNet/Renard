@@ -87,6 +87,11 @@ def conversational_pipeline(
 
     if not "graph_type" in graph_extractor_kwargs:
         graph_extractor_kwargs["graph_type"] = "conversation"
+    if (
+        graph_extractor_kwargs["graph_type"] == "conversation"
+        and not "conversation_dist" in graph_extractor_kwargs
+    ):
+        graph_extractor_kwargs["conversation_dist"] = 1
 
     return Pipeline(
         [
