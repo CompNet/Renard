@@ -13,6 +13,7 @@ from transformers import (
     PreTrainedModel,
     EvalPrediction,
     pipeline as hg_pipeline,
+    BatchEncoding,
 )
 from more_itertools import flatten
 from transformers.pipelines.pt_utils import KeyDataset
@@ -26,23 +27,19 @@ from sklearn.metrics import precision_recall_fscore_support
 Relation = tuple[Character, str, Character]
 
 
-def _load_ARF_line(example: dict, tokenizer: PreTrainedTokenizerFast) -> dict:
-    example["relations"] = ast.literal_eval(example["relations"] or "[]")
+def _load_ARF_line(example: dict, tokenizer: PreTrainedTokenizerFast) -> BatchEncoding:
+    relations = ast.literal_eval(example["relations"] or "[]")
 
     def format_rel(rel: dict) -> str:
         return "({}, {}, {})".format(rel["entity1"], rel["relation"], rel["entity2"])
 
-    labels = " ".join(map(format_rel, example["relations"]))
-    with tokenizer.as_target_tokenizer():
-        labels_batch = tokenizer(labels)
-    example["labels"] = labels_batch["input_ids"]
+    labels = "[" + ",".join(map(format_rel, relations)) + "]"
 
     text = example["chunk"] or ""
-    example["input_ids"] = tokenizer(GenerativeRelationExtractor.task_prompt(text))[
-        "input_ids"
-    ]
+    batch = tokenizer(GenerativeRelationExtractor.task_prompt(text), text_target=labels)
+    batch["relations"] = relations
 
-    return example
+    return batch
 
 
 def load_ARF_dataset(tokenizer: PreTrainedTokenizerFast) -> HGDataset:
