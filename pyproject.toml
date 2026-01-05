@@ -23,7 +23,7 @@ dependencies = [
     "datasets>=4.0.0",
     "rank-bm25>=0.2.2",
     "accelerate>=1.10.1",
-    "scikit-learn[ui]>=1.6.1",
+    "scikit-learn>=1.6.1",
     "tiktoken>=0.12.0",
     "protobuf>=6.33.2",
 ]
@@ -53,7 +53,9 @@ ui = [
     "gradio>=4.44.1",
     "pyvis>=0.3.2",
 ]
-# torch alternatives (default is cpu torch)
+cpu = [
+  "torch>=2.7.1",
+]
 cuda128 = [
   "torch>=2.7.1",
 ]
@@ -61,23 +63,37 @@ rocm63 = [
   "torch>=2.7.1",
   "pytorch-triton-rocm>=3.1.0", 
 ]
+rocm64 = [
+  "torch>=2.7.1",
+  "pytorch-triton-rocm>=3.1.0", 
+]
 
 [tool.uv]
 conflicts = [
   [
+    { extra = "cpu" },
     { extra = "cuda128" },
     { extra = "rocm63" },
+    { extra = "rocm64" },
   ],
 ]
 
 [tool.uv.sources]
 torch = [
+  { index = "pytorch-cpu", extra = "cpu" },
   { index = "pytorch-cuda128", extra = "cuda128" },
   { index = "pytorch-rocm63", extra = "rocm63" },
+  { index = "pytorch-rocm64", extra = "rocm64" },
 ]
 pytorch-triton-rocm = [
-  { index = "pytorch-rocm63", extra = "rocm63" }
+  { index = "pytorch-rocm63", extra = "rocm63" },
+  { index = "pytorch-rocm64", extra = "rocm64" },
 ]
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
 
 [[tool.uv.index]]
 name = "pytorch-cuda128"
@@ -87,4 +103,9 @@ explicit = true
 [[tool.uv.index]]
 name = "pytorch-rocm63"
 url = "https://download.pytorch.org/whl/rocm6.3"
+explicit = true
+
+[[tool.uv.index]]
+name = "pytorch-rocm64"
+url = "https://download.pytorch.org/whl/rocm6.4"
 explicit = true
