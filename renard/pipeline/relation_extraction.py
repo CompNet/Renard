@@ -26,17 +26,24 @@ from sklearn.metrics import precision_recall_fscore_support
 #: (subject, relation, object)
 Relation = tuple[Character, str, Character]
 
+seq2seq_special_tokens = ["<triplet>", "<subj>", "<rel>", "<obj>", "</triplet>"]
+
 
 def _load_ARF_line(example: dict, tokenizer: PreTrainedTokenizerFast) -> BatchEncoding:
     relations = ast.literal_eval(example["relations"] or "[]")
 
     def format_rel(rel: dict) -> str:
-        return "({}, {}, {})".format(rel["entity1"], rel["relation"], rel["entity2"])
+        return "<triplet> <subj> {} <rel> {} <obj> {} </triplet>".format(
+            rel["entity1"], rel["relation"], rel["entity2"]
+        )
 
-    labels = "[" + ",".join(map(format_rel, relations)) + "]"
+    labels = " ".join(map(format_rel, relations))
 
     text = example["chunk"] or ""
-    batch = tokenizer(GenerativeRelationExtractor.task_prompt(text), text_target=labels)
+    batch = tokenizer(
+        tokenizer.bos_token + GenerativeRelationExtractor.task_prompt(text),
+        text_target=labels + tokenizer.eos_token,
+    )
     batch["relations"] = relations
 
     return batch
@@ -101,6 +108,7 @@ def train_model_on_ARF(
     assert not tokenizer is None
     tokenizer.pad_token = tokenizer.eos_token
     pad_token_i = tokenizer.encode(tokenizer.pad_token)[0]
+    tokenizer.add_special_tokens({"additional_special_tokens": seq2seq_special_tokens})
 
     dataset = load_ARF_dataset(tokenizer)
 
@@ -123,7 +131,7 @@ def train_model_on_ARF(
         targs,
         train_dataset=dataset["train"],
         eval_dataset=dataset["test"],
-        data_collator=DataCollatorForSeq2Seq(tokenizer),
+        data_collator=DataCollatorForSeq2Seq(tokenizer, model),
         compute_metrics=compute_metrics,
     )
     trainer.train()
@@ -203,7 +211,15 @@ class GenerativeRelationExtractor(PipelineStep):
 
     @staticmethod
     def parse_text_relations(text_relations: str) -> list[tuple[str, str, str]]:
-        return re.findall(r"\(([^,]+), ([^,]+), ([^,]+)\)", text_relations)
+        triplets = re.findall(
+            r"<triplet> ?<subj>([^<]+)<rel>([^<]+)<obj>([^<]+)</triplet>",
+            text_relations,
+        )
+        triplets = [
+            (subj.strip(" "), rel.strip(" "), obj.strip(" "))
+            for subj, rel, obj in triplets
+        ]
+        return triplets
 
     @staticmethod
     def identify_character(
