@@ -1,3 +1,4 @@
+from markdown.test_tools import Kwargs
 from typing import Any, Type, Union, Optional
 import os
 from dataclasses import dataclass
@@ -6,7 +7,6 @@ from renard.pipeline.core import PipelineState
 from renard.pipeline.ner import BertNamedEntityRecognizer
 from renard.pipeline.tokenization import NLTKTokenizer
 from renard.pipeline.ner import NLTKNamedEntityRecognizer
-from renard.pipeline.corefs import BertCoreferenceResolver
 from renard.pipeline.character_unification import (
     Character,
     GraphRulesCharacterUnifier,
@@ -36,51 +36,73 @@ class PipelineStepBuilder:
         return self.cls(**step_kwargs)
 
 
-tokenization_step_builders = [PipelineStepBuilder(NLTKTokenizer, "", {})]
-ner_step_builders = [
-    PipelineStepBuilder(
-        NLTKNamedEntityRecognizer, "Fast NER method relying on POS tagging", {}
-    ),
-    PipelineStepBuilder(
-        BertNamedEntityRecognizer, "BERT based deep learning NER model", {}
-    ),
-]
-coref_step_builders = [
-    PipelineStepBuilder(
-        BertCoreferenceResolver, "BERT based deep learning coreference model", {}
-    )
-]
-character_unification_step_builders = [
-    PipelineStepBuilder(
-        GraphRulesCharacterUnifier,
-        "Rules based character unification algorithm",
-        {
-            "min_appearances": ("uint", 0),
-            "link_corefs_mentions": (bool, False),
-            "ignore_leading_determiner": (bool, False),
-        },
-    ),
-    PipelineStepBuilder(NaiveCharacterUnifier, "Baseline naive character unifier", {}),
-]
-graph_extraction_step_builder = [
-    PipelineStepBuilder(
-        CoOccurrencesGraphExtractor,
-        "",
-        {"co_occurrences_dist": ("uint", 25)},
-    )
-]
+tok_step_builders = {
+    builder.name(): builder for builder in [PipelineStepBuilder(NLTKTokenizer, "", {})]
+}
+ner_step_builders = {
+    builder.name(): builder
+    for builder in [
+        PipelineStepBuilder(
+            NLTKNamedEntityRecognizer, "Fast NER method relying on POS tagging", {}
+        ),
+        PipelineStepBuilder(
+            BertNamedEntityRecognizer, "BERT based deep learning NER model", {}
+        ),
+    ]
+}
+cu_step_builders = {
+    builder.name(): builder
+    for builder in [
+        PipelineStepBuilder(
+            GraphRulesCharacterUnifier,
+            "Rules based character unification algorithm",
+            {
+                "min_appearances": ("uint", 0),
+                "link_corefs_mentions": (bool, False),
+                "ignore_leading_determiner": (bool, False),
+            },
+        ),
+        PipelineStepBuilder(
+            NaiveCharacterUnifier, "Baseline naive character unifier", {}
+        ),
+    ]
+}
+ge_step_builders = {
+    builder.name(): builder
+    for builder in [
+        PipelineStepBuilder(
+            CoOccurrencesGraphExtractor,
+            "",
+            {"co_occurrences_dist": ("uint", 25)},
+        )
+    ]
+}
 
 
-def select_step_builder(
-    builders: list[PipelineStepBuilder], name: str
+def update_step_builder_for_lang(
+    builder: PipelineStepBuilder,
+    available_builders: list[PipelineStepBuilder],
+    lang: str,
 ) -> PipelineStepBuilder:
-    return next(b for b in builders if b.name() == name)
+    """Given a BUILDERS, a list of alternative AVAILABLE_BUILDERS and
+    a LANG, find a builder supporting LANG.  This function does not
+    guarantee that the returned step satisfies LANG.
+    """
+    for possible_builder in [builder] + available_builders:
+        kwargs = possible_builder.kwargs
+        # a bit clunky, but we have to actually instantiate the step
+        # to get its supported languages
+        supported_langs = possible_builder.make_step(kwargs).supported_langs()
+        if supported_langs == "any" or lang in supported_langs:
+            return possible_builder
+    return builder
 
 
 @dataclass
 class UserState:
     pipeline: Pipeline
-    last_run_kwargs: list[dict]
+    pipeline_kwargs: dict
+    last_run_step_kwargs: list[dict]
     last_run_state: Optional[PipelineState] = None
 
 
@@ -91,15 +113,19 @@ def init_pipeline_(request: gr.Request):
     if not request.session_hash:
         return
     global user_state
+    default_pipeline_kwargs = {"lang": "eng"}
     default_pipeline = Pipeline(
         [
             NLTKTokenizer(),
             NLTKNamedEntityRecognizer(),
             GraphRulesCharacterUnifier(),
             CoOccurrencesGraphExtractor(co_occurrences_dist=25),
-        ]
+        ],
+        **default_pipeline_kwargs,  # type: ignore
     )
-    user_state[request.session_hash] = UserState(default_pipeline, [])
+    user_state[request.session_hash] = UserState(
+        default_pipeline, default_pipeline_kwargs, []
+    )
 
 
 def free_pipeline_(request: gr.Request):
@@ -122,21 +148,27 @@ def get_viridis_hex(value: float, min_value: float, max_value: float) -> str:
     return matplotlib.colors.to_hex(color)
 
 
-def update_pipeline(
+def update_pipeline_if_necessary(
     state: UserState,
+    pipeline_kwargs: dict[str, Any],
     step_builders: list[PipelineStepBuilder],
     step_kwargs: list[dict[str, Any]],
 ):
     step_names = [b.name() for b in step_builders]
     pipeline_names = [step.__class__.__name__ for step in state.pipeline.steps]
-    if step_names == pipeline_names and step_kwargs == state.last_run_kwargs:
+    if (
+        pipeline_kwargs == state.pipeline_kwargs
+        and step_names == pipeline_names
+        and step_kwargs == state.last_run_step_kwargs
+    ):
         return state.pipeline
 
     pipeline = Pipeline(
         [
             builder.make_step(kwargs)
             for builder, kwargs in zip(step_builders, step_kwargs)
-        ]
+        ],
+        **pipeline_kwargs,
     )
     return pipeline
 
@@ -144,6 +176,7 @@ def update_pipeline(
 def run_pipeline(
     request: gr.Request,
     text: str,
+    pipeline_kwargs: dict[str, Any],
     tokenization_step: str,
     tokenization_kwargs: dict[str, Any],
     ner_step: str,
@@ -156,28 +189,31 @@ def run_pipeline(
     global user_state
     assert request.session_hash
     pipeline = user_state[request.session_hash]
-    kwargs = [
+    step_kwargs = [
         tokenization_kwargs,
         ner_kwargs,
         character_unification_kwargs,
         graph_extraction_kwargs,
     ]
-    pipeline = update_pipeline(
+    pipeline = update_pipeline_if_necessary(
         pipeline,
+        pipeline_kwargs,
         [
-            select_step_builder(tokenization_step_builders, tokenization_step),
-            select_step_builder(ner_step_builders, ner_step),
-            select_step_builder(
-                character_unification_step_builders, character_unification_step
-            ),
-            select_step_builder(graph_extraction_step_builder, graph_extraction_step),
+            tok_step_builders[tokenization_step],
+            ner_step_builders[ner_step],
+            cu_step_builders[character_unification_step],
+            ge_step_builders[graph_extraction_step],
         ],
-        kwargs,
+        step_kwargs,
     )
     user_state[request.session_hash].pipeline = pipeline
-    user_state[request.session_hash].last_run_kwargs = kwargs
+    user_state[request.session_hash].pipeline_kwargs = pipeline_kwargs
+    user_state[request.session_hash].last_run_step_kwargs = step_kwargs
 
-    out = pipeline(text)
+    try:
+        out = pipeline(text)
+    except Exception as e:
+        raise gr.Error(str(e))
     assert not out.characters is None
     assert not out.character_network is None
     assert isinstance(out.character_network, nx.Graph)
@@ -230,7 +266,8 @@ def run_pipeline(
 
 
 def render_kwargs_(step_builder: PipelineStepBuilder, kwargs: gr.State):
-    def set_kwargs(kwargs: dict, name: str, value: Any):
+    def set_kwargs(kwargs: dict, name: str, value: Any) -> dict:
+        print(f"set {step_builder.name()}.{name} to {value}")
         return {**kwargs, name: value}
 
     for name, (typ, default) in step_builder.kwargs.items():
@@ -263,17 +300,16 @@ with gr.Blocks(title="Renard") as demo:
                     with gr.Accordion("Click to expand", open=False):
                         tok_kwargs = gr.State({})
                         tok_ddown = gr.Dropdown(
-                            [s.name() for s in tokenization_step_builders],
-                            value=tokenization_step_builders[0].name(),
+                            [name for name in tok_step_builders],
+                            value=list(tok_step_builders.keys())[0],
                             label="Tokenization step",
                         )
                         tok_ddown.change(lambda: {}, [], [tok_kwargs])
 
                         @gr.render(inputs=tok_ddown)
                         def render_tok_kwargs(tok_step: str):
-                            step_builder = select_step_builder(
-                                tokenization_step_builders, tok_step
-                            )
+                            print(f"set tokenization step to {tok_step}")
+                            step_builder = tok_step_builders[tok_step]
                             gr.Markdown(step_builder.description)
                             render_kwargs_(step_builder, tok_kwargs)
 
@@ -282,17 +318,16 @@ with gr.Blocks(title="Renard") as demo:
                     with gr.Accordion("Click to expand", open=False):
                         ner_kwargs = gr.State({})
                         ner_ddown = gr.Dropdown(
-                            [s.name() for s in ner_step_builders],
-                            value=ner_step_builders[0].name,
+                            [name for name in ner_step_builders.keys()],
+                            value=list(ner_step_builders.keys())[0],
                             label="NER step",
                         )
                         ner_ddown.change(lambda: {}, [], [ner_kwargs])
 
                         @gr.render(inputs=ner_ddown)
                         def render_ner_kwargs(ner_step: str):
-                            ner_builder = select_step_builder(
-                                ner_step_builders, ner_step
-                            )
+                            print(f"set NER step to {ner_step}")
+                            ner_builder = ner_step_builders[ner_step]
                             gr.Markdown(ner_builder.description)
                             render_kwargs_(ner_builder, ner_kwargs)
 
@@ -301,17 +336,16 @@ with gr.Blocks(title="Renard") as demo:
                     with gr.Accordion("Click to expand", open=False):
                         cu_kwargs = gr.State({})
                         cu_ddown = gr.Dropdown(
-                            [s.name() for s in character_unification_step_builders],
-                            value=character_unification_step_builders[0].name(),
+                            [name for name in cu_step_builders.keys()],
+                            value=list(cu_step_builders.keys())[0],
                             label="Character unification step",
                         )
                         cu_ddown.change(lambda: {}, [], [cu_kwargs])
 
                         @gr.render(inputs=cu_ddown)
                         def render_cu_kwargs(cu_step: str):
-                            step_builder = select_step_builder(
-                                character_unification_step_builders, cu_step
-                            )
+                            print(f"set character unification step to {cu_step}")
+                            step_builder = cu_step_builders[cu_step]
                             gr.Markdown(step_builder.description)
                             render_kwargs_(step_builder, cu_kwargs)
 
@@ -320,22 +354,86 @@ with gr.Blocks(title="Renard") as demo:
                     with gr.Accordion("Click to expand", open=False):
                         ge_kwargs = gr.State({})
                         ge_ddown = gr.Dropdown(
-                            [s.name() for s in graph_extraction_step_builder],
-                            value=graph_extraction_step_builder[0].name(),
+                            [name for name in ge_step_builders.keys()],
+                            value=list(ge_step_builders.keys())[0],
                             label="Graph extraction step",
                         )
                         ge_ddown.change(lambda: {}, [], [ge_kwargs])
 
                         @gr.render(inputs=ge_ddown)
                         def render_ge_kwargs(ge_step: str):
-                            step_builder = select_step_builder(
-                                graph_extraction_step_builder, ge_step
-                            )
+                            print(f"set graph extraction step to {ge_step}")
+                            step_builder = ge_step_builders[ge_step]
                             gr.Markdown(step_builder.description)
                             render_kwargs_(step_builder, ge_kwargs)
 
+                with gr.Group():
+                    gr.Markdown("## Pipeline Parameters")
+                    with gr.Accordion("Click to expand", open=False):
+                        pipeline_kwargs = gr.State({})
+
+                        def set_pipeline_kwargs(
+                            kwargs: dict,
+                            name: str,
+                            value: Any,
+                            tok_step: str,
+                            ner_step: str,
+                            cu_step: str,
+                            ge_step: str,
+                        ) -> tuple[dict, str, str, str, str]:
+                            new_kwargs = {**kwargs, name: value}
+                            print(f"set {name} to {value}")
+                            builder_names = [tok_step, ner_step, cu_step, ge_step]
+                            if name == "lang":
+                                return (
+                                    new_kwargs,
+                                    update_step_builder_for_lang(
+                                        tok_step_builders[tok_step],
+                                        list(tok_step_builders.values()),
+                                        value,
+                                    ).name(),
+                                    update_step_builder_for_lang(
+                                        ner_step_builders[ner_step],
+                                        list(ner_step_builders.values()),
+                                        value,
+                                    ).name(),
+                                    update_step_builder_for_lang(
+                                        cu_step_builders[cu_step],
+                                        list(cu_step_builders.values()),
+                                        value,
+                                    ).name(),
+                                    update_step_builder_for_lang(
+                                        ge_step_builders[ge_step],
+                                        list(ge_step_builders.values()),
+                                        value,
+                                    ).name(),
+                                )
+                            return new_kwargs, tok_step, ner_step, cu_step, ge_step
+
+                        lang_ddown = gr.Dropdown(
+                            ["eng", "fra"], value="eng", label="Language"
+                        )
+                        lang_ddown.change(
+                            set_pipeline_kwargs,
+                            [
+                                pipeline_kwargs,
+                                gr.State("lang"),
+                                lang_ddown,
+                                tok_ddown,
+                                ner_ddown,
+                                cu_ddown,
+                                ge_ddown,
+                            ],
+                            [
+                                pipeline_kwargs,
+                                tok_ddown,
+                                ner_ddown,
+                                cu_ddown,
+                                ge_ddown,
+                            ],
+                        )
+
             with gr.Column(scale=3):
-                # TODO: pipeline level parameter like 'lang'
                 input_text = gr.State()
                 input_text_radio = gr.Radio(
                     choices=["Predefined Example", "Raw text", "Upload .txt file"],
@@ -396,6 +494,7 @@ with gr.Blocks(title="Renard") as demo:
             fn=run_pipeline,
             inputs=[
                 input_text,
+                pipeline_kwargs,
                 tok_ddown,
                 tok_kwargs,
                 ner_ddown,
