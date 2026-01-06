@@ -26,16 +26,12 @@ from sklearn.metrics import precision_recall_fscore_support
 #: (subject, relation, object)
 Relation = tuple[Character, str, Character]
 
-seq2seq_special_tokens = ["<triplet>", "<subj>", "<rel>", "<obj>", "</triplet>"]
-
 
 def _load_ARF_line(example: dict, tokenizer: PreTrainedTokenizerFast) -> BatchEncoding:
     relations = ast.literal_eval(example["relations"] or "[]")
 
     def format_rel(rel: dict) -> str:
-        return "<triplet> <subj> {} <rel> {} <obj> {} </triplet>".format(
-            rel["entity1"], rel["relation"], rel["entity2"]
-        )
+        return "({}, {}, {})".format(rel["entity1"], rel["relation"], rel["entity2"])
 
     labels = " ".join(map(format_rel, relations))
 
@@ -108,7 +104,6 @@ def train_model_on_ARF(
     assert not tokenizer is None
     tokenizer.pad_token = tokenizer.eos_token
     pad_token_i = tokenizer.encode(tokenizer.pad_token)[0]
-    tokenizer.add_special_tokens({"additional_special_tokens": seq2seq_special_tokens})
 
     dataset = load_ARF_dataset(tokenizer)
 
@@ -207,12 +202,12 @@ class GenerativeRelationExtractor(PipelineStep):
 
     @staticmethod
     def task_prompt(text: str) -> str:
-        return f"Extract relations from the given text: {text}"
+        return f"Extract triplets (subject, relation, object) from the given text: '{text}'"
 
     @staticmethod
     def parse_text_relations(text_relations: str) -> list[tuple[str, str, str]]:
         triplets = re.findall(
-            r"<triplet> ?<subj>([^<]+)<rel>([^<]+)<obj>([^<]+)</triplet>",
+            r"\(([^,]+), ?([^,]+), ?([^,]+)\)",
             text_relations,
         )
         triplets = [
