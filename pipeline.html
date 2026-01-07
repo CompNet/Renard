@@ -56,6 +56,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#quote-detection">Quote Detection</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#sentiment-analysis">Sentiment Analysis</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#characters-extraction">Characters Extraction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#relation-extraction">Relation Extraction</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#speaker-attribution">Speaker Attribution</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#graph-extraction">Graph Extraction</a></li>
 </ul>
@@ -160,17 +161,21 @@ exception:</p>
 </pre></div>
 </div>
 <p>For simplicity, one can use one of the preconfigured pipelines:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">renard.pipeline.preconfigured</span><span class="w"> </span><span class="kn">import</span> <span class="n">bert_pipeline</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">renard.pipeline.preconfigured</span><span class="w"> </span><span class="kn">import</span> <span class="n">co_occurence_pipeline</span>
 
 <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;./my_doc.txt&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
     <span class="n">text</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
 
-<span class="n">pipeline</span> <span class="o">=</span> <span class="n">bert_pipeline</span><span class="p">(</span>
-    <span class="n">graph_extractor_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;co_occurrences_dist&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;sentences&quot;</span><span class="p">)}</span>
-<span class="p">)</span>
+<span class="n">pipeline</span> <span class="o">=</span> <span class="n">co_occurrence_pipeline</span><span class="p">()</span>
 <span class="n">out</span> <span class="o">=</span> <span class="n">pipeline</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
 </pre></div>
 </div>
+<p>The following preconfigured pipelines are available:</p>
+<ul class="simple">
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">co_occurrence_pipeline()</span></code></p></li>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">conversational_pipeline()</span></code></p></li>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">relational_pipeline()</span></code></p></li>
+</ul>
 <section id="pipeline-output-the-pipeline-state">
 <h2>Pipeline Output: the Pipeline State<a class="headerlink" href="#pipeline-output-the-pipeline-state" title="Link to this heading"></a></h2>
 <p>The <a class="reference internal" href="reference.html#renard.pipeline.core.PipelineState" title="renard.pipeline.core.PipelineState"><code class="xref py py-class docutils literal notranslate"><span class="pre">PipelineState</span></code></a> represents a state that is propagated and
@@ -215,7 +220,7 @@ substitutions in the text.</p>
 <p>Tokenization is the task of cutting text in <em>tokens</em>. It is usually
 the first task to apply to a text. 2 tokenizer are available:</p>
 <ul class="simple">
-<li><p><a class="reference internal" href="reference.html#renard.pipeline.tokenization.NLTKTokenizer" title="renard.pipeline.tokenization.NLTKTokenizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">NLTKTokenizer</span></code></a></p></li>
+<li><p><a class="reference internal" href="reference.html#renard.pipeline.tokenization.NLTKTokenizer" title="renard.pipeline.tokenization.NLTKTokenizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">NLTKTokenizer</span></code></a> is the tokenizer from NLTK.</p></li>
 <li><p><a class="reference internal" href="reference.html#renard.pipeline.stanford_corenlp.StanfordCoreNLPPipeline" title="renard.pipeline.stanford_corenlp.StanfordCoreNLPPipeline"><code class="xref py py-class docutils literal notranslate"><span class="pre">StanfordCoreNLPPipeline</span></code></a> does contain a tokenizer as part
 of its full NLP pipeline.</p></li>
 </ul>
@@ -225,8 +230,10 @@ of its full NLP pipeline.</p></li>
 <p>Named entity recognition (NER) detects entities occurences in the
 text. 3 modules are available:</p>
 <ul class="simple">
-<li><p><a class="reference internal" href="reference.html#renard.pipeline.ner.NLTKNamedEntityRecognizer" title="renard.pipeline.ner.NLTKNamedEntityRecognizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">NLTKNamedEntityRecognizer</span></code></a></p></li>
-<li><p><a class="reference internal" href="reference.html#renard.pipeline.ner.BertNamedEntityRecognizer" title="renard.pipeline.ner.BertNamedEntityRecognizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">BertNamedEntityRecognizer</span></code></a></p></li>
+<li><p><a class="reference internal" href="reference.html#renard.pipeline.ner.NLTKNamedEntityRecognizer" title="renard.pipeline.ner.NLTKNamedEntityRecognizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">NLTKNamedEntityRecognizer</span></code></a> is a lightweight NER module from
+NLTK, based on POS tagging and rules.</p></li>
+<li><p><a class="reference internal" href="reference.html#renard.pipeline.ner.BertNamedEntityRecognizer" title="renard.pipeline.ner.BertNamedEntityRecognizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">BertNamedEntityRecognizer</span></code></a> is a NER module employing a
+finetuned BERT model.</p></li>
 <li><p><a class="reference internal" href="reference.html#renard.pipeline.stanford_corenlp.StanfordCoreNLPPipeline" title="renard.pipeline.stanford_corenlp.StanfordCoreNLPPipeline"><code class="xref py py-class docutils literal notranslate"><span class="pre">StanfordCoreNLPPipeline</span></code></a> contains a NER model as part of
 its full NLP pipeline.</p></li>
 </ul>
@@ -234,7 +241,8 @@ its full NLP pipeline.</p></li>
 <section id="coreference-resolution">
 <h3>Coreference Resolution<a class="headerlink" href="#coreference-resolution" title="Link to this heading"></a></h3>
 <ul class="simple">
-<li><p><a class="reference internal" href="reference.html#renard.pipeline.corefs.SpacyCorefereeCoreferenceResolver" title="renard.pipeline.corefs.SpacyCorefereeCoreferenceResolver"><code class="xref py py-class docutils literal notranslate"><span class="pre">SpacyCorefereeCoreferenceResolver</span></code></a></p></li>
+<li><p><a class="reference internal" href="reference.html#renard.pipeline.corefs.SpacyCorefereeCoreferenceResolver" title="renard.pipeline.corefs.SpacyCorefereeCoreferenceResolver"><code class="xref py py-class docutils literal notranslate"><span class="pre">SpacyCorefereeCoreferenceResolver</span></code></a> uses the spacy coreferee
+module.</p></li>
 <li><p><a class="reference internal" href="reference.html#renard.pipeline.corefs.BertCoreferenceResolver" title="renard.pipeline.corefs.BertCoreferenceResolver"><code class="xref py py-class docutils literal notranslate"><span class="pre">BertCoreferenceResolver</span></code></a>, using the Tibert library.</p></li>
 <li><p><a class="reference internal" href="reference.html#renard.pipeline.stanford_corenlp.StanfordCoreNLPPipeline" title="renard.pipeline.stanford_corenlp.StanfordCoreNLPPipeline"><code class="xref py py-class docutils literal notranslate"><span class="pre">StanfordCoreNLPPipeline</span></code></a> can execute a coreference
 resolution model as part of its pipeline.</p></li>
@@ -243,14 +251,14 @@ resolution model as part of its pipeline.</p></li>
 <section id="quote-detection">
 <h3>Quote Detection<a class="headerlink" href="#quote-detection" title="Link to this heading"></a></h3>
 <ul class="simple">
-<li><p><a class="reference internal" href="reference.html#renard.pipeline.quote_detection.QuoteDetector" title="renard.pipeline.quote_detection.QuoteDetector"><code class="xref py py-class docutils literal notranslate"><span class="pre">QuoteDetector</span></code></a></p></li>
+<li><p><a class="reference internal" href="reference.html#renard.pipeline.quote_detection.QuoteDetector" title="renard.pipeline.quote_detection.QuoteDetector"><code class="xref py py-class docutils literal notranslate"><span class="pre">QuoteDetector</span></code></a> detect quotes using simple logic.</p></li>
 </ul>
 </section>
 <section id="sentiment-analysis">
 <h3>Sentiment Analysis<a class="headerlink" href="#sentiment-analysis" title="Link to this heading"></a></h3>
 <ul class="simple">
 <li><p><a class="reference internal" href="reference.html#renard.pipeline.sentiment_analysis.NLTKSentimentAnalyzer" title="renard.pipeline.sentiment_analysis.NLTKSentimentAnalyzer"><code class="xref py py-class docutils literal notranslate"><span class="pre">NLTKSentimentAnalyzer</span></code></a> leverages NLTK’s Vader for sentiment
-analysis</p></li>
+analysis.</p></li>
 </ul>
 </section>
 <section id="characters-extraction">
@@ -259,21 +267,36 @@ analysis</p></li>
 occurences detected using NER. This is done by assigning each mention
 to a unique character.</p>
 <ul class="simple">
-<li><p><a class="reference internal" href="reference.html#renard.pipeline.character_unification.NaiveCharacterUnifier" title="renard.pipeline.character_unification.NaiveCharacterUnifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">NaiveCharacterUnifier</span></code></a></p></li>
-<li><p><a class="reference internal" href="reference.html#renard.pipeline.character_unification.GraphRulesCharacterUnifier" title="renard.pipeline.character_unification.GraphRulesCharacterUnifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">GraphRulesCharacterUnifier</span></code></a></p></li>
+<li><p><a class="reference internal" href="reference.html#renard.pipeline.character_unification.NaiveCharacterUnifier" title="renard.pipeline.character_unification.NaiveCharacterUnifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">NaiveCharacterUnifier</span></code></a> assigns each mention with a unique
+form to a character.</p></li>
+<li><p><a class="reference internal" href="reference.html#renard.pipeline.character_unification.GraphRulesCharacterUnifier" title="renard.pipeline.character_unification.GraphRulesCharacterUnifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">GraphRulesCharacterUnifier</span></code></a> uses a set of rules to assign
+each mention to a character.</p></li>
+</ul>
+</section>
+<section id="relation-extraction">
+<h3>Relation Extraction<a class="headerlink" href="#relation-extraction" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><code class="xref py py-class docutils literal notranslate"><span class="pre">GenerativeRelationExtractor</span></code> is currently in development
+and should not be used.</p></li>
 </ul>
 </section>
 <section id="speaker-attribution">
 <h3>Speaker Attribution<a class="headerlink" href="#speaker-attribution" title="Link to this heading"></a></h3>
 <ul class="simple">
-<li><p><a class="reference internal" href="reference.html#renard.pipeline.speaker_attribution.BertSpeakerDetector" title="renard.pipeline.speaker_attribution.BertSpeakerDetector"><code class="xref py py-class docutils literal notranslate"><span class="pre">BertSpeakerDetector</span></code></a></p></li>
+<li><p><a class="reference internal" href="reference.html#renard.pipeline.speaker_attribution.BertSpeakerDetector" title="renard.pipeline.speaker_attribution.BertSpeakerDetector"><code class="xref py py-class docutils literal notranslate"><span class="pre">BertSpeakerDetector</span></code></a> detects speaker using a finetuned BERT
+model.</p></li>
 </ul>
 </section>
 <section id="graph-extraction">
 <h3>Graph Extraction<a class="headerlink" href="#graph-extraction" title="Link to this heading"></a></h3>
 <ul class="simple">
-<li><p><a class="reference internal" href="reference.html#renard.pipeline.graph_extraction.CoOccurrencesGraphExtractor" title="renard.pipeline.graph_extraction.CoOccurrencesGraphExtractor"><code class="xref py py-class docutils literal notranslate"><span class="pre">CoOccurrencesGraphExtractor</span></code></a></p></li>
-<li><p><a class="reference internal" href="reference.html#renard.pipeline.graph_extraction.ConversationalGraphExtractor" title="renard.pipeline.graph_extraction.ConversationalGraphExtractor"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConversationalGraphExtractor</span></code></a></p></li>
+<li><p><a class="reference internal" href="reference.html#renard.pipeline.graph_extraction.CoOccurrencesGraphExtractor" title="renard.pipeline.graph_extraction.CoOccurrencesGraphExtractor"><code class="xref py py-class docutils literal notranslate"><span class="pre">CoOccurrencesGraphExtractor</span></code></a> extracts a graph of
+co-occurrence between characters.</p></li>
+<li><p><a class="reference internal" href="reference.html#renard.pipeline.graph_extraction.ConversationalGraphExtractor" title="renard.pipeline.graph_extraction.ConversationalGraphExtractor"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConversationalGraphExtractor</span></code></a> extracts a conversational
+graph: either conversation between characters, or of character
+mentions.</p></li>
+<li><p><code class="xref py py-class docutils literal notranslate"><span class="pre">RelationalGraphExtractor</span></code> extracts a relational graph,
+where the relation between each character is typed.</p></li>
 </ul>
 </section>
 </section>
@@ -313,8 +336,9 @@ time. In Renard, such graphs are representend by a <code class="docutils literal
 <span class="go">[&lt;networkx.classes.graph.Graph object at 0x7fd9e9115900&gt;]</span>
 </pre></div>
 </div>
-<p>See <a class="reference internal" href="reference.html#renard.pipeline.graph_extraction.CoOccurrencesGraphExtractor" title="renard.pipeline.graph_extraction.CoOccurrencesGraphExtractor"><code class="xref py py-class docutils literal notranslate"><span class="pre">CoOccurrencesGraphExtractor</span></code></a> for more details on the
-usage of the <code class="docutils literal notranslate"><span class="pre">dynamic</span></code> and <code class="docutils literal notranslate"><span class="pre">dynamic_window</span></code> arguments.</p>
+<p>Both <a class="reference internal" href="reference.html#renard.pipeline.graph_extraction.CoOccurrencesGraphExtractor" title="renard.pipeline.graph_extraction.CoOccurrencesGraphExtractor"><code class="xref py py-class docutils literal notranslate"><span class="pre">CoOccurrencesGraphExtractor</span></code></a> and
+<a class="reference internal" href="reference.html#renard.pipeline.graph_extraction.ConversationalGraphExtractor" title="renard.pipeline.graph_extraction.ConversationalGraphExtractor"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConversationalGraphExtractor</span></code></a> support dynamic networks. See
+their documentation for more details.</p>
 <p>Plot and export functions work as one would expect
 intuitively. <a class="reference internal" href="reference.html#renard.pipeline.core.PipelineState.plot_graph" title="renard.pipeline.core.PipelineState.plot_graph"><code class="xref py py-meth docutils literal notranslate"><span class="pre">PipelineState.plot_graph()</span></code></a> allow to visualize the
 dynamic graph using a slider, and
@@ -324,10 +348,9 @@ graph to a directory. Meanwhile,
 dynamic graph to the Gephi format.</p>
 <section id="custom-segmentation">
 <h3>Custom Segmentation<a class="headerlink" href="#custom-segmentation" title="Link to this heading"></a></h3>
-<p>The <code class="docutils literal notranslate"><span class="pre">dynamic_window</span></code> parameter of
-<code class="xref py py-class docutils literal notranslate"><span class="pre">CoOccurencesGraphExtractor</span></code> determines the segmentation of
-the dynamic networks, in number of interactions. In the example above,
-a new graph will be created for each 20 interactions.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">dynamic_window</span></code> parameter determines the segmentation of the
+dynamic networks, in number of interactions. In the example above, a
+new graph will be created for each 20 interactions.</p>
 <p>While one can rely on the arguments of the graph extractor of the
 pipeline to determine the dynamic window, Renard allows to specify a
 custom segmentation of a text with the <code class="docutils literal notranslate"><span class="pre">dynamic_blocks</span></code>
