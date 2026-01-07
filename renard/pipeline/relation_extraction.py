@@ -94,9 +94,9 @@ def _triple_precision_recall_f1(
 
 
 def train_model_on_ARF(
-    model: str | PreTrainedModel,
+    model: Union[str, PreTrainedModel],
     targs: TrainingArguments,
-    tokenizer: PreTrainedTokenizerFast | None = None,
+    tokenizer: Union[PreTrainedTokenizerFast, None] = None,
 ) -> PreTrainedModel:
     if isinstance(model, str):
         assert tokenizer is None
