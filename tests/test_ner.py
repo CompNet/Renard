@@ -18,7 +18,7 @@ from renard.pipeline.ner.retrieval import (
 
 
 @pytest.mark.skipif(
-    os.getenv("RENARD_TEST_SEQEVAL_OPTDEP") != "1",
+    os.getenv("RENARD_TEST_OPTDEP_SEQEVAL") != "1",
     reason="not testing seqeval based functions",
 )
 @given(lists(sampled_from(("B-PER", "I-PER", "O")), min_size=1))
@@ -34,7 +34,7 @@ def test_has_correct_number_of_entities(tokens: List[str]):
     assert len(entities) == len(tokens)
 
 
-@pytest.mark.skipif(os.getenv("RENARD_TEST_ALL") != "1", reason="performance")
+@pytest.mark.skipif(os.getenv("RENARD_TEST_SLOW") != "1", reason="performance")
 @pytest.mark.parametrize(
     "retriever_class", [NERSamenounContextRetriever, NERBM25ContextRetriever]
 )
@@ -53,7 +53,7 @@ def test_retrieves_context(retriever_class: Type[NERContextRetriever]):
     assert len(ctx_dataset._context_mask) == len(sentences)
 
 
-@pytest.mark.skipif(os.getenv("RENARD_TEST_ALL") != "1", reason="performance")
+@pytest.mark.skipif(os.getenv("RENARD_TEST_SLOW") != "1", reason="performance")
 def test_neural_retrieves_context():
     context_retriever = NERNeuralContextRetriever(
         NEREnsembleContextRetriever(

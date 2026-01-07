@@ -75,15 +75,20 @@ For simplicity, one can use one of the preconfigured pipelines:
 
 .. code-block:: python
 
-   from renard.pipeline.preconfigured import bert_pipeline
+   from renard.pipeline.preconfigured import co_occurence_pipeline
 
    with open("./my_doc.txt") as f:
        text = f.read()
 
-   pipeline = bert_pipeline(
-       graph_extractor_kwargs={"co_occurrences_dist": (1, "sentences")}
-   )
+   pipeline = co_occurrence_pipeline()
    out = pipeline(text)
+
+
+The following preconfigured pipelines are available:
+
+- :func:`.co_occurrence_pipeline`
+- :func:`.conversational_pipeline`
+- :func:`.relational_pipeline`
 
 
 Pipeline Output: the Pipeline State
@@ -137,7 +142,7 @@ Tokenization
 Tokenization is the task of cutting text in *tokens*. It is usually
 the first task to apply to a text. 2 tokenizer are available:
 
-- :class:`.NLTKTokenizer`
+- :class:`.NLTKTokenizer` is the tokenizer from NLTK.
 - :class:`.StanfordCoreNLPPipeline` does contain a tokenizer as part
   of its full NLP pipeline.
 
@@ -148,8 +153,10 @@ Named Entity Recognition
 Named entity recognition (NER) detects entities occurences in the
 text. 3 modules are available:
 
-- :class:`.NLTKNamedEntityRecognizer`
-- :class:`.BertNamedEntityRecognizer`
+- :class:`.NLTKNamedEntityRecognizer` is a lightweight NER module from
+  NLTK, based on POS tagging and rules.
+- :class:`.BertNamedEntityRecognizer` is a NER module employing a
+  finetuned BERT model.
 - :class:`.StanfordCoreNLPPipeline` contains a NER model as part of
   its full NLP pipeline.
 
@@ -157,7 +164,8 @@ text. 3 modules are available:
 Coreference Resolution
 ----------------------
 
-- :class:`.SpacyCorefereeCoreferenceResolver`
+- :class:`.SpacyCorefereeCoreferenceResolver` uses the spacy coreferee
+  module.
 - :class:`.BertCoreferenceResolver`, using the Tibert library.
 - :class:`.StanfordCoreNLPPipeline` can execute a coreference
   resolution model as part of its pipeline.
@@ -166,14 +174,14 @@ Coreference Resolution
 Quote Detection
 ---------------
 
-- :class:`.QuoteDetector`
+- :class:`.QuoteDetector` detect quotes using simple logic.
 
 
 Sentiment Analysis
 ------------------
 
 - :class:`.NLTKSentimentAnalyzer` leverages NLTK's Vader for sentiment
-  analysis
+  analysis.
 
 
 Characters Extraction
@@ -183,21 +191,36 @@ Characters extraction (or alias resolution) extract characters from
 occurences detected using NER. This is done by assigning each mention
 to a unique character.
 
-- :class:`.NaiveCharacterUnifier`
-- :class:`.GraphRulesCharacterUnifier`
+- :class:`.NaiveCharacterUnifier` assigns each mention with a unique
+  form to a character.
+- :class:`.GraphRulesCharacterUnifier` uses a set of rules to assign
+  each mention to a character.
+
+
+Relation Extraction
+-------------------
+
+- :class:`.GenerativeRelationExtractor` is currently in development
+  and should not be used.
 
 
 Speaker Attribution
 -------------------
 
-- :class:`.BertSpeakerDetector`
+- :class:`.BertSpeakerDetector` detects speaker using a finetuned BERT
+  model.
 
 
 Graph Extraction
 ----------------
 
-- :class:`.CoOccurrencesGraphExtractor`
-- :class:`.ConversationalGraphExtractor`
+- :class:`.CoOccurrencesGraphExtractor` extracts a graph of
+  co-occurrence between characters.
+- :class:`.ConversationalGraphExtractor` extracts a conversational
+  graph: either conversation between characters, or of character
+  mentions.
+- :class:`.RelationalGraphExtractor` extracts a relational graph,
+  where the relation between each character is typed.
 
 
 Dynamic Graphs
@@ -240,8 +263,9 @@ When executing the above block of code, the output attribute
 >>> out.character_network
 [<networkx.classes.graph.Graph object at 0x7fd9e9115900>]
 
-See :class:`.CoOccurrencesGraphExtractor` for more details on the
-usage of the ``dynamic`` and ``dynamic_window`` arguments.
+Both :class:`.CoOccurrencesGraphExtractor` and
+:class:`.ConversationalGraphExtractor` support dynamic networks. See
+their documentation for more details.
 
 Plot and export functions work as one would expect
 intuitively. :meth:`.PipelineState.plot_graph` allow to visualize the
@@ -255,10 +279,9 @@ dynamic graph to the Gephi format.
 Custom Segmentation
 -------------------
 
-The ``dynamic_window`` parameter of
-:class:`.CoOccurencesGraphExtractor` determines the segmentation of
-the dynamic networks, in number of interactions. In the example above,
-a new graph will be created for each 20 interactions.
+The ``dynamic_window`` parameter determines the segmentation of the
+dynamic networks, in number of interactions. In the example above, a
+new graph will be created for each 20 interactions.
 
 While one can rely on the arguments of the graph extractor of the
 pipeline to determine the dynamic window, Renard allows to specify a

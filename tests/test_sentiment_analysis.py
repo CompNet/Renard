@@ -8,7 +8,7 @@ def test_polarity():
     # text is not used, only sentences
     out_dict = sentiment_analyzer(sentences=[pos_sent, neg_sent])
 
-    pos_polarity = out_dict["sentences_polarities"][0]
-    neg_polarity = out_dict["sentences_polarities"][1]
+    pos_polarity = out_dict["sentence_polarities"][0]
+    neg_polarity = out_dict["sentence_polarities"][1]
     assert pos_polarity >= 0
     assert neg_polarity <= 0

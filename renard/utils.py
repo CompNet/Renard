@@ -84,7 +84,7 @@ def search_pattern(seq: Iterable[R], pattern: List[R]) -> List[int]:
 #:
 #: ([(block start, block end), ...], unit)
 #:
-#: see :func:`block_indices` to easily create `BlockBounds`
+#: see :func:`block_bounds` to easily create `BlockBounds`
 BlockBounds = Tuple[List[Tuple[int, int]], Literal["characters", "tokens"]]
 
 
@@ -132,3 +132,21 @@ def charbb2tokenbb(char_bb: BlockBounds, char2token: List[int]) -> BlockBounds:
     for char_block_start, char_block_end in char_bb[0]:
         tokens_blocks.append((char2token[char_block_start], char2token[char_block_end]))
     return (tokens_blocks, "tokens")
+
+
+def make_vocab(elements: list[T]) -> dict[T, int]:
+    """Create a vocabulary from a list of elements.
+
+    :return: a dictionary mapping each element to its index in the
+             vocabulary
+    """
+    vocab = {}
+    next_index = 0
+
+    for elt in elements:
+        vocab[elt] = vocab.get(elt, next_index)
+        elt_was_just_added = vocab[elt] == next_index
+        if elt_was_just_added:
+            next_index += 1
+
+    return vocab

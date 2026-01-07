@@ -9,11 +9,16 @@ Renard (Relationship Extraction from NARrative Documents) is a modular library f
 
 # Installation
 
-You can install the latest version using pip:
+Currently, Renard supports Python>=3.9,<=3.12. You can install the
+latest version using pip:
 
 > pip install renard-pipeline
 
-Currently, Renard supports Python>=3.9,<=3.12
+If you have a GPU, there are accelerated versions for Nvidia CUDA and
+AMD ROCm:
+
+> pip install renard-pipeline[cuda128]
+> pip install renard-pipeline[rocm63]
 
 
 # Documentation
@@ -67,7 +72,25 @@ see [the "Contributing" section of the documentation](https://compnet.github.io/
 
 > uv run python -m pytest tests
 
-Expensive tests are disabled by default. These can be run by setting the environment variable `RENARD_TEST_ALL` to `1`.
+Alternatively, the project Makefile has a test target:
+
+> make test
+
+Expensive tests are disabled by default. These can be run by setting the environment variable `RENARD_TEST_SLOW` to `1`.
+
+
+
+# Renard UI
+
+Since version 0.7, Renard has a web interface powered by gradio. First, install the additional dependencies:
+
+> uv sync --group ui
+
+Then, simply run:
+
+> make ui
+
+And open your browser at http://127.0.0.1:7860
 
 
 # How to cite

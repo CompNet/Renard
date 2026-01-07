@@ -1,6 +1,6 @@
 [project]
 name = "renard-pipeline"
-version = "0.6.5"
+version = "0.7.0"
 description = "Relationships Extraction from NARrative Documents"
 authors = [
     {name = "Arthur Amalvy", email = "arthur.amalvy@univ-avignon.fr"},
@@ -9,20 +9,23 @@ license = { text = "GPL-3.0-only" }
 readme = "README.md"
 requires-python = ">=3.9,<3.13"
 dependencies = [
-    "torch>=2.0.0,!=2.0.1",
-    "transformers>=4.37",
-    "nltk>=3.9",
-    "tqdm>=4.62",
-    "networkx>=3.0",
-    "more-itertools>=10.5",
-    "nameparser>=1.1",
-    "matplotlib>=3.5",
-    "pandas>=2.0",
-    "pytest>=8.3.0",
-    "tibert>=0.5",
-    "grimbert>=0.1",
-    "datasets>=3.0",
+    "torch>=2.7.0",
+    "transformers>=4.57.1",
+    "nltk>=3.9.1",
+    "tqdm>=4.67.1",
+    "networkx>=3.2",
+    "more-itertools>=10.7",
+    "nameparser>=1.1.3",
+    "matplotlib>=3.9",
+    "pytest>=8.4.1",
+    "tibert>=0.5.2",
+    "grimbert>=0.1.5",
+    "datasets>=4.0.0",
     "rank-bm25>=0.2.2",
+    "accelerate>=1.10.1",
+    "scikit-learn>=1.6.1",
+    "tiktoken>=0.12.0",
+    "protobuf>=6.33.2",
 ]
 
 [build-system]
@@ -44,3 +47,65 @@ dev = [
     "sphinx-rtd-theme>=1.0.0",
     "sphinx-autodoc-typehints>=1.12.0",
 ]
+
+[project.optional-dependencies]
+ui = [
+    "gradio>=4.44.1",
+    "pyvis>=0.3.2",
+]
+cpu = [
+  "torch>=2.7.1",
+]
+cuda128 = [
+  "torch>=2.7.1",
+]
+rocm63 = [
+  "torch>=2.7.1",
+  "pytorch-triton-rocm>=3.1.0", 
+]
+rocm64 = [
+  "torch>=2.7.1",
+  "pytorch-triton-rocm>=3.1.0", 
+]
+
+[tool.uv]
+conflicts = [
+  [
+    { extra = "cpu" },
+    { extra = "cuda128" },
+    { extra = "rocm63" },
+    { extra = "rocm64" },
+  ],
+]
+
+[tool.uv.sources]
+torch = [
+  { index = "pytorch-cpu", extra = "cpu" },
+  { index = "pytorch-cuda128", extra = "cuda128" },
+  { index = "pytorch-rocm63", extra = "rocm63" },
+  { index = "pytorch-rocm64", extra = "rocm64" },
+]
+pytorch-triton-rocm = [
+  { index = "pytorch-rocm63", extra = "rocm63" },
+  { index = "pytorch-rocm64", extra = "rocm64" },
+]
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[[tool.uv.index]]
+name = "pytorch-cuda128"
+url = "https://download.pytorch.org/whl/cu128"
+explicit = true
+
+[[tool.uv.index]]
+name = "pytorch-rocm63"
+url = "https://download.pytorch.org/whl/rocm6.3"
+explicit = true
+
+[[tool.uv.index]]
+name = "pytorch-rocm64"
+url = "https://download.pytorch.org/whl/rocm6.4"
+explicit = true

@@ -26,7 +26,7 @@ class NLTKSentimentAnalyzer(PipelineStep):
             # sentences in the pipeline as 'sentences', while
             # 'sentences_tokens' would replace the current 'sentences'
             # attribute.
-            "sentences_polarities": [
+            "sentence_polarities": [
                 self.sentiment_analyzer.polarity_scores(" ".join(s))["compound"]
                 for s in sentences
             ]
@@ -36,4 +36,4 @@ class NLTKSentimentAnalyzer(PipelineStep):
         return {"sentences"}
 
     def production(self) -> Set[str]:
-        return {"sentences_polarities"}
+        return {"sentence_polarities"}
