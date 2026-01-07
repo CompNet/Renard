@@ -1,6 +1,6 @@
 [project]
 name = "renard-pipeline"
-version = "0.6.5"
+version = "0.7.0"
 description = "Relationships Extraction from NARrative Documents"
 authors = [
     {name = "Arthur Amalvy", email = "arthur.amalvy@univ-avignon.fr"},
