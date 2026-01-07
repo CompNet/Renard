@@ -39,6 +39,7 @@ def _load_ARF_line(example: dict, tokenizer: PreTrainedTokenizerFast) -> BatchEn
     batch = tokenizer(
         tokenizer.bos_token + GenerativeRelationExtractor.task_prompt(text),
         text_target=labels + tokenizer.eos_token,
+        add_special_tokens=False,
     )
     batch["relations"] = relations
 
