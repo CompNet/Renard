@@ -136,6 +136,13 @@ def train_model_on_ARF(
 
 
 class GenerativeRelationExtractor(PipelineStep):
+    """
+
+    .. warning::
+
+        This extractor is in development and should not be used.
+    """
+
     DEFAULT_MODEL = "compnet-renard/t5-small-literary-relation-extraction"
 
     def __init__(

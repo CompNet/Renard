@@ -200,8 +200,8 @@ to a unique character.
 Relation Extraction
 -------------------
 
-- :class:`.GenerativeRelationExtractor` extracts relations between characters
-  using a finetuned T5 model.
+- :class:`.GenerativeRelationExtractor` is currently in development
+  and should not be used.
 
 
 Speaker Attribution
