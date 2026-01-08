@@ -84,11 +84,11 @@
 <h1>Installation<a class="headerlink" href="#installation" title="Link to this heading"></a></h1>
 <section id="using-pip">
 <h2>Using Pip<a class="headerlink" href="#using-pip" title="Link to this heading"></a></h2>
-<p>For the simplest case, use <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">renard-pipeline</span></code>. By default, this installs the CPU version of PyTorch. If you want GPU support to accelerate inference:</p>
-<ul class="simple">
-<li><p>CUDA 12.8: <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">renard-pipeline[cuda128]</span></code></p></li>
-<li><p>ROCm 6.3: <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">renard-pipeline[rocm63]</span></code></p></li>
-</ul>
+<p>For the simplest case, use <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">renard-pipeline</span></code>. By default, this installs the cuda version of PyTorch. For other versions:</p>
+<p>CPU only:
+<code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">torch</span> <span class="pre">--index-url</span> <span class="pre">https://download.pytorch.org/whl/cpu</span> <span class="pre">&amp;&amp;</span> <span class="pre">pip</span> <span class="pre">install</span> <span class="pre">renard-pipeline</span></code></p>
+<p>ROCM 6.4:
+<code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">torch</span> <span class="pre">--index-url</span> <span class="pre">https://download.pytorch.org/whl/rocm6.4</span> <span class="pre">&amp;&amp;</span> <span class="pre">pip</span> <span class="pre">install</span> <span class="pre">renard-pipeline</span></code></p>
 <p>Note that for some modules, you might need to install additional
 libraries:</p>
 <ul class="simple">
