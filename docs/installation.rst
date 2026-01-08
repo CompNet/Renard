@@ -5,10 +5,13 @@ Installation
 Using Pip
 =========
 
-For the simplest case, use ``pip install renard-pipeline``. By default, this installs the CPU version of PyTorch. If you want GPU support to accelerate inference:
+For the simplest case, use ``pip install renard-pipeline``. By default, this installs the cuda version of PyTorch. For other versions:
 
-- CUDA 12.8: ``pip install renard-pipeline[cuda128]``
-- ROCm 6.3: ``pip install renard-pipeline[rocm63]``
+CPU only: 
+``pip install torch --index-url https://download.pytorch.org/whl/cpu && pip install renard-pipeline``
+
+ROCM 6.4:
+``pip install torch --index-url https://download.pytorch.org/whl/rocm6.4 && pip install renard-pipeline``
 
 
 Note that for some modules, you might need to install additional
