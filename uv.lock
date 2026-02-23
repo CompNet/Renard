@@ -3229,7 +3229,7 @@ wheels = [
 
 [[package]]
 name = "renard-pipeline"
-version = "0.7.0"
+version = "0.7.1"
 source = { editable = "." }
 dependencies = [
     { name = "accelerate" },
@@ -4369,9 +4369,9 @@ dependencies = [
     { name = "typing-extensions", marker = "(python_full_version >= '3.10' and sys_platform == 'darwin' and extra == 'extra-15-renard-pipeline-cpu') or (python_full_version < '3.10' and extra == 'extra-15-renard-pipeline-cpu' and extra == 'extra-15-renard-pipeline-cuda128') or (python_full_version < '3.10' and extra == 'extra-15-renard-pipeline-cpu' and extra == 'extra-15-renard-pipeline-rocm63') or (python_full_version < '3.10' and extra == 'extra-15-renard-pipeline-cpu' and extra == 'extra-15-renard-pipeline-rocm64') or (python_full_version < '3.10' and extra == 'extra-15-renard-pipeline-cuda128' and extra == 'extra-15-renard-pipeline-rocm63') or (python_full_version < '3.10' and extra == 'extra-15-renard-pipeline-cuda128' and extra == 'extra-15-renard-pipeline-rocm64') or (python_full_version < '3.10' and extra == 'extra-15-renard-pipeline-rocm63' and extra == 'extra-15-renard-pipeline-rocm64') or (sys_platform != 'darwin' and extra == 'extra-15-renard-pipeline-cpu' and extra == 'extra-15-renard-pipeline-cuda128') or (sys_platform != 'darwin' and extra == 'extra-15-renard-pipeline-cpu' and extra == 'extra-15-renard-pipeline-rocm63') or (sys_platform != 'darwin' and extra == 'extra-15-renard-pipeline-cpu' and extra == 'extra-15-renard-pipeline-rocm64') or (sys_platform != 'darwin' and extra == 'extra-15-renard-pipeline-cuda128' and extra == 'extra-15-renard-pipeline-rocm63') or (sys_platform != 'darwin' and extra == 'extra-15-renard-pipeline-cuda128' and extra == 'extra-15-renard-pipeline-rocm64') or (sys_platform != 'darwin' and extra == 'extra-15-renard-pipeline-rocm63' and extra == 'extra-15-renard-pipeline-rocm64') or (extra != 'extra-15-renard-pipeline-cpu' and extra == 'extra-15-renard-pipeline-cuda128' and extra == 'extra-15-renard-pipeline-rocm63') or (extra != 'extra-15-renard-pipeline-cpu' and extra == 'extra-15-renard-pipeline-cuda128' and extra == 'extra-15-renard-pipeline-rocm64') or (extra != 'extra-15-renard-pipeline-cpu' and extra == 'extra-15-renard-pipeline-rocm63' and extra == 'extra-15-renard-pipeline-rocm64')" },
 ]
 wheels = [
-    { url = "https://download.pytorch.org/whl/cpu/torch-2.9.1-cp310-none-macosx_11_0_arm64.whl" },
-    { url = "https://download.pytorch.org/whl/cpu/torch-2.9.1-cp311-none-macosx_11_0_arm64.whl" },
-    { url = "https://download.pytorch.org/whl/cpu/torch-2.9.1-cp312-none-macosx_11_0_arm64.whl" },
+    { url = "https://download.pytorch.org/whl/cpu/torch-2.9.1-cp310-none-macosx_11_0_arm64.whl", hash = "sha256:bf1e68cfb935ae2046374ff02a7aa73dda70351b46342846f557055b3a540bf0" },
+    { url = "https://download.pytorch.org/whl/cpu/torch-2.9.1-cp311-none-macosx_11_0_arm64.whl", hash = "sha256:a52952a8c90a422c14627ea99b9826b7557203b46b4d0772d3ca5c7699692425" },
+    { url = "https://download.pytorch.org/whl/cpu/torch-2.9.1-cp312-none-macosx_11_0_arm64.whl", hash = "sha256:287242dd1f830846098b5eca847f817aa5c6015ea57ab4c1287809efea7b77eb" },
 ]
 
 [[package]]
@@ -4426,17 +4426,17 @@ dependencies = [
     { name = "typing-extensions", marker = "(python_full_version >= '3.10' and sys_platform != 'darwin' and extra == 'extra-15-renard-pipeline-cpu') or (python_full_version < '3.10' and extra == 'extra-15-renard-pipeline-cpu' and extra == 'extra-15-renard-pipeline-cuda128') or (python_full_version < '3.10' and extra == 'extra-15-renard-pipeline-cpu' and extra == 'extra-15-renard-pipeline-rocm63') or (python_full_version < '3.10' and extra == 'extra-15-renard-pipeline-cpu' and extra == 'extra-15-renard-pipeline-rocm64') or (python_full_version < '3.10' and extra == 'extra-15-renard-pipeline-cuda128' and extra == 'extra-15-renard-pipeline-rocm63') or (python_full_version < '3.10' and extra == 'extra-15-renard-pipeline-cuda128' and extra == 'extra-15-renard-pipeline-rocm64') or (python_full_version < '3.10' and extra == 'extra-15-renard-pipeline-rocm63' and extra == 'extra-15-renard-pipeline-rocm64') or (sys_platform == 'darwin' and extra == 'extra-15-renard-pipeline-cpu' and extra == 'extra-15-renard-pipeline-cuda128') or (sys_platform == 'darwin' and extra == 'extra-15-renard-pipeline-cpu' and extra == 'extra-15-renard-pipeline-rocm63') or (sys_platform == 'darwin' and extra == 'extra-15-renard-pipeline-cpu' and extra == 'extra-15-renard-pipeline-rocm64') or (extra != 'extra-15-renard-pipeline-cpu' and extra == 'extra-15-renard-pipeline-cuda128' and extra == 'extra-15-renard-pipeline-rocm63') or (extra != 'extra-15-renard-pipeline-cpu' and extra == 'extra-15-renard-pipeline-cuda128' and extra == 'extra-15-renard-pipeline-rocm64') or (extra != 'extra-15-renard-pipeline-cpu' and extra == 'extra-15-renard-pipeline-rocm63' and extra == 'extra-15-renard-pipeline-rocm64')" },
 ]
 wheels = [
-    { url = "https://download.pytorch.org/whl/cpu/torch-2.9.1%2Bcpu-cp310-cp310-manylinux_2_28_aarch64.whl" },
-    { url = "https://download.pytorch.org/whl/cpu/torch-2.9.1%2Bcpu-cp310-cp310-manylinux_2_28_x86_64.whl" },
-    { url = "https://download.pytorch.org/whl/cpu/torch-2.9.1%2Bcpu-cp310-cp310-win_amd64.whl" },
-    { url = "https://download.pytorch.org/whl/cpu/torch-2.9.1%2Bcpu-cp311-cp311-manylinux_2_28_aarch64.whl" },
-    { url = "https://download.pytorch.org/whl/cpu/torch-2.9.1%2Bcpu-cp311-cp311-manylinux_2_28_x86_64.whl" },
-    { url = "https://download.pytorch.org/whl/cpu/torch-2.9.1%2Bcpu-cp311-cp311-win_amd64.whl" },
-    { url = "https://download.pytorch.org/whl/cpu/torch-2.9.1%2Bcpu-cp311-cp311-win_arm64.whl" },
-    { url = "https://download.pytorch.org/whl/cpu/torch-2.9.1%2Bcpu-cp312-cp312-manylinux_2_28_aarch64.whl" },
-    { url = "https://download.pytorch.org/whl/cpu/torch-2.9.1%2Bcpu-cp312-cp312-manylinux_2_28_x86_64.whl" },
-    { url = "https://download.pytorch.org/whl/cpu/torch-2.9.1%2Bcpu-cp312-cp312-win_amd64.whl" },
-    { url = "https://download.pytorch.org/whl/cpu/torch-2.9.1%2Bcpu-cp312-cp312-win_arm64.whl" },
+    { url = "https://download.pytorch.org/whl/cpu/torch-2.9.1%2Bcpu-cp310-cp310-manylinux_2_28_aarch64.whl", hash = "sha256:10866c8a48c4aa5ae3f48538dc8a055b99c57d9c6af2bf5dd715374d9d6ddca3" },
+    { url = "https://download.pytorch.org/whl/cpu/torch-2.9.1%2Bcpu-cp310-cp310-manylinux_2_28_x86_64.whl", hash = "sha256:7210713b66943fdbfcc237b2e782871b649123ac5d29f548ce8c85be4223ab38" },
+    { url = "https://download.pytorch.org/whl/cpu/torch-2.9.1%2Bcpu-cp310-cp310-win_amd64.whl", hash = "sha256:d6e8441453dc27524e3f1037fbf27b90a02644b84e42944b9354b4024cb51cc1" },
+    { url = "https://download.pytorch.org/whl/cpu/torch-2.9.1%2Bcpu-cp311-cp311-manylinux_2_28_aarch64.whl", hash = "sha256:0e611cfb16724e62252b67d31073bc5c490cb83e92ecdc1192762535e0e44487" },
+    { url = "https://download.pytorch.org/whl/cpu/torch-2.9.1%2Bcpu-cp311-cp311-manylinux_2_28_x86_64.whl", hash = "sha256:3de2adb9b4443dc9210ef1f1b16da3647ace53553166d6360bbbd7edd6f16e4d" },
+    { url = "https://download.pytorch.org/whl/cpu/torch-2.9.1%2Bcpu-cp311-cp311-win_amd64.whl", hash = "sha256:69b3785d28be5a9c56ab525788ec5000349ec59132a74b7d5e954b905015b992" },
+    { url = "https://download.pytorch.org/whl/cpu/torch-2.9.1%2Bcpu-cp311-cp311-win_arm64.whl", hash = "sha256:15b4ae6fe371d96bffb8e1e9af62164797db20a0dc1337345781659cfd0b8bb1" },
+    { url = "https://download.pytorch.org/whl/cpu/torch-2.9.1%2Bcpu-cp312-cp312-manylinux_2_28_aarch64.whl", hash = "sha256:3bf9b442a51a2948e41216a76d7ab00f0694cfcaaa51b6f9bcab57b7f89843e6" },
+    { url = "https://download.pytorch.org/whl/cpu/torch-2.9.1%2Bcpu-cp312-cp312-manylinux_2_28_x86_64.whl", hash = "sha256:7417d8c565f219d3455654cb431c6d892a3eb40246055e14d645422de13b9ea1" },
+    { url = "https://download.pytorch.org/whl/cpu/torch-2.9.1%2Bcpu-cp312-cp312-win_amd64.whl", hash = "sha256:a4e06b4f441675d26b462123c8a83e77c55f1ec8ebc081203be2db1ea8054add" },
+    { url = "https://download.pytorch.org/whl/cpu/torch-2.9.1%2Bcpu-cp312-cp312-win_arm64.whl", hash = "sha256:1abe31f14b560c1f062699e966cb08ef5b67518a1cfac2d8547a3dbcd8387b06" },
 ]
 
 [[package]]
@@ -4459,9 +4459,9 @@ dependencies = [
     { name = "typing-extensions", marker = "(python_full_version >= '3.10' and extra == 'extra-15-renard-pipeline-rocm64') or (extra == 'extra-15-renard-pipeline-rocm63' and extra == 'extra-15-renard-pipeline-rocm64') or (extra == 'extra-15-renard-pipeline-cpu' and extra == 'extra-15-renard-pipeline-cuda128') or (extra == 'extra-15-renard-pipeline-cpu' and extra == 'extra-15-renard-pipeline-rocm63') or (extra == 'extra-15-renard-pipeline-cpu' and extra == 'extra-15-renard-pipeline-rocm64') or (extra == 'extra-15-renard-pipeline-cuda128' and extra == 'extra-15-renard-pipeline-rocm63') or (extra == 'extra-15-renard-pipeline-cuda128' and extra == 'extra-15-renard-pipeline-rocm64')" },
 ]
 wheels = [
-    { url = "https://download.pytorch.org/whl/rocm6.4/torch-2.9.1%2Brocm6.4-cp310-cp310-manylinux_2_28_x86_64.whl" },
-    { url = "https://download.pytorch.org/whl/rocm6.4/torch-2.9.1%2Brocm6.4-cp311-cp311-manylinux_2_28_x86_64.whl" },
-    { url = "https://download.pytorch.org/whl/rocm6.4/torch-2.9.1%2Brocm6.4-cp312-cp312-manylinux_2_28_x86_64.whl" },
+    { url = "https://download.pytorch.org/whl/rocm6.4/torch-2.9.1%2Brocm6.4-cp310-cp310-manylinux_2_28_x86_64.whl", hash = "sha256:879e2065c2493eca823c0037d2a70ee4a13f66146b3689395376ca728b743acc" },
+    { url = "https://download.pytorch.org/whl/rocm6.4/torch-2.9.1%2Brocm6.4-cp311-cp311-manylinux_2_28_x86_64.whl", hash = "sha256:5a4a6c10ee410fdff68a8102d9f53f836d755b2d1eb6502f2f2853794f31ed0a" },
+    { url = "https://download.pytorch.org/whl/rocm6.4/torch-2.9.1%2Brocm6.4-cp312-cp312-manylinux_2_28_x86_64.whl", hash = "sha256:43471c9e4520402b5feeebd6c6d180e8bf2314402925798fe219c32fecd1ef95" },
 ]
 
 [[package]]
