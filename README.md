@@ -16,13 +16,11 @@ latest version using pip:
 
 By default, this pulls the cuda version of pytorch. If you want a CPU-only version of torch you should do:
 
-> pip install torch --index-url https://download.pytorch.org/whl/cpu
-> pip install renard-pipeline
+> pip install torch --index-url https://download.pytorch.org/whl/cpu && pip install renard-pipeline
 
-For an AMD rocm version of torch:
+For an AMD rocm version of torch (ROCm 6.4):
 
-> pip install torch --index-url https://download.pytorch.org/whl/rocm6.4
-> pip install renard-pipeline
+> pip install torch --index-url https://download.pytorch.org/whl/rocm6.4 && pip install renard-pipeline
 
 
 # Documentation
