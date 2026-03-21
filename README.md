@@ -32,7 +32,7 @@ If you need local documentation, it can be generated using `Sphinx`. From the `d
 
 # Interactive Demo
 
-You can check the [interactive demo of Renard at HuggingFace](https://huggingface.co/spaces/compnet-renard/renard-demo). The UI used for the demo is currently in development and will be available directly in Renard in the next version.
+You can check the [interactive demo of Renard at HuggingFace](https://huggingface.co/spaces/compnet-renard/renard-demo). The demo uses the UI integrated in Renard.
 
 
 # Tutorial
