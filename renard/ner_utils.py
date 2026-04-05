@@ -236,6 +236,7 @@ def hgdataset_from_conll2002(
     tag_conversion_map: Optional[Dict[str, str]] = None,
     separator: str = "\t",
     max_sent_len: Optional[int] = None,
+    labels: Optional[list[str]] = None,
     **kwargs,
 ) -> HGDataset:
     """Load a CoNLL-2002 file as a Huggingface Dataset.
@@ -244,9 +245,13 @@ def hgdataset_from_conll2002(
     :param tag_conversion_map: passed to :func:`load_conll2002_bio`
     :param separator: passed to :func:`load_conll2002_bio`
     :param max_sent_len: passed to :func:`load_conll2002_bio`
+    :param labels: the list of all possible labels.  If ``None``, will
+        automatically be assigned to the sorted list of possible tags
+        found in the input file.
     :param kwargs: additional kwargs for :func:`open`
 
-    :return: a :class:`datasets.Dataset` with features 'tokens' and 'labels'.
+    :return: a :class:`datasets.Dataset` with features 'tokens' and
+             'labels'.
     """
     sentences, tokens, entities = load_conll2002_bio(
         path, tag_conversion_map, separator, max_sent_len, **kwargs
@@ -269,9 +274,9 @@ def hgdataset_from_conll2002(
     ]
 
     dataset = HGDataset.from_dict({"tokens": sentences, "labels": sent_tags})
-    dataset = dataset.cast_column(
-        "labels", Sequence(ClassLabel(names=sorted(set(tags))))
-    )
+    if labels is None:
+        labels = sorted(set(tags))
+    dataset = dataset.cast_column("labels", Sequence(ClassLabel(names=labels)))
     return dataset
 
 
