@@ -6,7 +6,7 @@ import functools as ft
 from more_itertools import flatten
 import torch
 from torch.utils.data import Dataset
-from datasets import Dataset as HGDataset, DatasetDict as HGDatasetDict
+from datasets import Dataset as HFDataset, DatasetDict as HFDatasetDict
 from datasets import Sequence, ClassLabel
 from transformers import (
     AutoModelForTokenClassification,
@@ -235,14 +235,14 @@ def load_conll2002_bio(
     return sents, list(flatten(sents)), entities
 
 
-def hgdataset_from_conll2002(
+def hfdataset_from_conll2002(
     path: str,
     tag_conversion_map: Optional[Dict[str, str]] = None,
     separator: str = "\t",
     max_sent_len: Optional[int] = None,
     labels: Optional[list[str]] = None,
     **kwargs,
-) -> HGDataset:
+) -> HFDataset:
     """Load a CoNLL-2002 file as a Huggingface Dataset.
 
     :param path: passed to :func:`.load_conll2002_bio`
@@ -277,11 +277,19 @@ def hgdataset_from_conll2002(
         for sent_start, sent_end in zip(sent_starts, sent_ends)
     ]
 
-    dataset = HGDataset.from_dict({"tokens": sentences, "labels": sent_tags})
+    dataset = HFDataset.from_dict({"tokens": sentences, "labels": sent_tags})
     if labels is None:
         labels = sorted(set(tags))
     dataset = dataset.cast_column("labels", Sequence(ClassLabel(names=labels)))
     return dataset
+
+
+def hgdataset_from_conll2002(**kwargs) -> HFDataset:
+    """
+    Deprecated function that only exists for retrocompatibility, you
+    should call :func:`.hfdataset_from_conll2002` instead.
+    """
+    return hfdataset_from_conll2002(**kwargs)
 
 
 def _tokenize_and_align_labels(
@@ -324,15 +332,15 @@ def _tokenize_and_align_labels(
 
 
 def train_ner_model(
-    hg_id: str,
-    dataset: Union[HGDataset, HGDatasetDict],
+    hf_id: str,
+    dataset: Union[HFDataset, HFDatasetDict],
     targs: TrainingArguments,
     train_split: str = "train",
     valid_split: str = "valid",
 ) -> PreTrainedModel:
     """Train a NER model on the given dataset.
 
-    :param hg_id: huggingface ID of the model to train
+    :param hf_id: huggingface ID of the model to train
     :param dataset: huggingface dataset on which to train.  The
         'labels' column is assumed to contain NER labels.
     :param TrainingArguments: training arguments for the huggingface
@@ -345,14 +353,14 @@ def train_ner_model(
     # BERT tokenizer splits tokens into subtokens. The
     # tokenize_and_align_labels function correctly aligns labels and
     # subtokens.
-    tokenizer = AutoTokenizer.from_pretrained(hg_id)
+    tokenizer = AutoTokenizer.from_pretrained(hf_id)
     dataset = dataset.map(
         ft.partial(_tokenize_and_align_labels, tokenizer=tokenizer), batched=True
     )
 
     label_lst = dataset[train_split].features["labels"].feature.names
     model = AutoModelForTokenClassification.from_pretrained(
-        hg_id,
+        hf_id,
         num_labels=len(label_lst),
         id2label={i: label for i, label in enumerate(label_lst)},
         label2id={label: i for i, label in enumerate(label_lst)},

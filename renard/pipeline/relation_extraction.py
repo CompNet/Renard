@@ -1,7 +1,7 @@
 from typing import Any, Union, Optional, Literal
 import ast, re
 import functools as ft
-from datasets import load_dataset, Dataset as HGDataset
+from datasets import load_dataset, Dataset as HFDataset
 import torch
 from transformers import (
     AutoModelForSeq2SeqLM,
@@ -12,7 +12,7 @@ from transformers import (
     DataCollatorForSeq2Seq,
     PreTrainedModel,
     EvalPrediction,
-    pipeline as hg_pipeline,
+    pipeline as hf_pipeline,
     BatchEncoding,
 )
 from more_itertools import flatten
@@ -46,7 +46,7 @@ def _load_ARF_line(example: dict, tokenizer: PreTrainedTokenizerFast) -> BatchEn
     return batch
 
 
-def load_ARF_dataset(tokenizer: PreTrainedTokenizerFast) -> HGDataset:
+def load_ARF_dataset(tokenizer: PreTrainedTokenizerFast) -> HFDataset:
     """
     Load the Artificial Relationships in Fiction dataset
     (https://huggingface.co/datasets/Despina/project_gutenberg) by
@@ -154,7 +154,7 @@ class GenerativeRelationExtractor(PipelineStep):
         self.model = (
             GenerativeRelationExtractor.DEFAULT_MODEL if model is None else model
         )
-        self.hg_pipeline = None
+        self.hf_pipeline = None
         self.batch_size = batch_size
         if device == "auto":
             self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -163,7 +163,7 @@ class GenerativeRelationExtractor(PipelineStep):
 
     def _pipeline_init_(self, lang: str, progress_reporter: ProgressReporter, **kwargs):
         super()._pipeline_init_(lang, progress_reporter, **kwargs)
-        self.hg_pipeline = hg_pipeline(
+        self.hf_pipeline = hf_pipeline(
             "text2text-generation",
             torch_dtype=torch.bfloat16,
             model=self.model,
@@ -173,19 +173,19 @@ class GenerativeRelationExtractor(PipelineStep):
     def __call__(
         self, sentences: list[list[str]], characters: list[Character], **kwargs
     ) -> dict[str, Any]:
-        assert not self.hg_pipeline is None
+        assert not self.hf_pipeline is None
 
         sentence_relations = []
 
         # chunk as in the ARF dataset
-        dataset = HGDataset.from_list(
+        dataset = HFDataset.from_list(
             [
                 {"text": GenerativeRelationExtractor.task_prompt(" ".join(sent))}
                 for sent in sentences
             ]
         )
         for out in self._progress_(
-            self.hg_pipeline(KeyDataset(dataset, "text"), batch_size=self.batch_size),
+            self.hf_pipeline(KeyDataset(dataset, "text"), batch_size=self.batch_size),
             total=len(dataset),
         ):
             text_relations = out[0]["generated_text"]
