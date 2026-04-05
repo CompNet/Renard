@@ -1,7 +1,8 @@
 from typing import Any, Union, Optional, Literal
 import ast, re
 import functools as ft
-from datasets import load_dataset, Dataset as HFDataset
+from dataclasses import dataclass
+from datasets import load_dataset, Dataset as HFDataset, DatasetDict as HFDatasetDict
 import torch
 from transformers import (
     AutoModelForSeq2SeqLM,
@@ -23,8 +24,19 @@ from renard.pipeline.character_unification import Character
 from renard.utils import make_vocab
 from sklearn.metrics import precision_recall_fscore_support
 
-#: (subject, relation, object)
+#: (subject, predicate, object)
 Relation = tuple[Character, str, Character]
+
+ARF_VALID_NOVELS = {
+    "Blue Jackets: The Log of the Teaser",
+    "Nightmare Abbey",
+    "The White Chief of the Caffres",
+}
+ARF_TEST_NOVELS = {
+    "Molly Brown's Freshman Days",
+    "Ancient Rome: The Lives of Great Men",
+    "The White Chief of the Caffres",
+}
 
 
 def _load_ARF_line(example: dict, tokenizer: PreTrainedTokenizerFast) -> BatchEncoding:
@@ -37,7 +49,7 @@ def _load_ARF_line(example: dict, tokenizer: PreTrainedTokenizerFast) -> BatchEn
 
     text = example["chunk"] or ""
     batch = tokenizer(
-        tokenizer.bos_token + GenerativeRelationExtractor.task_prompt(text),
+        tokenizer.bos_token + Seq2SeqRelationExtractor.task_prompt(text),
         text_target=labels + tokenizer.eos_token,
         add_special_tokens=False,
     )
@@ -46,7 +58,7 @@ def _load_ARF_line(example: dict, tokenizer: PreTrainedTokenizerFast) -> BatchEn
     return batch
 
 
-def load_ARF_dataset(tokenizer: PreTrainedTokenizerFast) -> HFDataset:
+def load_ARF_dataset(tokenizer: PreTrainedTokenizerFast) -> HFDatasetDict:
     """
     Load the Artificial Relationships in Fiction dataset
     (https://huggingface.co/datasets/Despina/project_gutenberg) by
@@ -57,8 +69,15 @@ def load_ARF_dataset(tokenizer: PreTrainedTokenizerFast) -> HFDataset:
         "synthetic_relations_in_fiction_books",
         split="train",
     )
-    dataset = dataset.train_test_split(test_size=0.001)
-    return dataset.map(ft.partial(_load_ARF_line, tokenizer=tokenizer))
+
+    dataset = dataset.map(ft.partial(_load_ARF_line, tokenizer=tokenizer))
+
+    ARF_TRAIN_NOVELS = set(dataset["title"]) - (ARF_VALID_NOVELS | ARF_TEST_NOVELS)
+    train = dataset.filter(lambda example: example["title"] in ARF_TRAIN_NOVELS)
+    valid = dataset.filter(lambda example: example["title"] in ARF_VALID_NOVELS)
+    test = dataset.filter(lambda example: example["title"] in ARF_TEST_NOVELS)
+
+    return HFDatasetDict({"train": train, "valid": valid, "test": test})  # type: ignore
 
 
 def _triple_precision_recall_f1(
@@ -108,17 +127,19 @@ def train_model_on_ARF(
 
     dataset = load_ARF_dataset(tokenizer)
 
-    def compute_metrics(eval_preds: EvalPrediction) -> dict[str, float]:
+    def compute_metrics(eval_preds) -> dict[str, float]:
         eval_preds.label_ids[eval_preds.label_ids == -100] = pad_token_i
+        eval_preds.predictions[eval_preds.predictions == -100] = pad_token_i
 
         labels_str = tokenizer.batch_decode(
             eval_preds.label_ids, skip_special_tokens=True
         )
-        labels = list(map(GenerativeRelationExtractor.parse_text_relations, labels_str))
+        labels = list(map(Seq2SeqRelationExtractor.parse_text_relations, labels_str))
 
-        pred_ids = eval_preds.predictions[0].argmax(axis=-1)
-        preds_str = tokenizer.batch_decode(pred_ids, skip_special_tokens=True)
-        preds = list(map(GenerativeRelationExtractor.parse_text_relations, preds_str))
+        preds_str = tokenizer.batch_decode(
+            eval_preds.predictions, skip_special_tokens=True
+        )
+        preds = list(map(Seq2SeqRelationExtractor.parse_text_relations, preds_str))
 
         return _triple_precision_recall_f1(labels, preds)
 
@@ -126,7 +147,7 @@ def train_model_on_ARF(
         model,
         targs,
         train_dataset=dataset["train"],
-        eval_dataset=dataset["test"],
+        eval_dataset=dataset["valid"],
         data_collator=DataCollatorForSeq2Seq(tokenizer, model),
         compute_metrics=compute_metrics,
     )
@@ -135,7 +156,7 @@ def train_model_on_ARF(
     return model
 
 
-class GenerativeRelationExtractor(PipelineStep):
+class Seq2SeqRelationExtractor(PipelineStep):
     """
 
     .. warning::
@@ -151,9 +172,7 @@ class GenerativeRelationExtractor(PipelineStep):
         batch_size: int = 1,
         device: Literal["cpu", "cuda", "auto"] = "auto",
     ):
-        self.model = (
-            GenerativeRelationExtractor.DEFAULT_MODEL if model is None else model
-        )
+        self.model = Seq2SeqRelationExtractor.DEFAULT_MODEL if model is None else model
         self.hf_pipeline = None
         self.batch_size = batch_size
         if device == "auto":
@@ -180,7 +199,7 @@ class GenerativeRelationExtractor(PipelineStep):
         # chunk as in the ARF dataset
         dataset = HFDataset.from_list(
             [
-                {"text": GenerativeRelationExtractor.task_prompt(" ".join(sent))}
+                {"text": Seq2SeqRelationExtractor.task_prompt(" ".join(sent))}
                 for sent in sentences
             ]
         )
@@ -190,17 +209,13 @@ class GenerativeRelationExtractor(PipelineStep):
         ):
             text_relations = out[0]["generated_text"]
 
-            raw_triples = GenerativeRelationExtractor.parse_text_relations(
-                text_relations
-            )
+            raw_triples = Seq2SeqRelationExtractor.parse_text_relations(text_relations)
             triples = []
             for subj, rel, obj in raw_triples:
-                subj_char = GenerativeRelationExtractor.identify_character(
+                subj_char = Seq2SeqRelationExtractor.identify_character(
                     subj, characters
                 )
-                obj_char = GenerativeRelationExtractor.identify_character(
-                    obj, characters
-                )
+                obj_char = Seq2SeqRelationExtractor.identify_character(obj, characters)
                 if subj_char is None or obj_char is None or subj_char == obj_char:
                     continue
                 triples.append((subj_char, rel, obj_char))
