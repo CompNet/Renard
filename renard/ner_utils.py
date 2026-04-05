@@ -337,6 +337,7 @@ def train_ner_model(
     targs: TrainingArguments,
     train_split: str = "train",
     valid_split: str = "valid",
+    trainer_class: type[Trainer] = Trainer,
 ) -> PreTrainedModel:
     """Train a NER model on the given dataset.
 
@@ -347,6 +348,8 @@ def train_ner_model(
         trainer.
     :param train_split: split of the dataset used for train.
     :param valid_split: split of the dataset used for validation.
+    :param trainer_class: trainer class to use.  Can be used to
+        override the default huggingface trainer.
     """
     from transformers import DataCollatorForTokenClassification
 
@@ -366,12 +369,11 @@ def train_ner_model(
         label2id={label: i for i, label in enumerate(label_lst)},
     )
 
-    trainer = Trainer(
+    trainer = trainer_class(
         model,
         targs,
         train_dataset=dataset[train_split],
         eval_dataset=dataset[valid_split],
-        # data_collator=DataCollatorForTokenClassificationWithBatchEncoding(tokenizer),
         data_collator=DataCollatorForTokenClassification(tokenizer),
         tokenizer=tokenizer,
     )
