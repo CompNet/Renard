@@ -6,7 +6,7 @@ import functools as ft
 from more_itertools import flatten
 import torch
 from torch.utils.data import Dataset
-from datasets import Dataset as HGDataset
+from datasets import Dataset as HGDataset, DatasetDict as HGDatasetDict
 from datasets import Sequence, ClassLabel
 from transformers import (
     AutoModelForTokenClassification,
@@ -316,9 +316,21 @@ def _tokenize_and_align_labels(
 
 def train_ner_model(
     hg_id: str,
-    dataset: HGDataset,
+    dataset: Union[HGDataset, HGDatasetDict],
     targs: TrainingArguments,
+    train_split: str = "train",
+    valid_split: str = "valid",
 ) -> PreTrainedModel:
+    """Train a NER model on the given dataset.
+
+    :param hg_id: huggingface ID of the model to train
+    :param dataset: huggingface dataset on which to train.  The
+        'labels' column is assumed to contain NER labels.
+    :param TrainingArguments: training arguments for the huggingface
+        trainer.
+    :param train_split: split of the dataset used for train.
+    :param valid_split: split of the dataset used for validation.
+    """
     from transformers import DataCollatorForTokenClassification
 
     # BERT tokenizer splits tokens into subtokens. The
@@ -328,9 +340,8 @@ def train_ner_model(
     dataset = dataset.map(
         ft.partial(_tokenize_and_align_labels, tokenizer=tokenizer), batched=True
     )
-    dataset = dataset.train_test_split(test_size=0.1)
 
-    label_lst = dataset["train"].features["labels"].feature.names
+    label_lst = dataset[train_split].features["labels"].feature.names
     model = AutoModelForTokenClassification.from_pretrained(
         hg_id,
         num_labels=len(label_lst),
@@ -341,8 +352,8 @@ def train_ner_model(
     trainer = Trainer(
         model,
         targs,
-        train_dataset=dataset["train"],
-        eval_dataset=dataset["test"],
+        train_dataset=dataset[train_split],
+        eval_dataset=dataset[valid_split],
         # data_collator=DataCollatorForTokenClassificationWithBatchEncoding(tokenizer),
         data_collator=DataCollatorForTokenClassification(tokenizer),
         tokenizer=tokenizer,
