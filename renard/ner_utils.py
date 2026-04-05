@@ -213,8 +213,10 @@ def load_conll2002_bio(
     tags = []
     for line in raw_data.split("\n"):
         line = line.strip("\n")
-        if re.fullmatch(r"\s*", line) or (
-            not max_sent_len is None and len(sent_tokens) >= max_sent_len
+        if (
+            re.fullmatch(r"\s*", line)  # ignore empty lines
+            or re.fullmatch(r"# [^:]+: .*", line)  # ignore Novelties style metadata
+            or (not max_sent_len is None and len(sent_tokens) >= max_sent_len)
         ):
             if len(sent_tokens) == 0:
                 continue
@@ -224,6 +226,8 @@ def load_conll2002_bio(
         token, tag = line.split(separator)
         sent_tokens.append(token)
         tags.append(tag_conversion_map.get(tag, tag))
+    if len(sent_tokens) != 0:
+        sents.append(sent_tokens)
 
     tokens = list(flatten(sents))
     entities = ner_entities(tokens, tags)
