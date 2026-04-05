@@ -1,31 +1,31 @@
 [project]
 name = "renard-pipeline"
-version = "0.7.1"
+version = "0.7.2"
 description = "Relationships Extraction from NARrative Documents"
 authors = [
     {name = "Arthur Amalvy", email = "arthur.amalvy@univ-avignon.fr"},
 ]
 license = { text = "GPL-3.0-only" }
 readme = "README.md"
-requires-python = ">=3.9,<3.13"
+requires-python = ">=3.10,<3.14"
 dependencies = [
-    "torch>=2.7.0",
-    "transformers>=4.57.1",
-    "nltk>=3.9.1",
+    "torch>=2.8.0",
+    "transformers>=5.0.0",
+    "nltk>=3.9.3",
     "tqdm>=4.67.1",
     "networkx>=3.2",
     "more-itertools>=10.7",
     "nameparser>=1.1.3",
     "matplotlib>=3.9",
     "pytest>=8.4.1",
-    "tibert>=0.5.2",
+    "tibert>=0.5.3",
     "grimbert>=0.1.5",
     "datasets>=4.0.0",
     "rank-bm25>=0.2.2",
     "accelerate>=1.10.1",
     "scikit-learn>=1.6.1",
     "tiktoken>=0.12.0",
-    "protobuf>=6.33.2",
+    "protobuf>=6.33.5",
 ]
 
 [build-system]
@@ -50,22 +50,28 @@ dev = [
 
 [project.optional-dependencies]
 ui = [
-    "gradio>=4.44.1",
+    "gradio>=6.0.0",
     "pyvis>=0.3.2",
 ]
 cpu = [
-  "torch>=2.7.1",
+  "torch>=2.8.0",
 ]
 cuda128 = [
-  "torch>=2.7.1",
+  "torch>=2.8.0",
+]
+cuda129 = [
+  "torch>=2.8.0",
 ]
 rocm63 = [
-  "torch>=2.7.1",
+  "torch>=2.8.0",
   "pytorch-triton-rocm>=3.1.0", 
 ]
 rocm64 = [
-  "torch>=2.7.1",
+  "torch>=2.8.0",
   "pytorch-triton-rocm>=3.1.0", 
+]
+dspy = [
+    "dspy>=2.6.27",
 ]
 
 [tool.uv]
@@ -73,6 +79,7 @@ conflicts = [
   [
     { extra = "cpu" },
     { extra = "cuda128" },
+    { extra = "cuda129" },
     { extra = "rocm63" },
     { extra = "rocm64" },
   ],
@@ -82,6 +89,7 @@ conflicts = [
 torch = [
   { index = "pytorch-cpu", extra = "cpu" },
   { index = "pytorch-cuda128", extra = "cuda128" },
+  { index = "pytorch-cuda129", extra = "cuda129" },
   { index = "pytorch-rocm63", extra = "rocm63" },
   { index = "pytorch-rocm64", extra = "rocm64" },
 ]
@@ -98,6 +106,11 @@ explicit = true
 [[tool.uv.index]]
 name = "pytorch-cuda128"
 url = "https://download.pytorch.org/whl/cu128"
+explicit = true
+
+[[tool.uv.index]]
+name = "pytorch-cuda129"
+url = "https://download.pytorch.org/whl/cu129"
 explicit = true
 
 [[tool.uv.index]]
