@@ -375,7 +375,6 @@ def train_ner_model(
         train_dataset=dataset[train_split],
         eval_dataset=dataset[valid_split],
         data_collator=DataCollatorForTokenClassification(tokenizer),
-        tokenizer=tokenizer,
     )
     trainer.train()
 
