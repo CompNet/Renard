@@ -64,6 +64,13 @@ NLTKNamedEntityRecognizer
    :members:
 
 
+Retrieval
+---------
+
+.. automodule:: renard.pipeline.ner.retrieval
+   :members:
+
+
 Coreference Resolution
 ======================
 
