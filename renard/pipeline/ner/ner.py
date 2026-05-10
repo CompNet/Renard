@@ -281,7 +281,7 @@ class BertNamedEntityRecognizer(PipelineStep):
         batch_labels = ["O"] * len(tokens)
 
         try:
-            inference_start = ctxmask[batch_i].tolist().index(1)
+            inference_start = ctxmask[batch_i].tolist().index(0)
         except ValueError:
             inference_start = 0
 
@@ -290,7 +290,7 @@ class BertNamedEntityRecognizer(PipelineStep):
             if token_i is None:
                 continue
 
-            if ctxmask[batch_i][token_i] == 0:
+            if ctxmask[batch_i][token_i] == 1:
                 continue
 
             batch_labels[token_i - inference_start] = wp_label

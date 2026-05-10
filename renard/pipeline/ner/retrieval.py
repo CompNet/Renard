@@ -66,7 +66,7 @@ class NERContextRetriever:
 
             elements_with_context.append((lctx, elt, rctx))
 
-        return NERDataset(
+        ner_dataset = NERDataset(
             [lctx + element + rctx for lctx, element, rctx in elements_with_context],
             dataset.tokenizer,
             [
@@ -74,6 +74,7 @@ class NERContextRetriever:
                 for lctx, element, rctx in elements_with_context
             ],
         )
+        return ner_dataset
 
 
 class NERSamenounContextRetriever(NERContextRetriever):
