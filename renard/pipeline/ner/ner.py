@@ -155,7 +155,7 @@ class BertNamedEntityRecognizer(PipelineStep):
         :param tokenizer: a custom tokenizer
         :param context_retriever: if specified, use
             ``context_retriever`` to retrieve relevant global context
-            at run time, generally trading runtme for NER performance.
+            at run time, generally trading runtime for NER performance.
         """
         if isinstance(model, str):
             self.huggingface_model_id = model
@@ -286,7 +286,6 @@ class BertNamedEntityRecognizer(PipelineStep):
             inference_start = 0
 
         for wplabel_j, wp_label in enumerate(wp_labels):
-
             token_i = batchs.token_to_word(batch_i, wplabel_j)
             if token_i is None:
                 continue
