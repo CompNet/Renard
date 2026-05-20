@@ -82,7 +82,7 @@ class PipelineStep:
 
     def _pipeline_init_(
         self, lang: str, progress_reporter: ProgressReporter, **kwargs
-    ) -> Optional[Dict[Pipeline.PipelineParameter, Any]]:
+    ) -> Optional[Dict[str, Any]]:
         """Set the step configuration that is common to the whole
         pipeline.
 
@@ -576,16 +576,13 @@ class PipelineState:
 class Pipeline:
     """A flexible NLP pipeline"""
 
-    #: all the possible parameters of the whole pipeline, that are
-    #: shared between steps
-    PipelineParameter = Literal["lang", "progress_reporter", "character_ner_tag"]
-
     def __init__(
         self,
         steps: List[PipelineStep],
         lang: str = "eng",
         progress_report: Optional[Literal["tqdm"]] = "tqdm",
         warn: bool = True,
+        **step_additional_params,
     ) -> None:
         """
         :param steps: a ``tuple`` of :class:``PipelineStep``, that
@@ -595,6 +592,14 @@ class Pipeline:
             progress.
         :param lang: ISO 639-3 language code
         :param warn:
+
+        :param step_additional_params: additional parameters passed to
+            :meth:`._pipeline_init_` when
+            :meth:`_pipeline_init_steps_` is called.  The following
+            values are currently used:
+
+                - ``'character_ner_tag'``: the NER tag corresponding
+                  to characters (default: ``PER``)
         """
         self.steps = steps
 
@@ -602,8 +607,12 @@ class Pipeline:
         self.progress_reporter = get_progress_reporter(progress_report)
 
         self.lang = lang
-        self.character_ner_tag = "PER"
         self.warn = warn
+
+        self.step_additional_params = step_additional_params
+        self.step_additional_params["character_ner_tag"] = (
+            self.step_additional_params.get("character_ner_tag", "PER")
+        )
 
     def _pipeline_init_steps_(self, ignored_steps: Optional[List[str]] = None):
         """Initialise steps with global pipeline parameters.
@@ -613,16 +622,18 @@ class Pipeline:
         """
         steps_progress_reporter = self.progress_reporter.get_subreporter()
         steps = self._non_ignored_steps(ignored_steps)
-        pipeline_params = {
-            "progress_reporter": steps_progress_reporter,
-            "character_ner_tag": self.character_ner_tag,
-        }
+        pipeline_params = self.step_additional_params.copy()
         for step in steps:
-            step_additional_params = step._pipeline_init_(self.lang, **pipeline_params)
+            step_additional_params = step._pipeline_init_(
+                self.lang, progress_reporter=steps_progress_reporter, **pipeline_params
+            )
             if not step_additional_params is None:
                 for key, value in step_additional_params.items():
                     setattr(self, key, value)
-                    pipeline_params[key] = value
+                    # parameters set by the user have precedence over
+                    # step mandated parameters
+                    if not key in self.step_additional_params:
+                        pipeline_params[key] = value
 
     def _non_ignored_steps(
         self, ignored_steps: Optional[List[str]]
