@@ -13,7 +13,7 @@
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="_static/documentation_options.js?v=5929fcd5"></script>
-      <script src="_static/doctools.js?v=9a2dae69"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
       <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="#" />
@@ -122,6 +122,8 @@
 </li>
         <li><a href="reference.html#renard.pipeline.ner.NLTKNamedEntityRecognizer.__call__">(renard.pipeline.ner.NLTKNamedEntityRecognizer method)</a>
 </li>
+        <li><a href="reference.html#renard.pipeline.ner.retrieval.NERContextRetriever.__call__">(renard.pipeline.ner.retrieval.NERContextRetriever method)</a>
+</li>
         <li><a href="reference.html#renard.pipeline.preprocessing.CustomSubstitutionPreprocessor.__call__">(renard.pipeline.preprocessing.CustomSubstitutionPreprocessor method)</a>
 </li>
         <li><a href="reference.html#renard.pipeline.quote_detection.QuoteDetector.__call__">(renard.pipeline.quote_detection.QuoteDetector method)</a>
@@ -136,7 +138,11 @@
 </li>
       </ul></li>
       <li><a href="reference.html#renard.pipeline.character_unification.Character.__delattr__">__delattr__() (renard.pipeline.character_unification.Character method)</a>
+
+      <ul>
+        <li><a href="reference.html#renard.pipeline.ner.retrieval.NERNeuralContextRetrievalExample.__delattr__">(renard.pipeline.ner.retrieval.NERNeuralContextRetrievalExample method)</a>
 </li>
+      </ul></li>
       <li><a href="reference.html#renard.pipeline.character_unification.Character.__eq__">__eq__() (renard.pipeline.character_unification.Character method)</a>
 
       <ul>
@@ -145,6 +151,10 @@
         <li><a href="reference.html#renard.pipeline.core.PipelineState.__eq__">(renard.pipeline.core.PipelineState method)</a>
 </li>
         <li><a href="reference.html#renard.pipeline.ner.NEREntity.__eq__">(renard.pipeline.ner.NEREntity method)</a>
+</li>
+        <li><a href="reference.html#renard.pipeline.ner.retrieval.NERContextRetrievalMatch.__eq__">(renard.pipeline.ner.retrieval.NERContextRetrievalMatch method)</a>
+</li>
+        <li><a href="reference.html#renard.pipeline.ner.retrieval.NERNeuralContextRetrievalExample.__eq__">(renard.pipeline.ner.retrieval.NERNeuralContextRetrievalExample method)</a>
 </li>
       </ul></li>
       <li><a href="reference.html#renard.pipeline.core.PipelineState.__hash__">__hash__ (renard.pipeline.core.PipelineState attribute)</a>
@@ -155,6 +165,10 @@
         <li><a href="reference.html#renard.pipeline.core.Mention.__hash__">(renard.pipeline.core.Mention method)</a>
 </li>
         <li><a href="reference.html#renard.pipeline.ner.NEREntity.__hash__">(renard.pipeline.ner.NEREntity method)</a>
+</li>
+        <li><a href="reference.html#renard.pipeline.ner.retrieval.NERContextRetrievalMatch.__hash__">(renard.pipeline.ner.retrieval.NERContextRetrievalMatch method)</a>
+</li>
+        <li><a href="reference.html#renard.pipeline.ner.retrieval.NERNeuralContextRetrievalExample.__hash__">(renard.pipeline.ner.retrieval.NERNeuralContextRetrievalExample method)</a>
 </li>
       </ul></li>
       <li><a href="reference.html#renard.ner_utils.DataCollatorForTokenClassificationWithBatchEncoding.__init__">__init__() (renard.ner_utils.DataCollatorForTokenClassificationWithBatchEncoding method)</a>
@@ -190,6 +204,22 @@
 </li>
         <li><a href="reference.html#renard.pipeline.ner.NLTKNamedEntityRecognizer.__init__">(renard.pipeline.ner.NLTKNamedEntityRecognizer method)</a>
 </li>
+        <li><a href="reference.html#renard.pipeline.ner.retrieval.NERBM25ContextRetriever.__init__">(renard.pipeline.ner.retrieval.NERBM25ContextRetriever method)</a>
+</li>
+        <li><a href="reference.html#renard.pipeline.ner.retrieval.NERContextRetrievalMatch.__init__">(renard.pipeline.ner.retrieval.NERContextRetrievalMatch method)</a>
+</li>
+        <li><a href="reference.html#renard.pipeline.ner.retrieval.NERContextRetriever.__init__">(renard.pipeline.ner.retrieval.NERContextRetriever method)</a>
+</li>
+        <li><a href="reference.html#renard.pipeline.ner.retrieval.NEREnsembleContextRetriever.__init__">(renard.pipeline.ner.retrieval.NEREnsembleContextRetriever method)</a>
+</li>
+        <li><a href="reference.html#renard.pipeline.ner.retrieval.NERNeighborsContextRetriever.__init__">(renard.pipeline.ner.retrieval.NERNeighborsContextRetriever method)</a>
+</li>
+        <li><a href="reference.html#renard.pipeline.ner.retrieval.NERNeuralContextRetrievalExample.__init__">(renard.pipeline.ner.retrieval.NERNeuralContextRetrievalExample method)</a>
+</li>
+        <li><a href="reference.html#renard.pipeline.ner.retrieval.NERNeuralContextRetriever.__init__">(renard.pipeline.ner.retrieval.NERNeuralContextRetriever method)</a>
+</li>
+        <li><a href="reference.html#renard.pipeline.ner.retrieval.NERSamenounContextRetriever.__init__">(renard.pipeline.ner.retrieval.NERSamenounContextRetriever method)</a>
+</li>
         <li><a href="reference.html#renard.pipeline.preprocessing.CustomSubstitutionPreprocessor.__init__">(renard.pipeline.preprocessing.CustomSubstitutionPreprocessor method)</a>
 </li>
         <li><a href="reference.html#renard.pipeline.quote_detection.QuoteDetector.__init__">(renard.pipeline.quote_detection.QuoteDetector method)</a>
@@ -216,9 +246,17 @@
 </li>
         <li><a href="reference.html#renard.pipeline.ner.NEREntity.__repr__">(renard.pipeline.ner.NEREntity method)</a>
 </li>
+        <li><a href="reference.html#renard.pipeline.ner.retrieval.NERContextRetrievalMatch.__repr__">(renard.pipeline.ner.retrieval.NERContextRetrievalMatch method)</a>
+</li>
+        <li><a href="reference.html#renard.pipeline.ner.retrieval.NERNeuralContextRetrievalExample.__repr__">(renard.pipeline.ner.retrieval.NERNeuralContextRetrievalExample method)</a>
+</li>
       </ul></li>
       <li><a href="reference.html#renard.pipeline.character_unification.Character.__setattr__">__setattr__() (renard.pipeline.character_unification.Character method)</a>
+
+      <ul>
+        <li><a href="reference.html#renard.pipeline.ner.retrieval.NERNeuralContextRetrievalExample.__setattr__">(renard.pipeline.ner.retrieval.NERNeuralContextRetrievalExample method)</a>
 </li>
+      </ul></li>
       <li><a href="reference.html#renard.resources.hypocorisms.HypocorismGazetteer._add_hypocorism_">_add_hypocorism_() (renard.resources.hypocorisms.HypocorismGazetteer method)</a>
 </li>
       <li><a href="reference.html#renard.pipeline.corefs.SpacyCorefereeCoreferenceResolver._coreferee_get_mention_tokens">_coreferee_get_mention_tokens() (renard.pipeline.corefs.SpacyCorefereeCoreferenceResolver static method)</a>
@@ -305,8 +343,12 @@
 </li>
       <li><a href="reference.html#renard.pipeline.core.Pipeline.check_valid">check_valid() (renard.pipeline.core.Pipeline method)</a>
 </li>
+      <li><a href="reference.html#renard.pipeline.ner.retrieval.NERNeuralContextRetrievalExample.context">context (renard.pipeline.ner.retrieval.NERNeuralContextRetrievalExample attribute)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference.html#renard.pipeline.ner.retrieval.NERNeuralContextRetrievalExample.context_side">context_side (renard.pipeline.ner.retrieval.NERNeuralContextRetrievalExample attribute)</a>
+</li>
       <li><a href="reference.html#renard.pipeline.graph_extraction.ConversationalGraphExtractor">ConversationalGraphExtractor (class in renard.pipeline.graph_extraction)</a>
 </li>
       <li><a href="reference.html#renard.pipeline.graph_extraction.CoOccurrencesGraphExtractor">CoOccurrencesGraphExtractor (class in renard.pipeline.graph_extraction)</a>
@@ -339,10 +381,12 @@
 <h2 id="E">E</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="reference.html#renard.pipeline.core.PipelineState.entities">entities (renard.pipeline.core.PipelineState attribute)</a>
+      <li><a href="reference.html#renard.pipeline.ner.retrieval.NERNeuralContextRetrievalExample.element">element (renard.pipeline.ner.retrieval.NERNeuralContextRetrievalExample attribute)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference.html#renard.pipeline.core.PipelineState.entities">entities (renard.pipeline.core.PipelineState attribute)</a>
+</li>
       <li><a href="reference.html#renard.pipeline.core.PipelineState.export_graph_to_gexf">export_graph_to_gexf() (renard.pipeline.core.PipelineState method)</a>
 </li>
   </ul></td>
@@ -371,10 +415,12 @@
 <h2 id="H">H</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="reference.html#renard.ner_utils.hgdataset_from_conll2002">hgdataset_from_conll2002() (in module renard.ner_utils)</a>
+      <li><a href="reference.html#renard.ner_utils.hfdataset_from_conll2002">hfdataset_from_conll2002() (in module renard.ner_utils)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference.html#renard.ner_utils.hgdataset_from_conll2002">hgdataset_from_conll2002() (in module renard.ner_utils)</a>
+</li>
       <li><a href="reference.html#renard.resources.hypocorisms.HypocorismGazetteer">HypocorismGazetteer (class in renard.resources.hypocorisms)</a>
 </li>
   </ul></td>
@@ -414,6 +460,8 @@
         <li><a href="reference.html#module-renard.graph_utils">renard.graph_utils</a>
 </li>
         <li><a href="reference.html#module-renard.ner_utils">renard.ner_utils</a>
+</li>
+        <li><a href="reference.html#module-renard.pipeline.ner.retrieval">renard.pipeline.ner.retrieval</a>
 </li>
         <li><a href="reference.html#module-renard.pipeline.preprocessing">renard.pipeline.preprocessing</a>
 </li>
@@ -470,9 +518,25 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference.html#renard.ner_utils.ner_entities">ner_entities() (in module renard.ner_utils)</a>
 </li>
+      <li><a href="reference.html#renard.pipeline.ner.retrieval.NERBM25ContextRetriever">NERBM25ContextRetriever (class in renard.pipeline.ner.retrieval)</a>
+</li>
+      <li><a href="reference.html#renard.pipeline.ner.retrieval.NERContextRetrievalMatch">NERContextRetrievalMatch (class in renard.pipeline.ner.retrieval)</a>
+</li>
+      <li><a href="reference.html#renard.pipeline.ner.retrieval.NERContextRetriever">NERContextRetriever (class in renard.pipeline.ner.retrieval)</a>
+</li>
       <li><a href="reference.html#renard.ner_utils.NERDataset">NERDataset (class in renard.ner_utils)</a>
 </li>
+      <li><a href="reference.html#renard.pipeline.ner.retrieval.NEREnsembleContextRetriever">NEREnsembleContextRetriever (class in renard.pipeline.ner.retrieval)</a>
+</li>
       <li><a href="reference.html#renard.pipeline.ner.NEREntity">NEREntity (class in renard.pipeline.ner)</a>
+</li>
+      <li><a href="reference.html#renard.pipeline.ner.retrieval.NERNeighborsContextRetriever">NERNeighborsContextRetriever (class in renard.pipeline.ner.retrieval)</a>
+</li>
+      <li><a href="reference.html#renard.pipeline.ner.retrieval.NERNeuralContextRetrievalExample">NERNeuralContextRetrievalExample (class in renard.pipeline.ner.retrieval)</a>
+</li>
+      <li><a href="reference.html#renard.pipeline.ner.retrieval.NERNeuralContextRetriever">NERNeuralContextRetriever (class in renard.pipeline.ner.retrieval)</a>
+</li>
+      <li><a href="reference.html#renard.pipeline.ner.retrieval.NERSamenounContextRetriever">NERSamenounContextRetriever (class in renard.pipeline.ner.retrieval)</a>
 </li>
       <li><a href="reference.html#renard.pipeline.ner.NLTKNamedEntityRecognizer">NLTKNamedEntityRecognizer (class in renard.pipeline.ner)</a>
 </li>
@@ -506,8 +570,6 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference.html#renard.pipeline.core.Pipeline">Pipeline (class in renard.pipeline.core)</a>
 </li>
-      <li><a href="reference.html#renard.pipeline.core.Pipeline.PipelineParameter">PipelineParameter (renard.pipeline.core.Pipeline attribute)</a>
-</li>
       <li><a href="reference.html#renard.pipeline.core.PipelineState">PipelineState (class in renard.pipeline.core)</a>
 </li>
       <li><a href="reference.html#renard.pipeline.core.PipelineStep">PipelineStep (class in renard.pipeline.core)</a>
@@ -519,6 +581,8 @@
       <li><a href="reference.html#renard.pipeline.core.PipelineState.plot_graphs_to_dir">plot_graphs_to_dir() (renard.pipeline.core.PipelineState method)</a>
 </li>
       <li><a href="reference.html#renard.plot_utils.plot_nx_graph_reasonably">plot_nx_graph_reasonably() (in module renard.plot_utils)</a>
+</li>
+      <li><a href="reference.html#renard.pipeline.ner.retrieval.NERNeuralContextRetriever.predict">predict() (renard.pipeline.ner.retrieval.NERNeuralContextRetriever method)</a>
 </li>
       <li><a href="reference.html#renard.pipeline.character_unification.GraphRulesCharacterUnifier.production">production() (renard.pipeline.character_unification.GraphRulesCharacterUnifier method)</a>
 
@@ -582,6 +646,13 @@
 
       <ul>
         <li><a href="reference.html#module-renard.ner_utils">module</a>
+</li>
+      </ul></li>
+      <li>
+    renard.pipeline.ner.retrieval
+
+      <ul>
+        <li><a href="reference.html#module-renard.pipeline.ner.retrieval">module</a>
 </li>
       </ul></li>
       <li>
@@ -672,11 +743,13 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference.html#renard.pipeline.ner.NEREntity.tag">tag (renard.pipeline.ner.NEREntity attribute)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference.html#renard.pipeline.core.PipelineState.text">text (renard.pipeline.core.PipelineState attribute)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference.html#renard.pipeline.core.PipelineState.tokens">tokens (renard.pipeline.core.PipelineState attribute)</a>
+</li>
+      <li><a href="reference.html#renard.ner_utils.train_ner_model">train_ner_model() (in module renard.ner_utils)</a>
 </li>
   </ul></td>
 </tr></table>

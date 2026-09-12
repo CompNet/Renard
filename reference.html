@@ -14,7 +14,7 @@
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="_static/documentation_options.js?v=5929fcd5"></script>
-      <script src="_static/doctools.js?v=9a2dae69"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
       <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
@@ -98,6 +98,17 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#nltknamedentityrecognizer">NLTKNamedEntityRecognizer</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#renard.pipeline.ner.NLTKNamedEntityRecognizer"><code class="docutils literal notranslate"><span class="pre">NLTKNamedEntityRecognizer</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-renard.pipeline.ner.retrieval">Retrieval</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#renard.pipeline.ner.retrieval.NERBM25ContextRetriever"><code class="docutils literal notranslate"><span class="pre">NERBM25ContextRetriever</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#renard.pipeline.ner.retrieval.NERContextRetrievalMatch"><code class="docutils literal notranslate"><span class="pre">NERContextRetrievalMatch</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#renard.pipeline.ner.retrieval.NERContextRetriever"><code class="docutils literal notranslate"><span class="pre">NERContextRetriever</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#renard.pipeline.ner.retrieval.NEREnsembleContextRetriever"><code class="docutils literal notranslate"><span class="pre">NEREnsembleContextRetriever</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#renard.pipeline.ner.retrieval.NERNeighborsContextRetriever"><code class="docutils literal notranslate"><span class="pre">NERNeighborsContextRetriever</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#renard.pipeline.ner.retrieval.NERNeuralContextRetrievalExample"><code class="docutils literal notranslate"><span class="pre">NERNeuralContextRetrievalExample</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#renard.pipeline.ner.retrieval.NERNeuralContextRetriever"><code class="docutils literal notranslate"><span class="pre">NERNeuralContextRetriever</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#renard.pipeline.ner.retrieval.NERSamenounContextRetriever"><code class="docutils literal notranslate"><span class="pre">NERSamenounContextRetriever</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -218,9 +229,11 @@
 <li class="toctree-l4"><a class="reference internal" href="#renard.ner_utils.DataCollatorForTokenClassificationWithBatchEncoding"><code class="docutils literal notranslate"><span class="pre">DataCollatorForTokenClassificationWithBatchEncoding</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#renard.ner_utils.NERDataset"><code class="docutils literal notranslate"><span class="pre">NERDataset</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#renard.ner_utils._tokenize_and_align_labels"><code class="docutils literal notranslate"><span class="pre">_tokenize_and_align_labels()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#renard.ner_utils.hfdataset_from_conll2002"><code class="docutils literal notranslate"><span class="pre">hfdataset_from_conll2002()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#renard.ner_utils.hgdataset_from_conll2002"><code class="docutils literal notranslate"><span class="pre">hgdataset_from_conll2002()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#renard.ner_utils.load_conll2002_bio"><code class="docutils literal notranslate"><span class="pre">load_conll2002_bio()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#renard.ner_utils.ner_entities"><code class="docutils literal notranslate"><span class="pre">ner_entities()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#renard.ner_utils.train_ner_model"><code class="docutils literal notranslate"><span class="pre">train_ner_model()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -262,7 +275,7 @@
 <h3>Pipeline<a class="headerlink" href="#pipeline" title="Link to this heading"></a></h3>
 <dl class="py class">
 <dt class="sig sig-object py" id="renard.pipeline.core.Pipeline">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">renard.pipeline.core.</span></span><span class="sig-name descname"><span class="pre">Pipeline</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">steps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lang</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'eng'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress_report</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'tqdm'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">warn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.core.Pipeline" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">renard.pipeline.core.</span></span><span class="sig-name descname"><span class="pre">Pipeline</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">steps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lang</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'eng'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress_report</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'tqdm'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">warn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">step_additional_params</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.core.Pipeline" title="Link to this definition"></a></dt>
 <dd><p>A flexible NLP pipeline</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -274,14 +287,6 @@
 </ul>
 </dd>
 </dl>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="renard.pipeline.core.Pipeline.PipelineParameter">
-<span class="sig-name descname"><span class="pre">PipelineParameter</span></span><a class="headerlink" href="#renard.pipeline.core.Pipeline.PipelineParameter" title="Link to this definition"></a></dt>
-<dd><p>all the possible parameters of the whole pipeline, that are
-shared between steps</p>
-<p>alias of <code class="xref py py-obj docutils literal notranslate"><span class="pre">Literal</span></code>[‘lang’, ‘progress_reporter’, ‘character_ner_tag’]</p>
-</dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="renard.pipeline.core.Pipeline.__call__">
 <span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignored_steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.core.Pipeline.__call__" title="Link to this definition"></a></dt>
@@ -305,7 +310,7 @@ with a production in <code class="docutils literal notranslate"><span class="pre
 
 <dl class="py method">
 <dt class="sig sig-object py" id="renard.pipeline.core.Pipeline.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">steps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lang</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'eng'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress_report</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'tqdm'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">warn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.core.Pipeline.__init__" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">steps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lang</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'eng'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress_report</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'tqdm'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">warn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">step_additional_params</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.core.Pipeline.__init__" title="Link to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -316,6 +321,17 @@ progress using tqdm.  if <code class="docutils literal notranslate"><span class=
 progress.</p></li>
 <li><p><strong>lang</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – ISO 639-3 language code</p></li>
 <li><p><strong>warn</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></span>)</p></li>
+<li><p><strong>step_additional_params</strong> – <p>additional parameters passed to
+<a class="reference internal" href="#renard.pipeline.core.PipelineStep._pipeline_init_" title="renard.pipeline.core.PipelineStep._pipeline_init_"><code class="xref py py-meth docutils literal notranslate"><span class="pre">_pipeline_init_()</span></code></a> when
+<a class="reference internal" href="#renard.pipeline.core.Pipeline._pipeline_init_steps_" title="renard.pipeline.core.Pipeline._pipeline_init_steps_"><code class="xref py py-meth docutils literal notranslate"><span class="pre">_pipeline_init_steps_()</span></code></a> is called.  The following
+values are currently used:</p>
+<blockquote>
+<div><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">'character_ner_tag'</span></code>: the NER tag corresponding
+to characters (default: <code class="docutils literal notranslate"><span class="pre">PER</span></code>)</p></li>
+</ul>
+</div></blockquote>
+</p></li>
 </ul>
 </dd>
 </dl>
@@ -751,7 +767,7 @@ pipeline.</p>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code>[<code class="docutils literal notranslate"><span class="pre">'lang'</span></code>, <code class="docutils literal notranslate"><span class="pre">'progress_reporter'</span></code>, <code class="docutils literal notranslate"><span class="pre">'character_ner_tag'</span></code>], <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]]</span></p>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]]</span></p>
 </dd>
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>a step can return a dictionary of pipeline params if
@@ -1094,8 +1110,8 @@ using <a class="reference internal" href="#renard.pipeline.ner.NEREntity.shifted
 <li><p><strong>model</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">PreTrainedModel</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>]</span>)</p></li>
 <li><p><strong>batch_size</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></span>)</p></li>
 <li><p><strong>device</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code>[<code class="docutils literal notranslate"><span class="pre">'cpu'</span></code>, <code class="docutils literal notranslate"><span class="pre">'cuda'</span></code>, <code class="docutils literal notranslate"><span class="pre">'auto'</span></code>]</span>)</p></li>
-<li><p><strong>tokenizer</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">PreTrainedTokenizerFast</span></code>]</span>)</p></li>
-<li><p><strong>context_retriever</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">NERContextRetriever</span></code>]</span>)</p></li>
+<li><p><strong>tokenizer</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">TokenizersBackend</span></code>]</span>)</p></li>
+<li><p><strong>context_retriever</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<a class="reference internal" href="#renard.pipeline.ner.retrieval.NERContextRetriever" title="renard.pipeline.ner.retrieval.NERContextRetriever"><code class="xref py py-class docutils literal notranslate"><span class="pre">NERContextRetriever</span></code></a>]</span>)</p></li>
 </ul>
 </dd>
 </dl>
@@ -1134,10 +1150,10 @@ well.</p></li>
 </p></li>
 <li><p><strong>batch_size</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></span>) – batch size at inference</p></li>
 <li><p><strong>device</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code>[<code class="docutils literal notranslate"><span class="pre">'cpu'</span></code>, <code class="docutils literal notranslate"><span class="pre">'cuda'</span></code>, <code class="docutils literal notranslate"><span class="pre">'auto'</span></code>]</span>) – computation device</p></li>
-<li><p><strong>tokenizer</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">PreTrainedTokenizerFast</span></code>]</span>) – a custom tokenizer</p></li>
-<li><p><strong>context_retriever</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">NERContextRetriever</span></code>]</span>) – if specified, use
+<li><p><strong>tokenizer</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">TokenizersBackend</span></code>]</span>) – a custom tokenizer</p></li>
+<li><p><strong>context_retriever</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<a class="reference internal" href="#renard.pipeline.ner.retrieval.NERContextRetriever" title="renard.pipeline.ner.retrieval.NERContextRetriever"><code class="xref py py-class docutils literal notranslate"><span class="pre">NERContextRetriever</span></code></a>]</span>) – if specified, use
 <code class="docutils literal notranslate"><span class="pre">context_retriever</span></code> to retrieve relevant global context
-at run time, generally trading runtme for NER performance.</p></li>
+at run time, generally trading runtime for NER performance.</p></li>
 </ul>
 </dd>
 </dl>
@@ -1329,6 +1345,325 @@ the string <code class="docutils literal notranslate"><span class="pre">'any'</s
 </dd></dl>
 
 </section>
+<section id="module-renard.pipeline.ner.retrieval">
+<span id="retrieval"></span><h3>Retrieval<a class="headerlink" href="#module-renard.pipeline.ner.retrieval" title="Link to this heading"></a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="renard.pipeline.ner.retrieval.NERBM25ContextRetriever">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">renard.pipeline.ner.retrieval.</span></span><span class="sig-name descname"><span class="pre">NERBM25ContextRetriever</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">k</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.ner.retrieval.NERBM25ContextRetriever" title="Link to this definition"></a></dt>
+<dd><p>A context retriever that selects elements according to the BM25 ranking formula.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>k</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></span>)</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="renard.pipeline.ner.retrieval.NERBM25ContextRetriever.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">k</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.ner.retrieval.NERBM25ContextRetriever.__init__" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>k</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></span>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="renard.pipeline.ner.retrieval.NERContextRetrievalMatch">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">renard.pipeline.ner.retrieval.</span></span><span class="sig-name descname"><span class="pre">NERContextRetrievalMatch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">element</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">element_i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">side</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">score</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.ner.retrieval.NERContextRetrievalMatch" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>element</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</span>)</p></li>
+<li><p><strong>element_i</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></span>)</p></li>
+<li><p><strong>side</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code>[<code class="docutils literal notranslate"><span class="pre">'left'</span></code>, <code class="docutils literal notranslate"><span class="pre">'right'</span></code>]</span>)</p></li>
+<li><p><strong>score</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]</span>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="renard.pipeline.ner.retrieval.NERContextRetrievalMatch.__eq__">
+<span class="sig-name descname"><span class="pre">__eq__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.ner.retrieval.NERContextRetrievalMatch.__eq__" title="Link to this definition"></a></dt>
+<dd><p>Return self==value.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="renard.pipeline.ner.retrieval.NERContextRetrievalMatch.__hash__">
+<span class="sig-name descname"><span class="pre">__hash__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.ner.retrieval.NERContextRetrievalMatch.__hash__" title="Link to this definition"></a></dt>
+<dd><p>Return hash(self).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="renard.pipeline.ner.retrieval.NERContextRetrievalMatch.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">element</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">element_i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">side</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">score</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.ner.retrieval.NERContextRetrievalMatch.__init__" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>element</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</span>)</p></li>
+<li><p><strong>element_i</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></span>)</p></li>
+<li><p><strong>side</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code>[<code class="docutils literal notranslate"><span class="pre">'left'</span></code>, <code class="docutils literal notranslate"><span class="pre">'right'</span></code>]</span>)</p></li>
+<li><p><strong>score</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]</span>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="renard.pipeline.ner.retrieval.NERContextRetrievalMatch.__repr__">
+<span class="sig-name descname"><span class="pre">__repr__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.ner.retrieval.NERContextRetrievalMatch.__repr__" title="Link to this definition"></a></dt>
+<dd><p>Return repr(self).</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="renard.pipeline.ner.retrieval.NERContextRetriever">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">renard.pipeline.ner.retrieval.</span></span><span class="sig-name descname"><span class="pre">NERContextRetriever</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">k</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.ner.retrieval.NERContextRetriever" title="Link to this definition"></a></dt>
+<dd><p>Base class for NER context retrievers.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>k</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></span>)</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="renard.pipeline.ner.retrieval.NERContextRetriever.__call__">
+<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.ner.retrieval.NERContextRetriever.__call__" title="Link to this definition"></a></dt>
+<dd><p>Call self as a function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>dataset</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#renard.ner_utils.NERDataset" title="renard.ner_utils.NERDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">NERDataset</span></code></a></span>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#renard.ner_utils.NERDataset" title="renard.ner_utils.NERDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">NERDataset</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="renard.pipeline.ner.retrieval.NERContextRetriever.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">k</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.ner.retrieval.NERContextRetriever.__init__" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>k</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></span>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="renard.pipeline.ner.retrieval.NEREnsembleContextRetriever">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">renard.pipeline.ner.retrieval.</span></span><span class="sig-name descname"><span class="pre">NEREnsembleContextRetriever</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">retrievers</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.ner.retrieval.NEREnsembleContextRetriever" title="Link to this definition"></a></dt>
+<dd><p>Combine several context retriever</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>retrievers</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<a class="reference internal" href="#renard.pipeline.ner.retrieval.NERContextRetriever" title="renard.pipeline.ner.retrieval.NERContextRetriever"><code class="xref py py-class docutils literal notranslate"><span class="pre">NERContextRetriever</span></code></a>]</span>)</p></li>
+<li><p><strong>k</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></span>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="renard.pipeline.ner.retrieval.NEREnsembleContextRetriever.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">retrievers</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.ner.retrieval.NEREnsembleContextRetriever.__init__" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>retrievers</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<a class="reference internal" href="#renard.pipeline.ner.retrieval.NERContextRetriever" title="renard.pipeline.ner.retrieval.NERContextRetriever"><code class="xref py py-class docutils literal notranslate"><span class="pre">NERContextRetriever</span></code></a>]</span>)</p></li>
+<li><p><strong>k</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></span>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="renard.pipeline.ner.retrieval.NERNeighborsContextRetriever">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">renard.pipeline.ner.retrieval.</span></span><span class="sig-name descname"><span class="pre">NERNeighborsContextRetriever</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">k</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.ner.retrieval.NERNeighborsContextRetriever" title="Link to this definition"></a></dt>
+<dd><p>A context retriever that chooses nearby elements.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>k</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></span>)</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="renard.pipeline.ner.retrieval.NERNeighborsContextRetriever.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">k</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.ner.retrieval.NERNeighborsContextRetriever.__init__" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>k</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></span>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="renard.pipeline.ner.retrieval.NERNeuralContextRetrievalExample">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">renard.pipeline.ner.retrieval.</span></span><span class="sig-name descname"><span class="pre">NERNeuralContextRetrievalExample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">element</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context_side</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.ner.retrieval.NERNeuralContextRetrievalExample" title="Link to this definition"></a></dt>
+<dd><p>A context retrieval example.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>element</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</span>)</p></li>
+<li><p><strong>context</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</span>)</p></li>
+<li><p><strong>context_side</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code>[<code class="docutils literal notranslate"><span class="pre">'left'</span></code>, <code class="docutils literal notranslate"><span class="pre">'right'</span></code>]</span>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="renard.pipeline.ner.retrieval.NERNeuralContextRetrievalExample.__delattr__">
+<span class="sig-name descname"><span class="pre">__delattr__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.ner.retrieval.NERNeuralContextRetrievalExample.__delattr__" title="Link to this definition"></a></dt>
+<dd><p>Implement delattr(self, name).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="renard.pipeline.ner.retrieval.NERNeuralContextRetrievalExample.__eq__">
+<span class="sig-name descname"><span class="pre">__eq__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.ner.retrieval.NERNeuralContextRetrievalExample.__eq__" title="Link to this definition"></a></dt>
+<dd><p>Return self==value.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="renard.pipeline.ner.retrieval.NERNeuralContextRetrievalExample.__hash__">
+<span class="sig-name descname"><span class="pre">__hash__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.ner.retrieval.NERNeuralContextRetrievalExample.__hash__" title="Link to this definition"></a></dt>
+<dd><p>Return hash(self).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="renard.pipeline.ner.retrieval.NERNeuralContextRetrievalExample.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">element</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context_side</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.ner.retrieval.NERNeuralContextRetrievalExample.__init__" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>element</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</span>)</p></li>
+<li><p><strong>context</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</span>)</p></li>
+<li><p><strong>context_side</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code>[<code class="docutils literal notranslate"><span class="pre">'left'</span></code>, <code class="docutils literal notranslate"><span class="pre">'right'</span></code>]</span>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="renard.pipeline.ner.retrieval.NERNeuralContextRetrievalExample.__repr__">
+<span class="sig-name descname"><span class="pre">__repr__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.ner.retrieval.NERNeuralContextRetrievalExample.__repr__" title="Link to this definition"></a></dt>
+<dd><p>Return repr(self).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="renard.pipeline.ner.retrieval.NERNeuralContextRetrievalExample.__setattr__">
+<span class="sig-name descname"><span class="pre">__setattr__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.ner.retrieval.NERNeuralContextRetrievalExample.__setattr__" title="Link to this definition"></a></dt>
+<dd><p>Implement setattr(self, name, value).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="renard.pipeline.ner.retrieval.NERNeuralContextRetrievalExample.context">
+<span class="sig-name descname"><span class="pre">context</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code><span class="pre">[</span><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code><span class="pre">]</span></em><a class="headerlink" href="#renard.pipeline.ner.retrieval.NERNeuralContextRetrievalExample.context" title="Link to this definition"></a></dt>
+<dd><p>context to assist during prediction</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="renard.pipeline.ner.retrieval.NERNeuralContextRetrievalExample.context_side">
+<span class="sig-name descname"><span class="pre">context_side</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code><span class="pre">[</span><code class="docutils literal notranslate"><span class="pre">'left'</span></code><span class="pre">,</span> <code class="docutils literal notranslate"><span class="pre">'right'</span></code><span class="pre">]</span></em><a class="headerlink" href="#renard.pipeline.ner.retrieval.NERNeuralContextRetrievalExample.context_side" title="Link to this definition"></a></dt>
+<dd><p>context side (does the context comes from the left or the right of <code class="docutils literal notranslate"><span class="pre">sent</span></code> ?)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="renard.pipeline.ner.retrieval.NERNeuralContextRetrievalExample.element">
+<span class="sig-name descname"><span class="pre">element</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code><span class="pre">[</span><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code><span class="pre">]</span></em><a class="headerlink" href="#renard.pipeline.ner.retrieval.NERNeuralContextRetrievalExample.element" title="Link to this definition"></a></dt>
+<dd><p>text on which NER is performed</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="renard.pipeline.ner.retrieval.NERNeuralContextRetriever">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">renard.pipeline.ner.retrieval.</span></span><span class="sig-name descname"><span class="pre">NERNeuralContextRetriever</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">heuristic_context_selector</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pretrained_model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'compnet-renard/bert-base-cased-NER-reranker'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device_str</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'auto'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.ner.retrieval.NERNeuralContextRetriever" title="Link to this definition"></a></dt>
+<dd><p>A neural context retriever as in Amalvy et al.  2024</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>heuristic_context_selector</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#renard.pipeline.ner.retrieval.NERContextRetriever" title="renard.pipeline.ner.retrieval.NERContextRetriever"><code class="xref py py-class docutils literal notranslate"><span class="pre">NERContextRetriever</span></code></a></span>)</p></li>
+<li><p><strong>pretrained_model</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">BertForSequenceClassification</span></code>]</span>)</p></li>
+<li><p><strong>k</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></span>)</p></li>
+<li><p><strong>batch_size</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></span>)</p></li>
+<li><p><strong>threshold</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></span>)</p></li>
+<li><p><strong>device_str</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code>[<code class="docutils literal notranslate"><span class="pre">'cuda'</span></code>, <code class="docutils literal notranslate"><span class="pre">'cpu'</span></code>, <code class="docutils literal notranslate"><span class="pre">'auto'</span></code>]</span>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="renard.pipeline.ner.retrieval.NERNeuralContextRetriever.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">heuristic_context_selector</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pretrained_model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'compnet-renard/bert-base-cased-NER-reranker'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device_str</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'auto'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.ner.retrieval.NERNeuralContextRetriever.__init__" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pretrained_model</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">BertForSequenceClassification</span></code>]</span>) – pretrained model name, used to
+load a <code class="xref py py-class docutils literal notranslate"><span class="pre">transformers.BertForSequenceClassification</span></code></p></li>
+<li><p><strong>heuristic_context_selector</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#renard.pipeline.ner.retrieval.NERContextRetriever" title="renard.pipeline.ner.retrieval.NERContextRetriever"><code class="xref py py-class docutils literal notranslate"><span class="pre">NERContextRetriever</span></code></a></span>) – name of the context
+selector to use as retrieval heuristic, from
+<code class="docutils literal notranslate"><span class="pre">context_selector_name_to_class</span></code></p></li>
+<li><p><strong>heuristic_context_selector_kwargs</strong> – kwargs to pass the
+heuristic context retriever at instantiation time</p></li>
+<li><p><strong>k</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></span>) – max number of sents to retrieve</p></li>
+<li><p><strong>batch_size</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></span>) – batch size used at inference</p></li>
+<li><p><strong>threshold</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></span>)</p></li>
+<li><p><strong>device_str</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code>[<code class="docutils literal notranslate"><span class="pre">'cuda'</span></code>, <code class="docutils literal notranslate"><span class="pre">'cpu'</span></code>, <code class="docutils literal notranslate"><span class="pre">'auto'</span></code>]</span>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="renard.pipeline.ner.retrieval.NERNeuralContextRetriever.predict">
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">examples</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.ner.retrieval.NERNeuralContextRetriever.predict" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dataset</strong> – A list of <code class="xref py py-class docutils literal notranslate"><span class="pre">ContextSelectionExample</span></code></p></li>
+<li><p><strong>examples</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<a class="reference internal" href="#renard.pipeline.ner.retrieval.NERNeuralContextRetrievalExample" title="renard.pipeline.ner.retrieval.NERNeuralContextRetrievalExample"><code class="xref py py-class docutils literal notranslate"><span class="pre">NERNeuralContextRetrievalExample</span></code></a>]</span>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A tensor of shape <code class="docutils literal notranslate"><span class="pre">(len(dataset),</span> <span class="pre">2)</span></code> of class
+scores</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="renard.pipeline.ner.retrieval.NERSamenounContextRetriever">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">renard.pipeline.ner.retrieval.</span></span><span class="sig-name descname"><span class="pre">NERSamenounContextRetriever</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">k</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.ner.retrieval.NERSamenounContextRetriever" title="Link to this definition"></a></dt>
+<dd><p>Retrieve relevant context using the samenoun strategy as in
+Amalvy et al.  2023.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>k</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></span>)</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="renard.pipeline.ner.retrieval.NERSamenounContextRetriever.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">k</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.pipeline.ner.retrieval.NERSamenounContextRetriever.__init__" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>k</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></span>) – the max number of sentences to retrieve</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
 </section>
 <section id="coreference-resolution">
 <h2>Coreference Resolution<a class="headerlink" href="#coreference-resolution" title="Link to this heading"></a></h2>
@@ -1408,7 +1743,7 @@ coreference resolution’ (Joshi et al.  2019).</p>
 <li><p><strong>huggingface_model_id</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</span>)</p></li>
 <li><p><strong>batch_size</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></span>)</p></li>
 <li><p><strong>device</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code>[<code class="docutils literal notranslate"><span class="pre">'auto'</span></code>, <code class="docutils literal notranslate"><span class="pre">'cuda'</span></code>, <code class="docutils literal notranslate"><span class="pre">'cpu'</span></code>]</span>)</p></li>
-<li><p><strong>tokenizer</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">PreTrainedTokenizerFast</span></code>]</span>)</p></li>
+<li><p><strong>tokenizer</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">TokenizersBackend</span></code>]</span>)</p></li>
 <li><p><strong>block_size</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></span>)</p></li>
 <li><p><strong>hierarchical_merging</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></span>)</p></li>
 </ul>
@@ -1452,7 +1787,7 @@ tibert’s hierarchical merging feature.  In that case,
 blocks of size <code class="docutils literal notranslate"><span class="pre">block_size</span></code> are merged to perform
 inference on the whole document.</p></li>
 <li><p><strong>model</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">BertForCoreferenceResolution</span></code>]</span>)</p></li>
-<li><p><strong>tokenizer</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">PreTrainedTokenizerFast</span></code>]</span>)</p></li>
+<li><p><strong>tokenizer</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">TokenizersBackend</span></code>]</span>)</p></li>
 </ul>
 </dd>
 </dl>
@@ -2218,7 +2553,7 @@ the string <code class="docutils literal notranslate"><span class="pre">'any'</s
 <li><p><strong>model</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">PreTrainedModel</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>]</span>)</p></li>
 <li><p><strong>batch_size</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></span>)</p></li>
 <li><p><strong>device</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code>[<code class="docutils literal notranslate"><span class="pre">'cpu'</span></code>, <code class="docutils literal notranslate"><span class="pre">'cuda'</span></code>, <code class="docutils literal notranslate"><span class="pre">'auto'</span></code>]</span>)</p></li>
-<li><p><strong>tokenizer</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">PreTrainedTokenizerFast</span></code>]</span>)</p></li>
+<li><p><strong>tokenizer</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">TokenizersBackend</span></code>]</span>)</p></li>
 </ul>
 </dd>
 </dl>
@@ -2250,7 +2585,7 @@ the string <code class="docutils literal notranslate"><span class="pre">'any'</s
 <li><p><strong>model</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">PreTrainedModel</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>]</span>)</p></li>
 <li><p><strong>batch_size</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></span>)</p></li>
 <li><p><strong>device</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code>[<code class="docutils literal notranslate"><span class="pre">'cpu'</span></code>, <code class="docutils literal notranslate"><span class="pre">'cuda'</span></code>, <code class="docutils literal notranslate"><span class="pre">'auto'</span></code>]</span>)</p></li>
-<li><p><strong>tokenizer</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">PreTrainedTokenizerFast</span></code>]</span>)</p></li>
+<li><p><strong>tokenizer</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">TokenizersBackend</span></code>]</span>)</p></li>
 </ul>
 </dd>
 </dl>
@@ -3135,7 +3470,7 @@ correct <code class="docutils literal notranslate"><span class="pre">encodings</
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>tokenizer</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">PreTrainedTokenizerFast</span></code></span>)</p></li>
+<li><p><strong>tokenizer</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">TokenizersBackend</span></code></span>)</p></li>
 <li><p><strong>pad_to_multiple_of</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]</span>)</p></li>
 </ul>
 </dd>
@@ -3160,7 +3495,7 @@ correct <code class="docutils literal notranslate"><span class="pre">encodings</
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>tokenizer</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">PreTrainedTokenizerFast</span></code></span>)</p></li>
+<li><p><strong>tokenizer</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">TokenizersBackend</span></code></span>)</p></li>
 <li><p><strong>pad_to_multiple_of</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]</span>)</p></li>
 </ul>
 </dd>
@@ -3183,7 +3518,7 @@ the context can still be passed as input to the model.</p>
 <dt class="field-even">Parameters<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
 <li><p><strong>elements</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]</span>)</p></li>
-<li><p><strong>tokenizer</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">PreTrainedTokenizerFast</span></code></span>)</p></li>
+<li><p><strong>tokenizer</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">TokenizersBackend</span></code></span>)</p></li>
 <li><p><strong>context_mask</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]]]</span>)</p></li>
 </ul>
 </dd>
@@ -3195,7 +3530,7 @@ the context can still be passed as input to the model.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>elements</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]</span>)</p></li>
-<li><p><strong>tokenizer</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">PreTrainedTokenizerFast</span></code></span>)</p></li>
+<li><p><strong>tokenizer</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">TokenizersBackend</span></code></span>)</p></li>
 <li><p><strong>context_mask</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]]]</span>)</p></li>
 </ul>
 </dd>
@@ -3212,7 +3547,7 @@ the context can still be passed as input to the model.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>examples</strong> – an object with keys ‘tokens’ and ‘labels’</p></li>
-<li><p><strong>tokenizer</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">PreTrainedTokenizerFast</span></code></span>)</p></li>
+<li><p><strong>tokenizer</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">TokenizersBackend</span></code></span>)</p></li>
 <li><p><strong>label_all_tokens</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></span>)</p></li>
 </ul>
 </dd>
@@ -3220,8 +3555,8 @@ the context can still be passed as input to the model.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="renard.ner_utils.hgdataset_from_conll2002">
-<span class="sig-prename descclassname"><span class="pre">renard.ner_utils.</span></span><span class="sig-name descname"><span class="pre">hgdataset_from_conll2002</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tag_conversion_map</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">separator</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'\\t'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_sent_len</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.ner_utils.hgdataset_from_conll2002" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="renard.ner_utils.hfdataset_from_conll2002">
+<span class="sig-prename descclassname"><span class="pre">renard.ner_utils.</span></span><span class="sig-name descname"><span class="pre">hfdataset_from_conll2002</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tag_conversion_map</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">separator</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'\\t'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_sent_len</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.ner_utils.hfdataset_from_conll2002" title="Link to this definition"></a></dt>
 <dd><p>Load a CoNLL-2002 file as a Huggingface Dataset.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -3230,6 +3565,9 @@ the context can still be passed as input to the model.</p>
 <li><p><strong>tag_conversion_map</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]</span>) – passed to <a class="reference internal" href="#renard.ner_utils.load_conll2002_bio" title="renard.ner_utils.load_conll2002_bio"><code class="xref py py-func docutils literal notranslate"><span class="pre">load_conll2002_bio()</span></code></a></p></li>
 <li><p><strong>separator</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – passed to <a class="reference internal" href="#renard.ner_utils.load_conll2002_bio" title="renard.ner_utils.load_conll2002_bio"><code class="xref py py-func docutils literal notranslate"><span class="pre">load_conll2002_bio()</span></code></a></p></li>
 <li><p><strong>max_sent_len</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]</span>) – passed to <a class="reference internal" href="#renard.ner_utils.load_conll2002_bio" title="renard.ner_utils.load_conll2002_bio"><code class="xref py py-func docutils literal notranslate"><span class="pre">load_conll2002_bio()</span></code></a></p></li>
+<li><p><strong>labels</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]</span>) – the list of all possible labels.  If <code class="docutils literal notranslate"><span class="pre">None</span></code>, will
+automatically be assigned to the sorted list of possible tags
+found in the input file.</p></li>
 <li><p><strong>kwargs</strong> – additional kwargs for <code class="xref py py-func docutils literal notranslate"><span class="pre">open()</span></code></p></li>
 </ul>
 </dd>
@@ -3237,7 +3575,20 @@ the context can still be passed as input to the model.</p>
 <dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></span></p>
 </dd>
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>a <code class="xref py py-class docutils literal notranslate"><span class="pre">datasets.Dataset</span></code> with features ‘tokens’ and ‘labels’.</p>
+<dd class="field-odd"><p>a <code class="xref py py-class docutils literal notranslate"><span class="pre">datasets.Dataset</span></code> with features ‘tokens’ and
+‘labels’.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="renard.ner_utils.hgdataset_from_conll2002">
+<span class="sig-prename descclassname"><span class="pre">renard.ner_utils.</span></span><span class="sig-name descname"><span class="pre">hgdataset_from_conll2002</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.ner_utils.hgdataset_from_conll2002" title="Link to this definition"></a></dt>
+<dd><p>Deprecated function that only exists for retrocompatibility, you
+should call <a class="reference internal" href="#renard.ner_utils.hfdataset_from_conll2002" title="renard.ner_utils.hfdataset_from_conll2002"><code class="xref py py-func docutils literal notranslate"><span class="pre">hfdataset_from_conll2002()</span></code></a> instead.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></span></p>
 </dd>
 </dl>
 </dd></dl>
@@ -3289,6 +3640,31 @@ should be in the CoNLL-2002 form (such as ‘B-PER I-PER’)</p></li>
 </dd>
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>A list of ner entities, in apparition order</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="renard.ner_utils.train_ner_model">
+<span class="sig-prename descclassname"><span class="pre">renard.ner_utils.</span></span><span class="sig-name descname"><span class="pre">train_ner_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hf_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">targs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">train_split='train'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">valid_split='valid'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trainer_class=&lt;class</span> <span class="pre">'transformers.trainer.Trainer'&gt;</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#renard.ner_utils.train_ner_model" title="Link to this definition"></a></dt>
+<dd><p>Train a NER model on the given dataset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>hf_id</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – huggingface ID of the model to train</p></li>
+<li><p><strong>dataset</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">DatasetDict</span></code>]</span>) – huggingface dataset on which to train.  The
+‘labels’ column is assumed to contain NER labels.</p></li>
+<li><p><strong>TrainingArguments</strong> – training arguments for the huggingface
+trainer.</p></li>
+<li><p><strong>train_split</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – split of the dataset used for train.</p></li>
+<li><p><strong>valid_split</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – split of the dataset used for validation.</p></li>
+<li><p><strong>trainer_class</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">type</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Trainer</span></code>]</span>) – trainer class to use.  Can be used to
+override the default huggingface trainer.</p></li>
+<li><p><strong>targs</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">TrainingArguments</span></code></span>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">PreTrainedModel</span></code></span></p>
 </dd>
 </dl>
 </dd></dl>
