@@ -11,7 +11,7 @@ requires-python = ">=3.10,<3.14"
 dependencies = [
     "torch>=2.8.0",
     "transformers>=5.0.0",
-    "nltk>=3.9.3",
+    "nltk>=3.10.3",
     "tqdm>=4.67.1",
     "networkx>=3.2",
     "more-itertools>=10.7",
@@ -64,11 +64,18 @@ cuda129 = [
 ]
 rocm63 = [
   "torch>=2.8.0",
-  "pytorch-triton-rocm>=3.1.0", 
+  "triton-rocm",
+  "pytorch-triton-rocm>=3.5.0 ; sys_platform == 'linux'", 
 ]
 rocm64 = [
   "torch>=2.8.0",
-  "pytorch-triton-rocm>=3.1.0", 
+  "triton-rocm",
+  "pytorch-triton-rocm>=3.5.0 ; sys_platform == 'linux'", 
+]
+rocm71 = [
+  "torch>=2.8.0",
+  "triton-rocm",
+  "pytorch-triton-rocm>=3.1.0 ; sys_platform == 'linux'", 
 ]
 dspy = [
     "dspy>=2.6.27",
@@ -82,6 +89,7 @@ conflicts = [
     { extra = "cuda129" },
     { extra = "rocm63" },
     { extra = "rocm64" },
+    { extra = "rocm71" },
   ],
 ]
 
@@ -90,12 +98,19 @@ torch = [
   { index = "pytorch-cpu", extra = "cpu" },
   { index = "pytorch-cuda128", extra = "cuda128" },
   { index = "pytorch-cuda129", extra = "cuda129" },
-  { index = "pytorch-rocm63", extra = "rocm63" },
-  { index = "pytorch-rocm64", extra = "rocm64" },
+  { index = "pytorch-rocm63", extra = "rocm63", marker = "sys_platform == 'linux'" },
+  { index = "pytorch-rocm64", extra = "rocm64", marker = "sys_platform == 'linux'" },
+  { index = "pytorch-rocm71", extra = "rocm71", marker = "sys_platform == 'linux'" },
 ]
 pytorch-triton-rocm = [
-  { index = "pytorch-rocm63", extra = "rocm63" },
-  { index = "pytorch-rocm64", extra = "rocm64" },
+  { index = "pytorch-rocm63", extra = "rocm63", marker = "sys_platform == 'linux'" },
+  { index = "pytorch-rocm64", extra = "rocm64", marker = "sys_platform == 'linux'" },
+  { index = "pytorch-rocm71", extra = "rocm71", marker = "sys_platform == 'linux'" },
+]
+triton-rocm = [
+  { index = "pytorch-rocm63", extra = "rocm63", marker = "sys_platform == 'linux'" },
+  { index = "pytorch-rocm64", extra = "rocm64", marker = "sys_platform == 'linux'" },
+  { index = "pytorch-rocm71", extra = "rocm71", marker = "sys_platform == 'linux'" },
 ]
 
 [[tool.uv.index]]
@@ -121,4 +136,9 @@ explicit = true
 [[tool.uv.index]]
 name = "pytorch-rocm64"
 url = "https://download.pytorch.org/whl/rocm6.4"
+explicit = true
+
+[[tool.uv.index]]
+name = "pytorch-rocm71"
+url = "https://download.pytorch.org/whl/rocm7.1"
 explicit = true
