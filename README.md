@@ -9,7 +9,7 @@ Renard (Relationship Extraction from NARrative Documents) is a modular library f
 
 # Installation
 
-Currently, Renard supports Python>=3.9,<=3.12. You can install the
+Currently, Renard supports Python>=3.10,<=3.14. You can install the
 latest version using pip:
 
 > pip install renard-pipeline
@@ -18,7 +18,7 @@ By default, this pulls the cuda version of pytorch. If you want a CPU-only versi
 
 > pip install torch --index-url https://download.pytorch.org/whl/cpu && pip install renard-pipeline
 
-For an AMD rocm version of torch (ROCm 6.4):
+For an AMD rocm version of torch (ROCm 7.1):
 
 > pip install torch --index-url https://download.pytorch.org/whl/rocm6.4 && pip install renard-pipeline
 
