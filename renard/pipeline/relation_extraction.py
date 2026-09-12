@@ -183,7 +183,7 @@ class Seq2SeqRelationExtractor(PipelineStep):
     def _pipeline_init_(self, lang: str, progress_reporter: ProgressReporter, **kwargs):
         super()._pipeline_init_(lang, progress_reporter, **kwargs)
         self.hf_pipeline = hf_pipeline(
-            "text2text-generation",
+            "text-generation",
             torch_dtype=torch.bfloat16,
             model=self.model,
             device=self.device,
@@ -197,14 +197,13 @@ class Seq2SeqRelationExtractor(PipelineStep):
         sentence_relations = []
 
         # chunk as in the ARF dataset
-        dataset = HFDataset.from_list(
-            [
-                {"text": Seq2SeqRelationExtractor.task_prompt(" ".join(sent))}
-                for sent in sentences
-            ]
-        )
+        dataset = [
+            Seq2SeqRelationExtractor.task_prompt(" ".join(sent)) for sent in sentences
+        ]
         for out in self._progress_(
-            self.hf_pipeline(KeyDataset(dataset, "text"), batch_size=self.batch_size),
+            self.hf_pipeline(
+                dataset, batch_size=self.batch_size, return_full_text=False
+            ),
             total=len(dataset),
         ):
             text_relations = out[0]["generated_text"]
