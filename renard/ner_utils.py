@@ -6,7 +6,7 @@ import functools as ft
 from more_itertools import flatten
 import torch
 from torch.utils.data import Dataset
-from datasets import Dataset as HGDataset
+from datasets import Dataset as HFDataset, DatasetDict as HFDatasetDict
 from datasets import Sequence, ClassLabel
 from transformers import (
     AutoModelForTokenClassification,
@@ -92,7 +92,7 @@ class NERDataset(Dataset):
             assert all(
                 [len(cm) == len(elt) for elt, cm in zip(self.elements, context_mask)]
             )
-        self._context_mask = context_mask or [[1] * len(elt) for elt in self.elements]
+        self._context_mask = context_mask or [[0] * len(elt) for elt in self.elements]
 
         self.tokenizer = tokenizer
 
@@ -213,8 +213,10 @@ def load_conll2002_bio(
     tags = []
     for line in raw_data.split("\n"):
         line = line.strip("\n")
-        if re.fullmatch(r"\s*", line) or (
-            not max_sent_len is None and len(sent_tokens) >= max_sent_len
+        if (
+            re.fullmatch(r"\s*", line)  # ignore empty lines
+            or re.fullmatch(r"# [^:]+: .*", line)  # ignore Novelties style metadata
+            or (not max_sent_len is None and len(sent_tokens) >= max_sent_len)
         ):
             if len(sent_tokens) == 0:
                 continue
@@ -224,6 +226,8 @@ def load_conll2002_bio(
         token, tag = line.split(separator)
         sent_tokens.append(token)
         tags.append(tag_conversion_map.get(tag, tag))
+    if len(sent_tokens) != 0:
+        sents.append(sent_tokens)
 
     tokens = list(flatten(sents))
     entities = ner_entities(tokens, tags)
@@ -231,22 +235,27 @@ def load_conll2002_bio(
     return sents, list(flatten(sents)), entities
 
 
-def hgdataset_from_conll2002(
+def hfdataset_from_conll2002(
     path: str,
     tag_conversion_map: Optional[Dict[str, str]] = None,
     separator: str = "\t",
     max_sent_len: Optional[int] = None,
+    labels: Optional[list[str]] = None,
     **kwargs,
-) -> HGDataset:
+) -> HFDataset:
     """Load a CoNLL-2002 file as a Huggingface Dataset.
 
     :param path: passed to :func:`.load_conll2002_bio`
     :param tag_conversion_map: passed to :func:`load_conll2002_bio`
     :param separator: passed to :func:`load_conll2002_bio`
     :param max_sent_len: passed to :func:`load_conll2002_bio`
+    :param labels: the list of all possible labels.  If ``None``, will
+        automatically be assigned to the sorted list of possible tags
+        found in the input file.
     :param kwargs: additional kwargs for :func:`open`
 
-    :return: a :class:`datasets.Dataset` with features 'tokens' and 'labels'.
+    :return: a :class:`datasets.Dataset` with features 'tokens' and
+             'labels'.
     """
     sentences, tokens, entities = load_conll2002_bio(
         path, tag_conversion_map, separator, max_sent_len, **kwargs
@@ -268,11 +277,19 @@ def hgdataset_from_conll2002(
         for sent_start, sent_end in zip(sent_starts, sent_ends)
     ]
 
-    dataset = HGDataset.from_dict({"tokens": sentences, "labels": sent_tags})
-    dataset = dataset.cast_column(
-        "labels", Sequence(ClassLabel(names=sorted(set(tags))))
-    )
+    dataset = HFDataset.from_dict({"tokens": sentences, "labels": sent_tags})
+    if labels is None:
+        labels = sorted(set(tags))
+    dataset = dataset.cast_column("labels", Sequence(ClassLabel(names=labels)))
     return dataset
+
+
+def hgdataset_from_conll2002(**kwargs) -> HFDataset:
+    """
+    Deprecated function that only exists for retrocompatibility, you
+    should call :func:`.hfdataset_from_conll2002` instead.
+    """
+    return hfdataset_from_conll2002(**kwargs)
 
 
 def _tokenize_and_align_labels(
@@ -315,37 +332,49 @@ def _tokenize_and_align_labels(
 
 
 def train_ner_model(
-    hg_id: str,
-    dataset: HGDataset,
+    hf_id: str,
+    dataset: Union[HFDataset, HFDatasetDict],
     targs: TrainingArguments,
+    train_split: str = "train",
+    valid_split: str = "valid",
+    trainer_class: type[Trainer] = Trainer,
 ) -> PreTrainedModel:
+    """Train a NER model on the given dataset.
+
+    :param hf_id: huggingface ID of the model to train
+    :param dataset: huggingface dataset on which to train.  The
+        'labels' column is assumed to contain NER labels.
+    :param TrainingArguments: training arguments for the huggingface
+        trainer.
+    :param train_split: split of the dataset used for train.
+    :param valid_split: split of the dataset used for validation.
+    :param trainer_class: trainer class to use.  Can be used to
+        override the default huggingface trainer.
+    """
     from transformers import DataCollatorForTokenClassification
 
     # BERT tokenizer splits tokens into subtokens. The
     # tokenize_and_align_labels function correctly aligns labels and
     # subtokens.
-    tokenizer = AutoTokenizer.from_pretrained(hg_id)
+    tokenizer = AutoTokenizer.from_pretrained(hf_id)
     dataset = dataset.map(
         ft.partial(_tokenize_and_align_labels, tokenizer=tokenizer), batched=True
     )
-    dataset = dataset.train_test_split(test_size=0.1)
 
-    label_lst = dataset["train"].features["labels"].feature.names
+    label_lst = dataset[train_split].features["labels"].feature.names
     model = AutoModelForTokenClassification.from_pretrained(
-        hg_id,
+        hf_id,
         num_labels=len(label_lst),
         id2label={i: label for i, label in enumerate(label_lst)},
         label2id={label: i for i, label in enumerate(label_lst)},
     )
 
-    trainer = Trainer(
+    trainer = trainer_class(
         model,
         targs,
-        train_dataset=dataset["train"],
-        eval_dataset=dataset["test"],
-        # data_collator=DataCollatorForTokenClassificationWithBatchEncoding(tokenizer),
+        train_dataset=dataset[train_split],
+        eval_dataset=dataset[valid_split],
         data_collator=DataCollatorForTokenClassification(tokenizer),
-        tokenizer=tokenizer,
     )
     trainer.train()
 

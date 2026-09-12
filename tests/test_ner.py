@@ -5,8 +5,9 @@ from hypothesis import given
 from hypothesis.control import assume
 from hypothesis.strategies import lists, sampled_from
 from transformers import BertTokenizerFast
+from renard.pipeline.progress import get_progress_reporter
 from renard.ner_utils import NERDataset
-from renard.pipeline.ner import ner_entities, score_ner
+from renard.pipeline.ner import ner_entities, score_ner, BertNamedEntityRecognizer
 from renard.pipeline.ner.retrieval import (
     NERBM25ContextRetriever,
     NERContextRetriever,
@@ -32,6 +33,22 @@ def test_has_correct_number_of_entities(tokens: List[str]):
     bio_tags = ["B-PER" for _ in tokens]
     entities = ner_entities(tokens, bio_tags)
     assert len(entities) == len(tokens)
+
+
+@pytest.mark.skipif(os.getenv("RENARD_TEST_SLOW") != "1", reason="performance")
+def test_run_with_context_retriever():
+    ner_step = BertNamedEntityRecognizer(
+        context_retriever=NERNeighborsContextRetriever(k=2)
+    )
+    ner_step._pipeline_init_(lang="eng", progress_reporter=get_progress_reporter(None))
+    # known crash in Renard==0.7.1
+    sentences = [
+        "Whether i shall turn out to be the hero of my own life , or whether that station will be held by anybody else , these pages must show .".split(),
+        "To begin my life with the beginning of my life , i record that i was born ( as i have been informed and believe ) on a friday , at twelve o'clock at night .".split(),
+        "This was the fault of Dr. Strange .".split(),
+    ]
+    tokens = [token for tokens in sentences for token in tokens]
+    _ = ner_step(tokens, sentences)
 
 
 @pytest.mark.skipif(os.getenv("RENARD_TEST_SLOW") != "1", reason="performance")

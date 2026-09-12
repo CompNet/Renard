@@ -128,7 +128,7 @@ def relational_pipeline(
     """
     from renard.pipeline.tokenization import NLTKTokenizer
     from renard.pipeline.character_unification import GraphRulesCharacterUnifier
-    from renard.pipeline.relation_extraction import GenerativeRelationExtractor
+    from renard.pipeline.relation_extraction import Seq2SeqRelationExtractor
     from renard.pipeline.graph_extraction import RelationalGraphExtractor
 
     tokenizer_kwargs = tokenizer_kwargs or {}
@@ -142,7 +142,7 @@ def relational_pipeline(
             NLTKTokenizer(**tokenizer_kwargs),
             ner_step(**ner_kwargs),
             GraphRulesCharacterUnifier(**character_unifier_kwargs),
-            GenerativeRelationExtractor(**relation_extractor_kwargs),
+            Seq2SeqRelationExtractor(**relation_extractor_kwargs),
             RelationalGraphExtractor(**graph_extractor_kwargs),
         ],
         **pipeline_kwargs,

@@ -29,6 +29,8 @@ class NERContextRetrievalMatch:
 
 
 class NERContextRetriever:
+    """Base class for NER context retrievers."""
+
     def __init__(self, k: int) -> None:
         self.k = k
 
@@ -64,7 +66,7 @@ class NERContextRetriever:
 
             elements_with_context.append((lctx, elt, rctx))
 
-        return NERDataset(
+        ner_dataset = NERDataset(
             [lctx + element + rctx for lctx, element, rctx in elements_with_context],
             dataset.tokenizer,
             [
@@ -72,6 +74,7 @@ class NERContextRetriever:
                 for lctx, element, rctx in elements_with_context
             ],
         )
+        return ner_dataset
 
 
 class NERSamenounContextRetriever(NERContextRetriever):
@@ -278,7 +281,9 @@ class NERNeuralContextRetriever(NERContextRetriever):
         self.ctx_classifier = self.ctx_classifier.to(self.device)
 
         data_collator = DataCollatorWithPadding(dataset.tokenizer)  # type: ignore
-        dataloader = DataLoader(dataset, batch_size=self.batch_size, shuffle=False, collate_fn=data_collator)  # type: ignore
+        dataloader = DataLoader(
+            dataset, batch_size=self.batch_size, shuffle=False, collate_fn=data_collator
+        )  # type: ignore
 
         # inference using self.ctx_classifier
         self.ctx_classifier = self.ctx_classifier.eval()
