@@ -7,7 +7,7 @@ from hypothesis.strategies import lists, sampled_from
 from transformers import BertTokenizerFast
 from renard.pipeline.progress import get_progress_reporter
 from renard.ner_utils import NERDataset
-from renard.pipeline.ner import ner_entities, score_ner, BertNamedEntityRecognizer
+from renard.pipeline.ner import ner_entities, BertNamedEntityRecognizer
 from renard.pipeline.ner.retrieval import (
     NERBM25ContextRetriever,
     NERContextRetriever,
@@ -16,16 +16,6 @@ from renard.pipeline.ner.retrieval import (
     NERSamenounContextRetriever,
     NERNeuralContextRetriever,
 )
-
-
-@pytest.mark.skipif(
-    os.getenv("RENARD_TEST_OPTDEP_SEQEVAL") != "1",
-    reason="not testing seqeval based functions",
-)
-@given(lists(sampled_from(("B-PER", "I-PER", "O")), min_size=1))
-def test_score_same_tags(tags: List[str]):
-    assume("B-PER" in tags)
-    assert (1.0, 1.0, 1.0) == score_ner(tags, tags)
 
 
 @given(lists(sampled_from(string.ascii_uppercase)))

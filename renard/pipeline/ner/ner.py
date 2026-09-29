@@ -49,32 +49,6 @@ class NEREntity(Mention):
         return hash(tuple(self.tokens) + (self.start_idx, self.end_idx, self.tag))
 
 
-def score_ner(
-    pred_bio_tags: List[str], ref_bio_tags: List[str]
-) -> Tuple[float, float, float]:
-    """Score NER as in CoNLL-2003 shared task using the ``seqeval``
-    library, if installed.
-
-    Precision is the percentage of named entities in ``ref_bio_tags``
-    that are correct.  Recall is the percentage of named entities in
-    pred_bio_tags that are in ref_bio_tags.  F1 is the harmonic mean
-    of both.
-
-    :param pred_bio_tags:
-    :param ref_bio_tags:
-
-    :return: ``(precision, recall, F1 score)``
-    """
-    from seqeval.metrics import precision_score, recall_score, f1_score
-
-    assert len(pred_bio_tags) == len(ref_bio_tags)
-    return (
-        precision_score([ref_bio_tags], [pred_bio_tags]),
-        recall_score([ref_bio_tags], [pred_bio_tags]),
-        f1_score([ref_bio_tags], [pred_bio_tags]),
-    )
-
-
 class NLTKNamedEntityRecognizer(PipelineStep):
     """An entity recognizer based on NLTK"""
 
