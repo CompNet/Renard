@@ -5,6 +5,7 @@ from nltk.data import load
 from nltk.tokenize.destructive import NLTKWordTokenizer
 from renard.pipeline.core import PipelineStep
 from renard.nltk_utils import NLTK_ISO_STRING_TO_LANG
+from renard.lang_utils import ISO_639_3_TO_ISO_639_1
 
 
 def make_char2token(text: str, token2chars: List[Tuple[int, int]]) -> List[int]:
@@ -77,6 +78,58 @@ class NLTKTokenizer(PipelineStep):
 
     def supported_langs(self) -> Union[Set[str], Literal["any"]]:
         return set(NLTK_ISO_STRING_TO_LANG.keys())
+
+    def needs(self) -> Set[str]:
+        return {"text"}
+
+    def production(self) -> Set[str]:
+        return {"tokens", "char2token", "sentences"}
+
+
+class StanzaTokenizer(PipelineStep):
+    """The tokenizer from StanfordCoreNLP stanza.
+
+    .. note::
+
+        The ``stanza`` extra must be installed for this tokenizer to work.
+    """
+
+    def __init__(self, **stanza_pipeline_kwargs):
+        self.stanza_pipeline_kwargs = stanza_pipeline_kwargs
+        super().__init__()
+
+    def _pipeline_init_(self, lang: str, **kwargs):
+        import stanza
+
+        self.nlp = stanza.Pipeline(
+            ISO_639_3_TO_ISO_639_1[lang],
+            processors="tokenize",
+            **self.stanza_pipeline_kwargs,
+        )
+        super()._pipeline_init_(lang, **kwargs)
+
+    def __call__(self, text: str, **kwargs) -> Dict[str, Any]:
+        doc = self.nlp(text)
+
+        tokens = []
+        token2chars = []
+        sentences = []
+
+        for stanza_sent in doc.sentences:
+            sent_tokens = [stanza_token.text for stanza_token in stanza_sent.words]
+            sent_token2chars = [
+                (stanza_token.start_char, stanza_token.end_char)
+                for stanza_token in stanza_sent.words
+            ]
+            tokens += sent_tokens
+            token2chars += sent_token2chars
+            sentences.append(sent_tokens)
+
+        return {
+            "tokens": tokens,
+            "char2token": make_char2token(text, token2chars),
+            "sentences": sentences,
+        }
 
     def needs(self) -> Set[str]:
         return {"text"}

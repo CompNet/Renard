@@ -7,10 +7,10 @@ script_dir = os.path.abspath(os.path.dirname(__file__))
 
 
 @pytest.mark.skipif(
-    os.getenv("RENARD_TEST_OPTDEP_STANZA") != "1",
-    reason="not testing stanza based modules",
+    os.getenv("RENARD_TEST_OPTDEP_STANZA") != "1", reason="optional stanza dependency"
 )
-def test_stanza_pipeline_runs():
+@pytest.mark.skipif(os.getenv("RENARD_TEST_SLOW") != "1", reason="performance")
+def test_stanford_corenlp_pipeline_runs():
     from renard.pipeline.stanford_corenlp import StanfordCoreNLPPipeline
 
     text = load_novel_chapters("pride_and_prejudice")[0]

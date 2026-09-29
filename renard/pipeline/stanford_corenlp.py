@@ -33,7 +33,7 @@ def corenlp_annotations_bio_tags(annotations: CoreNLP_pb2.Document) -> List[str]
     :return: an array of bio tags.
     """
     corenlp_tokens = [
-        token for sentence in annotations.sentence for token in sentence.token  # type: ignore
+        token for sentence in annotations.sentence for token in sentence.token
     ]
     bio_tags = ["O"] * len(corenlp_tokens)
 
@@ -44,8 +44,7 @@ def corenlp_annotations_bio_tags(annotations: CoreNLP_pb2.Document) -> List[str]
         "MISC": "MISC",
     }
 
-    for mention in annotations.mentions:  # type: ignore
-
+    for mention in annotations.mentions:
         # ignore tags not in conll 2003 format
         if not mention.ner in stanford_to_bio:
             continue
@@ -163,7 +162,6 @@ class StanfordCoreNLPPipeline(PipelineStep):
             properties=corenlp_properties,
             **self.server_kwargs,
         ) as client:
-
             # compute annotation
             annotations: CoreNLP_pb2.Document = client.annotate(text)  # type: ignore
 
@@ -179,15 +177,12 @@ class StanfordCoreNLPPipeline(PipelineStep):
 
             # parse corefs if enabled
             if self.annotate_corefs:
-
                 coref_chains = []
 
                 for coref_chain in annotations.corefChain:  # type: ignore
-
                     chain = []
 
                     for mention in coref_chain.mention:  # type: ignore
-
                         mention_sent = annotations.sentence[mention.sentenceIndex]  # type: ignore
                         sent_start_idx = mention_sent.token[0].tokenBeginIndex
 
