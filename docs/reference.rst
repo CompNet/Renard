@@ -43,6 +43,11 @@ NLTKTokenizer
 .. autoclass:: renard.pipeline.tokenization.NLTKTokenizer
    :members:
 
+StanzaTokenizer
+---------------
+
+.. autoclass:: renard.pipeline.tokenization.StanzaTokenizer
+   :members:
 
 
 Named Entity Recognition

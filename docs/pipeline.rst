@@ -143,8 +143,13 @@ Tokenization is the task of cutting text in *tokens*. It is usually
 the first task to apply to a text. 2 tokenizer are available:
 
 - :class:`.NLTKTokenizer` is the tokenizer from NLTK.
+- :class:`.StanzaTokenizer` is the stanza tokenizer, which supports
+  many languages. Note that it is only available if `stanza` is
+  installed, which is not the default (available in the `stanza`
+  extra).
 - :class:`.StanfordCoreNLPPipeline` does contain a tokenizer as part
-  of its full NLP pipeline.
+  of its full NLP pipeline (also only available as part of the
+  `stanza` extra).
 
 
 Named Entity Recognition
