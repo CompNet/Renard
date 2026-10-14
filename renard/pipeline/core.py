@@ -582,7 +582,7 @@ class Pipeline:
         lang: str = "eng",
         progress_report: Optional[Literal["tqdm"]] = "tqdm",
         warn: bool = True,
-        **step_additional_params,
+        **kwargs,
     ) -> None:
         """
         :param steps: a ``tuple`` of :class:``PipelineStep``, that
@@ -593,13 +593,14 @@ class Pipeline:
         :param lang: ISO 639-3 language code
         :param warn:
 
-        :param step_additional_params: additional parameters passed to
+        :param kwargs: additional parameters passed to
             :meth:`._pipeline_init_` when
             :meth:`_pipeline_init_steps_` is called.  The following
             values are currently used:
 
                 - ``'character_ner_tag'``: the NER tag corresponding
-                  to characters (default: ``PER``)
+                  to characters (default: ``PER``, but steps can
+                  override this.).
         """
         self.steps = steps
 
@@ -609,7 +610,18 @@ class Pipeline:
         self.lang = lang
         self.warn = warn
 
-        self.step_additional_params = step_additional_params
+        # There a 3 ways pipeline-level parameters can be set:
+        #
+        # 1. There is a default value supplied by renard.
+        # 2. A step overrides the default value. For example, a NER
+        #    step may change the character_ner_tag param
+        # 3. The user overrides the value by passing a value in
+        #    step_additional_params
+        #
+        # The priority is as follows:
+        # user > step > default
+        self.user_step_additional_params = kwargs
+        self.step_additional_params = self.user_step_additional_params.copy()
         self.step_additional_params["character_ner_tag"] = (
             self.step_additional_params.get("character_ner_tag", "PER")
         )
@@ -629,10 +641,7 @@ class Pipeline:
             )
             if not step_additional_params is None:
                 for key, value in step_additional_params.items():
-                    setattr(self, key, value)
-                    # parameters set by the user have precedence over
-                    # step mandated parameters
-                    if not key in self.step_additional_params:
+                    if not key in self.user_step_additional_params:
                         pipeline_params[key] = value
 
     def _non_ignored_steps(

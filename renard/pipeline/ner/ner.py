@@ -99,9 +99,16 @@ class NLTKNamedEntityRecognizer(PipelineStep):
 class BertNamedEntityRecognizer(PipelineStep):
     """An entity recognizer based on BERT"""
 
-    LANG_TO_MODELS = {
-        "fra": "compnet-renard/camembert-base-literary-NER",
-        "eng": "compnet-renard/bert-base-cased-literary-NER",
+    @dataclass
+    class ModelConfig:
+        name: str
+        character_ner_tag: str
+
+    LANG_TO_MODEL = {
+        "fra": ModelConfig("compnet-renard/camembert-base-literary-NER", "PER"),
+        "eng": ModelConfig(
+            "compnet-renard/ModernBERT-base-literary-NER-novelties", "CHR"
+        ),
     }
 
     def __init__(
@@ -151,7 +158,7 @@ class BertNamedEntityRecognizer(PipelineStep):
 
         super().__init__()
 
-    def _pipeline_init_(self, lang: str, **kwargs):
+    def _pipeline_init_(self, lang: str, **kwargs) -> Optional[dict[str, Any]]:
         from transformers import AutoModelForTokenClassification, AutoTokenizer  # type: ignore
 
         super()._pipeline_init_(lang, **kwargs)
@@ -172,16 +179,20 @@ class BertNamedEntityRecognizer(PipelineStep):
 
             # the user did not supply anything: load the default model
             else:
-                model_str = BertNamedEntityRecognizer.LANG_TO_MODELS.get(lang)
-                if model_str is None:
+                model_config = BertNamedEntityRecognizer.LANG_TO_MODEL.get(lang)
+                if model_config is None:
                     raise ValueError(
                         f"BertNamedEntityRecognizer does not support language {lang}"
                     )
-                self.model = AutoModelForTokenClassification.from_pretrained(model_str)
+                self.model = AutoModelForTokenClassification.from_pretrained(
+                    model_config.name
+                )
                 if self.tokenizer is None:
-                    self.tokenizer = AutoTokenizer.from_pretrained(model_str)
-
-        assert not self.tokenizer is None
+                    self.tokenizer = AutoTokenizer.from_pretrained(model_config.name)
+                # some models can use different NER tags for
+                # character: override the default configuration of
+                # Renard
+                return {"character_ner_tag": model_config.character_ner_tag}
 
     def __call__(
         self,
