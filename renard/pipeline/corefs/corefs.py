@@ -86,7 +86,7 @@ class BertCoreferenceResolver(PipelineStep):
             # the user did not supply anything: load the default model
             else:
                 self.model = BertForCoreferenceResolution.from_pretrained(
-                    "compnet-renard/bert-base-cased-literary-coref"
+                    "compnet-renard/bert-base-cased-literary-coref-v2"
                 )
                 self.tokenizer = BertTokenizerFast.from_pretrained("bert-base-cased")
 
