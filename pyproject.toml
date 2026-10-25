@@ -7,7 +7,8 @@ authors = [
 ]
 license = { text = "GPL-3.0-only" }
 readme = "README.md"
-requires-python = ">=3.11,<3.15"
+# we can't add Python 3.15 yet as scipy does not have pre-built wheels for Python 3.15 yet, and the source build can prove difficult (see e.g. https://github.com/scipy/scipy/issues/23947)
+requires-python = ">=3.11,<3.14"
 dependencies = [
     "torch>=2.8.0",
     "transformers>=5.0.0",
@@ -20,12 +21,13 @@ dependencies = [
     "pytest>=8.4.1",
     "tibert>=0.6.0",
     "grimbert>=0.1.5",
-    "datasets>=4.0.0",
+    "datasets>=5.0.0",
     "rank-bm25>=0.2.2",
     "accelerate>=1.10.1",
-    "scikit-learn>=1.6.1",
+    "scikit-learn>=1.7.0",
     "tiktoken>=0.12.0",
     "protobuf>=6.33.5",
+    "lm-format-enforcer>=0.11.3",
 ]
 
 [build-system]
