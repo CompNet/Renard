@@ -13,7 +13,7 @@ from lmformatenforcer.integrations.transformers import (
 )
 # fmt: on
 
-from typing import Any, Union, Optional, Literal, Type, Set
+from typing import Any, Union, Optional, Literal, Type, Set, Tuple, cast
 import ast, re, math, json, sys
 from more_itertools import chunked, flatten
 import functools as ft
@@ -26,13 +26,14 @@ from transformers import (
     TrainingArguments,
     PreTrainedTokenizerFast,
     PreTrainedModel,
+    BatchEncoding,
 )
 from pydantic import BaseModel, create_model
 from transformers.pipelines.pt_utils import KeyDataset
-from renard.pipeline.core import PipelineStep
+from renard.pipeline.core import PipelineStep, Mention
 from renard.pipeline.progress import ProgressReporter
 from renard.pipeline.character_unification import Character
-from renard.utils import make_vocab
+from renard.utils import make_vocab, block_bounds
 from sklearn.metrics import precision_recall_fscore_support
 
 #: (subject, predicate, object)
@@ -211,48 +212,63 @@ class LLMRelationExtractor(PipelineStep):
     ) -> dict[str, Any]:  # type: ignore
         assert not self.model is None
         assert not self.tokenizer is None
-
-        class ProtoTriplet(BaseModel):
-            subject: str
-            object: str
-
-        RelationLiteral = Literal[tuple(self.relations)]  # type: ignore
-        Triplet = create_model(
-            "Relation", __base__=ProtoTriplet, relation=(RelationLiteral, ...)
-        )
-
-        class TripletList(BaseModel):
-            triplets: list[Triplet]  # type: ignore
-
-        prompts = [
-            self.make_task_prompt(" ".join(sent), TripletList) for sent in sentences
-        ]
-
         if self.tokenizer.pad_token is None:
             self.tokenizer.pad_token = self.tokenizer.eos_token
 
-        parser = JsonSchemaParser(TripletList.model_json_schema())
-        prefix_function = build_transformers_prefix_allowed_tokens_fn(
-            self.tokenizer, parser
-        )
+        sent_mention2character = self.sentence_mention2character(sentences, characters)
+        # we only perform inference if a character mention is present in the sentence
+        sent_data = [
+            (i, sent, mention2char)
+            for i, (sent, mention2char) in enumerate(
+                zip(sentences, sent_mention2character)
+            )
+            if len(mention2char) > 0
+        ]
 
-        triplets: list[list[Relation]] = []
+        triplets: list[list[Relation]] = [[] for _ in sentences]
 
-        for batch_prompts in self._progress_(
-            chunked(prompts, self.batch_size),
-            total=math.floor(len(prompts) / self.batch_size),
+        for batch in self._progress_(
+            chunked(sent_data, self.batch_size),
+            total=math.floor(len(sent_data) / self.batch_size),
         ):
+            batch_sent_i = [i for i, _, _ in batch]
+            batch_sents = [sents for _, sents, _ in batch]
+            batch_mention2char = [mention2char for _, _, mention2char in batch]
+
+            batch_triplet_list_models = [
+                self.make_triplet_list_model(set(mention2char.keys()))
+                for mention2char in batch_mention2char
+            ]
+            batch_parsers = [
+                JsonSchemaParser(tl.model_json_schema())
+                for tl in batch_triplet_list_models
+            ]
+            batch_prefix_functions = [
+                build_transformers_prefix_allowed_tokens_fn(self.tokenizer, parser)
+                for parser in batch_parsers
+            ]
+
+            def batch_prefix_allowed_tokens_fn(
+                batch_id: int, input_ids: torch.Tensor
+            ) -> list[int]:
+                target_fn = batch_prefix_functions[batch_id]
+                return target_fn(batch_id, input_ids)
+
+            batch_prompts = [
+                self.make_task_prompt(" ".join(sent), tl)
+                for sent, tl in zip(batch_sents, batch_triplet_list_models)
+            ]
+
             inputs = self.tokenizer(
                 batch_prompts, padding=True, return_tensors="pt"
             ).to(self.model.device)
             output_ids = self.model.generate(
                 **inputs,
                 max_new_tokens=max([len(prompt) for prompt in batch_prompts]) * 4,
-                prefix_allowed_tokens_fn=prefix_function,
+                prefix_allowed_tokens_fn=batch_prefix_allowed_tokens_fn,
                 do_sample=False,
             )  # type: ignore
 
-            batch_triplets = []
             prompt_len = inputs["input_ids"].shape[-1]
             for i in range(len(batch_prompts)):
                 generated_ids = output_ids[i][prompt_len:]
@@ -272,21 +288,45 @@ class LLMRelationExtractor(PipelineStep):
 
                 sent_triplets = []
                 for triplet in raw_sent_triplets:
-                    subj_char = LLMRelationExtractor.identify_character(
-                        triplet["subject"], characters
-                    )
-                    obj_char = LLMRelationExtractor.identify_character(
-                        triplet["object"], characters
-                    )
+                    subj_char = batch_mention2char[i].get(triplet["subject"])
+                    obj_char = batch_mention2char[i].get(triplet["object"])
                     if subj_char is None or obj_char is None or subj_char == obj_char:
                         continue
                     sent_triplets.append((subj_char, triplet["relation"], obj_char))
 
-                batch_triplets.append(sent_triplets)
-
-            triplets += batch_triplets
+                triplets[batch_sent_i[i]] = sent_triplets
 
         return {"sentence_relations": triplets}
+
+    def sentence_mention2character(
+        self, sentences: list[list[str]], characters: list[Character]
+    ) -> list[dict[str, Character]]:
+        sent_bounds = block_bounds(sentences)[0]
+        mentions = [{} for _ in range(len(sent_bounds))]
+
+        for character in characters:
+            for mention in character.mentions:
+                for sent_i, (start_i, end_i) in enumerate(sent_bounds):
+                    if mention.start_idx >= start_i and mention.end_idx <= end_i:
+                        mentions[sent_i][" ".join(mention.tokens)] = character
+
+        return mentions
+
+    def make_triplet_list_model(self, mentions_str: set[str]) -> Type[BaseModel]:
+        SubjectLiteral = Literal[tuple(mentions_str)]  # type: ignore
+        RelationLiteral = Literal[tuple(self.relations)]  # type: ignore
+        ObjectLiteral = Literal[tuple(mentions_str)]  # type: ignore
+        Triplet = create_model(
+            "Relation",
+            subject=(SubjectLiteral, ...),
+            relation=(RelationLiteral, ...),
+            object=(ObjectLiteral, ...),
+        )
+
+        class TripletList(BaseModel):
+            triplets: list[Triplet]  # type: ignore
+
+        return TripletList
 
     def make_task_prompt(self, text: str, pydantic_model: Type[BaseModel]) -> str:
         assert not self.tokenizer is None
@@ -305,18 +345,6 @@ class LLMRelationExtractor(PipelineStep):
         return self.tokenizer.apply_chat_template(
             messages, tokenize=False, add_generation_prompt=True, enable_thinking=False
         )  # type: ignore
-
-    @staticmethod
-    def identify_character(
-        name: str, characters: list[Character]
-    ) -> Optional[Character]:
-        possible_character = None
-        for character in characters:
-            if name in character.names:
-                if not possible_character is None:
-                    return None
-                possible_character = character
-        return possible_character
 
     def supported_langs(self) -> set[str]:
         return {"eng"}
